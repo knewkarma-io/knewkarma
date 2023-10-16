@@ -1,0 +1,22 @@
+{
+  "author": "Author",
+  "subreddit_name_prefixed": "Subreddit",
+  "subreddit_type": "Subreddit Type",
+  "author_flair_type": "Author Flair Type",
+  "author_premium": "Author Is Premium",
+  "link_title": "Title",
+  "link_id": "ID",
+  "link_permalink": "Permalink",
+  "ups": "Upvotes",
+  "downs": "Downvotes",
+  "score": "Score",
+  "score_hidden": "Hidden Score",
+  "total_awards_received": "Total Awards",
+  "gilded": "Gilded",
+  "over_18": "Is NSFW",
+  "edited": "Edited",
+  "stickied": "Stickied",
+  "locked": "Locked",
+  "archived": "Archived",
+  "quarantined": "Quarantined"
+}
