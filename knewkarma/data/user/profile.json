@@ -1,0 +1,10 @@
+{
+  "id": "ID",
+  "hide_from_robots": "Is Hidden From Bots",
+  "is_gold": "Is Gold",
+  "is_mod": "Is Mod",
+  "is_employee": "Is Employee",
+  "is_blocked": "Is Blocked",
+  "accept_followers": "Accept Followers",
+  "has_subscribed": "Has Subscribed"
+}
