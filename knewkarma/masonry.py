@@ -454,8 +454,9 @@ class TreeMasonry:
         - args.sort: Post data (comments/awards) sort criterion.
         - args.limit: Maximum number of comments/awards to get.
         - args.profile: Use to get a post's data without comments or awards.
-        - args.comments: use to get a post's comments.
-        - args.awards: Use to get a post's awards.
+        - args.comments: Use to get a post's comments.
+        - args.csv: Use to save data to a SCV file.
+        - args.json: Use to save data to a JSON file.
         """
         post_id = arguments.id
         post_subreddit = arguments.subreddit
