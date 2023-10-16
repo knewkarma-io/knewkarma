@@ -1,0 +1,33 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "knewkarma"
+version = "2.0.0.0"
+description = "Reddit Data Analysis Toolkit."
+authors = ["Richard Mwewa <rly0nheart@duck.com>"]
+readme = "README.md"
+license = "MIT License"
+homepage = "https://github.com/bellingcat"
+documentation = "https://github.com/bellingcat/knewkarma/wiki"
+repository = "https://github.com/bellingcat/knewkarma.git"
+keywords = ["reddit-crawler", "reddit-scraping", "reddit", "reddit-api"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Visual Basic",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Natural Language :: English"
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+aiohttp = "*"
+glyphoji = "*"
+rich = "*"
+
+[tool.poetry.scripts]
+knewkarma = "knewkarma.knewkarma:on_call"
