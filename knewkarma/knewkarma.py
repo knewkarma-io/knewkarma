@@ -26,34 +26,56 @@ def on_call():
 
             if args.mode == "user":
                 if args.profile:
-                    asyncio.run(tree_masonry.tree_user_profile(username=args.username))
+                    asyncio.run(
+                        tree_masonry.tree_user_profile(
+                            username=args.username,
+                            save_to_csv=args.csv,
+                            save_to_json=args.json,
+                        )
+                    )
                 elif args.posts:
                     asyncio.run(
                         tree_masonry.tree_user_posts(
-                            username=args.username, sort=args.sort, limit=args.limit
+                            username=args.username,
+                            sort=args.sort,
+                            limit=args.limit,
+                            save_to_json=args.json,
                         )
                     )
                 elif args.comments:
                     asyncio.run(
                         tree_masonry.tree_user_comments(
-                            username=args.username, sort=args.sort, limit=args.limit
+                            username=args.username,
+                            sort=args.sort,
+                            limit=args.limit,
+                            save_to_json=args.json,
                         )
                     )
             elif args.mode == "subreddit":
                 if args.profile:
                     asyncio.run(
-                        tree_masonry.tree_subreddit_profile(subreddit=args.subreddit)
+                        tree_masonry.tree_subreddit_profile(
+                            subreddit=args.subreddit,
+                            save_to_csv=args.csv,
+                            save_to_json=args.json,
+                        )
                     )
                 elif args.posts:
                     asyncio.run(
                         tree_masonry.tree_subreddit_posts(
-                            subreddit=args.subreddit, sort=args.sort, limit=args.limit
+                            subreddit=args.subreddit,
+                            sort=args.sort,
+                            limit=args.limit,
+                            save_to_json=args.json,
                         )
                     )
             elif args.mode == "search":
                 asyncio.run(
                     tree_masonry.tree_search_results(
-                        query=args.query, sort=args.sort, limit=args.limit
+                        query=args.query,
+                        sort=args.sort,
+                        limit=args.limit,
+                        save_to_json=args.json,
                     )
                 )
             elif args.mode == "post":
@@ -65,6 +87,7 @@ def on_call():
                             listing=args.listing,
                             sort=args.sort,
                             limit=args.limit,
+                            save_to_json=args.json,
                         )
                     )
                 elif args.frontpage:
@@ -72,6 +95,7 @@ def on_call():
                         tree_masonry.tree_front_page_posts(
                             sort=args.sort,
                             limit=args.limit,
+                            save_to_json=args.json,
                         )
                     )
         except KeyboardInterrupt:

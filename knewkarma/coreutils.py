@@ -1,4 +1,5 @@
 import argparse
+import csv
 import json
 import logging
 import os
@@ -45,6 +46,36 @@ def format_api_data(api_data: dict, data_file: str) -> dict:
         formatted_data[readable_key] = api_data.get(api_key, "N/A")
 
     return formatted_data
+
+
+def save_data(
+    data: dict, filename: str, save_to_json: bool = False, save_to_csv: bool = False
+):
+    """
+    Save the given data to JSON and/or CSV files based on the arguments.
+
+    :param data: The data to be saved, which is a list of dictionaries.
+    :param filename: The base filename to use when saving.
+    :param save_to_json: A boolean value to indicate whether to save data as a JSON file.
+    :param save_to_csv: A boolean value to indicate whether to save data as a CSV file.
+    """
+    # Save to JSON if save_json is True
+    if save_to_json:
+        with open(f"{filename}.json", "w") as json_file:
+            json.dump(data, json_file)
+        print(f"Data saved to {json_file.name} 🎉")
+
+    # Save to CSV if save_csv is True
+    if save_to_csv:
+        with open(f"{filename}.csv", "w", newline="") as csv_file:
+            writer = csv.writer(csv_file)
+            # Write the header based on keys from the first dictionary
+            header = data[0].keys()
+            writer.writerow(header)
+            # Write each row
+            for row in data:
+                writer.writerow(row.values())
+        log.info(f"Data saved to {csv_file.name} 🎉")
 
 
 async def check_updates():

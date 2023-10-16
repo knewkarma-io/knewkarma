@@ -12,11 +12,11 @@
     <PackageProjectUrl>https://github.com/bellingcat/knewkarma/wiki</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/bellingcat/knewkarma</RepositoryUrl>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <PackageTags>reddit;scraper;reddit-scraper;osint;reddit-data</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
     <AnalysisLevel>6.0-recommended</AnalysisLevel>
