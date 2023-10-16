@@ -23,6 +23,6 @@ A **Reddit** data analysis toolkit.
 *Refer to the [Wiki](https://github.com/bellingcat/knewkarma/wiki) for Installation, Usage and Uninstallation
 instructions.*
 ***
-<a href="https://www.buymeacoffee.com/_rly0nheart"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=_rly0nheart&button_colour=40DCA5&font_colour=ffffff&font_family=Comic&outline_colour=000000&coffee_colour=FFDD00" /></a>
+<a href="https://www.buymeacoffee.com/_rly0nheart"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=_rly0nheart&button_colour=40DCA5&font_colour=ffffff&font_family=Comic&outline_colour=000000&coffee_colour=FFDD00" /></a>
 
 ![me](https://github.com/bellingcat/reddit-post-scraping-tool/assets/74001397/21e0bb33-7a84-45d6-92ba-00e40891ba31)
