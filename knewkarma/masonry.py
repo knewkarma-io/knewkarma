@@ -6,7 +6,7 @@ from rich import print
 from rich.tree import Tree
 
 from .api import API
-from .coreutils import convert_timestamp_to_datetime, format_api_data
+from .coreutils import convert_timestamp_to_datetime, format_api_data, save_data
 
 
 class TreeMasonry:
@@ -195,13 +195,14 @@ class TreeMasonry:
                     )
 
     async def tree_user_profile(
-        self,
-        username: str,
+        self, username: str, save_to_csv: bool, save_to_json: bool
     ):
         """
         Asynchronously visualises a user's profile data in a Tree structure.
 
         :param username: The user to visualise profile data for.
+        :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
+        :param save_to_csv: A boolean value indicating whether data should be save to a CSV file.
         """
         # Get profile data from the API
         data = await self.api.get_user_profile(username=username)
@@ -248,13 +249,27 @@ class TreeMasonry:
             # Print the visualised tree structure.
             print(user_tree)
 
-    async def tree_user_posts(self, username: str, sort: str, limit: int):
+            save_data(
+                data=data,
+                save_to_csv=save_to_csv,
+                save_to_json=save_to_json,
+                filename=f"{username}_profile",
+            )
+
+    async def tree_user_posts(
+        self,
+        username: str,
+        sort: str,
+        limit: int,
+        save_to_json: bool,
+    ):
         """
         Asynchronously visualises a user's posts in a Tree structure.
 
         :param username: The user to visualise posts for.
         :param sort: Sort criterion of the posts (default is all).
         :param limit: Maximum number of posts to show.
+        :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
         """
         # Initialise a tree structure to visualise the results.
         posts_tree = Tree(
@@ -277,13 +292,22 @@ class TreeMasonry:
             # Print the visualised tree structure.
             print(posts_tree)
 
-    async def tree_user_comments(self, username: str, sort: str, limit: int):
+            save_data(
+                data=posts[0],
+                save_to_json=save_to_json,
+                filename=f"{username}_posts",
+            )
+
+    async def tree_user_comments(
+        self, username: str, sort: str, limit: int, save_to_json: bool
+    ):
         """
         Asynchronously visualises a user's comments in a Tree structure.
 
         :param username: The user to visualise comments for.
         :param sort: Sort criterion of the comments (default is all).
         :param limit: Maximum number of comments to show.
+        :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
         """
         # Initialise a tree structure to visualise the results.
         comments_tree = Tree(
@@ -303,11 +327,21 @@ class TreeMasonry:
             # Print the visualised tree structure.
             print(comments_tree)
 
-    async def tree_subreddit_profile(self, subreddit: str):
+            save_data(
+                data=comments[0],
+                save_to_json=save_to_json,
+                filename=f"{username}_comments",
+            )
+
+    async def tree_subreddit_profile(
+        self, subreddit: str, save_to_csv: bool, save_to_json: bool
+    ):
         """
         Asynchronously visualises a user's profile data in a Tree structure.
 
         :param subreddit: The subreddit to visualise profile data for.
+        :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
+        :param save_to_csv: A boolean value indicating whether data should be save to a CSV file.
         """
         # Get subreddit data from the API
         data = await self.api.get_subreddit_profile(subreddit=subreddit)
@@ -324,13 +358,22 @@ class TreeMasonry:
             # Print the visualised tree structure.
             print(subreddit_tree)
 
-    async def tree_subreddit_posts(self, subreddit: str, sort: str, limit: int):
+            save_data(
+                data=data,
+                save_to_json=save_to_json,
+                filename=f"{subreddit}_profile",
+            )
+
+    async def tree_subreddit_posts(
+        self, subreddit: str, sort: str, limit: int, save_to_json: bool
+    ):
         """
         Asynchronously visualises a subreddit's posts in a Tree structure.
 
         :param subreddit: The subreddit to visualise posts for.
         :param sort: Sort criterion of the posts (default is all).
         :param limit: Maximum number of posts to show.
+         :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
         """
         # Initialise a tree structure to visualise the results.
         posts_tree = Tree(
@@ -352,13 +395,22 @@ class TreeMasonry:
             # Print the visualised tree structure.
             print(posts_tree)
 
-    async def tree_search_results(self, query: str, sort: str, limit: int):
+            save_data(
+                data=posts[0],
+                save_to_json=save_to_json,
+                filename=f"{subreddit}_posts",
+            )
+
+    async def tree_search_results(
+        self, query: str, sort: str, limit: int, save_to_json: bool
+    ):
         """
         Asynchronously visualises search results in a tree structure.
 
         :param query: Search query.
         :param sort: Sort criterion of the results (default is all).
         :param limit: Maximum number of results to show.
+        :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
         """
         # Initialise a tree structure to visualise the results.
         results_tree = Tree(
@@ -377,6 +429,12 @@ class TreeMasonry:
 
             # Print the visualised tree structure.
             print(results_tree)
+
+            save_data(
+                data=results[0],
+                save_to_json=save_to_json,
+                filename=f"{query}_results",
+            )
 
     import argparse
 
@@ -425,6 +483,13 @@ class TreeMasonry:
 
                     print(post_tree)
 
+                    save_data(
+                        data=post,
+                        save_to_csv=arguments.csv,
+                        save_to_json=arguments.json,
+                        filename=f"{raw_post.get('id')}_post_profile",
+                    )
+
             if arguments.comments:
                 if raw_comments:
                     comments_tree = Tree(
@@ -439,13 +504,22 @@ class TreeMasonry:
                     # Print the visualised tree structure.
                     print(comments_tree)
 
-    async def tree_post_listings(self, listing: str, sort: str, limit: int):
+                    save_data(
+                        data=raw_comments[0],
+                        save_to_json=arguments.json,
+                        filename=f"{raw_post.get('id')}_comments",
+                    )
+
+    async def tree_post_listings(
+        self, listing: str, sort: str, limit: int, save_to_json: bool
+    ):
         """
         Asynchronously visualises posts from a specified listing in a tree structure.
 
         :param listing: Listing to get posts from.
         :param sort: Sort criterion of the posts (default is all).
         :param limit: Maximum number of posts to show.
+        :param save_to_json: A boolean value to indicate whether to save data as a JSON file.
         """
         # Get posts from the API and add filters accordingly
         posts = await self.api.get_post_listings(
@@ -467,12 +541,19 @@ class TreeMasonry:
             # Print the visualised tree structure.
             print(posts_tree)
 
-    async def tree_front_page_posts(self, sort: str, limit: int):
+            save_data(
+                data=posts[0],
+                save_to_json=save_to_json,
+                filename=f"{listing}_posts",
+            )
+
+    async def tree_front_page_posts(self, sort: str, limit: int, save_to_json: bool):
         """
         Asynchronously visualises posts from the Reddit front-page in a tree structure.
 
         :param sort: Sort criterion of the posts (default is all).
         :param limit: Maximum number of posts to show.
+        :param save_to_json: A boolean value to indicate whether to save data as a JSON file.
         """
         # Get front page posts from the API and add filters accordingly
         posts = await self.api.get_front_page_posts(sort=sort, limit=limit)
@@ -491,6 +572,12 @@ class TreeMasonry:
 
             # Print the visualised tree structure.
             print(posts_tree)
+
+            save_data(
+                data=posts[0],
+                save_to_json=save_to_json,
+                filename=f"frontpage_posts",
+            )
 
 
 class DataMasonry:
