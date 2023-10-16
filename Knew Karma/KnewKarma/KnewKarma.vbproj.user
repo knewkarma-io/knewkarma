@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Update="Forms\Comments.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\About.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\Main.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\Posts.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\MiscData.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\UserProfile.vb">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>
