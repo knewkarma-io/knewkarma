@@ -2,7 +2,7 @@
 
 A **Reddit** data analysis toolkit.
 
-[![Upload Python Package](https://github.com/bellingcat/reddit-post-scraping-tool/actions/workflows/python-publish.yml/badge.svg)](https://github.com/rly0nheart/reddit-post-scraping-tool/actions/workflows/python-publish.yml) [![CodeQL](https://github.com/bellingcat/reddit-post-scraping-tool/actions/workflows/codeql.yml/badge.svg)](https://github.com/rly0nheart/reddit-post-scraping-tool/actions/workflows/codeql.yml) ![.Net](https://img.shields.io/badge/.NET-5C2D91?style=flat&logo=.net&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=flat&logo=python&logoColor=ffdd54)
+![.Net](https://img.shields.io/badge/.NET-5C2D91?style=flat&logo=.net&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=flat&logo=python&logoColor=ffdd54)
 ***
 
 # 📃 Features
