@@ -63,18 +63,18 @@ def save_data(
     if save_to_json:
         with open(f"{filename}.json", "w") as json_file:
             json.dump(data, json_file)
-        print(f"Data saved to {json_file.name} 🎉")
+        log.info(f"Data saved to {json_file.name} 🎉")
 
     # Save to CSV if save_csv is True
     if save_to_csv:
         with open(f"{filename}.csv", "w", newline="") as csv_file:
             writer = csv.writer(csv_file)
             # Write the header based on keys from the first dictionary
-            header = data[0].keys()
+            header = data.keys()
             writer.writerow(header)
+            
             # Write each row
-            for row in data:
-                writer.writerow(row.values())
+            writer.writerow(data.values())
         log.info(f"Data saved to {csv_file.name} 🎉")
 
 
