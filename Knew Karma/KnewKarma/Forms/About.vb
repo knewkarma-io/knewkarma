@@ -53,6 +53,6 @@
     End Sub
 
     Private Sub ButtonCheckforUpdates_Click(sender As Object, e As EventArgs) Handles ButtonGetUpdates.Click
-        Shell($"cmd.exe /c start https://github.com/bellingcat/reddit-post-scraping-tool/releases/latest")
+        Shell($"cmd.exe /c start https://github.com/bellingcat/knewkarma/releases/latest")
     End Sub
 End Class
