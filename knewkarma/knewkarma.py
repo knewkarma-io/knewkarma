@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
 
-from .coreutils import __version__, args, banner, check_updates, log, path_finder
+from .coreutils import __version__, args, check_updates, log, path_finder, print_banner
 from .masonry import TreeMasonry
 from .messages import message
 
@@ -12,8 +12,8 @@ def on_call():
 
     if args.mode:
         try:
-            banner()
             path_finder()
+            print_banner()
             log.info(
                 message(
                     message_type="info",
