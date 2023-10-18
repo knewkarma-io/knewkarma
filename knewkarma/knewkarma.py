@@ -12,8 +12,8 @@ def on_call():
 
     if args.mode:
         try:
+            banner()
             path_finder()
-            print(banner())
             log.info(
                 message(
                     message_type="info",
