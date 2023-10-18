@@ -19,11 +19,13 @@ CSV_DIRECTORY = os.path.join(PROGRAM_DIRECTORY, "csv")
 JSON_DIRECTORY = os.path.join(PROGRAM_DIRECTORY, "json")
 
 
-def banner() -> str:
-    return f"""
+def print_banner():
+    print(
+        f"""
 ┓┏┓         ┓┏┓         
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻v{__version__}"""
+    )
 
 
 def format_api_data(api_data: dict, data_file: str) -> dict:
