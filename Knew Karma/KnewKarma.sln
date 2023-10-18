@@ -11,6 +11,7 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Description = Reddit Data Analysis Toolkit.
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{46C2541E-6F65-461A-A479-F65D445C36EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
