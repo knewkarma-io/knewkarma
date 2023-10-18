@@ -11,6 +11,13 @@ from rich.markdown import Markdown
 
 from . import __version__, __author__, __about__
 
+# Construct path to the program's directory
+PROGRAM_DIRECTORY = os.path.expanduser(os.path.join("~", "knewkarma"))
+
+# Construct paths to directories of CSV and JSON files.
+CSV_DIRECTORY = os.path.join(PROGRAM_DIRECTORY, "csv")
+JSON_DIRECTORY = os.path.join(PROGRAM_DIRECTORY, "json")
+
 
 def banner() -> str:
     return f"""
@@ -31,21 +38,30 @@ def format_api_data(api_data: dict, data_file: str) -> dict:
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Construct the path to the settings.json file
-    data = os.path.join(current_dir, "data", data_file)
+    # Construct path to the mapping data file
+    mapping_data_file = os.path.join(current_dir, "data", data_file)
 
     # Load the mapping from the specified file
-    with open(data, "r") as file:
-        key_mapping = json.load(file)
+    with open(mapping_data_file, "r", encoding="utf-8") as file:
+        mapping_data = json.load(file)
 
     # Initialize an empty dictionary to hold the formatted data
     formatted_data = {}
 
     # Map API data to human-readable format using the mapping
-    for api_key, readable_key in key_mapping.items():
-        formatted_data[readable_key] = api_data.get(api_key, "N/A")
+    for api_data_key, mapping_data_key in mapping_data.items():
+        formatted_data[mapping_data_key] = api_data.get(api_data_key, "N/A")
 
     return formatted_data
+
+
+def path_finder():
+    """
+    Creates file directories if they don't already exist.
+    """
+    file_directories = [CSV_DIRECTORY, JSON_DIRECTORY]
+    for directory in file_directories:
+        os.makedirs(directory, exist_ok=True)
 
 
 def save_data(
@@ -61,18 +77,20 @@ def save_data(
     """
     # Save to JSON if save_json is True
     if save_to_json:
-        with open(f"{filename}.json", "w") as json_file:
+        with open(os.path.join(JSON_DIRECTORY, f"{filename}.json"), "w") as json_file:
             json.dump(data, json_file)
         log.info(f"Data saved to {json_file.name} 🎉")
 
     # Save to CSV if save_csv is True
     if save_to_csv:
-        with open(f"{filename}.csv", "w", newline="") as csv_file:
+        with open(
+            os.path.join(CSV_DIRECTORY, f"{filename}.csv"), "w", newline=""
+        ) as csv_file:
             writer = csv.writer(csv_file)
             # Write the header based on keys from the first dictionary
             header = data.keys()
             writer.writerow(header)
-            
+
             # Write each row
             writer.writerow(data.values())
         log.info(f"Data saved to {csv_file.name} 🎉")
