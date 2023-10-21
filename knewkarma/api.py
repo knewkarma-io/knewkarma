@@ -15,6 +15,9 @@ class API:
         """
         Initialise the API class with various Reddit API endpoints.
         """
+        self.updates_endpoint = (
+            "https://api.github.com/repos/bellingcat/knewkarma/releases/latest"
+        )
         # :param username: The Reddit username
         self.user_profile_endpoint = f"{API.USER_DATA_ENDPOINT}/%s/about.json"
 
@@ -103,6 +106,31 @@ class API:
                     error_message=str(e),
                 )
             )
+
+    async def get_updates(self):
+        """
+        This function checks if there's a new release of a project on GitHub.
+        If there is, it shows a notification to the user about the release.
+        """
+        from . import __version__
+        from plyer import notification
+
+        # Make a GET request to the GitHub API to get the latest release of the project.
+        response = await self.get_data(endpoint=self.updates_endpoint)
+
+        if response:
+            remote_version = response.get("tag_name")
+
+            # Check if the remote version tag matches the current version tag.
+            if remote_version != __version__:
+                # Notify user about the new release.
+                notification.notify(
+                    title=f"Knew Karma",
+                    message=message(
+                        message_type="info", message_key="update", version=__version__
+                    ),
+                    timeout=20,
+                )
 
     async def get_user_profile(self, username: str) -> dict:
         """
