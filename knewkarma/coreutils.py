@@ -7,7 +7,6 @@ from datetime import datetime
 
 from rich import print
 from rich.logging import RichHandler
-from rich.markdown import Markdown
 
 from . import __version__, __author__, __about__
 
@@ -67,7 +66,10 @@ def path_finder():
 
 
 def save_data(
-    data: dict, filename: str, save_to_json: bool = False, save_to_csv: bool = False
+    data: dict,
+    filename: str,
+    save_to_json: bool = False,
+    save_to_csv: bool = False,
 ):
     """
     Save the given data to JSON and/or CSV files based on the arguments.
@@ -78,7 +80,7 @@ def save_data(
     :param save_to_csv: A boolean value to indicate whether to save data as a CSV file.
     """
     from glyphoji import glyph
-    
+
     # Save to JSON if save_json is True
     if save_to_json:
         with open(os.path.join(JSON_DIRECTORY, f"{filename}.json"), "w") as json_file:
@@ -98,36 +100,6 @@ def save_data(
             # Write each row
             writer.writerow(data.values())
         log.info(f"Data saved to {csv_file.name} {glyph.party_popper}")
-
-
-async def check_updates():
-    """
-    This function checks if there's a new release of a project on GitHub. If there is, it logs an
-    information message and prints the release notes.
-    """
-    from .api import API
-
-    # Make a GET request to the GitHub API to get the latest release of the project.
-    response = await API.get_data(
-        endpoint="https://api.github.com/repos/bellingcat/knewkarma/releases/latest"
-    )
-
-    if response:
-        remote_version = response.get("tag_name")
-
-        # Check if the remote version tag matches the current version tag.
-        if remote_version != __version__:
-            # If not, convert the release notes from Markdown to HTML.
-            raw_release_notes = response.get("body")
-
-            # Log an info message about the new release.
-            log.info(
-                f"Knew Karma {remote_version} is available. "
-                f"Run 'pip install --upgrade knewkarma' to get the updates."
-            )
-
-            # Print the release notes.
-            print(Markdown(raw_release_notes))
 
 
 def convert_timestamp_to_datetime(timestamp: int) -> str:
