@@ -10,20 +10,13 @@ from rich.logging import RichHandler
 
 from . import __version__, __author__, __about__
 
-# Construct path to the program's directory
-PROGRAM_DIRECTORY = os.path.expanduser(os.path.join("~", "knewkarma"))
-
-# Construct paths to directories of CSV and JSON files.
-CSV_DIRECTORY = os.path.join(PROGRAM_DIRECTORY, "csv")
-JSON_DIRECTORY = os.path.join(PROGRAM_DIRECTORY, "json")
-
 
 def print_banner():
     print(
-        f"""
+        """
 ┓┏┓         ┓┏┓         
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
-┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻v{__version__}"""
+┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
     )
 
 
@@ -36,11 +29,8 @@ def format_api_data(api_data: dict, data_file: str) -> dict:
 
     :returns: A Formatted JSON object with human-readable keys.
     """
-
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-
     # Construct path to the mapping data file
-    mapping_data_file = os.path.join(current_dir, "data", data_file)
+    mapping_data_file = os.path.join(CURRENT_FILE_DIRECTORY, "data", data_file)
 
     # Load the mapping from the specified file
     with open(mapping_data_file, "r", encoding="utf-8") as file:
@@ -261,3 +251,13 @@ def create_parser() -> argparse.ArgumentParser:
 
 args = create_parser().parse_args()
 log = set_loglevel(debug_mode=args.debug)
+
+# Construct path to the program's directory
+PROGRAM_DIRECTORY = os.path.expanduser(os.path.join("~", "knewkarma"))
+
+# Construct path to the current file's directory
+CURRENT_FILE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+
+# Construct paths to directories of CSV and JSON files.
+CSV_DIRECTORY = os.path.join(PROGRAM_DIRECTORY, "csv")
+JSON_DIRECTORY = os.path.join(PROGRAM_DIRECTORY, "json")
