@@ -12,9 +12,10 @@ error_messages = {
 
 #: Dictionary of informational message templates
 info_messages = {
-    "program_started": "Started {program_name} {program_version} {start_time}...",
+    "program_started": "Started Knew Karma {version} {start_time}...",
     "program_stopped": "Stopped in {run_time} seconds.",
     "help": "usage: [green]knewkarma -h[/] or [green]knewkarma --help[/]",
+    "update": "A new release of Knew Karma ({version}) is available.\nTo update, run: pip install --upgrade knewkarma",
 }
 
 

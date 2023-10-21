@@ -1,12 +1,13 @@
-import asyncio
-from datetime import datetime
-
-from .coreutils import __version__, args, check_updates, log, path_finder, print_banner
-from .masonry import TreeMasonry
-from .messages import message
-
-
 def on_call():
+    import asyncio
+    from datetime import datetime
+
+    from .api import API
+    from .coreutils import __version__, args, log, path_finder, print_banner
+    from .messages import message
+    from .masonry import TreeMasonry
+
+    api = API()
     tree_masonry = TreeMasonry()
     start_time = datetime.now()
 
@@ -18,12 +19,11 @@ def on_call():
                 message(
                     message_type="info",
                     message_key="program_started",
-                    program_name="Knew Karma",
-                    program_version=__version__,
+                    version=__version__,
                     start_time=start_time,
                 )
             )
-            asyncio.run(check_updates())
+            asyncio.run(api.get_updates())
 
             if args.mode == "user":
                 if args.profile:
