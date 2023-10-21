@@ -112,8 +112,12 @@ class API:
         This function checks if there's a new release of a project on GitHub.
         If there is, it shows a notification to the user about the release.
         """
-        from . import __version__
+        import os
+
         from plyer import notification
+
+        from . import __version__
+        from .coreutils import CURRENT_FILE_DIRECTORY
 
         # Make a GET request to the GitHub API to get the latest release of the project.
         response = await self.get_data(endpoint=self.updates_endpoint)
@@ -123,12 +127,16 @@ class API:
 
             # Check if the remote version tag matches the current version tag.
             if remote_version != __version__:
+                # Set icon file to show in the desktop notification
+                icon_file = "icon.ico" if os.name == "nt" else "icon.png"
+
                 # Notify user about the new release.
                 notification.notify(
-                    title=f"Knew Karma",
+                    title="Knew Karma",
                     message=message(
                         message_type="info", message_key="update", version=__version__
                     ),
+                    app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
                     timeout=20,
                 )
 
