@@ -12,7 +12,7 @@ license = "MIT License"
 homepage = "https://pypi.org/project/knewkarma"
 documentation = "https://github.com/bellingcat/knewkarma/wiki"
 repository = "https://github.com/bellingcat/knewkarma.git"
-keywords = ["reddit-crawler", "reddit-scraping", "reddit", "reddit-api"]
+keywords = ["reddit-crawler", "reddit-scraping", "reddit", "reddit-api", "reddit-data"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python :: 3",
