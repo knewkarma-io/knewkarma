@@ -3,18 +3,24 @@ def on_call():
     from datetime import datetime
 
     from .api import API
-    from .coreutils import __version__, args, log, path_finder, print_banner
+    from .coreutils import __version__, args, log, path_finder
     from .messages import message
-    from .masonry import TreeMasonry
+    from .tree_masonry import Masonry
 
     api = API()
-    tree_masonry = TreeMasonry()
+    tree_masonry = Masonry()
     start_time = datetime.now()
 
     if args.mode:
+        print(
+            """
+┓┏┓         ┓┏┓         
+┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
+┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
+        )
+
         try:
             path_finder()
-            print_banner()
             log.info(
                 message(
                     message_type="info",
