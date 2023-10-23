@@ -31,7 +31,7 @@ class TreeMasonry:
         :param is_post: A boolean value to determine whether a branch is a post.
         :param post_text: If is_post is set to True, post_text will contain the posts selftext.
         """
-        branch = target_tree.add(f"[bold]{branch_title}[/]")
+        branch = target_tree.add(branch_title, style="bold")
         for key, value in branch_data.items():
             branch.add(f"{key}: {value}", style="dim")
         if is_post:
@@ -122,7 +122,7 @@ class TreeMasonry:
             #     Every Reddit user has a user subreddit that starts with u_ (e.g., u_AutoModerator).
             await self.add_branch(
                 target_tree=target_tree,
-                branch_title=f"[bold]{f'{glyph.busts_in_silhouette} Subreddit' if is_user_subreddit else subreddit_data.get('public_description')}[/]",
+                branch_title=f"{f'{glyph.busts_in_silhouette} Subreddit' if is_user_subreddit else subreddit_data.get('public_description')}",
                 branch_data=profile,
             )
 
@@ -130,28 +130,28 @@ class TreeMasonry:
             # Add a Banner branch to target_tree.
             await self.add_branch(
                 target_tree=target_tree,
-                branch_title=f"{glyph.thumbs_up} [bold]Allows[/]",
+                branch_title=f"{glyph.thumbs_up} Allows",
                 branch_data=allows,
             )
 
             # Add a Banner branch to target_tree.
             await self.add_branch(
                 target_tree=target_tree,
-                branch_title=f"{glyph.puzzle_piece} [bold]Banner[/]",
+                branch_title=f"{glyph.puzzle_piece} Banner",
                 branch_data=banner,
             )
 
             # Add a Header branch to target_tree.
             await self.add_branch(
                 target_tree=target_tree,
-                branch_title=f"{glyph.memo} [bold]Header[/]",
+                branch_title=f"{glyph.memo} Header",
                 branch_data=header,
             )
 
             # Add a Flairs branch to target_tree.
             await self.add_branch(
                 target_tree=target_tree,
-                branch_title=f"{glyph.four_leaf_clover} [bold]Flairs[/]",
+                branch_title=f"{glyph.four_leaf_clover} Flairs",
                 branch_data=flair,
             )
 
@@ -236,14 +236,14 @@ class TreeMasonry:
             await self.add_branch(
                 target_tree=user_tree,
                 branch_data=verification,
-                branch_title=f"{glyph.check_mark_button} [bold]Verification[/]",
+                branch_title=f"{glyph.check_mark_button} Verification",
             )
 
             # Add a branch for the user's Karma count
             await self.add_branch(
                 target_tree=user_tree,
                 branch_data=karma,
-                branch_title=f"{glyph.four_leaf_clover} [bold]Karma[/]",
+                branch_title=f"{glyph.four_leaf_clover} Karma",
             )
 
             # Print the visualised tree structure.
@@ -273,8 +273,9 @@ class TreeMasonry:
         """
         # Initialise a tree structure to visualise the results.
         posts_tree = Tree(
-            f"[bold]Showing {username}'s "
-            f"[cyan]{limit}[/] [green]{sort}[/] posts[/]",
+            f"Showing {username}'s "
+            f"[cyan]{limit}[/] [green]{sort}[/] posts",
+            style="bold",
             guide_style="bold bright_blue",
         )
 
@@ -311,7 +312,8 @@ class TreeMasonry:
         """
         # Initialise a tree structure to visualise the results.
         comments_tree = Tree(
-            f"[bold]Showing {username}'s [green]{sort}[/] [cyan]{limit}[/] comments[/]",
+            f"Showing {username}'s [green]{sort}[/] [cyan]{limit}[/] comments",
+            style="bold",
             guide_style="bold bright_blue",
         )
 
@@ -348,8 +350,7 @@ class TreeMasonry:
 
         if data:
             # Initialise a tree structure to visualise the results.
-            subreddit_tree = Tree(
-                f"[bold]{data.get('title')}[/]", guide_style="bold bright_blue"
+            subreddit_tree = Tree(data.get('title'), guide_style="bold bright_blue", style="bold"
             )
 
             # Create a subreddit profile tree
@@ -377,7 +378,7 @@ class TreeMasonry:
         """
         # Initialise a tree structure to visualise the results.
         posts_tree = Tree(
-            f"[bold]Showing r/{subreddit}'s [cyan]{limit}[/] [green]{sort}[/] posts[/]",
+            f"Showing r/{subreddit}'s [cyan]{limit}[/] [green]{sort}[/] posts", style="bold",
             guide_style="bold bright_blue",
         )
 
