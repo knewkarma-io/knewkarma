@@ -9,10 +9,10 @@ from .api import API
 from .coreutils import convert_timestamp_to_datetime, format_api_data, save_data
 
 
-class TreeMasonry:
+class Masonry:
     def __init__(self):
         self.api = API()
-        self.mallet = DataMasonry()
+        self.mallet = Mallet()
 
     @staticmethod
     async def add_branch(
@@ -201,8 +201,8 @@ class TreeMasonry:
         Asynchronously visualises a user's profile data in a Tree structure.
 
         :param username: The user to visualise profile data for.
-        :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
-        :param save_to_csv: A boolean value indicating whether data should be save to a CSV file.
+        :param save_to_json: A boolean value indicating whether data should be saved to a JSON file.
+        :param save_to_csv: A boolean value indicating whether data should be saved to a CSV file.
         """
         # Get profile data from the API
         data = await self.api.get_user_profile(username=username)
@@ -269,12 +269,11 @@ class TreeMasonry:
         :param username: The user to visualise posts for.
         :param sort: Sort criterion of the posts (default is all).
         :param limit: Maximum number of posts to show.
-        :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
+        :param save_to_json: A boolean value indicating whether data should be saved to a JSON file.
         """
         # Initialise a tree structure to visualise the results.
         posts_tree = Tree(
-            f"Showing {username}'s "
-            f"[cyan]{limit}[/] [green]{sort}[/] posts",
+            f"Showing {username}'s " f"[cyan]{limit}[/] [green]{sort}[/] posts",
             style="bold",
             guide_style="bold bright_blue",
         )
@@ -308,7 +307,7 @@ class TreeMasonry:
         :param username: The user to visualise comments for.
         :param sort: Sort criterion of the comments (default is all).
         :param limit: Maximum number of comments to show.
-        :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
+        :param save_to_json: A boolean value indicating whether data should be saved to a JSON file.
         """
         # Initialise a tree structure to visualise the results.
         comments_tree = Tree(
@@ -342,15 +341,16 @@ class TreeMasonry:
         Asynchronously visualises a user's profile data in a Tree structure.
 
         :param subreddit: The subreddit to visualise profile data for.
-        :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
-        :param save_to_csv: A boolean value indicating whether data should be save to a CSV file.
+        :param save_to_json: A boolean value indicating whether data should be saved to a JSON file.
+        :param save_to_csv: A boolean value indicating whether data should be saved to a CSV file.
         """
         # Get subreddit data from the API
         data = await self.api.get_subreddit_profile(subreddit=subreddit)
 
         if data:
             # Initialise a tree structure to visualise the results.
-            subreddit_tree = Tree(data.get('title'), guide_style="bold bright_blue", style="bold"
+            subreddit_tree = Tree(
+                data.get("title"), guide_style="bold bright_blue", style="bold"
             )
 
             # Create a subreddit profile tree
@@ -361,6 +361,7 @@ class TreeMasonry:
 
             save_data(
                 data=data,
+                save_to_csv=save_to_csv,
                 save_to_json=save_to_json,
                 filename=f"{subreddit}_profile",
             )
@@ -374,11 +375,12 @@ class TreeMasonry:
         :param subreddit: The subreddit to visualise posts for.
         :param sort: Sort criterion of the posts (default is all).
         :param limit: Maximum number of posts to show.
-         :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
+         :param save_to_json: A boolean value indicating whether data should be saved to a JSON file.
         """
         # Initialise a tree structure to visualise the results.
         posts_tree = Tree(
-            f"Showing r/{subreddit}'s [cyan]{limit}[/] [green]{sort}[/] posts", style="bold",
+            f"Showing r/{subreddit}'s [cyan]{limit}[/] [green]{sort}[/] posts",
+            style="bold",
             guide_style="bold bright_blue",
         )
 
@@ -411,7 +413,7 @@ class TreeMasonry:
         :param query: Search query.
         :param sort: Sort criterion of the results (default is all).
         :param limit: Maximum number of results to show.
-        :param save_to_json: A boolean value indicating whether data should be save to a JSON file.
+        :param save_to_json: A boolean value indicating whether data should be saved to a JSON file.
         """
         # Initialise a tree structure to visualise the results.
         results_tree = Tree(
@@ -456,7 +458,7 @@ class TreeMasonry:
         - args.limit: Maximum number of comments/awards to get.
         - args.profile: Use to get a post's data without comments or awards.
         - args.comments: Use to get a post's comments.
-        - args.csv: Use to save data to a SCV file.
+        - args.csv: Use to save data to a CSV file.
         - args.json: Use to save data to a JSON file.
         """
         post_id = arguments.id
@@ -582,9 +584,9 @@ class TreeMasonry:
             )
 
 
-class DataMasonry:
+class Mallet:
     """
-    The TreeData class holds methods used to re-restructure the API data in-order to get only the relevant information.
+    The Mallet class holds methods used to re-restructure the API data in-order to get only the relevant information.
     """
 
     @staticmethod
