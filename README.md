@@ -21,7 +21,7 @@ A **Reddit** Data Analysis Toolkit.
 
 # 📖 Documentation
 
-*Refer to the [Wiki](https://github.com/bellingcat/knewkarma/wiki) for Installation, Usage and Uninstallation
+*[Refer to the Wiki](https://github.com/bellingcat/knewkarma/wiki) for Installation, Usage and Uninstallation
 instructions.*
 ***
 [![me](https://github.com/bellingcat/reddit-post-scraping-tool/assets/74001397/21e0bb33-7a84-45d6-92ba-00e40891ba31)](https://about.me/rly0nheart)
