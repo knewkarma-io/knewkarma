@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 
 from rich.logging import RichHandler
+from rich_argparse import RichHelpFormatter
 
 from . import __version__, __author__, __about__
 
@@ -65,7 +66,7 @@ def save_data(
     if save_to_json:
         with open(os.path.join(JSON_DIRECTORY, f"{filename}.json"), "w") as json_file:
             json.dump(data, json_file)
-        log.info(f"Data saved to {json_file.name} {glyph.party_popper}")
+        log.info(f"JSON data saved to {json_file.name} {glyph.party_popper}")
 
     # Save to CSV if save_csv is True
     if save_to_csv:
@@ -79,7 +80,7 @@ def save_data(
 
             # Write each row
             writer.writerow(data.values())
-        log.info(f"Data saved to {csv_file.name} {glyph.party_popper}")
+        log.info(f"CSV data saved to {csv_file.name} {glyph.party_popper}")
 
 
 def convert_timestamp_to_datetime(timestamp: int) -> str:
@@ -94,11 +95,11 @@ def convert_timestamp_to_datetime(timestamp: int) -> str:
     return datetime_object
 
 
-def set_loglevel(debug_mode: bool) -> logging.getLogger:
+def setup_logging(debug_mode: bool) -> logging.getLogger:
     """
     Configure and return a logging object with the specified log level.
 
-    :param debug_mode: If True, the log level is set to "NOTSET". Otherwise, it is set to "INFO".
+    :param debug_mode: A boolean value indicating whether debug mode should be enabled or not.
     :return: A logging object configured with the specified log level.
     """
     logging.basicConfig(
@@ -108,7 +109,7 @@ def set_loglevel(debug_mode: bool) -> logging.getLogger:
             RichHandler(markup=True, log_time_format="%I:%M:%S %p", show_level=False)
         ],
     )
-    return logging.getLogger(f"Knew Karma")
+    return logging.getLogger("Knew Karma")
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -120,37 +121,51 @@ def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=f"Knew Karma - by {__author__} ({__about__})",
         epilog="A Reddit Data Analysis Toolkit.",
+        formatter_class=RichHelpFormatter,
     )
 
     subparsers = parser.add_subparsers(dest="mode", help="Operation mode")
 
     # User mode
-    user_parser = subparsers.add_parser("user", help="User operations")
+    user_parser = subparsers.add_parser(
+        "user", help="User operations", formatter_class=RichHelpFormatter
+    )
     user_parser.add_argument("username", help="Username to query")
     user_parser.add_argument(
-        "--profile", action="store_true", help="Get a user's profile"
-    )
-    user_parser.add_argument("--posts", action="store_true", help="Get a user's posts")
-    user_parser.add_argument(
-        "--comments",
+        "-comments-",
+        dest="comments",
         action="store_true",
         help="Get a user's comments",
     )
+    user_parser.add_argument(
+        "-posts-", dest="posts", action="store_true", help="Get a user's posts"
+    )
+    user_parser.add_argument(
+        "-profile-", dest="profile", action="store_true", help="Get a user's profile"
+    )
 
     # Subreddit mode
-    subreddit_parser = subparsers.add_parser("subreddit", help="User operations")
+    subreddit_parser = subparsers.add_parser(
+        "subreddit", help="User operations", formatter_class=RichHelpFormatter
+    )
     subreddit_parser.add_argument("subreddit", help="Subreddit to query")
     subreddit_parser.add_argument(
-        "--profile",
+        "-profile-",
+        dest="profile",
         action="store_true",
         help="Get a subreddit's profile",
     )
     subreddit_parser.add_argument(
-        "--posts", dest="posts", action="store_true", help="Get a subreddit's posts"
+        "-posts-",
+        dest="posts",
+        action="store_true",
+        help="Get a subreddit's posts",
     )
 
     # Post mode
-    post_parser = subparsers.add_parser("post", help="Post operations")
+    post_parser = subparsers.add_parser(
+        "post", help="Post operations", formatter_class=RichHelpFormatter
+    )
     post_parser.add_argument(
         "id",
         help="Post ID",
@@ -160,24 +175,29 @@ def create_parser() -> argparse.ArgumentParser:
         help="Source subreddit",
     )
     post_parser.add_argument(
-        "--profile",
+        "-profile-",
+        dest="profile",
         action="store_true",
         help="Get a post's (profile) data",
     )
     post_parser.add_argument(
-        "--comments", action="store_true", help="Get a post's comments"
+        "-comments-", dest="comments", action="store_true", help="Get a post's comments"
     )
-    post_parser.add_argument("--awards", action="store_true", help=argparse.SUPPRESS)
+    post_parser.add_argument(
+        "-awards-", dest="awards", action="store_true", help=argparse.SUPPRESS
+    )
 
     # Posts mode
     posts_parser = subparsers.add_parser("posts", help="Posts operations")
     posts_parser.add_argument(
-        "--listings",
+        "-listings-",
+        dest="listings",
         action="store_true",
         help="Get posts from a specified listing",
     )
     posts_parser.add_argument(
-        "--frontpage",
+        "-frontpage-",
+        dest="frontpage",
         action="store_true",
         help="Get posts from the Reddit front-page",
     )
@@ -189,7 +209,9 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     # Search mode
-    search_parser = subparsers.add_parser("search", help="Search posts")
+    search_parser = subparsers.add_parser(
+        "search", help="Search posts", formatter_class=RichHelpFormatter
+    )
     search_parser.add_argument("query", help="Search query")
 
     # Global options
@@ -234,7 +256,7 @@ def create_parser() -> argparse.ArgumentParser:
 
 
 args = create_parser().parse_args()
-log = set_loglevel(debug_mode=args.debug)
+log = setup_logging(debug_mode=args.debug)
 
 # Construct path to the program's directory
 PROGRAM_DIRECTORY = os.path.expanduser(os.path.join("~", "knewkarma"))
