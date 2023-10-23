@@ -5,19 +5,9 @@ import logging
 import os
 from datetime import datetime
 
-from rich import print
 from rich.logging import RichHandler
 
 from . import __version__, __author__, __about__
-
-
-def print_banner():
-    print(
-        """
-┓┏┓         ┓┏┓         
-┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
-┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
-    )
 
 
 def format_api_data(api_data: dict, data_file: str) -> dict:
@@ -136,44 +126,31 @@ def create_parser() -> argparse.ArgumentParser:
 
     # User mode
     user_parser = subparsers.add_parser("user", help="User operations")
-    user_parser.add_argument(
-        "-profile-", dest="profile", action="store_true", help="Get a user's profile"
-    )
-    user_parser.add_argument(
-        "-posts-", dest="posts", action="store_true", help="Get a user's posts"
-    )
-    user_parser.add_argument(
-        "-comments-", dest="comments", action="store_true", help="Get a user's comments"
-    )
     user_parser.add_argument("username", help="Username to query")
+    user_parser.add_argument(
+        "--profile", action="store_true", help="Get a user's profile"
+    )
+    user_parser.add_argument("--posts", action="store_true", help="Get a user's posts")
+    user_parser.add_argument(
+        "--comments",
+        action="store_true",
+        help="Get a user's comments",
+    )
 
     # Subreddit mode
     subreddit_parser = subparsers.add_parser("subreddit", help="User operations")
+    subreddit_parser.add_argument("subreddit", help="Subreddit to query")
     subreddit_parser.add_argument(
-        "-profile-",
-        dest="profile",
+        "--profile",
         action="store_true",
         help="Get a subreddit's profile",
     )
     subreddit_parser.add_argument(
-        "-posts-", dest="posts", action="store_true", help="Get a subreddit's posts"
+        "--posts", dest="posts", action="store_true", help="Get a subreddit's posts"
     )
-    subreddit_parser.add_argument("subreddit", help="Subreddit to query")
 
     # Post mode
     post_parser = subparsers.add_parser("post", help="Post operations")
-    post_parser.add_argument(
-        "-profile-",
-        dest="profile",
-        action="store_true",
-        help="Get a post's (profile) data",
-    )
-    post_parser.add_argument(
-        "-comments-", dest="comments", action="store_true", help="Get a post's comments"
-    )
-    post_parser.add_argument(
-        "-awards-", dest="awards", action="store_true", help=argparse.SUPPRESS
-    )
     post_parser.add_argument(
         "id",
         help="Post ID",
@@ -182,18 +159,25 @@ def create_parser() -> argparse.ArgumentParser:
         "subreddit",
         help="Source subreddit",
     )
+    post_parser.add_argument(
+        "--profile",
+        action="store_true",
+        help="Get a post's (profile) data",
+    )
+    post_parser.add_argument(
+        "--comments", action="store_true", help="Get a post's comments"
+    )
+    post_parser.add_argument("--awards", action="store_true", help=argparse.SUPPRESS)
 
     # Posts mode
     posts_parser = subparsers.add_parser("posts", help="Posts operations")
     posts_parser.add_argument(
-        "-listings-",
-        dest="listings",
+        "--listings",
         action="store_true",
         help="Get posts from a specified listing",
     )
     posts_parser.add_argument(
-        "-frontpage-",
-        dest="frontpage",
+        "--frontpage",
         action="store_true",
         help="Get posts from the Reddit front-page",
     )
