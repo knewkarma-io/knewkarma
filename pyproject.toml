@@ -29,6 +29,7 @@ aiohttp = "*"
 glyphoji = "*"
 plyer = "*"
 rich = "*"
+rich-argparse = "*"
 
 [tool.poetry.scripts]
 knewkarma = "knewkarma.knewkarma:on_call"
