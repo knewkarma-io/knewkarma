@@ -231,12 +231,12 @@ def create_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--json",
-        help="Write all found data to a JSON file.",
+        help="Write data to a JSON file.",
         action="store_true",
     )
     parser.add_argument(
         "--csv",
-        help="Write all found data to a CSV file.",
+        help="Write data to a CSV file.",
         action="store_true",
     )
     parser.add_argument(
