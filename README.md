@@ -17,11 +17,10 @@ A **Reddit** Data Analysis Toolkit.
 - [x] Returns **Posts** from a specified **listing**.
 - [x] **Searches** for posts matching a given query form **all over Reddit**.
 
-***
-
 # 📖 Documentation
 
 *[Refer to the Wiki](https://github.com/bellingcat/knewkarma/wiki) for Installation, Usage and Uninstallation
 instructions.*
 ***
-[![me](https://github.com/bellingcat/reddit-post-scraping-tool/assets/74001397/21e0bb33-7a84-45d6-92ba-00e40891ba31)](https://about.me/rly0nheart)
+[![me](https://github.com/bellingcat/knewkarma/assets/74001397/0055f870-8542-4627-82f7-4d4a04210dd6)
+](https://about.me/rly0nheart)
