@@ -28,10 +28,9 @@ Partial Class Main
         Dim TreeNode2 As TreeNode = New TreeNode("User")
         Dim TreeNode3 As TreeNode = New TreeNode("Front Page")
         Dim TreeNode4 As TreeNode = New TreeNode("Listings")
-        Dim TreeNode5 As TreeNode = New TreeNode("Post (N/A)")
-        Dim TreeNode6 As TreeNode = New TreeNode("Search")
-        Dim TreeNode7 As TreeNode = New TreeNode("Posts", New TreeNode() {TreeNode3, TreeNode4, TreeNode5, TreeNode6})
-        Dim TreeNode8 As TreeNode = New TreeNode("Username", New TreeNode() {TreeNode1, TreeNode2, TreeNode7})
+        Dim TreeNode5 As TreeNode = New TreeNode("Search")
+        Dim TreeNode6 As TreeNode = New TreeNode("Posts", New TreeNode() {TreeNode3, TreeNode4, TreeNode5})
+        Dim TreeNode7 As TreeNode = New TreeNode("Username", New TreeNode() {TreeNode1, TreeNode2, TreeNode6})
         TextBoxQuery = New TextBox()
         ButtonSearch = New Button()
         ContextMenuStripRightClick = New ContextMenuStrip(components)
@@ -104,20 +103,6 @@ Partial Class Main
         Panel1 = New Panel()
         Label4 = New Label()
         NotifyIcon1 = New NotifyIcon(components)
-        PanelPostData = New Panel()
-        TextBoxPostSubreddit = New TextBox()
-        ButtonFetchPostData = New Button()
-        PanelPostDataHeader = New Panel()
-        Label6 = New Label()
-        TextBoxPostID = New TextBox()
-        GroupBoxPostDataFiltering = New GroupBox()
-        Label7 = New Label()
-        Label8 = New Label()
-        NumericUpDownPostDataLimit = New NumericUpDown()
-        ComboBoxPostDataListing = New ComboBox()
-        GroupBoxPostData = New GroupBox()
-        RadioButtonPostProfile = New RadioButton()
-        RadioButtonPostComments = New RadioButton()
         ContextMenuStripRightClick.SuspendLayout()
         GroupBoxSearchResultsFiltering.SuspendLayout()
         CType(NumericUpDownSearchResultLimit, ComponentModel.ISupportInitialize).BeginInit()
@@ -142,11 +127,6 @@ Partial Class Main
         GroupBoxPostListings.SuspendLayout()
         PanelSearchPosts.SuspendLayout()
         Panel1.SuspendLayout()
-        PanelPostData.SuspendLayout()
-        PanelPostDataHeader.SuspendLayout()
-        GroupBoxPostDataFiltering.SuspendLayout()
-        CType(NumericUpDownPostDataLimit, ComponentModel.ISupportInitialize).BeginInit()
-        GroupBoxPostData.SuspendLayout()
         SuspendLayout()
         ' 
         ' TextBoxQuery
@@ -726,6 +706,8 @@ Partial Class Main
         ' 
         ' TreeView1
         ' 
+        TreeView1.BorderStyle = BorderStyle.FixedSingle
+        TreeView1.HotTracking = True
         TreeView1.Location = New Point(12, 12)
         TreeView1.Name = "TreeView1"
         TreeNode1.Name = "childSubreddit"
@@ -736,15 +718,14 @@ Partial Class Main
         TreeNode3.Text = "Front Page"
         TreeNode4.Name = "subchildListings"
         TreeNode4.Text = "Listings"
-        TreeNode5.Name = "childPost"
-        TreeNode5.Text = "Post (N/A)"
-        TreeNode6.Name = "subchildSearch"
-        TreeNode6.Text = "Search"
-        TreeNode7.Name = "childPosts"
-        TreeNode7.Text = "Posts"
-        TreeNode8.Name = "MainRoot"
-        TreeNode8.Text = "Username"
-        TreeView1.Nodes.AddRange(New TreeNode() {TreeNode8})
+        TreeNode5.Name = "subchildSearch"
+        TreeNode5.Text = "Search"
+        TreeNode6.Name = "childPosts"
+        TreeNode6.Text = "Posts"
+        TreeNode7.Name = "MainRoot"
+        TreeNode7.Text = "Username"
+        TreeView1.Nodes.AddRange(New TreeNode() {TreeNode7})
+        TreeView1.ShowNodeToolTips = True
         TreeView1.Size = New Size(129, 186)
         TreeView1.TabIndex = 17
         ' 
@@ -1009,181 +990,6 @@ Partial Class Main
         NotifyIcon1.Text = "Knew Karma"
         NotifyIcon1.Visible = True
         ' 
-        ' PanelPostData
-        ' 
-        PanelPostData.BackColor = Color.Transparent
-        PanelPostData.Controls.Add(TextBoxPostSubreddit)
-        PanelPostData.Controls.Add(ButtonFetchPostData)
-        PanelPostData.Controls.Add(PanelPostDataHeader)
-        PanelPostData.Controls.Add(TextBoxPostID)
-        PanelPostData.Controls.Add(GroupBoxPostDataFiltering)
-        PanelPostData.Controls.Add(GroupBoxPostData)
-        PanelPostData.Enabled = False
-        PanelPostData.ForeColor = Color.Black
-        PanelPostData.Location = New Point(147, 12)
-        PanelPostData.Name = "PanelPostData"
-        PanelPostData.Size = New Size(221, 188)
-        PanelPostData.TabIndex = 28
-        PanelPostData.Visible = False
-        ' 
-        ' TextBoxPostSubreddit
-        ' 
-        TextBoxPostSubreddit.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
-        TextBoxPostSubreddit.Location = New Point(69, 162)
-        TextBoxPostSubreddit.Name = "TextBoxPostSubreddit"
-        TextBoxPostSubreddit.PlaceholderText = "Subreddit"
-        TextBoxPostSubreddit.Size = New Size(65, 23)
-        TextBoxPostSubreddit.TabIndex = 31
-        ' 
-        ' ButtonFetchPostData
-        ' 
-        ButtonFetchPostData.FlatStyle = FlatStyle.Popup
-        ButtonFetchPostData.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
-        ButtonFetchPostData.ForeColor = Color.Black
-        ButtonFetchPostData.Location = New Point(140, 162)
-        ButtonFetchPostData.Name = "ButtonFetchPostData"
-        ButtonFetchPostData.Size = New Size(79, 24)
-        ButtonFetchPostData.TabIndex = 6
-        ButtonFetchPostData.Text = "&Fetch"
-        ButtonFetchPostData.UseVisualStyleBackColor = True
-        ' 
-        ' PanelPostDataHeader
-        ' 
-        PanelPostDataHeader.BackColor = Color.Transparent
-        PanelPostDataHeader.BorderStyle = BorderStyle.FixedSingle
-        PanelPostDataHeader.Controls.Add(Label6)
-        PanelPostDataHeader.Enabled = False
-        PanelPostDataHeader.Location = New Point(3, 0)
-        PanelPostDataHeader.Name = "PanelPostDataHeader"
-        PanelPostDataHeader.Size = New Size(215, 20)
-        PanelPostDataHeader.TabIndex = 30
-        ' 
-        ' Label6
-        ' 
-        Label6.AutoSize = True
-        Label6.BackColor = Color.Transparent
-        Label6.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
-        Label6.ForeColor = Color.Black
-        Label6.Location = New Point(48, 0)
-        Label6.Name = "Label6"
-        Label6.Size = New Size(108, 16)
-        Label6.TabIndex = 29
-        Label6.Text = "Fetch a Post's data"
-        ' 
-        ' TextBoxPostID
-        ' 
-        TextBoxPostID.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
-        TextBoxPostID.Location = New Point(3, 162)
-        TextBoxPostID.Name = "TextBoxPostID"
-        TextBoxPostID.PlaceholderText = "Post ID"
-        TextBoxPostID.Size = New Size(62, 23)
-        TextBoxPostID.TabIndex = 5
-        ' 
-        ' GroupBoxPostDataFiltering
-        ' 
-        GroupBoxPostDataFiltering.Controls.Add(Label7)
-        GroupBoxPostDataFiltering.Controls.Add(Label8)
-        GroupBoxPostDataFiltering.Controls.Add(NumericUpDownPostDataLimit)
-        GroupBoxPostDataFiltering.Controls.Add(ComboBoxPostDataListing)
-        GroupBoxPostDataFiltering.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
-        GroupBoxPostDataFiltering.ForeColor = Color.Black
-        GroupBoxPostDataFiltering.Location = New Point(3, 81)
-        GroupBoxPostDataFiltering.Name = "GroupBoxPostDataFiltering"
-        GroupBoxPostDataFiltering.Size = New Size(215, 70)
-        GroupBoxPostDataFiltering.TabIndex = 11
-        GroupBoxPostDataFiltering.TabStop = False
-        GroupBoxPostDataFiltering.Text = "Set data sort criterion and output limit"
-        ' 
-        ' Label7
-        ' 
-        Label7.AutoSize = True
-        Label7.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        Label7.Location = New Point(126, 23)
-        Label7.Name = "Label7"
-        Label7.Size = New Size(81, 15)
-        Label7.TabIndex = 19
-        Label7.Text = "Limit output to:"
-        ' 
-        ' Label8
-        ' 
-        Label8.AutoSize = True
-        Label8.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        Label8.Location = New Point(4, 22)
-        Label8.Name = "Label8"
-        Label8.Size = New Size(68, 15)
-        Label8.TabIndex = 18
-        Label8.Text = "Sort data by:"
-        ' 
-        ' NumericUpDownPostDataLimit
-        ' 
-        NumericUpDownPostDataLimit.Enabled = False
-        NumericUpDownPostDataLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
-        NumericUpDownPostDataLimit.Location = New Point(130, 41)
-        NumericUpDownPostDataLimit.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
-        NumericUpDownPostDataLimit.Name = "NumericUpDownPostDataLimit"
-        NumericUpDownPostDataLimit.ReadOnly = True
-        NumericUpDownPostDataLimit.Size = New Size(79, 22)
-        NumericUpDownPostDataLimit.TabIndex = 17
-        NumericUpDownPostDataLimit.Value = New Decimal(New Integer() {10, 0, 0, 0})
-        ' 
-        ' ComboBoxPostDataListing
-        ' 
-        ComboBoxPostDataListing.AutoCompleteCustomSource.AddRange(New String() {"Controversial", "Hot", "Best", "New", "Rising"})
-        ComboBoxPostDataListing.AutoCompleteSource = AutoCompleteSource.CustomSource
-        ComboBoxPostDataListing.BackColor = SystemColors.Window
-        ComboBoxPostDataListing.DropDownStyle = ComboBoxStyle.DropDownList
-        ComboBoxPostDataListing.Enabled = False
-        ComboBoxPostDataListing.FlatStyle = FlatStyle.Popup
-        ComboBoxPostDataListing.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
-        ComboBoxPostDataListing.ForeColor = SystemColors.WindowText
-        ComboBoxPostDataListing.FormattingEnabled = True
-        ComboBoxPostDataListing.Items.AddRange(New Object() {"all", "best", "controversial", "hot", "new", "rising", "top"})
-        ComboBoxPostDataListing.Location = New Point(6, 40)
-        ComboBoxPostDataListing.Name = "ComboBoxPostDataListing"
-        ComboBoxPostDataListing.Size = New Size(116, 23)
-        ComboBoxPostDataListing.Sorted = True
-        ComboBoxPostDataListing.TabIndex = 11
-        ' 
-        ' GroupBoxPostData
-        ' 
-        GroupBoxPostData.BackColor = Color.Transparent
-        GroupBoxPostData.ContextMenuStrip = ContextMenuStripRightClick
-        GroupBoxPostData.Controls.Add(RadioButtonPostProfile)
-        GroupBoxPostData.Controls.Add(RadioButtonPostComments)
-        GroupBoxPostData.FlatStyle = FlatStyle.Flat
-        GroupBoxPostData.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
-        GroupBoxPostData.ForeColor = Color.Black
-        GroupBoxPostData.Location = New Point(3, 26)
-        GroupBoxPostData.Name = "GroupBoxPostData"
-        GroupBoxPostData.Size = New Size(215, 49)
-        GroupBoxPostData.TabIndex = 9
-        GroupBoxPostData.TabStop = False
-        GroupBoxPostData.Text = "Select subreddit data to fetch"
-        ' 
-        ' RadioButtonPostProfile
-        ' 
-        RadioButtonPostProfile.AutoSize = True
-        RadioButtonPostProfile.Checked = True
-        RadioButtonPostProfile.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        RadioButtonPostProfile.Location = New Point(6, 23)
-        RadioButtonPostProfile.Name = "RadioButtonPostProfile"
-        RadioButtonPostProfile.Size = New Size(56, 19)
-        RadioButtonPostProfile.TabIndex = 5
-        RadioButtonPostProfile.TabStop = True
-        RadioButtonPostProfile.Text = "Profile"
-        RadioButtonPostProfile.UseVisualStyleBackColor = True
-        ' 
-        ' RadioButtonPostComments
-        ' 
-        RadioButtonPostComments.AutoSize = True
-        RadioButtonPostComments.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        RadioButtonPostComments.Location = New Point(71, 23)
-        RadioButtonPostComments.Name = "RadioButtonPostComments"
-        RadioButtonPostComments.Size = New Size(77, 19)
-        RadioButtonPostComments.TabIndex = 6
-        RadioButtonPostComments.Text = "Comments"
-        RadioButtonPostComments.UseVisualStyleBackColor = True
-        ' 
         ' Main
         ' 
         AccessibleRole = AccessibleRole.Window
@@ -1192,7 +998,6 @@ Partial Class Main
         BackColor = Color.White
         ClientSize = New Size(377, 211)
         ContextMenuStrip = ContextMenuStripRightClick
-        Controls.Add(PanelPostData)
         Controls.Add(PanelSubredditData)
         Controls.Add(PanelSearchPosts)
         Controls.Add(PanelPostListings)
@@ -1248,15 +1053,6 @@ Partial Class Main
         PanelSearchPosts.PerformLayout()
         Panel1.ResumeLayout(False)
         Panel1.PerformLayout()
-        PanelPostData.ResumeLayout(False)
-        PanelPostData.PerformLayout()
-        PanelPostDataHeader.ResumeLayout(False)
-        PanelPostDataHeader.PerformLayout()
-        GroupBoxPostDataFiltering.ResumeLayout(False)
-        GroupBoxPostDataFiltering.PerformLayout()
-        CType(NumericUpDownPostDataLimit, ComponentModel.ISupportInitialize).EndInit()
-        GroupBoxPostData.ResumeLayout(False)
-        GroupBoxPostData.PerformLayout()
         ResumeLayout(False)
     End Sub
 
@@ -1336,18 +1132,4 @@ Partial Class Main
     Friend WithEvents Label5 As Label
     Friend WithEvents NotifyIcon1 As NotifyIcon
     Friend WithEvents ButtonFetchPostListings As Button
-    Friend WithEvents PanelPostData As Panel
-    Friend WithEvents ButtonFetchPostData As Button
-    Friend WithEvents PanelPostDataHeader As Panel
-    Friend WithEvents Label6 As Label
-    Friend WithEvents TextBoxPostID As TextBox
-    Friend WithEvents GroupBoxPostDataFiltering As GroupBox
-    Friend WithEvents Label7 As Label
-    Friend WithEvents Label8 As Label
-    Friend WithEvents NumericUpDownPostDataLimit As NumericUpDown
-    Friend WithEvents ComboBoxPostDataListing As ComboBox
-    Friend WithEvents GroupBoxPostData As GroupBox
-    Friend WithEvents RadioButtonPostProfile As RadioButton
-    Friend WithEvents RadioButtonPostComments As RadioButton
-    Friend WithEvents TextBoxPostSubreddit As TextBox
 End Class
