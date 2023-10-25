@@ -15,7 +15,8 @@ info_messages = {
     "program_started": "Started Knew Karma {version} {start_time}...",
     "program_stopped": "Stopped in {run_time} seconds.",
     "help": "usage: [green]knewkarma -h[/] or [green]knewkarma --help[/]",
-    "update": "A new release of Knew Karma ({version}) is available.\nTo update, run: pip install --upgrade knewkarma",
+    "update": "{program_name} {release_version} is available."
+    "To update, run: pip install --upgrade {program_call_name}",
 }
 
 
