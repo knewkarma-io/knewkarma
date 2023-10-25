@@ -330,8 +330,6 @@ Public Class SettingsManager
         ''' Apply colors to TextBox controls
         ''' </summary>
         Dim textBoxes As New List(Of TextBox) From {
-            Main.TextBoxPostID,
-            Main.TextBoxPostSubreddit,
             Main.TextBoxUsername,
             Main.TextBoxQuery,
             Main.TextBoxSubreddit
@@ -346,7 +344,6 @@ Public Class SettingsManager
         ''' Apply colors to NumericUpDown controls
         ''' </summary>
         Dim numericUpDowns As New List(Of NumericUpDown) From {
-            Main.NumericUpDownPostDataLimit,
             Main.NumericUpDownPostListingsLimit,
             Main.NumericUpDownFrontPageDataLimit,
             Main.NumericUpDownSubredditDataLimit,
@@ -362,7 +359,6 @@ Public Class SettingsManager
         ''' Apply colors to ComboBox controls
         ''' </summary>
         Dim comboBoxes As New List(Of ComboBox) From {
-            Main.ComboBoxPostDataListing,
             Main.ComboBoxPostListingsListing,
             Main.ComboBoxFrontPageDataListing,
             Main.ComboBoxSubredditPostsListing,

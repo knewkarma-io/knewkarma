@@ -1,20 +1,23 @@
 def on_call():
-    import asyncio
     from datetime import datetime
 
-    from .api import API
-    from .coreutils import __version__, args, log, path_finder, print_banner
+    from .coreutils import __version__, args, log, path_finder
     from .messages import message
-    from .masonry import TreeMasonry
+    from .tree_masonry import Masonry
 
-    api = API()
-    tree_masonry = TreeMasonry()
+    tree_masonry = Masonry()
     start_time = datetime.now()
 
     if args.mode:
+        print(
+            """
+┓┏┓         ┓┏┓         
+┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
+┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
+        )
+
         try:
             path_finder()
-            print_banner()
             log.info(
                 message(
                     message_type="info",
@@ -23,81 +26,73 @@ def on_call():
                     start_time=start_time,
                 )
             )
-            asyncio.run(api.get_updates())
+            tree_masonry.api.check_updates()
 
             if args.mode == "user":
                 if args.profile:
-                    asyncio.run(
-                        tree_masonry.tree_user_profile(
-                            username=args.username,
-                            save_to_csv=args.csv,
-                            save_to_json=args.json,
-                        )
+                    tree_masonry.tree_user_profile(
+                        username=args.username,
+                        save_to_csv=args.csv,
+                        save_to_json=args.json,
                     )
                 elif args.posts:
-                    asyncio.run(
-                        tree_masonry.tree_user_posts(
-                            username=args.username,
-                            sort=args.sort,
-                            limit=args.limit,
-                            save_to_json=args.json,
-                        )
-                    )
-                elif args.comments:
-                    asyncio.run(
-                        tree_masonry.tree_user_comments(
-                            username=args.username,
-                            sort=args.sort,
-                            limit=args.limit,
-                            save_to_json=args.json,
-                        )
-                    )
-            elif args.mode == "subreddit":
-                if args.profile:
-                    asyncio.run(
-                        tree_masonry.tree_subreddit_profile(
-                            subreddit=args.subreddit,
-                            save_to_csv=args.csv,
-                            save_to_json=args.json,
-                        )
-                    )
-                elif args.posts:
-                    asyncio.run(
-                        tree_masonry.tree_subreddit_posts(
-                            subreddit=args.subreddit,
-                            sort=args.sort,
-                            limit=args.limit,
-                            save_to_json=args.json,
-                        )
-                    )
-            elif args.mode == "search":
-                asyncio.run(
-                    tree_masonry.tree_search_results(
-                        query=args.query,
+                    tree_masonry.tree_user_posts(
+                        username=args.username,
                         sort=args.sort,
                         limit=args.limit,
                         save_to_json=args.json,
                     )
+                elif args.comments:
+                    tree_masonry.tree_user_comments(
+                        username=args.username,
+                        sort=args.sort,
+                        limit=args.limit,
+                        save_to_json=args.json,
+                    )
+            elif args.mode == "subreddit":
+                if args.profile:
+                    tree_masonry.tree_subreddit_profile(
+                        subreddit=args.subreddit,
+                        save_to_csv=args.csv,
+                        save_to_json=args.json,
+                    )
+                elif args.posts:
+                    tree_masonry.tree_subreddit_posts(
+                        subreddit=args.subreddit,
+                        sort=args.sort,
+                        limit=args.limit,
+                        save_to_json=args.json,
+                    )
+            elif args.mode == "search":
+                tree_masonry.tree_search_results(
+                    query=args.query,
+                    sort=args.sort,
+                    limit=args.limit,
+                    save_to_json=args.json,
                 )
             elif args.mode == "post":
-                asyncio.run(tree_masonry.tree_post_data(arguments=args))
+                tree_masonry.tree_post_data(
+                    post_id=args.post_id,
+                    post_subreddit=args.post_subreddit,
+                    sort=args.sort,
+                    limit=args.limit,
+                    show_comments=args.comments,
+                    save_to_csv=args.csv,
+                    save_to_json=args.json,
+                )
             elif args.mode == "posts":
                 if args.listings:
-                    asyncio.run(
-                        tree_masonry.tree_post_listings(
-                            listing=args.listing,
-                            sort=args.sort,
-                            limit=args.limit,
-                            save_to_json=args.json,
-                        )
+                    tree_masonry.tree_post_listings(
+                        listing=args.listing,
+                        sort=args.sort,
+                        limit=args.limit,
+                        save_to_json=args.json,
                     )
                 elif args.frontpage:
-                    asyncio.run(
-                        tree_masonry.tree_front_page_posts(
-                            sort=args.sort,
-                            limit=args.limit,
-                            save_to_json=args.json,
-                        )
+                    tree_masonry.tree_front_page_posts(
+                        sort=args.sort,
+                        limit=args.limit,
+                        save_to_json=args.json,
                     )
         except KeyboardInterrupt:
             log.warning(
@@ -114,5 +109,3 @@ def on_call():
                     run_time=datetime.now() - start_time,
                 )
             )
-    else:
-        log.info(message(message_type="info", message_key="help"))
