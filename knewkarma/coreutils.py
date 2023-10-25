@@ -95,6 +95,8 @@ def create_parser() -> argparse.ArgumentParser:
 
     :return: A configured argparse.ArgumentParser object ready to parse the command line arguments.
     """
+    from . import __operations_description__, __operations_epilog__
+
     parser = argparse.ArgumentParser(
         description=Markdown(__description__, style="argparse.text"),
         epilog=Markdown(__epilog__, style="argparse.text"),
@@ -107,7 +109,13 @@ def create_parser() -> argparse.ArgumentParser:
 
     # User mode
     user_parser = subparsers.add_parser(
-        "user", help="User operations", formatter_class=RichHelpFormatter
+        "user",
+        help="User operations",
+        description=Markdown(
+            __operations_description__.format("User"), style="argparse.text"
+        ),
+        epilog=Markdown(__operations_epilog__.format("user"), style="argparse.text"),
+        formatter_class=RichHelpFormatter,
     )
     user_parser.add_argument("username", help="Username to query")
     user_parser.add_argument(
@@ -125,7 +133,15 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Subreddit mode
     subreddit_parser = subparsers.add_parser(
-        "subreddit", help="Subreddit operations", formatter_class=RichHelpFormatter
+        "subreddit",
+        help="Subreddit operations",
+        description=Markdown(
+            __operations_description__.format("Subreddit"), style="argparse.text"
+        ),
+        epilog=Markdown(
+            __operations_epilog__.format("subreddit"), style="argparse.text"
+        ),
+        formatter_class=RichHelpFormatter,
     )
     subreddit_parser.add_argument("subreddit", help="Subreddit to query")
     subreddit_parser.add_argument(
@@ -143,7 +159,13 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Post mode
     post_parser = subparsers.add_parser(
-        "post", help="Post operations", formatter_class=RichHelpFormatter
+        "post",
+        help="Post operations",
+        description=Markdown(
+            __operations_description__.format("Post"), style="argparse.text"
+        ),
+        epilog=Markdown(__operations_epilog__.format("post"), style="argparse.text"),
+        formatter_class=RichHelpFormatter,
     )
     post_parser.add_argument(
         "id",
@@ -167,7 +189,15 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     # Posts mode
-    posts_parser = subparsers.add_parser("posts", help="Posts operations")
+    posts_parser = subparsers.add_parser(
+        "posts",
+        help="Posts operations",
+        description=Markdown(
+            __operations_description__.format("Posts"), style="argparse.text"
+        ),
+        epilog=Markdown(__operations_epilog__.format("posts"), style="argparse.text"),
+        formatter_class=RichHelpFormatter,
+    )
     posts_parser.add_argument(
         "-listings-",
         dest="listings",
@@ -189,7 +219,13 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Search mode
     search_parser = subparsers.add_parser(
-        "search", help="Search posts", formatter_class=RichHelpFormatter
+        "search",
+        help="Search posts",
+        description=Markdown(
+            __operations_description__.format("Search"), style="argparse.text"
+        ),
+        epilog=Markdown(__operations_epilog__.format("search"), style="argparse.text"),
+        formatter_class=RichHelpFormatter,
     )
     search_parser.add_argument("query", help="Search query")
 
@@ -199,21 +235,23 @@ def create_parser() -> argparse.ArgumentParser:
         "--sort",
         default="all",
         choices=["controversial", "new", "top", "best", "hot", "rising"],
-        help="Data sort criterion (default: new)",
+        help="Data sort criterion (default: %(default)s)",
     )
     parser.add_argument(
         "-l",
         "--limit",
         default=10,
         type=int,
-        help="Maximum number of posts/comments to get (default: %(default)s)",
+        help="Maximum number of results to get (default: %(default)s)",
     )
     parser.add_argument(
+        "-j",
         "--json",
         help="Write data to a JSON file.",
         action="store_true",
     )
     parser.add_argument(
+        "-c",
         "--csv",
         help="Write data to a CSV file.",
         action="store_true",
