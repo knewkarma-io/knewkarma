@@ -235,14 +235,14 @@ def create_parser() -> argparse.ArgumentParser:
         "--sort",
         default="all",
         choices=["controversial", "new", "top", "best", "hot", "rising"],
-        help="Data sort criterion (default: %(default)s)",
+        help="Bulk data sort criterion (default: %(default)s)",
     )
     parser.add_argument(
         "-l",
         "--limit",
         default=10,
         type=int,
-        help="Maximum number of results to get (default: %(default)s)",
+        help="Maximum number of bulk data to get (default: %(default)s)",
     )
     parser.add_argument(
         "-j",
@@ -259,7 +259,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-d",
         "--debug",
-        help="Run in debug mode",
+        help="Enable debug mode",
         action="store_true",
     )
     parser.add_argument(
