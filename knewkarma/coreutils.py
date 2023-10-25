@@ -6,35 +6,10 @@ import os
 from datetime import datetime
 
 from rich.logging import RichHandler
+from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
-from . import __version__, __author__, __about__
-
-
-def format_api_data(api_data: dict, data_file: str) -> dict:
-    """
-    Formats API data based on a key mapping from a JSON file.
-
-    :param api_data: Dictionary containing raw data from the API.
-    :param data_file: Path to the JSON file that contains the key mapping.
-
-    :returns: A Formatted JSON object with human-readable keys.
-    """
-    # Construct path to the mapping data file
-    mapping_data_file = os.path.join(CURRENT_FILE_DIRECTORY, "data", data_file)
-
-    # Load the mapping from the specified file
-    with open(mapping_data_file, "r", encoding="utf-8") as file:
-        mapping_data = json.load(file)
-
-    # Initialize an empty dictionary to hold the formatted data
-    formatted_data = {}
-
-    # Map API data to human-readable format using the mapping
-    for api_data_key, mapping_data_key in mapping_data.items():
-        formatted_data[mapping_data_key] = api_data.get(api_data_key, "N/A")
-
-    return formatted_data
+from . import __version__, __description__, __epilog__
 
 
 def path_finder():
@@ -83,7 +58,7 @@ def save_data(
         log.info(f"CSV data saved to {csv_file.name} {glyph.party_popper}")
 
 
-def convert_timestamp_to_datetime(timestamp: int) -> str:
+def convert_timestamp_to_datetime(timestamp: float) -> str:
     """
     Converts a Unix timestamp to a formatted datetime string.
 
@@ -106,7 +81,9 @@ def setup_logging(debug_mode: bool) -> logging.getLogger:
         level="NOTSET" if debug_mode else "INFO",
         format="%(message)s",
         handlers=[
-            RichHandler(markup=True, log_time_format="%I:%M:%S %p", show_level=False)
+            RichHandler(
+                markup=True, log_time_format="%I:%M:%S %p", show_level=debug_mode
+            )
         ],
     )
     return logging.getLogger("Knew Karma")
@@ -119,12 +96,14 @@ def create_parser() -> argparse.ArgumentParser:
     :return: A configured argparse.ArgumentParser object ready to parse the command line arguments.
     """
     parser = argparse.ArgumentParser(
-        description=f"Knew Karma - by {__author__} ({__about__})",
-        epilog="A Reddit Data Analysis Toolkit.",
+        description=Markdown(__description__, style="argparse.text"),
+        epilog=Markdown(__epilog__, style="argparse.text"),
         formatter_class=RichHelpFormatter,
     )
 
-    subparsers = parser.add_subparsers(dest="mode", help="Operation mode")
+    subparsers = parser.add_subparsers(
+        dest="mode", help="Operation mode", required=True
+    )
 
     # User mode
     user_parser = subparsers.add_parser(
@@ -225,7 +204,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-l",
         "--limit",
-        default=100,
+        default=10,
         type=int,
         help="Maximum number of posts/comments to get (default: %(default)s)",
     )
