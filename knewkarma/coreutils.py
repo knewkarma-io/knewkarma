@@ -125,7 +125,7 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Subreddit mode
     subreddit_parser = subparsers.add_parser(
-        "subreddit", help="User operations", formatter_class=RichHelpFormatter
+        "subreddit", help="Subreddit operations", formatter_class=RichHelpFormatter
     )
     subreddit_parser.add_argument("subreddit", help="Subreddit to query")
     subreddit_parser.add_argument(
