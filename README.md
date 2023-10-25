@@ -1,4 +1,4 @@
-![carbon(15)](https://github.com/bellingcat/knewkarma/assets/74001397/10e21133-2628-4643-86fa-f1c1d6d739a0)
+![knewkarma](https://github.com/bellingcat/knewkarma/assets/74001397/a52fc9fb-950b-423e-8d5b-a1421ecec617)
 
 
 A **Reddit** Data Analysis Toolkit.
