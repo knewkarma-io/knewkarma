@@ -27,7 +27,6 @@ Public Class Main
         ComboBoxSearchResultListing.SelectedIndex = 0
         ComboBoxSubredditPostsListing.SelectedIndex = 0
         ComboBoxPostListingsListing.SelectedIndex = 0
-        ComboBoxPostDataListing.SelectedIndex = 0
     End Sub
 
     Private Sub FormMain_HelpButtonClicked(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles MyBase.HelpButtonClicked
@@ -258,8 +257,6 @@ Public Class Main
         Me.Width = 393 ' Set the Window's width to 393 (normal width)
         Me.Text = My.Application.Info.AssemblyName
         Select Case e.Node.Text
-            Case "Post (N/A)"
-                PanelPostData.Visible = True
             Case "User"
                 PanelUserData.Visible = True
             Case "Subreddit"
@@ -346,24 +343,6 @@ Public Class Main
     ''' <param name="sender">The source of the event.</param>
     ''' <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
     Private Sub RadioButtonSubredditPosts_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButtonSubredditPosts.CheckedChanged
-        CoreUtils.HandleRadioButtonChanges(form:=Me)
-    End Sub
-
-    ''' <summary>
-    ''' Handles the CheckedChanged event for the RadioButtonPostProfile control. 
-    ''' </summary>
-    ''' <param name="sender">The source of the event.</param>
-    ''' <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-    Private Sub RadioButtonPostProfile_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButtonPostProfile.CheckedChanged
-        CoreUtils.HandleRadioButtonChanges(form:=Me)
-    End Sub
-
-    ''' <summary>
-    ''' Handles the CheckedChanged event for the RadioButtonPostComments control. 
-    ''' </summary>
-    ''' <param name="sender">The source of the event.</param>
-    ''' <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-    Private Sub RadioButtonPostComments_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButtonPostComments.CheckedChanged
         CoreUtils.HandleRadioButtonChanges(form:=Me)
     End Sub
 

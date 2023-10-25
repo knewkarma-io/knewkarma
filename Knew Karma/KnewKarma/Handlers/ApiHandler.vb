@@ -135,25 +135,4 @@ Public Class ApiHandler
         Dim data As JObject = Await AsyncGetData(endpoint:=$"{BASE_ENDPOINT}/r/{listing}.json?sort={sort}&limit={limit}")
         Return If(data IsNot Nothing AndAlso data("data") IsNot Nothing, data("data")?("children"), New JArray())
     End Function
-
-    ''' <summary>
-    ''' Asynchronously gets a post's data.
-    ''' </summary>
-    ''' <param name="postId">ID of the post.</param>
-    ''' <param name="Subreddit">The subreddit in which the post was posted.</param>
-    ''' <param name="sort">Sorting criterion ('new', 'hot', etc.).</param>
-    ''' <param name="limit">Maximum number of comments to fetch.</param>
-    ''' <returns>A tuple containing a post's data (post_information, list_of_comments).</returns>
-    Public Async Function AsyncGetPostData(postId As String, postSubreddit As String, sort As String, limit As Integer) As Task(Of (postData As JObject, postComments As JArray))
-
-        'TODO
-        ' Get this code to work.
-        ' The code returns the following error
-        ''' Error reading JObject from JsonReader. Current JsonReader item is not an object: StartArray. Path, '', line 1, position 1
-        Dim data As JArray = Await AsyncGetData(endpoint:=$"{BASE_ENDPOINT}/r/{postSubreddit}/comments/{postId}.json?{sort}&limit={limit}")
-        Dim postInformation As JObject = If(data(0)?("data")?("children")?(0)?("data"), New JObject())
-        Dim listOfComments As JArray = If(data(1)?("data")?("children"), New JArray())
-        Return (postInformation, listOfComments)
-    End Function
-
 End Class

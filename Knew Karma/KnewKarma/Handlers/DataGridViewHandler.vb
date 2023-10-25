@@ -91,18 +91,6 @@ Public Class DataGridViewer
         End If
     End Function
 
-    Public Shared Async Function AsyncLoadPostData(postId As String, postSubreddit As String, sort As String, limit As Integer) As Task
-        Dim Data = Await apiHandler.AsyncGetPostData(postId:=postId, postSubreddit:=postSubreddit, sort:=sort, limit:=limit)
-
-        Dim postData As JObject = Data.postData
-        Dim commentsList As JArray = Data.postComments
-
-        If Main.RadioButtonPostComments.Checked Then
-            PostComments(commentsList:=commentsList)
-        End If
-
-    End Function
-
     ''' <summary>
     ''' Loads the comments of a specific user and updates the DataGridView in the Comments.form.
     ''' </summary>

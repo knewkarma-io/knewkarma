@@ -4,31 +4,33 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "knewkarma"
-version = "1.4.1.0"
-description = "Reddit Data Analysis Toolkit."
+version = "1.5.0.0"
+description = "A Reddit Data Analysis Toolkit."
 authors = ["Richard Mwewa <rly0nheart@duck.com>"]
 readme = "README.md"
 license = "MIT License"
 homepage = "https://pypi.org/project/knewkarma"
 documentation = "https://github.com/bellingcat/knewkarma/wiki"
-repository = "https://github.com/bellingcat/knewkarma.git"
+repository = "https://github.com/bellingcat/knewkarma"
 keywords = ["reddit-crawler", "reddit-scraping", "reddit", "reddit-api", "reddit-data"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
-    "Programming Language :: Python :: 3",
     "Programming Language :: Visual Basic",
+    "Programming Language :: Python :: 3",
     "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Information Technology",
     "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
     "Natural Language :: English"
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-aiohttp = "*"
+python = "^3.10"
 glyphoji = "*"
 plyer = "*"
+requests = "*"
 rich = "*"
+rich-argparse = "*"
 
 [tool.poetry.scripts]
 knewkarma = "knewkarma.knewkarma:on_call"
