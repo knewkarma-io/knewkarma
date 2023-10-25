@@ -42,14 +42,6 @@ Public Class CoreUtils
             form.NumericUpDownSubredditDataLimit.Enabled = True
             form.ComboBoxSubredditPostsListing.Enabled = True
         End If
-
-        If form.RadioButtonPostProfile.Checked Then
-            form.NumericUpDownPostDataLimit.Enabled = False
-            form.ComboBoxPostDataListing.Enabled = False
-        ElseIf form.RadioButtonPostComments.Checked Then
-            form.NumericUpDownPostDataLimit.Enabled = True
-            form.ComboBoxPostDataListing.Enabled = True
-        End If
     End Sub
 
     ''' <summary>
