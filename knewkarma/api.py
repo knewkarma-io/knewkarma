@@ -145,7 +145,7 @@ class Api:
                         title="Knew Karma",
                         message=message(
                             message_type="info",
-                            message_key="update",
+                            message_key="update_found",
                             program_name="Knew Karma",
                             program_call_name="knewkarma",
                             release_version=remote_version,
@@ -157,7 +157,7 @@ class Api:
                     log.info(
                         message(
                             message_type="info",
-                            message_key="update",
+                            message_key="update_found",
                             program_name="Knew Karma",
                             program_call_name="knewkarma",
                             release_version=remote_version,
