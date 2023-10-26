@@ -155,7 +155,7 @@ class Api:
                     )
                 except NotImplementedError:  # Gets raised on Termux
                     log.info(
-                        message=message(
+                        message(
                             message_type="info",
                             message_key="update",
                             program_name="Knew Karma",
