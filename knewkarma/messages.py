@@ -12,7 +12,7 @@ error_messages = {
 
 #: Dictionary of informational message templates
 info_messages = {
-    "program_started": "Started {program_name} {program_version} at {start_time}...",
+    "program_started": "Started [bold]{program_name}[/] {program_version} at {start_time}...",
     "program_stopped": "Stopped in {run_time} seconds.",
     "help": "usage: [green]knewkarma -h[/] or [green]knewkarma --help[/]",
     "update": "{program_name} {release_version} is available."
