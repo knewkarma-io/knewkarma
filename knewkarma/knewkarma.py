@@ -22,8 +22,9 @@ def on_call():
                 message(
                     message_type="info",
                     message_key="program_started",
-                    version=__version__,
-                    start_time=start_time,
+                    program_name="Knew Karma",
+                    program_version=__version__,
+                    start_time=start_time.strftime("%a %b %d %Y, %H:%M:%S %p"),
                 )
             )
             tree_masonry.api.check_updates()
