@@ -299,16 +299,18 @@ class Masonry:
                 flair,
             ) = self.data_broker.subreddit_data(raw_data=raw_profile)
 
-            self.create_tree(
-                tree_title=raw_profile.get("public_description"),
-                tree_data=profile,
-                additional_data=[
-                    (f"{glyph.thumbs_up} Allows", allows),
-                    (f"{glyph.puzzle_piece} Banner", banner),
-                    (f"{glyph.memo} Header", header),
-                    (f"{glyph.four_leaf_clover} Flairs", flair),
-                ],
-                additional_text=raw_profile.get("submit_text"),
+            print(
+                self.create_tree(
+                    tree_title=raw_profile.get("public_description"),
+                    tree_data=profile,
+                    additional_data=[
+                        (f"{glyph.thumbs_up} Allows", allows),
+                        (f"{glyph.puzzle_piece} Banner", banner),
+                        (f"{glyph.memo} Header", header),
+                        (f"{glyph.four_leaf_clover} Flairs", flair),
+                    ],
+                    additional_text=raw_profile.get("submit_text"),
+                )
             )
 
             save_data(
