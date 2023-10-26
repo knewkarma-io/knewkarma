@@ -139,19 +139,30 @@ class Api:
                 # Set icon file to show in the desktop notification
                 icon_file = "icon.ico" if os.name == "nt" else "icon.png"
 
-                # Notify user about the new release.
-                notification.notify(
-                    title="Knew Karma",
-                    message=message(
-                        message_type="info",
-                        message_key="update",
-                        program_name="Knew Karma",
-                        program_call_name="knewkarma",
-                        release_version=remote_version,
-                    ),
-                    app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
-                    timeout=20,
-                )
+                try:
+                    # Notify user about the new release.
+                    notification.notify(
+                        title="Knew Karma",
+                        message=message(
+                            message_type="info",
+                            message_key="update",
+                            program_name="Knew Karma",
+                            program_call_name="knewkarma",
+                            release_version=remote_version,
+                        ),
+                        app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
+                        timeout=20,
+                    )
+                except NotImplementedError:  # Gets raised on Termux
+                    log.info(
+                        message=message(
+                            message_type="info",
+                            message_key="update",
+                            program_name="Knew Karma",
+                            program_call_name="knewkarma",
+                            release_version=remote_version,
+                        )
+                    )
 
     def get_user_profile(self, username: str) -> dict:
         """
