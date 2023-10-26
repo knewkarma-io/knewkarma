@@ -153,10 +153,7 @@ class Api:
                         app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
                         timeout=20,
                     )
-                except (
-                    NotImplementedError,
-                    ModuleNotFoundError,
-                ):  # Gets raised on Termux
+                except NotImplementedError:  # Gets raised on Termux
                     log.info(
                         message(
                             message_type="info",
