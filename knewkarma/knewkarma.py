@@ -22,7 +22,8 @@ def on_call():
                 message(
                     message_type="info",
                     message_key="program_started",
-                    version=__version__,
+                    program_name="Knew Karma",
+                    program_version=__version__,
                     start_time=start_time,
                 )
             )
