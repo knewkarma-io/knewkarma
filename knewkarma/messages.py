@@ -14,7 +14,7 @@ error_messages = {
 info_messages = {
     "program_started": "Started [bold]{program_name}[/] {program_version} at {start_time}...",
     "program_stopped": "Stopped in {run_time} seconds.",
-    "update_found": "{program_name} {release_version} is available."
+    "update_found": "{program_name} {release_version} (from {current_version}) is available. "
     "To update, run: pip install --upgrade {program_call_name}",
 }
 
