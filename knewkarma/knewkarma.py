@@ -3,7 +3,7 @@ def on_call():
 
     from .coreutils import __version__, args, log, path_finder
     from .messages import message
-    from .tree_masonry import Masonry
+    from .masonry import Masonry
 
     tree_masonry = Masonry()
     start_time = datetime.now()
