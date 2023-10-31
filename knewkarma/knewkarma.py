@@ -1,7 +1,5 @@
 def on_call():
-    from datetime import datetime
-
-    from .coreutils import __version__, args, log, path_finder
+    from .coreutils import __version__, args, datetime, log, path_finder
     from .messages import message
     from .masonry import Masonry
 
