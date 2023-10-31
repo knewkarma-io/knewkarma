@@ -35,13 +35,11 @@ def save_data(
     :param save_to_json: A boolean value to indicate whether to save data as a JSON file.
     :param save_to_csv: A boolean value to indicate whether to save data as a CSV file.
     """
-    from glyphoji import glyph
-
     # Save to JSON if save_json is True
     if save_to_json:
         with open(os.path.join(JSON_DIRECTORY, f"{filename}.json"), "w") as json_file:
             json.dump(data, json_file)
-        log.info(f"JSON data saved to {json_file.name} {glyph.party_popper}")
+        log.info(f"JSON data saved to {json_file.name}")
 
     # Save to CSV if save_csv is True
     if save_to_csv:
@@ -55,7 +53,7 @@ def save_data(
 
             # Write each row
             writer.writerow(data.values())
-        log.info(f"CSV data saved to {csv_file.name} {glyph.party_popper}")
+        log.info(f"CSV data saved to {csv_file.name}")
 
 
 def convert_timestamp_to_datetime(timestamp: float) -> str:
