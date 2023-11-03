@@ -70,7 +70,7 @@ def setup_logging(debug_mode: bool) -> logging.getLogger:
     """
     Configure and return a logging object with the specified log level.
 
-    :param debug_mode: A boolean value indicating whether debug mode should be enabled or not.
+    :param debug_mode: A boolean value indicating whether log level should be set to DEBUG.
     :return: A logging object configured with the specified log level.
     """
     logging.basicConfig(
@@ -94,8 +94,12 @@ def create_parser() -> argparse.ArgumentParser:
     from . import (
         __description__,
         __epilog__,
+        __post_examples__,
+        __posts_examples__,
+        __search_examples__,
+        __user_examples__,
+        __subreddit_examples__,
         __operations_description__,
-        __operations_epilog__,
         __version__,
     )
 
@@ -114,21 +118,18 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             __operations_description__.format("User"), style="argparse.text"
         ),
-        epilog=Markdown(__operations_epilog__.format("user"), style="argparse.text"),
+        epilog=Markdown(__user_examples__),
         formatter_class=RichHelpFormatter,
     )
     user_parser.add_argument("username", help="Username to query")
     user_parser.add_argument(
-        "-comments-",
-        dest="comments",
+        "-c",
+        "--comments",
         action="store_true",
         help="Get a user's comments",
     )
     user_parser.add_argument(
-        "-posts-", dest="posts", action="store_true", help="Get a user's posts"
-    )
-    user_parser.add_argument(
-        "-profile-", dest="profile", action="store_true", help="Get a user's profile"
+        "-p", "--posts", action="store_true", help="Get a user's posts"
     )
 
     # Subreddit mode
@@ -138,21 +139,16 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             __operations_description__.format("Subreddit"), style="argparse.text"
         ),
-        epilog=Markdown(
-            __operations_epilog__.format("subreddit"), style="argparse.text"
-        ),
+        epilog=Markdown(__subreddit_examples__),
         formatter_class=RichHelpFormatter,
     )
-    subreddit_parser.add_argument("subreddit", help="Subreddit to query")
     subreddit_parser.add_argument(
-        "-profile-",
-        dest="profile",
-        action="store_true",
-        help="Get a subreddit's profile",
+        "subreddit",
+        help="Subreddit to query",
     )
     subreddit_parser.add_argument(
-        "-posts-",
-        dest="posts",
+        "-p",
+        "--posts",
         action="store_true",
         help="Get a subreddit's posts",
     )
@@ -164,17 +160,11 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             __operations_description__.format("Post"), style="argparse.text"
         ),
-        epilog=Markdown(__operations_epilog__.format("post"), style="argparse.text"),
+        epilog=Markdown(__post_examples__),
         formatter_class=RichHelpFormatter,
     )
-    post_parser.add_argument(
-        "id",
-        help="Post ID",
-    )
-    post_parser.add_argument(
-        "subreddit",
-        help="Source subreddit",
-    )
+    post_parser.add_argument("post_id", help="Post ID")
+    post_parser.add_argument("post_subreddit", help="Source subreddit")
     post_parser.add_argument(
         "-c", "--comments", dest="comments", action="store_true", help="Show comments"
     )
@@ -189,22 +179,11 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             __operations_description__.format("Posts"), style="argparse.text"
         ),
-        epilog=Markdown(__operations_epilog__.format("posts"), style="argparse.text"),
+        epilog=Markdown(__posts_examples__),
         formatter_class=RichHelpFormatter,
     )
     posts_parser.add_argument(
-        "-listings-",
-        dest="listings",
-        action="store_true",
-        help="Get posts from a specified listing",
-    )
-    posts_parser.add_argument(
-        "-frontpage-",
-        dest="frontpage",
-        action="store_true",
-        help="Get posts from the Reddit front-page",
-    )
-    posts_parser.add_argument(
+        "-l",
         "--listing",
         help="Post listing name",
         choices=["best", "rising", "controversial"],
@@ -218,7 +197,7 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             __operations_description__.format("Search"), style="argparse.text"
         ),
-        epilog=Markdown(__operations_epilog__.format("search"), style="argparse.text"),
+        epilog=Markdown(__search_examples__),
         formatter_class=RichHelpFormatter,
     )
     search_parser.add_argument("query", help="Search query")
