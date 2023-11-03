@@ -179,13 +179,7 @@ class Executor:
         Executes a command-line arguments based cli of Knew Karma.
         """
         if self.arguments.mode == "user":
-            if self.arguments.profile:
-                self.tree_masonry.tree_user_profile(
-                    username=self.arguments.username,
-                    save_to_csv=self.arguments.csv,
-                    save_to_json=self.arguments.json,
-                )
-            elif self.arguments.posts:
+            if self.arguments.posts:
                 self.tree_masonry.tree_user_posts(
                     username=self.arguments.username,
                     sort=self.arguments.sort,
@@ -199,18 +193,25 @@ class Executor:
                     limit=self.arguments.limit,
                     save_to_json=self.arguments.json,
                 )
-        elif self.arguments.mode == "subreddit":
-            if self.arguments.profile:
-                self.tree_masonry.tree_subreddit_profile(
-                    subreddit=self.arguments.subreddit,
+            else:
+                self.tree_masonry.tree_user_profile(
+                    username=self.arguments.username,
                     save_to_csv=self.arguments.csv,
                     save_to_json=self.arguments.json,
                 )
-            elif self.arguments.posts:
+
+        elif self.arguments.mode == "subreddit":
+            if self.arguments.posts:
                 self.tree_masonry.tree_subreddit_posts(
                     subreddit=self.arguments.subreddit,
                     sort=self.arguments.sort,
                     limit=self.arguments.limit,
+                    save_to_json=self.arguments.json,
+                )
+            else:
+                self.tree_masonry.tree_subreddit_profile(
+                    subreddit=self.arguments.subreddit,
+                    save_to_csv=self.arguments.csv,
                     save_to_json=self.arguments.json,
                 )
         elif self.arguments.mode == "search":
@@ -231,14 +232,14 @@ class Executor:
                 save_to_json=self.arguments.json,
             )
         elif self.arguments.mode == "posts":
-            if self.arguments.listings:
+            if self.arguments.listing:
                 self.tree_masonry.tree_post_listings(
                     listing=self.arguments.listing,
                     sort=self.arguments.sort,
                     limit=self.arguments.limit,
                     save_to_json=self.arguments.json,
                 )
-            elif self.arguments.front_page:
+            else:
                 self.tree_masonry.tree_front_page_posts(
                     sort=self.arguments.sort,
                     limit=self.arguments.limit,
