@@ -1,6 +1,6 @@
 #: Dictionary of general message templates
 warning_messages = {
-    "user_interruption": "User interruption detected ([yellow]Ctrl+C[/])"
+    "user_interruption": "User interruption detected ([yellow]Ctrl+C[/])",
 }
 
 #: Dictionary of error message templates
@@ -23,6 +23,7 @@ prompt_messages = {
     "confirm": "[italic]Would you like to {prompt_message}?[/]",
     "set_output_limit": "[italic]Set bulk data output limit[/]",
     "set_output_sort_criterion": "[italic]Set bulk data sort criterion[/]",
+    "enter_something": "[italic]Enter {what_to_enter}[/]",
 }
 
 
