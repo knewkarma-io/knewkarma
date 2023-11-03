@@ -199,13 +199,13 @@ class Executor:
                     limit=self.arguments.limit,
                     save_to_json=self.arguments.json,
                 )
-            elif self.arguments.mode == "subreddit":
-                if self.arguments.profile:
-                    self.tree_masonry.tree_subreddit_profile(
-                        subreddit=self.arguments.subreddit,
-                        save_to_csv=self.arguments.csv,
-                        save_to_json=self.arguments.json,
-                    )
+        elif self.arguments.mode == "subreddit":
+            if self.arguments.profile:
+                self.tree_masonry.tree_subreddit_profile(
+                    subreddit=self.arguments.subreddit,
+                    save_to_csv=self.arguments.csv,
+                    save_to_json=self.arguments.json,
+                )
             elif self.arguments.posts:
                 self.tree_masonry.tree_subreddit_posts(
                     subreddit=self.arguments.subreddit,
@@ -213,32 +213,32 @@ class Executor:
                     limit=self.arguments.limit,
                     save_to_json=self.arguments.json,
                 )
-            elif self.arguments.mode == "search":
-                self.tree_masonry.tree_search_results(
-                    query=self.arguments.query,
+        elif self.arguments.mode == "search":
+            self.tree_masonry.tree_search_results(
+                query=self.arguments.query,
+                sort=self.arguments.sort,
+                limit=self.arguments.limit,
+                save_to_json=self.arguments.json,
+            )
+        elif self.arguments.mode == "post":
+            self.tree_masonry.tree_post_data(
+                post_id=self.arguments.post_id,
+                post_subreddit=self.arguments.post_subreddit,
+                sort=self.arguments.sort,
+                limit=self.arguments.limit,
+                show_comments=self.arguments.comments,
+                save_to_csv=self.arguments.csv,
+                save_to_json=self.arguments.json,
+            )
+        elif self.arguments.mode == "posts":
+            if self.arguments.listings:
+                self.tree_masonry.tree_post_listings(
+                    listing=self.arguments.listing,
                     sort=self.arguments.sort,
                     limit=self.arguments.limit,
                     save_to_json=self.arguments.json,
                 )
-            elif self.arguments.mode == "post":
-                self.tree_masonry.tree_post_data(
-                    post_id=self.arguments.post_id,
-                    post_subreddit=self.arguments.post_subreddit,
-                    sort=self.arguments.sort,
-                    limit=self.arguments.limit,
-                    show_comments=self.arguments.comments,
-                    save_to_csv=self.arguments.csv,
-                    save_to_json=self.arguments.json,
-                )
-            elif self.arguments.mode == "posts":
-                if self.arguments.listings:
-                    self.tree_masonry.tree_post_listings(
-                        listing=self.arguments.listing,
-                        sort=self.arguments.sort,
-                        limit=self.arguments.limit,
-                        save_to_json=self.arguments.json,
-                    )
-            elif self.arguments.frontpage:
+            elif self.arguments.front_page:
                 self.tree_masonry.tree_front_page_posts(
                     sort=self.arguments.sort,
                     limit=self.arguments.limit,
