@@ -303,7 +303,13 @@ class Executor:
                 else False
             )
             if command == "user":
-                username = Prompt.ask("Enter target username")
+                username = Prompt.ask(
+                    message(
+                        message_type="prompt",
+                        message_key="enter_something",
+                        what_to_enter="target username",
+                    )
+                )
                 while True:
                     user_option = Prompt.ask(
                         f"u/{username}",
@@ -322,7 +328,13 @@ class Executor:
                         user_action()
 
             elif command == "subreddit":
-                subreddit = Prompt.ask("Enter target subreddit name")
+                subreddit = Prompt.ask(
+                    message(
+                        message_type="prompt",
+                        message_key="enter_something",
+                        what_to_enter="target subreddit name",
+                    )
+                )
 
                 while True:
                     subreddit_option = Prompt.ask(
@@ -344,8 +356,20 @@ class Executor:
                         subreddit_action()
 
             elif command == "post":
-                post_id = Prompt.ask("Post ID")
-                post_subreddit = Prompt.ask("Post's source subreddit")
+                post_id = Prompt.ask(
+                    message(
+                        message_type="prompt",
+                        message_key="enter_something",
+                        what_to_enter="post ID",
+                    )
+                )
+                post_subreddit = Prompt.ask(
+                    message(
+                        message_type="prompt",
+                        message_key="enter_something",
+                        what_to_enter="post's source subreddit",
+                    )
+                )
                 show_comments = (
                     True
                     if Confirm.ask(
