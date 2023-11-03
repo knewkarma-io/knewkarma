@@ -22,7 +22,7 @@ class Masonry:
     def create_tree(
         self,
         tree_title: str,
-        is_populatable: bool = True,
+        is_empty: bool = False,
         tree_data: Union[dict, list] = None,
         additional_text: str = None,
         additional_data: [(str, Union[dict, list])] = None,
@@ -31,7 +31,7 @@ class Masonry:
         Creates a tree structure  and populates it with the given data.
 
         :param tree_title: Title of the tree.
-        :param is_populatable: A boolean value indicating whether the tree should be/is populated.
+        :param is_empty: A boolean value indicating whether the tree is empty.
         :param tree_data: Data to populate the tree with.
         :param additional_text: Additional text to add at the end of the tree.
         :param additional_data: A list of tuples containing additional data such that should be added to the tree.
@@ -68,11 +68,11 @@ class Masonry:
             if additional_text:
                 tree.add(Text(additional_text), style="italic")
 
-            return (
-                tree
-                if is_populatable
-                else Tree(tree_title, style="bold", guide_style="bold bright_blue")
-            )
+        return (
+            Tree(tree_title, style="bold", guide_style="bold bright_blue")
+            if is_empty
+            else tree
+        )
 
     @staticmethod
     def add_branch(
@@ -202,12 +202,11 @@ class Masonry:
             sort=sort,
             limit=limit,
         )
-
         if raw_posts:
             # Initialise a tree structure to visualise the results.
             posts_tree = self.create_tree(
                 tree_title=f"Visualising user's (@{username}) [cyan]{limit}[/] [green]{sort}[/] posts",
-                is_populatable=False,
+                is_empty=True,
             )
             for raw_post in raw_posts:
                 self.add_branch(
@@ -242,7 +241,7 @@ class Masonry:
         # Initialise a tree structure to visualise the results.
         comments_tree = self.create_tree(
             tree_title=f"Visualising {username}'s [green]{sort}[/] [cyan]{limit}[/] comments",
-            is_populatable=False,
+            is_empty=True,
         )
 
         # Get comments from the API and add filters accordingly
@@ -330,7 +329,7 @@ class Masonry:
         # Initialise a tree structure to visualise the results.
         posts_tree = self.create_tree(
             tree_title=f"Visualising subreddit's (r/{subreddit}) [cyan]{limit}[/] [green]{sort}[/] posts",
-            is_populatable=False,
+            is_empty=True,
         )
 
         raw_posts = self.api.get_subreddit_posts(
@@ -372,7 +371,7 @@ class Masonry:
         # Initialise a tree structure to visualise the results.
         results_tree = self.create_tree(
             tree_title=f"Visualising {limit} results for [italic]{query}[/] - {datetime.now()}",
-            is_populatable=False,
+            is_empty=True,
         )
 
         # Get search results from the API and add filters accordingly
@@ -483,7 +482,7 @@ class Masonry:
         # Initialise a tree structure to visualise the posts.
         posts_tree = self.create_tree(
             tree_title=f"Visualising {sort} {limit} posts from the '{listing}' listing",
-            is_populatable=False,
+            is_empty=True,
         )
 
         if raw_posts:
@@ -519,7 +518,7 @@ class Masonry:
         # Initialise a tree structure to visualise the posts.
         posts_tree = self.create_tree(
             tree_title=f"Visualising {sort} {limit} posts from the front-page",
-            is_populatable=False,
+            is_empty=True,
         )
 
         if raw_posts:
@@ -538,3 +537,5 @@ class Masonry:
                 save_to_json=save_to_json,
                 filename=f"frontpage_posts",
             )
+
+            print(posts_tree)
