@@ -9,8 +9,6 @@ from rich.logging import RichHandler
 from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
-from . import __version__, __description__, __epilog__
-
 
 def path_finder():
     """
@@ -35,13 +33,11 @@ def save_data(
     :param save_to_json: A boolean value to indicate whether to save data as a JSON file.
     :param save_to_csv: A boolean value to indicate whether to save data as a CSV file.
     """
-    from glyphoji import glyph
-
     # Save to JSON if save_json is True
     if save_to_json:
         with open(os.path.join(JSON_DIRECTORY, f"{filename}.json"), "w") as json_file:
             json.dump(data, json_file)
-        log.info(f"JSON data saved to {json_file.name} {glyph.party_popper}")
+        log.info(f"JSON data saved to {json_file.name}")
 
     # Save to CSV if save_csv is True
     if save_to_csv:
@@ -55,7 +51,7 @@ def save_data(
 
             # Write each row
             writer.writerow(data.values())
-        log.info(f"CSV data saved to {csv_file.name} {glyph.party_popper}")
+        log.info(f"CSV data saved to {csv_file.name}")
 
 
 def convert_timestamp_to_datetime(timestamp: float) -> str:
@@ -74,7 +70,7 @@ def setup_logging(debug_mode: bool) -> logging.getLogger:
     """
     Configure and return a logging object with the specified log level.
 
-    :param debug_mode: A boolean value indicating whether debug mode should be enabled or not.
+    :param debug_mode: A boolean value indicating whether log level should be set to DEBUG.
     :return: A logging object configured with the specified log level.
     """
     logging.basicConfig(
@@ -95,7 +91,17 @@ def create_parser() -> argparse.ArgumentParser:
 
     :return: A configured argparse.ArgumentParser object ready to parse the command line arguments.
     """
-    from . import __operations_description__, __operations_epilog__
+    from . import (
+        __description__,
+        __epilog__,
+        __post_examples__,
+        __posts_examples__,
+        __search_examples__,
+        __user_examples__,
+        __subreddit_examples__,
+        __operations_description__,
+        __version__,
+    )
 
     parser = argparse.ArgumentParser(
         description=Markdown(__description__, style="argparse.text"),
@@ -103,9 +109,7 @@ def create_parser() -> argparse.ArgumentParser:
         formatter_class=RichHelpFormatter,
     )
 
-    subparsers = parser.add_subparsers(
-        dest="mode", help="Operation mode", required=True
-    )
+    subparsers = parser.add_subparsers(dest="mode", help="Operation mode")
 
     # User mode
     user_parser = subparsers.add_parser(
@@ -114,21 +118,18 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             __operations_description__.format("User"), style="argparse.text"
         ),
-        epilog=Markdown(__operations_epilog__.format("user"), style="argparse.text"),
+        epilog=Markdown(__user_examples__),
         formatter_class=RichHelpFormatter,
     )
     user_parser.add_argument("username", help="Username to query")
     user_parser.add_argument(
-        "-comments-",
-        dest="comments",
+        "-c",
+        "--comments",
         action="store_true",
         help="Get a user's comments",
     )
     user_parser.add_argument(
-        "-posts-", dest="posts", action="store_true", help="Get a user's posts"
-    )
-    user_parser.add_argument(
-        "-profile-", dest="profile", action="store_true", help="Get a user's profile"
+        "-p", "--posts", action="store_true", help="Get a user's posts"
     )
 
     # Subreddit mode
@@ -138,21 +139,16 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             __operations_description__.format("Subreddit"), style="argparse.text"
         ),
-        epilog=Markdown(
-            __operations_epilog__.format("subreddit"), style="argparse.text"
-        ),
+        epilog=Markdown(__subreddit_examples__),
         formatter_class=RichHelpFormatter,
     )
-    subreddit_parser.add_argument("subreddit", help="Subreddit to query")
     subreddit_parser.add_argument(
-        "-profile-",
-        dest="profile",
-        action="store_true",
-        help="Get a subreddit's profile",
+        "subreddit",
+        help="Subreddit to query",
     )
     subreddit_parser.add_argument(
-        "-posts-",
-        dest="posts",
+        "-p",
+        "--posts",
         action="store_true",
         help="Get a subreddit's posts",
     )
@@ -164,28 +160,16 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             __operations_description__.format("Post"), style="argparse.text"
         ),
-        epilog=Markdown(__operations_epilog__.format("post"), style="argparse.text"),
+        epilog=Markdown(__post_examples__),
         formatter_class=RichHelpFormatter,
     )
+    post_parser.add_argument("post_id", help="Post ID")
+    post_parser.add_argument("post_subreddit", help="Source subreddit")
     post_parser.add_argument(
-        "id",
-        help="Post ID",
+        "-c", "--comments", dest="comments", action="store_true", help="Show comments"
     )
     post_parser.add_argument(
-        "subreddit",
-        help="Source subreddit",
-    )
-    post_parser.add_argument(
-        "-profile-",
-        dest="profile",
-        action="store_true",
-        help="Get a post's (profile) data",
-    )
-    post_parser.add_argument(
-        "-comments-", dest="comments", action="store_true", help="Get a post's comments"
-    )
-    post_parser.add_argument(
-        "-awards-", dest="awards", action="store_true", help=argparse.SUPPRESS
+        "-a", "--awards", dest="awards", action="store_true", help=argparse.SUPPRESS
     )
 
     # Posts mode
@@ -195,25 +179,14 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             __operations_description__.format("Posts"), style="argparse.text"
         ),
-        epilog=Markdown(__operations_epilog__.format("posts"), style="argparse.text"),
+        epilog=Markdown(__posts_examples__),
         formatter_class=RichHelpFormatter,
     )
     posts_parser.add_argument(
-        "-listings-",
-        dest="listings",
-        action="store_true",
-        help="Get posts from a specified listing",
-    )
-    posts_parser.add_argument(
-        "-frontpage-",
-        dest="frontpage",
-        action="store_true",
-        help="Get posts from the Reddit front-page",
-    )
-    posts_parser.add_argument(
+        "-l",
         "--listing",
         help="Post listing name",
-        choices=["hot", "new", "top"],
+        choices=["best", "controversial", "popular", "rising"],
         default="all",
     )
 
@@ -224,7 +197,7 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             __operations_description__.format("Search"), style="argparse.text"
         ),
-        epilog=Markdown(__operations_epilog__.format("search"), style="argparse.text"),
+        epilog=Markdown(__search_examples__),
         formatter_class=RichHelpFormatter,
     )
     search_parser.add_argument("query", help="Search query")
@@ -234,7 +207,7 @@ def create_parser() -> argparse.ArgumentParser:
         "-s",
         "--sort",
         default="all",
-        choices=["controversial", "new", "top", "best", "hot", "rising"],
+        choices=DATA_SORT_LISTINGS,
         help="Bulk data sort criterion (default: %(default)s)",
     )
     parser.add_argument(
@@ -259,7 +232,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-d",
         "--debug",
-        help="Enable debug mode",
+        help="Run Knew Karma in debug mode.",
         action="store_true",
     )
     parser.add_argument(
@@ -272,8 +245,9 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-args = create_parser().parse_args()
-log = setup_logging(debug_mode=args.debug)
+DATA_SORT_LISTINGS = ["controversial", "new", "top", "best", "hot", "rising"]
+arguments = create_parser().parse_args()
+log = setup_logging(debug_mode=arguments.debug)
 
 # Construct path to the program's directory
 PROGRAM_DIRECTORY = os.path.expanduser(os.path.join("~", "knewkarma"))

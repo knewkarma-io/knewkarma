@@ -1,112 +1,55 @@
 def on_call():
-    from datetime import datetime
-
-    from .coreutils import __version__, args, log, path_finder
+    from . import __version__
+    from .executor import Executor
+    from .coreutils import arguments, datetime, log, path_finder
+    from .masonry import Masonry
     from .messages import message
-    from .tree_masonry import Masonry
 
-    tree_masonry = Masonry()
-    start_time = datetime.now()
-
-    if args.mode:
-        print(
-            """
+    print(
+        """
 ┓┏┓         ┓┏┓         
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
+    )
+
+    tree_masonry = Masonry()
+    start_time = datetime.now()
+    executor = Executor(arguments=arguments, tree_masonry=tree_masonry)
+
+    path_finder()
+    try:
+        executor_title = (
+            "Command-Line Arguments"
+            if arguments.mode
+            else "Interactive Command-Line Wizard"
         )
-
-        try:
-            path_finder()
-            log.info(
-                message(
-                    message_type="info",
-                    message_key="program_started",
-                    program_name="Knew Karma",
-                    program_version=__version__,
-                    start_time=start_time.strftime("%a %b %d %Y, %H:%M:%S %p"),
-                )
+        log.info(
+            message(
+                message_type="info",
+                message_key="program_started",
+                program_name=f"Knew Karma",
+                executor_title=executor_title,
+                program_version=__version__,
+                start_time=start_time.strftime("%a %b %d %Y, %H:%M:%S %p"),
             )
-            tree_masonry.api.check_updates()
-
-            if args.mode == "user":
-                if args.profile:
-                    tree_masonry.tree_user_profile(
-                        username=args.username,
-                        save_to_csv=args.csv,
-                        save_to_json=args.json,
-                    )
-                elif args.posts:
-                    tree_masonry.tree_user_posts(
-                        username=args.username,
-                        sort=args.sort,
-                        limit=args.limit,
-                        save_to_json=args.json,
-                    )
-                elif args.comments:
-                    tree_masonry.tree_user_comments(
-                        username=args.username,
-                        sort=args.sort,
-                        limit=args.limit,
-                        save_to_json=args.json,
-                    )
-            elif args.mode == "subreddit":
-                if args.profile:
-                    tree_masonry.tree_subreddit_profile(
-                        subreddit=args.subreddit,
-                        save_to_csv=args.csv,
-                        save_to_json=args.json,
-                    )
-                elif args.posts:
-                    tree_masonry.tree_subreddit_posts(
-                        subreddit=args.subreddit,
-                        sort=args.sort,
-                        limit=args.limit,
-                        save_to_json=args.json,
-                    )
-            elif args.mode == "search":
-                tree_masonry.tree_search_results(
-                    query=args.query,
-                    sort=args.sort,
-                    limit=args.limit,
-                    save_to_json=args.json,
-                )
-            elif args.mode == "post":
-                tree_masonry.tree_post_data(
-                    post_id=args.post_id,
-                    post_subreddit=args.post_subreddit,
-                    sort=args.sort,
-                    limit=args.limit,
-                    show_comments=args.comments,
-                    save_to_csv=args.csv,
-                    save_to_json=args.json,
-                )
-            elif args.mode == "posts":
-                if args.listings:
-                    tree_masonry.tree_post_listings(
-                        listing=args.listing,
-                        sort=args.sort,
-                        limit=args.limit,
-                        save_to_json=args.json,
-                    )
-                elif args.frontpage:
-                    tree_masonry.tree_front_page_posts(
-                        sort=args.sort,
-                        limit=args.limit,
-                        save_to_json=args.json,
-                    )
-        except KeyboardInterrupt:
-            log.warning(
-                message(
-                    message_type="warning",
-                    message_key="user_interruption",
-                )
+        )
+        tree_masonry.api.check_updates()
+        if arguments.mode:
+            executor.execute_cli_arguments()
+        else:
+            executor.execute_cli_wizards()
+    except KeyboardInterrupt:
+        log.warning(
+            message(
+                message_type="warning",
+                message_key="user_interruption",
             )
-        finally:
-            log.info(
-                message(
-                    message_type="info",
-                    message_key="program_stopped",
-                    run_time=datetime.now() - start_time,
-                )
+        )
+    finally:
+        log.info(
+            message(
+                message_type="info",
+                message_key="program_stopped",
+                run_time=datetime.now() - start_time,
             )
+        )

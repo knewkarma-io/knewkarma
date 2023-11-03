@@ -1,6 +1,6 @@
 #: Dictionary of general message templates
 warning_messages = {
-    "user_interruption": "User interruption detected ([yellow]Ctrl+C[/])"
+    "user_interruption": "User interruption detected ([yellow]Ctrl+C[/])",
 }
 
 #: Dictionary of error message templates
@@ -12,10 +12,18 @@ error_messages = {
 
 #: Dictionary of informational message templates
 info_messages = {
-    "program_started": "Started [bold]{program_name}[/] {program_version} at {start_time}...",
+    "program_started": "Started [bold]{program_name}[/] {program_version} "
+    "([italic][blue]{executor_title}[/][/]) at {start_time}...",
     "program_stopped": "Stopped in {run_time} seconds.",
-    "update_found": "{program_name} {release_version} is available."
+    "update_found": "{program_name} {release_version} (from {current_version}) is available. "
     "To update, run: pip install --upgrade {program_call_name}",
+}
+
+prompt_messages = {
+    "confirm": "[italic]Would you like to {prompt_message}?[/]",
+    "set_output_limit": "[italic]Set bulk data output limit[/]",
+    "set_output_sort_criterion": "[italic]Set bulk data sort criterion[/]",
+    "enter_something": "[italic]Enter {what_to_enter}[/]",
 }
 
 
@@ -32,6 +40,7 @@ def message(message_type: str, message_key: str, **kwargs) -> str:
         "warning": warning_messages,
         "error": error_messages,
         "info": info_messages,
+        "prompt": prompt_messages,
     }
 
     template = message_dict.get(message_type, {}).get(message_key, "Message not found.")
