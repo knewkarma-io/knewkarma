@@ -149,9 +149,10 @@ class Api:
                             program_name="Knew Karma",
                             program_call_name="knewkarma",
                             release_version=remote_version,
+                            current_version=__version__,
                         ),
                         app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
-                        timeout=20,
+                        timeout=60,
                     )
                 except NotImplementedError:  # Gets raised on Termux
                     log.info(

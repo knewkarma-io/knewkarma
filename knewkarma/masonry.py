@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Union
 
-from glyphoji import glyph
 from rich import print
 from rich.text import Text
 from rich.tree import Tree
@@ -23,7 +22,7 @@ class Masonry:
     def create_tree(
         self,
         tree_title: str,
-        is_populatable: bool = True,
+        is_empty: bool = False,
         tree_data: Union[dict, list] = None,
         additional_text: str = None,
         additional_data: [(str, Union[dict, list])] = None,
@@ -32,7 +31,7 @@ class Masonry:
         Creates a tree structure  and populates it with the given data.
 
         :param tree_title: Title of the tree.
-        :param is_populatable: A boolean value indicating whether the tree should be/is populated.
+        :param is_empty: A boolean value indicating whether the tree is empty.
         :param tree_data: Data to populate the tree with.
         :param additional_text: Additional text to add at the end of the tree.
         :param additional_data: A list of tuples containing additional data such that should be added to the tree.
@@ -42,47 +41,45 @@ class Masonry:
         tree = Tree(tree_title, style="bold", guide_style="bold bright_blue")
         data_types = [dict, list]
         if type(tree_data) in data_types:
-            if type(tree_data) is dict:
-                for key, value in tree_data.items():
-                    tree.add(f"{key}: {value}", style="dim")
+            if isinstance(tree_data, dict):
+                for data_key, data_value in tree_data.items():
+                    tree.add(f"{data_key}: {data_value}", style="dim")
             else:
-                for item in tree_data:
-                    for key, value in item.items():
-                        tree.add(f"{key}: {value}", style="dim")
+                for count, item in enumerate(tree_data, start=1):
+                    tree.add(f"{count}: {item}", style="dim")
 
-        if additional_data:
-            for title, data in additional_data:
-                if type(data) in data_types:
-                    if type(data) is dict:
-                        self.add_branch(
-                            target_tree=tree,
-                            branch_title=title,
-                            branch_data=data,
-                        )
-                    else:
-                        for item in data:
+            if additional_data:
+                for title, branch_data in additional_data:
+                    if type(branch_data) in data_types:
+                        if isinstance(branch_data, dict):
                             self.add_branch(
                                 target_tree=tree,
                                 branch_title=title,
-                                branch_data=item,
+                                branch_data=branch_data,
                             )
+                        else:
+                            for item in branch_data:
+                                self.add_branch(
+                                    target_tree=tree,
+                                    branch_title=title,
+                                    branch_data=item,
+                                )
 
-        if additional_text:
-            tree.add(Text(additional_text), style="italic")
+            if additional_text:
+                tree.add(Text(additional_text), style="italic")
 
         return (
-            tree
-            if is_populatable
-            else Tree(tree_title, style="bold", guide_style="bold bright_blue")
+            Tree(tree_title, style="bold", guide_style="bold bright_blue")
+            if is_empty
+            else tree
         )
 
+    @staticmethod
     def add_branch(
-        self,
         target_tree: Tree,
         branch_title: str,
         branch_data: Union[dict, list],
         additional_text: str = None,
-        additional_data: [(str, Union[dict, list])] = None,
     ):
         """
         Populates a branch with the given data and adds it to the specified tree.
@@ -91,23 +88,22 @@ class Masonry:
         :param branch_title: The title for the new branch.
         :param branch_data: The data for the new branch in dictionary format.
         :param additional_text: Additional text to add at the end of the tree.
-        :param additional_data: A list of tuples containing additional data such that should be added to the tree.
         :returns: A populated branch.
         """
-        branch = target_tree.add(branch_title)
-        for key, value in branch_data.items():
-            branch.add(f"{key}: {value}", style="dim")
+        data_types = [dict, list]
+        if type(branch_data) in data_types:
+            branch = target_tree.add(branch_title, guide_style="bold blue")
+            if isinstance(branch_data, dict):
+                for data_key, data_value in branch_data.items():
+                    branch.add(f"{data_key}: {data_value}", style="dim")
+            else:
+                for count, item in enumerate(branch_data, start=1):
+                    branch.add(f"{count}. {item}")
 
-        if additional_data:
-            for title, data in additional_data:
-                self.add_branch(
-                    target_tree=branch, branch_title=title, branch_data=data
-                )
+            if additional_text:
+                branch.add(Text(additional_text), style="italic")
 
-        if additional_text:
-            branch.add(Text(additional_text), style="italic")
-
-        return target_tree
+            return target_tree
 
     def branch_posts(self, target_tree: Tree, posts: list, show_author: bool = False):
         """
@@ -124,8 +120,8 @@ class Masonry:
             # Set branch title to show the post author's username if the show_author is True.
             if show_author:
                 branch_title = (
-                    f"[italic]{convert_timestamp_to_datetime(post.get('created'))} b"
-                    f"y u/{post.get('author')}:[/] [bold]{post.get('title')}[/]"
+                    f"[italic]{convert_timestamp_to_datetime(post.get('created'))} | by"
+                    f" u/{post.get('author')}:[/] [bold]{post.get('title')}[/]"
                 )
             else:
                 # Otherwise, set the title of the branch to the title of the post.
@@ -170,10 +166,10 @@ class Masonry:
                     tree_title=raw_profile.get("subreddit").get("title"),
                     tree_data=profile,
                     additional_data=[
-                        (f"{glyph.face_in_clouds} Snoovatar", snoovatar),
+                        ("Snoovatar", snoovatar),
                         (raw_profile.get("subreddit").get("display_name"), subreddit),
-                        (f"{glyph.check_mark_button} Verification", verification),
-                        (f"{glyph.four_leaf_clover} Karma", karma),
+                        ("Verification", verification),
+                        ("Karma", karma),
                     ],
                 )
             )
@@ -206,12 +202,11 @@ class Masonry:
             sort=sort,
             limit=limit,
         )
-
         if raw_posts:
             # Initialise a tree structure to visualise the results.
             posts_tree = self.create_tree(
                 tree_title=f"Visualising user's (@{username}) [cyan]{limit}[/] [green]{sort}[/] posts",
-                is_populatable=False,
+                is_empty=True,
             )
             for raw_post in raw_posts:
                 self.add_branch(
@@ -246,7 +241,7 @@ class Masonry:
         # Initialise a tree structure to visualise the results.
         comments_tree = self.create_tree(
             tree_title=f"Visualising {username}'s [green]{sort}[/] [cyan]{limit}[/] comments",
-            is_populatable=False,
+            is_empty=True,
         )
 
         # Get comments from the API and add filters accordingly
@@ -304,10 +299,10 @@ class Masonry:
                     tree_title=raw_profile.get("public_description"),
                     tree_data=profile,
                     additional_data=[
-                        (f"{glyph.thumbs_up} Allows", allows),
-                        (f"{glyph.puzzle_piece} Banner", banner),
-                        (f"{glyph.memo} Header", header),
-                        (f"{glyph.four_leaf_clover} Flairs", flair),
+                        ("Allows", allows),
+                        ("Banner", banner),
+                        ("Header", header),
+                        ("Flairs", flair),
                     ],
                     additional_text=raw_profile.get("submit_text"),
                 )
@@ -334,7 +329,7 @@ class Masonry:
         # Initialise a tree structure to visualise the results.
         posts_tree = self.create_tree(
             tree_title=f"Visualising subreddit's (r/{subreddit}) [cyan]{limit}[/] [green]{sort}[/] posts",
-            is_populatable=False,
+            is_empty=True,
         )
 
         raw_posts = self.api.get_subreddit_posts(
@@ -376,7 +371,7 @@ class Masonry:
         # Initialise a tree structure to visualise the results.
         results_tree = self.create_tree(
             tree_title=f"Visualising {limit} results for [italic]{query}[/] - {datetime.now()}",
-            is_populatable=False,
+            is_empty=True,
         )
 
         # Get search results from the API and add filters accordingly
@@ -431,7 +426,7 @@ class Masonry:
 
         if raw_post:
             post_tree = self.create_tree(
-                tree_title=f"{raw_post.get('title')} by {raw_post.get('author')}",
+                tree_title=f"{raw_post.get('title')} | by {raw_post.get('author')}",
                 tree_data=self.data_broker.post_data(raw_post=raw_post),
                 additional_text=raw_post.get("selftext"),
             )
@@ -487,7 +482,7 @@ class Masonry:
         # Initialise a tree structure to visualise the posts.
         posts_tree = self.create_tree(
             tree_title=f"Visualising {sort} {limit} posts from the '{listing}' listing",
-            is_populatable=False,
+            is_empty=True,
         )
 
         if raw_posts:
@@ -523,7 +518,7 @@ class Masonry:
         # Initialise a tree structure to visualise the posts.
         posts_tree = self.create_tree(
             tree_title=f"Visualising {sort} {limit} posts from the front-page",
-            is_populatable=False,
+            is_empty=True,
         )
 
         if raw_posts:
@@ -542,3 +537,5 @@ class Masonry:
                 save_to_json=save_to_json,
                 filename=f"frontpage_posts",
             )
+
+            print(posts_tree)
