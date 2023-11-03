@@ -120,8 +120,8 @@ class Masonry:
             # Set branch title to show the post author's username if the show_author is True.
             if show_author:
                 branch_title = (
-                    f"[italic]{convert_timestamp_to_datetime(post.get('created'))} b"
-                    f"y u/{post.get('author')}:[/] [bold]{post.get('title')}[/]"
+                    f"[italic]{convert_timestamp_to_datetime(post.get('created'))} | by"
+                    f" u/{post.get('author')}:[/] [bold]{post.get('title')}[/]"
                 )
             else:
                 # Otherwise, set the title of the branch to the title of the post.
@@ -426,7 +426,7 @@ class Masonry:
 
         if raw_post:
             post_tree = self.create_tree(
-                tree_title=f"{raw_post.get('title')} by {raw_post.get('author')}",
+                tree_title=f"{raw_post.get('title')} | by {raw_post.get('author')}",
                 tree_data=self.data_broker.post_data(raw_post=raw_post),
                 additional_text=raw_post.get("selftext"),
             )
