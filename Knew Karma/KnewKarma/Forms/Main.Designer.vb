@@ -249,7 +249,7 @@ Partial Class Main
         TextBoxUsername.BackColor = SystemColors.Window
         TextBoxUsername.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         TextBoxUsername.ForeColor = SystemColors.WindowText
-        TextBoxUsername.Location = New Point(3, 162)
+        TextBoxUsername.Location = New Point(3, 163)
         TextBoxUsername.Name = "TextBoxUsername"
         TextBoxUsername.PlaceholderText = "Username (e.g., JohnDoe)"
         TextBoxUsername.Size = New Size(131, 23)
@@ -258,7 +258,7 @@ Partial Class Main
         ' TextBoxSubreddit
         ' 
         TextBoxSubreddit.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
-        TextBoxSubreddit.Location = New Point(3, 162)
+        TextBoxSubreddit.Location = New Point(3, 163)
         TextBoxSubreddit.Name = "TextBoxSubreddit"
         TextBoxSubreddit.PlaceholderText = "Subreddit (e.g., Ask)"
         TextBoxSubreddit.Size = New Size(131, 23)
@@ -606,10 +606,11 @@ Partial Class Main
         ' 
         ' ButtonFetchSubredditData
         ' 
+        ButtonFetchSubredditData.FlatAppearance.BorderSize = 0
         ButtonFetchSubredditData.FlatStyle = FlatStyle.Popup
         ButtonFetchSubredditData.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonFetchSubredditData.ForeColor = Color.Black
-        ButtonFetchSubredditData.Location = New Point(140, 162)
+        ButtonFetchSubredditData.Location = New Point(140, 163)
         ButtonFetchSubredditData.Name = "ButtonFetchSubredditData"
         ButtonFetchSubredditData.Size = New Size(79, 24)
         ButtonFetchSubredditData.TabIndex = 6
@@ -682,7 +683,7 @@ Partial Class Main
         ButtonFetchUserData.FlatStyle = FlatStyle.Popup
         ButtonFetchUserData.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonFetchUserData.ForeColor = Color.Black
-        ButtonFetchUserData.Location = New Point(140, 162)
+        ButtonFetchUserData.Location = New Point(140, 163)
         ButtonFetchUserData.Name = "ButtonFetchUserData"
         ButtonFetchUserData.Size = New Size(79, 24)
         ButtonFetchUserData.TabIndex = 4
