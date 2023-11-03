@@ -237,7 +237,7 @@
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.5.2"
+        "ProductVersion" = "8:1.6.0"
         "Manufacturer" = "8:Richard Mwewa"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/bellingcat/knewkarma/wiki"
