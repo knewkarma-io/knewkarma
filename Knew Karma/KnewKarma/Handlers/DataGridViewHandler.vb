@@ -416,7 +416,7 @@ Public Class DataGridHelper
     ''' Dictionary that maps the JSON key to a user-friendly header name for user subreddit.
     ''' </summary
     Public Shared ReadOnly UserSubredditHeaderMapping As New Dictionary(Of String, String) From {
-        {"display_name_prefixed", "Name"},
+        {"display_name", "Name"},
         {"accept_followers", "Accept Followers"},
         {"allowed_media_in_comments", "Allow Media in Comments"},
         {"banner_img", "Banner Image"},
