@@ -8,7 +8,7 @@ A **Reddit** Data Analysis Toolkit.
 
 # Features
 
-* **Knew Karma can get the following types of data from the following targets:**
+* **Knew Karma can get the following types of data from targets:**
    * **User**: *Posts*, *Comments* and *Profile* data.
    * **Post**: Data (with/without *Comments*) (available in the CLI).
    * **Subreddit**: *Posts* and *Profile* data.
