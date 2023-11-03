@@ -19,7 +19,9 @@ def on_call():
     path_finder()
     try:
         executor_title = (
-            "Command-line Arguments" if arguments.mode else "Interactive Wizard"
+            "Command-Line Arguments"
+            if arguments.mode
+            else "Interactive Command-Line Wizard"
         )
         log.info(
             message(
