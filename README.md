@@ -8,14 +8,18 @@ A **Reddit** Data Analysis Toolkit.
 
 # Features
 
-- [x] Has got both a Command-Line and Graphical User Interface instance.
-- [x] Dark mode (GUI)
-- [x] Saves results to either a **JSON** or **CSV** file.
-- [x] Gets **Posts**, **Comments** and **Profile** data of a specified **User**.
-- [x] Gets **Posts** and **Profile** data of a specified of a **Subreddit**.
-- [x] Returns **Posts** from Reddit's **front page**.
-- [x] Returns **Posts** from a specified **listing**.
-- [x] **Searches** for posts matching a given query form **all over Reddit**.
+* **Knew Karma can get the following types of data from the following targets:**
+   * **User**: *Posts*, *Comments* and *Profile* data.
+   * **Post**: Data (with/without *Comments*) (available in the CLI).
+   * **Subreddit**: *Posts* and *Profile* data.
+   * **Reddit Front-Page**: *Posts*.
+   * **Reddit Listing**: *Posts*.
+   * **Reddit Search**: *Posts* matching a given query.
+* **Other features include**:
+  * Saves results to either a **JSON** or **CSV** file.
+  * Has got both a **Command-Line** and **Graphical User Interface** instance.
+  * **Dark mode** (GUI)
+  
 
 # Documentation
 
