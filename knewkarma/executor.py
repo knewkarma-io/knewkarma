@@ -145,7 +145,7 @@ class Executor:
             def get_listing():
                 listing = Prompt.ask(
                     "listing",
-                    choices=["best", "rising", "controversial"],
+                    choices=["best", "controversial", "popular", "rising"],
                     default="all",
                 )
                 return self.tree_masonry.tree_post_listings(
