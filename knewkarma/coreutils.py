@@ -9,8 +9,6 @@ from rich.logging import RichHandler
 from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
-from . import __version__, __description__, __epilog__
-
 
 def path_finder():
     """
@@ -93,7 +91,13 @@ def create_parser() -> argparse.ArgumentParser:
 
     :return: A configured argparse.ArgumentParser object ready to parse the command line arguments.
     """
-    from . import __operations_description__, __operations_epilog__
+    from . import (
+        __description__,
+        __epilog__,
+        __operations_description__,
+        __operations_epilog__,
+        __version__,
+    )
 
     parser = argparse.ArgumentParser(
         description=Markdown(__description__, style="argparse.text"),
@@ -101,9 +105,7 @@ def create_parser() -> argparse.ArgumentParser:
         formatter_class=RichHelpFormatter,
     )
 
-    subparsers = parser.add_subparsers(
-        dest="mode", help="Operation mode", required=True
-    )
+    subparsers = parser.add_subparsers(dest="mode", help="Operation mode")
 
     # User mode
     user_parser = subparsers.add_parser(
@@ -174,16 +176,10 @@ def create_parser() -> argparse.ArgumentParser:
         help="Source subreddit",
     )
     post_parser.add_argument(
-        "-profile-",
-        dest="profile",
-        action="store_true",
-        help="Get a post's (profile) data",
+        "-c", "--comments", dest="comments", action="store_true", help="Show comments"
     )
     post_parser.add_argument(
-        "-comments-", dest="comments", action="store_true", help="Get a post's comments"
-    )
-    post_parser.add_argument(
-        "-awards-", dest="awards", action="store_true", help=argparse.SUPPRESS
+        "-a", "--awards", dest="awards", action="store_true", help=argparse.SUPPRESS
     )
 
     # Posts mode
@@ -211,7 +207,7 @@ def create_parser() -> argparse.ArgumentParser:
     posts_parser.add_argument(
         "--listing",
         help="Post listing name",
-        choices=["hot", "new", "top"],
+        choices=["best", "rising", "controversial"],
         default="all",
     )
 
@@ -232,7 +228,7 @@ def create_parser() -> argparse.ArgumentParser:
         "-s",
         "--sort",
         default="all",
-        choices=["controversial", "new", "top", "best", "hot", "rising"],
+        choices=DATA_SORT_LISTINGS,
         help="Bulk data sort criterion (default: %(default)s)",
     )
     parser.add_argument(
@@ -257,7 +253,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-d",
         "--debug",
-        help="Enable debug mode",
+        help="Run Knew Karma in debug mode.",
         action="store_true",
     )
     parser.add_argument(
@@ -270,8 +266,9 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-args = create_parser().parse_args()
-log = setup_logging(debug_mode=args.debug)
+DATA_SORT_LISTINGS = ["controversial", "new", "top", "best", "hot", "rising"]
+arguments = create_parser().parse_args()
+log = setup_logging(debug_mode=arguments.debug)
 
 # Construct path to the program's directory
 PROGRAM_DIRECTORY = os.path.expanduser(os.path.join("~", "knewkarma"))
