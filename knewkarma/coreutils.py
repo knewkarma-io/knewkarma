@@ -186,7 +186,7 @@ def create_parser() -> argparse.ArgumentParser:
         "-l",
         "--listing",
         help="Post listing name",
-        choices=["best", "rising", "controversial"],
+        choices=["best", "controversial", "popular", "rising"],
         default="all",
     )
 
