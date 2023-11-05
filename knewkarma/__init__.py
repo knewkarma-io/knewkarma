@@ -1,7 +1,7 @@
 import os
 
 DATA_SORT_LISTINGS = ["controversial", "new", "top", "best", "hot", "rising"]
-POST_LISTINGS = ["all", "best", "controversial", "popular", "rising"]
+POST_LISTINGS = ["best", "controversial", "popular", "rising"]
 
 # Construct path to the program's directory
 PROGRAM_DIRECTORY = os.path.expanduser(os.path.join("~", "knewkarma"))
