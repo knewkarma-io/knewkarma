@@ -12,6 +12,7 @@ def on_call():
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
     )
+    
     parser = create_parser()
     tree_masonry = Masonry()
     start_time = datetime.now()
