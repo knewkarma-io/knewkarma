@@ -20,7 +20,11 @@ __version__ = "2.0.0.0-beta"
 __description__ = """
 # Knew Karma
 > A **Reddit** Data Analysis Toolkit."""
-__epilog__ = f"# by [{__author__}]({__about__})"
+__epilog__ = f"""
+> Command-Line options can be mixed to get various data with a one-line command:
+`knewkarma OPERATION_MODE POSITIONAL_MODE_ARGUMENT -OPTION_1OPTION_2OPTION_3`
+# by [{__author__}]({__about__})
+"""
 
 
 __operations_description__ = "# **{}** Operations"
@@ -28,23 +32,28 @@ __user_examples__ = """
 # Examples
 ## Get User Profile
 ```
-knewkarma user USERNAME
+knewkarma user USERNAME --profile
 ```
+> Runs by default if no option is specified.
+
 
 ## Get User Comments (not sorted or limited)
 ```
-knewkarma user USERNAME ---comments
+knewkarma user USERNAME --comments
 ```
+
 
 ## Get User Posts (not sorted or limited)
 ```
 knewkarma user USERNAME --posts
 ```
 
+
 ## Get User Posts/Comments (sorted and limited)
 ```
 knewkarma --sort top --limit 20 user USERNAME --comments/--posts
 ```
+
 """
 
 __subreddit_examples__ = """
@@ -53,34 +62,42 @@ __subreddit_examples__ = """
 ```
 knewkarma subreddit SUBREDDIT_NAME --profile
 ```
+> Runs by default if no option is specified.
+
 
 ## Get Subreddit Posts (not sorted or limited)
 ```
 knewkarma subreddit SUBREDDIT_NAME --posts
 ```
 
+
 ## Get Subreddit Posts (sorted and limited)
 ```
 knewkarma --sort new --limit 20 subreddit SUBREDDIT_NAME
 ```
+
 """
 
 __post_examples__ = """
 # Examples
 ## Get Post Data (without comments)
 ```
-knewkarma post POST_ID SUBREDDIT_NAME
+knewkarma post POST_ID SUBREDDIT_NAME --profile
 ```
+> Runs by default if no option is specified.
+
 
 ## Get Post Data (with comments)
 ```
 knewkarma post POST_ID SUBREDDIT_NAME --comments
 ```
 
+
 ## Get Post's Comments (sorted and limited)
 ```
 knewkarma --sort top --limit 10 post POST_ID SUBREDDIT_NAME
 ```
+
 """
 
 __posts_examples__ = """
@@ -89,21 +106,26 @@ __posts_examples__ = """
 ```
 knewkarma posts --front-page
 ```
+> Runs by default if no option is specified.
+
 
 ## Get Posts from A Specified Listing (not sorted or limited)
 ```
 knewkarma posts --listing best
 ```
 
+
 ## Get Posts from Reddit Front-Page (sorted and limited)
 ```
 knewkarma --sort top --limit 20 posts --front-page
 ```
 
+
 ## Get Posts from A Specified Listing (sorted and limited)
 ```
-knewkarma --sort top --limit 20 posts --listing best
+knewkarma --sort top --limit 20 posts --listing all
 ```
+
 """
 
 __search_examples__ = """
@@ -113,8 +135,10 @@ __search_examples__ = """
 knewkarma search QUERY_STRING
 ```
 
+
 ## Search for Posts (sorted and limited)
 ```
 knewkarma --sort top --limit 20 search QUERY_STRING
 ```
+
 """
