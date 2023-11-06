@@ -116,7 +116,7 @@ def create_parser() -> argparse.ArgumentParser:
     posts_parser.add_argument(
         "-l",
         "--listing",
-        help="Get posts from a specified listing (default %(default)s)",
+        help="Get posts from a specified listing",
         choices=POST_LISTINGS,
     )
 
