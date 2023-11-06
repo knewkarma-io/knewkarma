@@ -118,7 +118,6 @@ def create_parser() -> argparse.ArgumentParser:
         "--listing",
         help="Get posts from a specified listing (default %(default)s)",
         choices=POST_LISTINGS,
-        default="all",
     )
 
     # Search mode
