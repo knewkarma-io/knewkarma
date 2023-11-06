@@ -50,10 +50,7 @@ def create_parser() -> argparse.ArgumentParser:
         help="Get a user's comments",
     )
     user_parser.add_argument(
-        "-p", "--profile", action="store_true", help="Get a user's profile"
-    )
-    user_parser.add_argument(
-        "-pp", "--posts", action="store_true", help="Get a user's posts"
+        "-p", "--posts", action="store_true", help="Get a user's posts"
     )
 
     # Subreddit mode
@@ -92,9 +89,6 @@ def create_parser() -> argparse.ArgumentParser:
     post_parser.add_argument(
         "-c", "--comments", dest="comments", action="store_true", help="Show comments"
     )
-    post_parser.add_argument(
-        "-a", "--awards", dest="awards", action="store_true", help=argparse.SUPPRESS
-    )
 
     # Posts mode
     posts_parser = subparsers.add_parser(
@@ -105,13 +99,6 @@ def create_parser() -> argparse.ArgumentParser:
         ),
         epilog=Markdown(__posts_examples__),
         formatter_class=RichHelpFormatter,
-    )
-    posts_parser.add_argument(
-        "-f",
-        "--front-page",
-        dest="front_page",
-        help="Get posts from Reddit Front-Page",
-        action="store_true",
     )
     posts_parser.add_argument(
         "-l",
