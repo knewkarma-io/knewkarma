@@ -1,0 +1,11 @@
+{
+  "id": "🆔 ID",
+  "icon_url": "🧩 Icon",
+  "icon_widht": "📐 Icon Width",
+  "icon_height": "📐 Icon Height",
+  "icon_format": "📄 Icon Format",
+  "coin_price": "🪙 Coin Price",
+  "coin_reward": "💰 Coin Reward",
+  "is_new": "🆕 Is New",
+  "award_type": "🏆 Award Type"
+}

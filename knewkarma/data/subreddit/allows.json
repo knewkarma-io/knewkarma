@@ -1,0 +1,13 @@
+{
+  "allow_talks": "🗣️ Talks",
+  "allow_polls": "🗳️ Polls",
+  "allow_videogifs": "🎞️ Video Gifs",
+  "allow_videos": "🎬 Videos",
+  "allow_images": "🖼️ Images",
+  "allow_galleries": "📂 Galleries",
+  "allow_predictions": "🔮 Predictions",
+  "allow_predictions_tournament": "🔮 Predictions Tournament",
+  "allow_prediction_contributors": "🔮 Predictions Contributors",
+  "allow_chat_post_creation": "🗨️ Chat Posts",
+  "allow_discovery": "🔍 Discovery"
+}

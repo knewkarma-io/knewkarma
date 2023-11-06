@@ -1,0 +1,20 @@
+{
+  "id": "🆔 ID",
+  "subreddit_type": "🏢 Subreddit Type",
+  "accounts_active": "👥 Current Active Users",
+  "subscribers": "🔔 Subscribers",
+  "lang": "🌐 Language",
+  "free_form_reports": "❔ Free Form Reports",
+  "wiki_enabled": "❔ Wiki Enabled",
+  "over18": "🔞 Over 18",
+  "spoilers_enabled": "🤫 Spoilers",
+  "icon_img": "🖼️ Icon Image",
+  "icon_size": "📐 Icon Size",
+  "submit_link_label": "📃 Submit Link Label",
+  "public_traffic": "🚦 Public Traffic",
+  "whitelist_status": "⬜ Whitelist Status",
+  "show_media": "❔ Show Media",
+  "user_sr_theme_enabled": "❔ User Sr Theme Enabled",
+  "show_media_preview": "❔ Show Media Preview",
+  "comment_score_hide_mins": "⏳ Comment Score Hide Mins"
+}
