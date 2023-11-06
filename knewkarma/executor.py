@@ -101,7 +101,7 @@ class Executor:
             """
             executed = False
             for argument, function in argument_map.items():
-                if getattr(self.arguments, argument) is not None:
+                if getattr(self.arguments, argument, False):
                     function()
                     executed = True
 
