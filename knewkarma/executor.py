@@ -62,26 +62,7 @@ class Executor:
                 save_to_json=self.arguments.json,
             )
         elif self.arguments.mode == "posts":
-            if self.arguments.listing:
-                self.tree_masonry.posts_tree(
-                    posts_type="listing_posts",
-                    posts_source=self.arguments.listing,
-                    posts_limit=self.arguments.limit,
-                    show_author=True,
-                    sort_criterion=self.arguments.sort,
-                    save_to_json=self.arguments.json,
-                )
-            else:
-                log.warning(
-                    "No specific argument provided, executing default function: [italic]front_page[/]"
-                )
-                self.tree_masonry.posts_tree(
-                    posts_type="front_page_posts",
-                    posts_limit=self.arguments.limit,
-                    show_author=True,
-                    sort_criterion=self.arguments.sort,
-                    save_to_json=self.arguments.json,
-                )
+            self.handlers.posts_mode_handler()
 
     class Handlers:
         def __init__(self, executor):
@@ -109,7 +90,7 @@ class Executor:
             if not executed:
                 default_argument, default_function = next(iter(argument_map.items()))
                 log.warning(
-                    f"No specific argument provided, executing default function: [italic]{default_argument}[/]"
+                    f"No specific argument provided, executing default ([italic]{default_argument}[/])..."
                 )
                 default_function()
 
@@ -145,3 +126,23 @@ class Executor:
                 ),
             }
             self.execute_functions(argument_map=subreddit_argument_map)
+
+        def posts_mode_handler(self):
+            posts_argument_map = {
+                "front_page": lambda: self.tree_masonry.posts_tree(
+                    posts_type="front_page_posts",
+                    posts_limit=self.arguments.limit,
+                    show_author=True,
+                    sort_criterion=self.arguments.sort,
+                    save_to_json=self.arguments.json,
+                ),
+                "listing": lambda: self.tree_masonry.posts_tree(
+                    posts_type="listing_posts",
+                    posts_source=self.arguments.listing,
+                    posts_limit=self.arguments.limit,
+                    show_author=True,
+                    sort_criterion=self.arguments.sort,
+                    save_to_json=self.arguments.json,
+                ),
+            }
+            self.execute_functions(argument_map=posts_argument_map)
