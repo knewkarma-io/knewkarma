@@ -21,8 +21,12 @@ __description__ = """
 # Knew Karma
 > A **Reddit** Data Analysis Toolkit."""
 __epilog__ = f"""
-> Command-Line options can be mixed to get various data with a one-line command:
-`knewkarma OPERATION_MODE POSITIONAL_MODE_ARGUMENT -OPTION_1OPTION_2OPTION_3`
+> Command-Line options can be mixed to get various data with a one-line command
+
+```
+knewkarma OPERATION_MODE POSITIONAL_MODE_ARGUMENT -OPTION_1OPTION_2OPTION_3
+```
+
 # by [{__author__}]({__about__})
 """
 
@@ -123,7 +127,7 @@ knewkarma --sort top --limit 20 posts --front-page
 
 ## Get Posts from A Specified Listing (sorted and limited)
 ```
-knewkarma --sort top --limit 20 posts --listing all
+knewkarma --sort top --limit 20 posts --listing best
 ```
 
 """
