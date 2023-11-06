@@ -17,7 +17,7 @@ class Broker:
 
         :returns: A Formatted JSON object with human-readable keys.
         """
-        from knewkarma.coreutils import CURRENT_FILE_DIRECTORY
+        from . import CURRENT_FILE_DIRECTORY
 
         # Construct path to the mapping data file
         mapping_data_file = os.path.join(CURRENT_FILE_DIRECTORY, "data", data_file)
