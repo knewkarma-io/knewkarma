@@ -31,7 +31,7 @@ class Executor:
                 tree_masonry=self.tree_masonry,
                 data_broker=self.data_broker,
             )
-            self.handlers.user_mode_handler(user_object=user)
+            self.handlers.user_handler(user_object=user)
 
         elif self.arguments.mode == "subreddit":
             subreddit = Subreddit(
@@ -39,7 +39,7 @@ class Executor:
                 tree_masonry=self.tree_masonry,
                 data_broker=self.data_broker,
             )
-            self.handlers.subreddit_mode_handler(subreddit_object=subreddit)
+            self.handlers.subreddit_handler(subreddit_object=subreddit)
 
         elif self.arguments.mode == "search":
             self.tree_masonry.posts_tree(
@@ -62,7 +62,7 @@ class Executor:
                 save_to_json=self.arguments.json,
             )
         elif self.arguments.mode == "posts":
-            self.handlers.posts_mode_handler()
+            self.handlers.posts_handler()
 
     class Handlers:
         def __init__(self, executor):
@@ -94,7 +94,7 @@ class Executor:
                 )
                 default_function()
 
-        def user_mode_handler(self, user_object: User):
+        def user_handler(self, user_object: User):
             user_argument_map = {
                 "profile": lambda: user_object.profile(
                     save_to_json=self.save_to_json,
@@ -114,7 +114,7 @@ class Executor:
 
             self.execute_functions(argument_map=user_argument_map)
 
-        def subreddit_mode_handler(self, subreddit_object: Subreddit):
+        def subreddit_handler(self, subreddit_object: Subreddit):
             subreddit_argument_map = {
                 "profile": lambda: subreddit_object.profile(
                     save_to_json=self.save_to_json, save_to_csv=self.save_to_csv
@@ -127,7 +127,7 @@ class Executor:
             }
             self.execute_functions(argument_map=subreddit_argument_map)
 
-        def posts_mode_handler(self):
+        def posts_handler(self):
             posts_argument_map = {
                 "front_page": lambda: self.tree_masonry.posts_tree(
                     posts_type="front_page_posts",
