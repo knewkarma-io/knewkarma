@@ -71,14 +71,14 @@ Public Class DataGridViewer
         Dim postsList As JArray = Nothing
         Dim listing As String = String.Empty
 
-        If Main.RadioButtonBest.Checked Then
-            listing = Main.RadioButtonBest.Text
-        ElseIf Main.RadioButtonRising.Checked Then
-            listing = Main.RadioButtonRising.Text
-        ElseIf Main.RadioButtonControversial.Checked Then
-            listing = Main.RadioButtonControversial.Text
-        ElseIf Main.RadioButtonPopular.Checked Then
-            listing = Main.RadioButtonPopular.Text
+        If MainWindow.RadioButtonBest.Checked Then
+            listing = MainWindow.RadioButtonBest.Text
+        ElseIf MainWindow.RadioButtonRising.Checked Then
+            listing = MainWindow.RadioButtonRising.Text
+        ElseIf MainWindow.RadioButtonControversial.Checked Then
+            listing = MainWindow.RadioButtonControversial.Text
+        ElseIf MainWindow.RadioButtonPopular.Checked Then
+            listing = MainWindow.RadioButtonPopular.Text
         End If
 
         postsList = Await apiHandler.AsyncGetPosts(
@@ -94,13 +94,13 @@ Public Class DataGridViewer
             For Each post As JObject In postsList
                 AddToDataGridView(
                     data:=post,
-                    form:=Posts,
+                    form:=PostsWindow,
                     dataGridViewName:="DataGridViewPosts",
                     RowKeys:=DataGridHelper.PostRowKeys
                 )
             Next
-            Posts.Text = $"{sort} {listing} {limit} posts"
-            Posts.Show()
+            PostsWindow.Text = $"{sort} {listing} {limit} posts"
+            PostsWindow.Show()
 
             ' Prompt to save data if the conditions are met.
             CoreUtils.PromptSaveData(data:=postsList, title:=$"{listing} posts")
@@ -117,11 +117,11 @@ Public Class DataGridViewer
         Dim IsValid As Boolean = CoreUtils.IsValidData(data:=ProfileData)
 
         If IsValid Then
-            UserProfile.Text = $"User Profile - {username}"
+            UserProfileWindow.Text = $"User Profile - {username}"
 
 
             SetupDataGrid(
-                UserProfile.DataGridViewUserProfile,
+                UserProfileWindow.DataGridViewUserProfile,
                 DataGridHelper.DefaultColumnHeaders
             )
 
@@ -139,9 +139,9 @@ Public Class DataGridViewer
                 End If
 
                 ' Add a row with the header and value.
-                UserProfile.DataGridViewUserProfile.Rows.Add(New Object() {header, value})
+                UserProfileWindow.DataGridViewUserProfile.Rows.Add(New Object() {header, value})
             Next
-            UserProfile.Show()
+            UserProfileWindow.Show()
             ' Get the user subreddit data from the user's profile data.
             LoadUserSubreddit(UserSubredditData:=ProfileData)
 
@@ -161,7 +161,7 @@ Public Class DataGridViewer
 
 
         SetupDataGrid(
-            UserProfile.DataGridViewUserSubreddit,
+            UserProfileWindow.DataGridViewUserSubreddit,
             DataGridHelper.DefaultColumnHeaders
         )
 
@@ -171,7 +171,7 @@ Public Class DataGridViewer
             Dim header = kvp.Value
 
             ' Add a row with the header and value.
-            UserProfile.DataGridViewUserSubreddit.Rows.Add(
+            UserProfileWindow.DataGridViewUserSubreddit.Rows.Add(
                 New Object() {header, If(UserSubredditData("subreddit")(key)?.ToString(),
                 "N/A")}
             )
@@ -189,8 +189,8 @@ Public Class DataGridViewer
                                                     sortCriterion As String,
                                                     postsLimit As Integer
                                                 ) As Task
-        Dim sort As String = Main.ComboBoxUserDataListing.Text
-        Dim limit As Integer = Main.NumericUpDownUserDataLimit.Value
+        Dim sort As String = MainWindow.ComboBoxUserDataListing.Text
+        Dim limit As Integer = MainWindow.NumericUpDownUserDataLimit.Value
 
 
         Dim postsList As JArray = Await apiHandler.AsyncGetPosts(
@@ -207,13 +207,13 @@ Public Class DataGridViewer
             For Each post As JObject In postsList
                 AddToDataGridView(
                     data:=post,
-                    form:=Posts,
+                    form:=PostsWindow,
                     dataGridViewName:="DataGridViewPosts",
                     RowKeys:=DataGridHelper.PostRowKeys
                 )
             Next
-            Posts.Text = $"u/{username}'s {sort} {limit} posts"
-            Posts.Show()
+            PostsWindow.Text = $"u/{username}'s {sort} {limit} posts"
+            PostsWindow.Show()
 
             ' Prompt to save data if the conditions are met.
             CoreUtils.PromptSaveData(data:=postsList, title:=$"User ({username}) posts")
@@ -247,13 +247,13 @@ Public Class DataGridViewer
             For Each Comment As JObject In commentsList
                 AddToDataGridView(
                     data:=Comment,
-                    form:=Comments,
+                    form:=CommentsWindow,
                     dataGridViewName:="DataGridViewComments",
                     RowKeys:=DataGridHelper.CommentRowKeys
                 )
             Next
-            Comments.Text = $"u/{username}'s {sortCriterion} {commentsLimit} comments"
-            Comments.Show()
+            CommentsWindow.Text = $"u/{username}'s {sortCriterion} {commentsLimit} comments"
+            CommentsWindow.Show()
 
             ' Prompt to save data if the conditions are met.
             CoreUtils.PromptSaveData(data:=commentsList, title:=$"User ({username}) comments")
@@ -266,44 +266,44 @@ Public Class DataGridViewer
     ''' </summary>
     ''' <param name="username">The username to fetch data for.</param>
     Public Shared Async Function AsyncLoadUserData(username As String) As Task
-        If Main.RadioButtonUserProfile.Checked Then
+        If MainWindow.RadioButtonUserProfile.Checked Then
             Await AsyncLoadUserProfile(username:=username)
-        ElseIf Main.RadioButtonUserPosts.Checked Then
+        ElseIf MainWindow.RadioButtonUserPosts.Checked Then
             Await AsyncLoadUserPosts(
                 username:=username,
-                sortCriterion:=Main.ComboBoxUserDataListing.Text,
-                postsLimit:=Main.NumericUpDownUserDataLimit.Value
+                sortCriterion:=MainWindow.ComboBoxUserDataListing.Text,
+                postsLimit:=MainWindow.NumericUpDownUserDataLimit.Value
             )
-        ElseIf Main.RadioButtonUserComments.Checked Then
+        ElseIf MainWindow.RadioButtonUserComments.Checked Then
             Await AsyncLoadUserComments(
                 username:=username,
-                sortCriterion:=Main.ComboBoxUserDataListing.Text,
-                commentsLimit:=Main.NumericUpDownUserDataLimit.Value
+                sortCriterion:=MainWindow.ComboBoxUserDataListing.Text,
+                commentsLimit:=MainWindow.NumericUpDownUserDataLimit.Value
             )
         End If
     End Function
 
     ''' <summary>
-    ''' Asynchronously load a subreddit's profile data and updates the FormProfile form.
+    ''' Asynchronously load a subreddit's profile data and updates the SubredditProfileWindow form.
     ''' </summary>
     ''' <param name="username">The username to fetch data for.</param>
     Public Shared Async Function SubredditProfile(subreddit As String) As Task
         Dim ProfileData As JObject = Await apiHandler.AsyncGetProfile(profileType:="subreddit_profile", profileSource:=subreddit)
         Dim IsValid As Boolean = CoreUtils.IsValidData(data:=ProfileData)
         If IsValid Then
-            MiscData.Text = $"Subreddit Profile - {subreddit}"
+            SubredditProfileWindow.Text = $"Subreddit Profile - {subreddit}"
 
-            SetupDataGrid(MiscData.DataGridViewProfile, DataGridHelper.DefaultColumnHeaders)
+            SetupDataGrid(SubredditProfileWindow.DataGridViewProfile, DataGridHelper.DefaultColumnHeaders)
 
             ' Loop over each property and populate the DataGridView accordingly.
             For Each KeyValuePair In DataGridHelper.SubRedditProfileHeaderMapping
                 Dim key = KeyValuePair.Key
                 Dim header = KeyValuePair.Value
                 ' Add a row with the header and value.
-                MiscData.DataGridViewProfile.Rows.Add(New Object() {header, ProfileData(key)})
+                SubredditProfileWindow.DataGridViewProfile.Rows.Add(New Object() {header, ProfileData(key)})
             Next
 
-            MiscData.Show()
+            SubredditProfileWindow.Show()
 
             ' Prompt to save data if the conditions are met.
             CoreUtils.PromptSaveData(data:=ProfileData, title:=$"Subreddit ({subreddit}) profile")
@@ -337,14 +337,14 @@ Public Class DataGridViewer
             For Each post As JObject In postsList
                 AddToDataGridView(
                     data:=post,
-                    form:=Posts,
+                    form:=PostsWindow,
                     dataGridViewName:="DataGridViewPosts",
                     RowKeys:=DataGridHelper.PostRowKeys
                 )
             Next
 
-            Posts.Text = $"Showing {sortCriterion} {postsLimit} posts from r/{subreddit}"
-            Posts.Show()
+            PostsWindow.Text = $"Showing {sortCriterion} {postsLimit} posts from r/{subreddit}"
+            PostsWindow.Show()
 
             ' Prompt to save data if the conditions are met.
             CoreUtils.PromptSaveData(data:=postsList, title:=$"Subreddit ({subreddit}) posts")
@@ -357,13 +357,13 @@ Public Class DataGridViewer
     ''' </summary>
     ''' <param name="subreddit">The username to fetch data for.</param>
     Public Shared Async Function LoadSubredditDataAsync(subreddit As String) As Task
-        If Main.RadioButtonSubredditProfile.Checked Then
+        If MainWindow.RadioButtonSubredditProfile.Checked Then
             Await SubredditProfile(subreddit:=subreddit)
-        ElseIf Main.RadioButtonSubredditPosts.Checked Then
+        ElseIf MainWindow.RadioButtonSubredditPosts.Checked Then
             Await AsyncLoadSubredditPosts(
                 subreddit:=subreddit,
-                sortCriterion:=Main.ComboBoxSubredditPostsListing.Text,
-                postsLimit:=Main.NumericUpDownSubredditPostsLimit.Value
+                sortCriterion:=MainWindow.ComboBoxSubredditPostsListing.Text,
+                postsLimit:=MainWindow.NumericUpDownSubredditPostsLimit.Value
             )
         End If
     End Function
@@ -376,7 +376,7 @@ Public Class DataGridViewer
     ''' <returns>A Task representing the asynchronous operation.</returns>
     Public Shared Async Function LoadSearchResultsAsync(
                                                        query As String,
-                                                       form As Posts,
+                                                       form As PostsWindow,
                                                        sortCriterion As String,
                                                        postsLimit As Integer
                                                    ) As Task
@@ -413,12 +413,12 @@ Public Class DataGridViewer
     ''' <param name="form">The Posts.object that contains the DataGridView to be updated.</param>
     ''' <returns>A Task representing the asynchronous operation.</returns>
     Public Shared Async Function LoadFrontPagePostsAsync(
-                                                        form As Posts,
+                                                        form As PostsWindow,
                                                         sortCriterion As String,
                                                         postsLimit As Integer
                                                     ) As Task
-        Dim sort As String = Main.ComboBoxFrontPageDataListing.Text
-        Dim limit As Integer = Main.NumericUpDownFrontPageDataLimit.Value
+        Dim sort As String = MainWindow.ComboBoxFrontPageDataListing.Text
+        Dim limit As Integer = MainWindow.NumericUpDownFrontPageDataLimit.Value
 
         Dim Posts As JArray = Await apiHandler.AsyncGetPosts(
             postsType:="front_page_posts",

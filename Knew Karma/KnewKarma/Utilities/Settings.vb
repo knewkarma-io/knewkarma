@@ -52,8 +52,8 @@ Public Class SettingsManager
             SaveToCsv = settings.SaveToCsv
             ColorSettings = settings.ColorSettings
 
-            Main.ToJSONToolStripMenuItem.Checked = settings.SaveToJson
-            Main.ToCSVToolStripMenuItem.Checked = settings.SaveToCsv
+            MainWindow.ToJSONToolStripMenuItem.Checked = settings.SaveToJson
+            MainWindow.ToCSVToolStripMenuItem.Checked = settings.SaveToCsv
         Else
             ' Settings file does not exist
             Dim defaultSettings = New SettingsManager With {
@@ -85,22 +85,22 @@ Public Class SettingsManager
             SaveToJson = False
             SaveToCsv = False
             ColorSettings = defaultSettings.ColorSettings
-            Main.ToJSONToolStripMenuItem.Checked = False
-            Main.ToCSVToolStripMenuItem.Checked = False
+            MainWindow.ToJSONToolStripMenuItem.Checked = False
+            MainWindow.ToCSVToolStripMenuItem.Checked = False
 
             ' Check the system settings to see if dark mode is enabled/disabled
             If CoreUtils.IsSystemDarkTheme() Then
                 ' If dark mode is enabled in the system settings, update the program's dark mode settings: 
                 ' set DarkMode to True, check the DarkModeEnable menu item, and uncheck the DarkModeDisable menu item.
                 DarkMode = True
-                Main.DarkModeEnableToolStripMenuItem.Checked = True
-                Main.DarkModeDisableToolStripMenuItem.Checked = False
+                MainWindow.DarkModeEnableToolStripMenuItem.Checked = True
+                MainWindow.DarkModeDisableToolStripMenuItem.Checked = False
             Else
                 ' If dark mode is not enabled in the system settings, update the program's dark mode settings:
                 ' set DarkMode to False, uncheck the DarkModeEnable menu item, and check the DarkModeDisable menu item.
                 DarkMode = False
-                Main.DarkModeEnableToolStripMenuItem.Checked = False
-                Main.DarkModeDisableToolStripMenuItem.Checked = True
+                MainWindow.DarkModeEnableToolStripMenuItem.Checked = False
+                MainWindow.DarkModeDisableToolStripMenuItem.Checked = True
             End If
         End If
     End Sub
@@ -148,10 +148,10 @@ Public Class SettingsManager
         ' Retrieve the current settings
         Dim settings As Dictionary(Of String, Object) = GetSettings()
         ' Apply the SaveToJson setting to the menu item checkbox
-        Main.ToJSONToolStripMenuItem.Checked = Me.SaveToJson
+        MainWindow.ToJSONToolStripMenuItem.Checked = Me.SaveToJson
 
         ' Apply the SaveToCsv setting to the menu item checkbox
-        Main.ToCSVToolStripMenuItem.Checked = Me.SaveToCsv
+        MainWindow.ToCSVToolStripMenuItem.Checked = Me.SaveToCsv
 
         ' Use ColorSettings property directly
         Dim colorSettings As Dictionary(Of String, Dictionary(Of String, String)) = Me.ColorSettings
@@ -181,15 +181,15 @@ Public Class SettingsManager
         SetUIColors(color:=color)
 
         If isDarkMode Then
-            Main.DarkModeEnableToolStripMenuItem.Text = "Enabled"
-            Main.DarkModeDisableToolStripMenuItem.Text = "Disable"
-            Main.DarkModeEnableToolStripMenuItem.Checked = True
-            Main.DarkModeDisableToolStripMenuItem.Checked = False
+            MainWindow.DarkModeEnableToolStripMenuItem.Text = "Enabled"
+            MainWindow.DarkModeDisableToolStripMenuItem.Text = "Disable"
+            MainWindow.DarkModeEnableToolStripMenuItem.Checked = True
+            MainWindow.DarkModeDisableToolStripMenuItem.Checked = False
         Else
-            Main.DarkModeEnableToolStripMenuItem.Text = "Enable"
-            Main.DarkModeDisableToolStripMenuItem.Text = "Disabled"
-            Main.DarkModeEnableToolStripMenuItem.Checked = False
-            Main.DarkModeDisableToolStripMenuItem.Checked = True
+            MainWindow.DarkModeEnableToolStripMenuItem.Text = "Enable"
+            MainWindow.DarkModeDisableToolStripMenuItem.Text = "Disabled"
+            MainWindow.DarkModeEnableToolStripMenuItem.Checked = False
+            MainWindow.DarkModeDisableToolStripMenuItem.Checked = True
         End If
     End Sub
 
@@ -198,16 +198,16 @@ Public Class SettingsManager
     ''' </summary>
     ''' <param name="color">A dictionary mapping color names to Color objects.</param>
     Private Shared Sub SetUIColors(ByVal color As Dictionary(Of String, Color))
-        Main.TreeView1.BackColor = color("InputFieldBackgroundColor")
-        Main.TreeView1.ForeColor = color("PrimaryTextColor")
-        Main.TreeView1.LineColor = color("SecondaryTextColor")
+        MainWindow.TreeView1.BackColor = color("InputFieldBackgroundColor")
+        MainWindow.TreeView1.ForeColor = color("PrimaryTextColor")
+        MainWindow.TreeView1.LineColor = color("SecondaryTextColor")
 
         ''' <summary>
         ''' Apply colors to tab pages
         ''' </summary>
         Dim tabpages As New List(Of TabPage) From {
-            UserProfile.TabPage1,
-            UserProfile.TabPage2
+            UserProfileWindow.TabPage1,
+            UserProfileWindow.TabPage2
         }
         For Each tabpage In tabpages
             tabpage.BackColor = color("InputFieldBackgroundColor")
@@ -218,11 +218,11 @@ Public Class SettingsManager
         ''' Apply colors to Forms
         ''' </summary>
         Dim forms As New List(Of Form) From {
-            Main,
-            About,
-            Comments,
-            MiscData,
-            Posts
+            MainWindow,
+            AboutWindow,
+            CommentsWindow,
+            SubredditProfileWindow,
+            PostsWindow
             }
         For Each form In forms
             form.BackColor = color("MainBackgroundColor")
@@ -233,15 +233,15 @@ Public Class SettingsManager
         ''' Apply colors to buttons
         ''' </summary>
         Dim buttons As New List(Of Button) From {
-            Main.ButtonFetchFrontPageData,
-            Main.ButtonFetchListingPosts,
-            Main.ButtonFetchSubredditData,
-            Main.ButtonFetchUserData,
-            Main.ButtonSearch,
-            About.ButtonViewLicense,
-            About.ButtonGetUpdates
+            MainWindow.ButtonFetchFrontPageData,
+            MainWindow.ButtonFetchListingPosts,
+            MainWindow.ButtonFetchSubredditData,
+            MainWindow.ButtonFetchUserData,
+            MainWindow.ButtonSearch,
+            AboutWindow.ButtonViewLicense,
+            AboutWindow.ButtonGetUpdates
         }
-        ' Main.ButtonFetchPostData,
+        ' MainWindow.ButtonFetchPostData,
         For Each button In buttons
             button.BackColor = color("InputFieldBackgroundColor")
             button.ForeColor = color("PrimaryTextColor")
@@ -251,24 +251,24 @@ Public Class SettingsManager
         ''' Apply colors to Label controls
         ''' </summary>
         Dim labels As New List(Of Label) From {
-            Main.LabelPostListingsLimit,
-            Main.LabelPostListingsListing,
-            Main.LabelFrontPageDataLimit,
-            Main.LabelFrontPageDataListing,
-            Main.LabelSearchResultsLimit,
-            Main.LabelSearchResultsListing,
-            Main.LabelUserPostsListing,
-            Main.LabelUserDataLimit,
-            Main.LabelSubredditPostsListing,
-            Main.LabelSubredditPostsLimit,
-            About.LabelProgramFirstName,
-            Main.Label1,
-            Main.Label2,
-            Main.Label3,
-            Main.Label4,
-            Main.Label5
+            MainWindow.LabelPostListingsLimit,
+            MainWindow.LabelPostListingsListing,
+            MainWindow.LabelFrontPageDataLimit,
+            MainWindow.LabelFrontPageDataListing,
+            MainWindow.LabelSearchResultsLimit,
+            MainWindow.LabelSearchResultsListing,
+            MainWindow.LabelUserPostsListing,
+            MainWindow.LabelUserDataLimit,
+            MainWindow.LabelSubredditPostsListing,
+            MainWindow.LabelSubredditPostsLimit,
+            AboutWindow.LabelProgramFirstName,
+            MainWindow.Label1,
+            MainWindow.Label2,
+            MainWindow.Label3,
+            MainWindow.Label4,
+            MainWindow.Label5
             }
-        About.LabelProgramLastName.ForeColor = color("SecondaryTextColor")
+        AboutWindow.LabelProgramLastName.ForeColor = color("SecondaryTextColor")
         For Each label In labels
             label.ForeColor = color("PrimaryTextColor")
         Next
@@ -277,18 +277,18 @@ Public Class SettingsManager
         ''' Apply colors to RadioButton controls
         ''' </summary>
         Dim radioButtons As New List(Of RadioButton) From {
-            Main.RadioButtonBest,
-            Main.RadioButtonRising,
-            Main.RadioButtonPopular,
-            Main.RadioButtonControversial,
-            Main.RadioButtonUserProfile,
-            Main.RadioButtonUserPosts,
-            Main.RadioButtonUserComments,
-            Main.RadioButtonSubredditProfile,
-            Main.RadioButtonSubredditPosts
+            MainWindow.RadioButtonBest,
+            MainWindow.RadioButtonRising,
+            MainWindow.RadioButtonPopular,
+            MainWindow.RadioButtonControversial,
+            MainWindow.RadioButtonUserProfile,
+            MainWindow.RadioButtonUserPosts,
+            MainWindow.RadioButtonUserComments,
+            MainWindow.RadioButtonSubredditProfile,
+            MainWindow.RadioButtonSubredditPosts
             }
-        ' Main.RadioButtonPostProfile,
-        ' Main.RadioButtonPostComments,
+        ' MainWindow.RadioButtonPostProfile,
+        ' MainWindow.RadioButtonPostComments,
         For Each radioButton In radioButtons
             radioButton.BackColor = color("MainBackgroundColor")
             radioButton.ForeColor = color("PrimaryTextColor")
@@ -298,9 +298,9 @@ Public Class SettingsManager
         ''' Apply colors to TextBox controls
         ''' </summary>
         Dim textBoxes As New List(Of TextBox) From {
-            Main.TextBoxUsername,
-            Main.TextBoxQuery,
-            Main.TextBoxSubreddit
+            MainWindow.TextBoxUsername,
+            MainWindow.TextBoxQuery,
+            MainWindow.TextBoxSubreddit
             }
 
         For Each textBox In textBoxes
@@ -312,11 +312,11 @@ Public Class SettingsManager
         ''' Apply colors to NumericUpDown controls
         ''' </summary>
         Dim numericUpDowns As New List(Of NumericUpDown) From {
-            Main.NumericUpDownPostListingsLimit,
-            Main.NumericUpDownFrontPageDataLimit,
-            Main.NumericUpDownSubredditPostsLimit,
-            Main.NumericUpDownUserDataLimit,
-            Main.NumericUpDownSearchResultLimit
+            MainWindow.NumericUpDownPostListingsLimit,
+            MainWindow.NumericUpDownFrontPageDataLimit,
+            MainWindow.NumericUpDownSubredditPostsLimit,
+            MainWindow.NumericUpDownUserDataLimit,
+            MainWindow.NumericUpDownSearchResultLimit
             }
         For Each numericUpDown In numericUpDowns
             numericUpDown.BackColor = color("InputFieldBackgroundColor")
@@ -327,11 +327,11 @@ Public Class SettingsManager
         ''' Apply colors to ComboBox controls
         ''' </summary>
         Dim comboBoxes As New List(Of ComboBox) From {
-            Main.ComboBoxPostListingsListing,
-            Main.ComboBoxFrontPageDataListing,
-            Main.ComboBoxSubredditPostsListing,
-            Main.ComboBoxUserDataListing,
-            Main.ComboBoxSearchResultListing
+            MainWindow.ComboBoxPostListingsListing,
+            MainWindow.ComboBoxFrontPageDataListing,
+            MainWindow.ComboBoxSubredditPostsListing,
+            MainWindow.ComboBoxUserDataListing,
+            MainWindow.ComboBoxSearchResultListing
             }
         For Each comboBox In comboBoxes
             comboBox.BackColor = color("InputFieldBackgroundColor")
@@ -342,17 +342,17 @@ Public Class SettingsManager
         ''' Apply colors to GroupBox controls
         ''' </summary>
         Dim GroupBoxes As New List(Of GroupBox) From {
-            Main.GroupBoxPostListings,
-            Main.GroupBoxFrontPageDataFiltering,
-            Main.GroupBoxSubredditDataFiltering,
-            Main.GroupBoxUserDataFiltering,
-            Main.GroupBoxSearchResultsFiltering,
-            Main.GroupBoxPostListingsFiltering,
-            Main.GroupBoxUserData,
-            Main.GroupBoxSubredditData
+            MainWindow.GroupBoxPostListings,
+            MainWindow.GroupBoxFrontPageDataFiltering,
+            MainWindow.GroupBoxSubredditDataFiltering,
+            MainWindow.GroupBoxUserDataFiltering,
+            MainWindow.GroupBoxSearchResultsFiltering,
+            MainWindow.GroupBoxPostListingsFiltering,
+            MainWindow.GroupBoxUserData,
+            MainWindow.GroupBoxSubredditData
             }
-        ' Main.GroupBoxPostDataFiltering,
-        ' Main.GroupBoxPostData,
+        ' MainWindow.GroupBoxPostDataFiltering,
+        ' MainWindow.GroupBoxPostData,
         For Each groupBox In GroupBoxes
             groupBox.BackColor = color("MainBackgroundColor")
             groupBox.ForeColor = color("SecondaryTextColor")
@@ -362,15 +362,15 @@ Public Class SettingsManager
         ''' Apply colors to ToolStripMenuItem items
         ''' </summary>
         Dim menuItems As New List(Of ToolStripMenuItem) From {
-            Main.SettingsToolStripMenuItem,
-            Main.DarkModeToolStripMenuItem,
-            Main.DarkModeEnableToolStripMenuItem,
-            Main.DarkModeDisableToolStripMenuItem,
-            Main.SaveDataToolStripMenuItem,
-            Main.ToJSONToolStripMenuItem,
-            Main.ToCSVToolStripMenuItem,
-            Main.AboutToolStripMenuItem,
-            Main.ExitToolStripMenuItem
+            MainWindow.SettingsToolStripMenuItem,
+            MainWindow.DarkModeToolStripMenuItem,
+            MainWindow.DarkModeEnableToolStripMenuItem,
+            MainWindow.DarkModeDisableToolStripMenuItem,
+            MainWindow.SaveDataToolStripMenuItem,
+            MainWindow.ToJSONToolStripMenuItem,
+            MainWindow.ToCSVToolStripMenuItem,
+            MainWindow.AboutToolStripMenuItem,
+            MainWindow.ExitToolStripMenuItem
             }
         For Each menuItem In menuItems
             menuItem.BackColor = color("MainBackgroundColor")
@@ -381,20 +381,20 @@ Public Class SettingsManager
         ''' Apply colors to data grid view cells
         ''' </summary>
         Dim cellStyles As New List(Of DataGridViewCellStyle) From {
-            MiscData.DataGridViewProfile.AlternatingRowsDefaultCellStyle,
-            MiscData.DataGridViewProfile.DefaultCellStyle,
-            UserProfile.DataGridViewUserProfile.AlternatingRowsDefaultCellStyle,
-            UserProfile.DataGridViewUserProfile.DefaultCellStyle,
-            UserProfile.DataGridViewUserSubreddit.AlternatingRowsDefaultCellStyle,
-            UserProfile.DataGridViewUserSubreddit.DefaultCellStyle,
-            Posts.DataGridViewPosts.AlternatingRowsDefaultCellStyle,
-            Posts.DataGridViewPosts.RowHeadersDefaultCellStyle,
-            Posts.DataGridViewPosts.ColumnHeadersDefaultCellStyle,
-            Posts.DataGridViewPosts.DefaultCellStyle,
-            Comments.DataGridViewComments.AlternatingRowsDefaultCellStyle,
-            Comments.DataGridViewComments.RowHeadersDefaultCellStyle,
-            Comments.DataGridViewComments.ColumnHeadersDefaultCellStyle,
-            Comments.DataGridViewComments.DefaultCellStyle
+            SubredditProfileWindow.DataGridViewProfile.AlternatingRowsDefaultCellStyle,
+            SubredditProfileWindow.DataGridViewProfile.DefaultCellStyle,
+            UserProfileWindow.DataGridViewUserProfile.AlternatingRowsDefaultCellStyle,
+            UserProfileWindow.DataGridViewUserProfile.DefaultCellStyle,
+            UserProfileWindow.DataGridViewUserSubreddit.AlternatingRowsDefaultCellStyle,
+            UserProfileWindow.DataGridViewUserSubreddit.DefaultCellStyle,
+            PostsWindow.DataGridViewPosts.AlternatingRowsDefaultCellStyle,
+            PostsWindow.DataGridViewPosts.RowHeadersDefaultCellStyle,
+            PostsWindow.DataGridViewPosts.ColumnHeadersDefaultCellStyle,
+            PostsWindow.DataGridViewPosts.DefaultCellStyle,
+            CommentsWindow.DataGridViewComments.AlternatingRowsDefaultCellStyle,
+            CommentsWindow.DataGridViewComments.RowHeadersDefaultCellStyle,
+            CommentsWindow.DataGridViewComments.ColumnHeadersDefaultCellStyle,
+            CommentsWindow.DataGridViewComments.DefaultCellStyle
             }
         For Each cellStyle In cellStyles
             cellStyle.BackColor = color("InputFieldBackgroundColor")
@@ -406,31 +406,31 @@ Public Class SettingsManager
         ''' Apply mouse enter/mouse leave colors to ToolStripMenuItem and ContextMenuStrip controls
         ''' </summary>
         Dim toolStripItems As New List(Of ToolStripMenuItem) From {
-            Main.SettingsToolStripMenuItem,
-            Main.DarkModeToolStripMenuItem,
-            Main.SaveDataToolStripMenuItem
+            MainWindow.SettingsToolStripMenuItem,
+            MainWindow.DarkModeToolStripMenuItem,
+            MainWindow.SaveDataToolStripMenuItem
         }
         ' Iterate over the individual menu items
         For Each toolStripItem In toolStripItems
             For Each item As ToolStripMenuItem In toolStripItem.DropDownItems
                 ' Add handlers for MouseEnter and MouseLeave events
                 AddHandler item.MouseEnter, Sub(sender As Object, e As EventArgs)
-                                                Main.OnMenuItemMouseEnter(sender:=sender, e:=e, color:=color)
+                                                MainWindow.OnMenuItemMouseEnter(sender:=sender, e:=e, color:=color)
                                             End Sub
                 AddHandler item.MouseLeave, Sub(sender As Object, e As EventArgs)
-                                                Main.OnMenuItemMouseLeave(sender:=sender, e:=e, color:=color)
+                                                MainWindow.OnMenuItemMouseLeave(sender:=sender, e:=e, color:=color)
                                             End Sub
             Next
         Next
 
         ' Iterate over the context menus and their items
-        For Each item As ToolStripMenuItem In Main.ContextMenuStripRightClick.Items
+        For Each item As ToolStripMenuItem In MainWindow.ContextMenuStripRightClick.Items
             ' Add handlers for MouseEnter and MouseLeave events
             AddHandler item.MouseEnter, Sub(sender As Object, e As EventArgs)
-                                            Main.OnMenuItemMouseEnter(sender:=sender, e:=e, color:=color)
+                                            MainWindow.OnMenuItemMouseEnter(sender:=sender, e:=e, color:=color)
                                         End Sub
             AddHandler item.MouseLeave, Sub(sender As Object, e As EventArgs)
-                                            Main.OnMenuItemMouseLeave(sender:=sender, e:=e, color:=color)
+                                            MainWindow.OnMenuItemMouseLeave(sender:=sender, e:=e, color:=color)
                                         End Sub
         Next
     End Sub

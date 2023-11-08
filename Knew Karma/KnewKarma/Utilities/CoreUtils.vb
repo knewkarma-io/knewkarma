@@ -9,7 +9,7 @@ Public Class CoreUtils
     ''' Handles the enabling and disabling of various controls based on the state of radio buttons on the main form.
     ''' </summary>
     ''' <param name="form">The main form containing the radio buttons and controls to be manipulated.</param>
-    Public Shared Sub HandleRadioButtonChanges(form As Main)
+    Public Shared Sub HandleRadioButtonChanges(form As MainWindow)
         ' Check the state of user radio buttons and enable/disable relevant controls accordingly
         ' Depending on which radio button is selected, different sets of controls will be enabled or disabled
         ' to provide a more intuitive user experience and prevent invalid configurations.
@@ -68,7 +68,7 @@ Public Class CoreUtils
     ''' <param name="IsAutoCheck">Indicates whether the update check is triggered automatically.</param>
     ''' <returns>A task representing the asynchronous operation.</returns>
     Public Shared Async Function AsyncCheckUpdates() As Task
-        About.Version.Text = "Checking for Updates..."
+        AboutWindow.Version.Text = "Checking for Updates..."
         ' Creating a new instance of the ApiHandler class to interact with the API.
         Dim Api As New ApiHandler()
 
@@ -82,10 +82,10 @@ Public Class CoreUtils
 
             ' Checking if the current version is the latest version.
             If tagName = My.Application.Info.Version.ToString Then
-                About.Version.Text = $"Up-to-date ({My.Application.Info.Version})"
+                AboutWindow.Version.Text = $"Up-to-date ({My.Application.Info.Version})"
             Else
-                About.Version.Text = $"Updates found ({tagName})"
-                About.ButtonGetUpdates.Enabled = True
+                AboutWindow.Version.Text = $"Updates found ({tagName})"
+                AboutWindow.ButtonGetUpdates.Enabled = True
             End If
         End If
     End Function
@@ -178,11 +178,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
     ''' <param name="data">The data to save, represented as a JToken, which can accommodate both JArray and JObject.</param>
     Public Shared Sub PromptSaveData(data As JToken, title As String)
         ' Save profile data to JSON if the JSON toolStripMenuItem is checked.
-        If Main.settings.SaveToJson Then
+        If MainWindow.settings.SaveToJson Then
             SaveDataToJson(data:=data, title:=title)
         End If
         ' Save profile data to CSV if the CSV toolStripMenuItem is checked.
-        If Main.settings.SaveToCsv Then
+        If MainWindow.settings.SaveToCsv Then
             SaveDataToCSV(data:=data, title:=title)
         End If
     End Sub
