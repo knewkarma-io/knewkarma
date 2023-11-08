@@ -1,6 +1,8 @@
 ﻿Imports System.Net.Http
 Imports Newtonsoft.Json.Linq
 Imports System.Runtime.InteropServices
+Imports System.Reflection
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel
 
 ''' <summary>
 ''' Class for making API calls to Reddit and or GitHub.
@@ -27,7 +29,10 @@ Public Class ApiHandler
     Public Async Function AsyncGetData(endpoint As String) As Task(Of JToken)
         Try
             Using httpClient As New HttpClient()
-                httpClient.DefaultRequestHeaders.Add("User-Agent", $"Knew-Karma/{appVersion} ({dotNetVersion}; +https://about.me/rly0nheart)")
+                httpClient.DefaultRequestHeaders.Add(
+                    "User-Agent",
+                    $"Knew-Karma/{appVersion} ({dotNetVersion}; +https://about.me/rly0nheart)"
+                )
 
                 Dim response As HttpResponseMessage = Await httpClient.GetAsync(endpoint)
 
@@ -35,12 +40,22 @@ Public Class ApiHandler
                     Dim json As String = Await response.Content.ReadAsStringAsync()
                     Return JObject.Parse(json)
                 Else
-                    MessageBox.Show(response.ReasonPhrase, "An API Error occurred", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    MessageBox.Show(
+                        response.ReasonPhrase,
+                        "An API Error occurred",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    )
                     Return Nothing
                 End If
             End Using
         Catch ex As Exception
-            MessageBox.Show(ex.Message, "An HTTP Error occurred", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show(
+                ex.Message,
+                "An HTTP Error occurred",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            )
         End Try
         Return Nothing
     End Function
@@ -52,87 +67,70 @@ Public Class ApiHandler
         Return Await AsyncGetData(endpoint:="https://api.github.com/repos/bellingcat/knewkarma/releases/latest")
     End Function
 
-    ''' <summary>
-    ''' Asynchronously fetches a user's Reddit profile.
-    ''' </summary>
-    ''' <param name="username">The Reddit username.</param>
-    ''' <returns>A JSON object containing the user's profile data.</returns>
-    Public Async Function AsyncGetUserProfile(username As String) As Task(Of JObject)
-        Dim data As JObject = Await AsyncGetData(endpoint:=$"{BASE_ENDPOINT}/user/{username}/about.json")
-        Return If(data IsNot Nothing AndAlso data("data") IsNot Nothing, data("data"), New JObject())
-    End Function
 
     ''' <summary>
-    ''' Asynchronously fetches posts submitted by a user.
+    ''' Asynchronously retrieves posts from a specified source.
     ''' </summary>
-    ''' <param name="username">The Reddit username.</param>
-    ''' <param name="sort">Sorting criterion ('new', 'hot', etc.).</param>
-    ''' <param name="limit">Number of posts to fetch.</param>
-    ''' <returns>A JSON array containing the user's posts.</returns>
-    Public Async Function AsyncGetUserPosts(username As String, sort As String, limit As Integer) As Task(Of JArray)
-        Dim data As JObject = Await AsyncGetData(endpoint:=$"{BASE_ENDPOINT}/user/{username}/submitted.json?sort={sort}&limit={limit}")
-        Return If(data IsNot Nothing AndAlso data("data") IsNot Nothing, data("data")?("children"), New JArray())
+    ''' <param name="sortCriterion">The criterion by which the posts should be sorted.</param>
+    ''' <param name="postsLimit">The limit on the number of posts to retrieve.</param>
+    ''' <param name="postsType">The type of posts to retrieve (e.g., user_posts, user_comments).</param>
+    ''' <param name="postsSource">The source from where the posts should be fetched (e.g., specific user or subreddit).</param>
+    ''' <returns>A Task(Of JArray) representing the asynchronous operation, which upon completion returns a JArray of posts.</returns>
+    Public Async Function AsyncGetPosts(
+                                       ByVal sortCriterion As String,
+                                       ByVal postsLimit As Integer,
+                                       ByVal postsType As String,
+                                       Optional ByVal postsSource As String = Nothing
+                                   ) As Task(Of JArray)
+        Dim postsTypeMap As New List(Of Tuple(Of String, String)) From {
+            Tuple.Create("user_posts", $"{BASE_ENDPOINT}/user/{postsSource}/submitted.json?sort={sortCriterion}&limit={postsLimit}"),
+            Tuple.Create("user_comments", $"{BASE_ENDPOINT}/user/{postsSource}/comments.json?sort={sortCriterion}&limit={postsLimit}"),
+            Tuple.Create("subreddit_posts", $"{BASE_ENDPOINT}/r/{postsSource}.json?sort={sortCriterion}&limit={postsLimit}"),
+            Tuple.Create("search_posts", $"{BASE_ENDPOINT}/search.json?q={postsSource}&sort={sortCriterion}&limit={postsLimit}"),
+            Tuple.Create("listing_posts", $"{BASE_ENDPOINT}/r/{postsSource}.json?sort={sortCriterion}&limit={postsLimit}"),
+            Tuple.Create("front_page_posts", $"{BASE_ENDPOINT}/.json?sort={sortCriterion}&limit={postsLimit}")
+        }
+
+        Dim postsEndpoint As String = Nothing
+
+        For Each Type In postsTypeMap
+            If Type.Item1 = postsType Then
+                postsEndpoint = Type.Item2
+                Exit For
+            End If
+        Next
+
+        Dim posts As JObject = Await AsyncGetData(endpoint:=postsEndpoint)
+
+        Return If(posts IsNot Nothing AndAlso posts?("data") IsNot Nothing, posts?("data")?("children"), New JArray())
+
     End Function
+
 
     ''' <summary>
-    ''' Asynchronously fetches comments submitted by a user.
+    ''' Asynchronously retrieves profile data from a specified source.
     ''' </summary>
-    ''' <param name="username">The Reddit username.</param>
-    ''' <param name="sort">Sorting criterion ('new', 'hot', etc.).</param>
-    ''' <param name="limit">Number of posts to fetch.</param>
-    ''' <returns>A JSON array containing the user's posts.</returns>
-    Public Async Function AsyncGetUserComments(username As String, sort As String, limit As Integer) As Task(Of JArray)
-        Dim data As JObject = Await AsyncGetData(endpoint:=$"{BASE_ENDPOINT}/user/{username}/comments.json?sort={sort}&limit={limit}")
-        Return If(data IsNot Nothing AndAlso data("data") IsNot Nothing, data("data")?("children"), New JArray())
-    End Function
+    ''' <param name="profileType">The type of profile to retrieve.</param>
+    ''' <param name="profileSource">The source from where the profile should be fetched (e.g., specific user or subreddit).</param>
+    ''' <returns>A Task(Of JObject) representing the asynchronous operation, which upon completion returns a Jobject of profile data.</returns>
+    Public Async Function AsyncGetProfile(
+                                         profileType As String, profileSource As String) As Task(Of JObject)
+        Dim profileTypeMap As New List(Of Tuple(Of String, String)) From {
+            Tuple.Create("user_profile", $"{BASE_ENDPOINT}/user/{profileSource}/about.json"),
+            Tuple.Create("subreddit_profile", $"{BASE_ENDPOINT}/r/{profileSource}/about.json")
+        }
 
-    ''' <summary>
-    ''' Asynchronously fetches profile data for a subreddit.
-    ''' </summary>
-    ''' <param name="subreddit">The subreddit name.</param>
-    ''' <returns>A JSON object containing the subreddit's profile data.</returns>
-    Public Async Function AsyncGetSubredditProfile(subreddit As String) As Task(Of JObject)
-        Dim data As JObject = Await AsyncGetData(endpoint:=$"{BASE_ENDPOINT}/r/{subreddit}/about.json")
-        Return If(data IsNot Nothing AndAlso data("data") IsNot Nothing, data("data"), New JObject())
-    End Function
+        Dim profileEndpoint As String = Nothing
 
-    ''' <summary>
-    ''' Asynchronously fetches posts in a subreddit.
-    ''' </summary>
-    ''' <param name="subreddit">The subreddit username.</param>
-    ''' <param name="sort">Sorting criterion ('new', 'hot', etc.).</param>
-    ''' <param name="limit">Number of posts to fetch.</param>
-    ''' <returns>A JSON array containing the user's posts.</returns>
-    Public Async Function AsyncGetSubredditPosts(subreddit As String, sort As String, limit As Integer) As Task(Of JArray)
-        Dim data As JObject = Await AsyncGetData(endpoint:=$"{BASE_ENDPOINT}/r/{subreddit}.json?sort={sort}&limit={limit}")
-        Return If(data IsNot Nothing AndAlso data("data") IsNot Nothing, data("data")?("children"), New JArray())
-    End Function
+        For Each Type In profileTypeMap
+            If Type.Item1 = profileType Then
+                profileEndpoint = Type.Item2
+                Exit For
+            End If
+        Next
 
-    ''' <summary>
-    ''' Asynchronously searches Reddit for a query string.
-    ''' </summary>
-    ''' <param name="query">The search query.</param>
-    ''' <param name="sort">Sorting criterion ('new', 'hot', etc.).</param>
-    ''' <param name="limit">Number of search results to fetch.</param>
-    ''' <returns>A JSON array containing the search results.</returns>
-    Public Async Function AsyncSearchPosts(query As String, sort As String, limit As Integer) As Task(Of JArray)
-        Dim data As JObject = Await AsyncGetData(endpoint:=$"{BASE_ENDPOINT}/search.json?q={query}&sort={sort}&limit={limit}")
-        Return If(data IsNot Nothing AndAlso data("data") IsNot Nothing, data("data")?("children"), New JArray())
-    End Function
+        Dim profile As JObject = Await AsyncGetData(endpoint:=profileEndpoint)
 
-    ''' <summary>
-    ''' Asynchronously gets posts from the Reddit front page.
-    ''' </summary>
-    ''' <param name="sort">Sorting criterion ('new', 'hot', etc.).</param>
-    ''' <param name="limit">Number of search results to fetch.</param>
-    ''' <returns>A JSON array containing the search results.</returns>
-    Public Async Function AsyncGetFrontPagePosts(sort As String, limit As Integer) As Task(Of JArray)
-        Dim data As JObject = Await AsyncGetData(endpoint:=$"{BASE_ENDPOINT}/.json?sort={sort}&limit={limit}")
-        Return If(data IsNot Nothing AndAlso data("data") IsNot Nothing, data("data")?("children"), New JArray())
-    End Function
-
-    Public Async Function AsyncGetListingsPosts(sort As String, limit As Integer, listing As String) As Task(Of JArray)
-        Dim data As JObject = Await AsyncGetData(endpoint:=$"{BASE_ENDPOINT}/r/{listing}.json?sort={sort}&limit={limit}")
-        Return If(data IsNot Nothing AndAlso data("data") IsNot Nothing, data("data")?("children"), New JArray())
+        Return If(profile IsNot Nothing AndAlso profile?("data") IsNot Nothing, profile?("data"), New JObject())
     End Function
 End Class
