@@ -33,7 +33,7 @@ Namespace My
 
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>
         Protected Overrides Sub OnCreateMainForm()
-            Me.MainForm = Global.KnewKarma.Main
+            Me.MainForm = Global.KnewKarma.MainWindow
         End Sub
 
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
