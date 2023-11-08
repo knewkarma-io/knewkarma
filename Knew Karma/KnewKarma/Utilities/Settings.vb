@@ -32,7 +32,11 @@ Public Class SettingsManager
     ''' <summary>
     ''' Represents the path where the settings file is stored.
     ''' </summary>
-    Private ReadOnly settingsFilePath As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Knew Karma", "settings.json")
+    Private ReadOnly settingsFilePath As String = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "Knew Karma",
+        "settings.json"
+    )
 
     ''' <summary>
     ''' Loads application settings from the 'settings.json' file.
@@ -161,7 +165,10 @@ Public Class SettingsManager
     ''' Colors are defined in a mapping for easier maintenance and flexibility.
     ''' </summary>
     ''' <param name="isDarkMode">Indicates whether Dark Mode is enabled.</param>
-    Public Shared Sub ApplyColorScheme(ByVal isDarkMode As Boolean, ByVal colorSettings As Dictionary(Of String, Dictionary(Of String, String)))
+    Public Shared Sub ApplyColorScheme(
+                                      ByVal isDarkMode As Boolean,
+                                      ByVal colorSettings As Dictionary(Of String, Dictionary(Of String, String))
+                                  )
         Dim color As New Dictionary(Of String, Color)
 
         Dim mode As String = If(isDarkMode, "Dark", "Light")
@@ -196,45 +203,6 @@ Public Class SettingsManager
         Main.TreeView1.LineColor = color("SecondaryTextColor")
 
         ''' <summary>
-        ''' Apply colors to data grid view controls
-        ''' </summary>
-        Dim dataGridViews As New List(Of DataGridView) From {
-            UserProfile.DataGridViewUserProfile,
-            UserProfile.DataGridViewUserSubreddit,
-            Comments.DataGridViewComments,
-            MiscData.DataGridViewProfile,
-            Posts.DataGridViewPosts
-        }
-        For Each datagridview In dataGridViews
-            datagridview.BackColor = color("MainBackgroundColor")
-            datagridview.ForeColor = color("PrimaryTextColor")
-        Next
-
-        ''' <summary>
-        ''' Apply colors to data grid view cells
-        ''' </summary>
-        Dim cellStyles As New List(Of DataGridViewCellStyle) From {
-            MiscData.DataGridViewProfile.AlternatingRowsDefaultCellStyle,
-            MiscData.DataGridViewProfile.DefaultCellStyle,
-            UserProfile.DataGridViewUserProfile.AlternatingRowsDefaultCellStyle,
-            UserProfile.DataGridViewUserProfile.DefaultCellStyle,
-            UserProfile.DataGridViewUserSubreddit.AlternatingRowsDefaultCellStyle,
-            UserProfile.DataGridViewUserSubreddit.DefaultCellStyle,
-            Posts.DataGridViewPosts.AlternatingRowsDefaultCellStyle,
-            Posts.DataGridViewPosts.RowHeadersDefaultCellStyle,
-            Posts.DataGridViewPosts.ColumnHeadersDefaultCellStyle,
-            Posts.DataGridViewPosts.DefaultCellStyle,
-            Comments.DataGridViewComments.AlternatingRowsDefaultCellStyle,
-            Comments.DataGridViewComments.RowHeadersDefaultCellStyle,
-            Comments.DataGridViewComments.ColumnHeadersDefaultCellStyle,
-            Comments.DataGridViewComments.DefaultCellStyle
-            }
-        For Each cellStyle In cellStyles
-            cellStyle.BackColor = color("InputFieldBackgroundColor")
-            cellStyle.ForeColor = color("PrimaryTextColor")
-        Next
-
-        ''' <summary>
         ''' Apply colors to tab pages
         ''' </summary>
         Dim tabpages As New List(Of TabPage) From {
@@ -266,7 +234,7 @@ Public Class SettingsManager
         ''' </summary>
         Dim buttons As New List(Of Button) From {
             Main.ButtonFetchFrontPageData,
-            Main.ButtonFetchPostListings,
+            Main.ButtonFetchListingPosts,
             Main.ButtonFetchSubredditData,
             Main.ButtonFetchUserData,
             Main.ButtonSearch,
@@ -292,7 +260,7 @@ Public Class SettingsManager
             Main.LabelUserPostsListing,
             Main.LabelUserDataLimit,
             Main.LabelSubredditPostsListing,
-            Main.LabelSubredditDataLimit,
+            Main.LabelSubredditPostsLimit,
             About.LabelProgramFirstName,
             Main.Label1,
             Main.Label2,
@@ -346,7 +314,7 @@ Public Class SettingsManager
         Dim numericUpDowns As New List(Of NumericUpDown) From {
             Main.NumericUpDownPostListingsLimit,
             Main.NumericUpDownFrontPageDataLimit,
-            Main.NumericUpDownSubredditDataLimit,
+            Main.NumericUpDownSubredditPostsLimit,
             Main.NumericUpDownUserDataLimit,
             Main.NumericUpDownSearchResultLimit
             }
@@ -362,7 +330,7 @@ Public Class SettingsManager
             Main.ComboBoxPostListingsListing,
             Main.ComboBoxFrontPageDataListing,
             Main.ComboBoxSubredditPostsListing,
-            Main.ComboBoxUserPostsListing,
+            Main.ComboBoxUserDataListing,
             Main.ComboBoxSearchResultListing
             }
         For Each comboBox In comboBoxes
@@ -410,6 +378,31 @@ Public Class SettingsManager
         Next
 
         ''' <summary>
+        ''' Apply colors to data grid view cells
+        ''' </summary>
+        Dim cellStyles As New List(Of DataGridViewCellStyle) From {
+            MiscData.DataGridViewProfile.AlternatingRowsDefaultCellStyle,
+            MiscData.DataGridViewProfile.DefaultCellStyle,
+            UserProfile.DataGridViewUserProfile.AlternatingRowsDefaultCellStyle,
+            UserProfile.DataGridViewUserProfile.DefaultCellStyle,
+            UserProfile.DataGridViewUserSubreddit.AlternatingRowsDefaultCellStyle,
+            UserProfile.DataGridViewUserSubreddit.DefaultCellStyle,
+            Posts.DataGridViewPosts.AlternatingRowsDefaultCellStyle,
+            Posts.DataGridViewPosts.RowHeadersDefaultCellStyle,
+            Posts.DataGridViewPosts.ColumnHeadersDefaultCellStyle,
+            Posts.DataGridViewPosts.DefaultCellStyle,
+            Comments.DataGridViewComments.AlternatingRowsDefaultCellStyle,
+            Comments.DataGridViewComments.RowHeadersDefaultCellStyle,
+            Comments.DataGridViewComments.ColumnHeadersDefaultCellStyle,
+            Comments.DataGridViewComments.DefaultCellStyle
+            }
+        For Each cellStyle In cellStyles
+            cellStyle.BackColor = color("InputFieldBackgroundColor")
+            cellStyle.ForeColor = color("PrimaryTextColor")
+        Next
+
+
+        ''' <summary>
         ''' Apply mouse enter/mouse leave colors to ToolStripMenuItem and ContextMenuStrip controls
         ''' </summary>
         Dim toolStripItems As New List(Of ToolStripMenuItem) From {
@@ -441,6 +434,7 @@ Public Class SettingsManager
                                         End Sub
         Next
     End Sub
+
 
     ''' <summary>
     ''' Toggles specific settings on or off based on the provided parameters.

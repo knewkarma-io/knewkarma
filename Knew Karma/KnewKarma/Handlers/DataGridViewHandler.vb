@@ -14,7 +14,10 @@ Public Class DataGridViewer
     ''' </summary>
     ''' <param name="dataGrid">The DataGridView to configure.</param>
     ''' <param name="columnHeaders">A Dictionary containing column keys and their display names.</param>
-    Private Shared Sub SetupDataGrid(dataGrid As DataGridView, columnHeaders As Dictionary(Of String, String))
+    Private Shared Sub SetupDataGrid(
+                                    dataGrid As DataGridView,
+                                    columnHeaders As Dictionary(Of String, String)
+                                )
         dataGrid.Rows.Clear()
         dataGrid.Columns.Clear()
 
@@ -32,7 +35,12 @@ Public Class DataGridViewer
     ''' <param name="dataGridViewName">The name of the DataGridView control to add the row to.</param>
     ''' <param name="RowKeys">A list of keys from the API response that represent the value of each Row.</param>
     ''' <returns>The updated form.</returns>
-    Private Shared Function AddToDataGridView(data As JObject, form As Form, dataGridViewName As String, RowKeys As List(Of String)) As Form
+    Private Shared Function AddToDataGridView(
+                                             data As JObject,
+                                             form As Form,
+                                             dataGridViewName As String,
+                                             RowKeys As List(Of String)
+                                             ) As Form
 
         Dim postRowData As New List(Of String)  ' Separate list to hold the values
 
@@ -65,23 +73,31 @@ Public Class DataGridViewer
 
         If Main.RadioButtonBest.Checked Then
             listing = Main.RadioButtonBest.Text
-            postsList = Await apiHandler.AsyncGetListingsPosts(sort:=sort, limit:=limit, listing:=listing)
         ElseIf Main.RadioButtonRising.Checked Then
             listing = Main.RadioButtonRising.Text
-            postsList = Await apiHandler.AsyncGetListingsPosts(sort:=sort, limit:=limit, listing:=listing)
         ElseIf Main.RadioButtonControversial.Checked Then
             listing = Main.RadioButtonControversial.Text
-            postsList = Await apiHandler.AsyncGetListingsPosts(sort:=sort, limit:=limit, listing:=listing)
         ElseIf Main.RadioButtonPopular.Checked Then
             listing = Main.RadioButtonPopular.Text
-            postsList = Await apiHandler.AsyncGetListingsPosts(sort:=sort, limit:=limit, listing:=listing)
         End If
+
+        postsList = Await apiHandler.AsyncGetPosts(
+            postsType:="listing_posts",
+            postsSource:=listing,
+            sortCriterion:=sort,
+            postsLimit:=limit
+        )
 
         Dim isValid As Boolean = CoreUtils.IsValidData(data:=postsList)
         If isValid Then
             ' Iterate over each post and add its data to the DataGridView.
             For Each post As JObject In postsList
-                AddToDataGridView(data:=post, form:=Posts, dataGridViewName:="DataGridViewPosts", RowKeys:=DataGridHelper.PostRowKeys)
+                AddToDataGridView(
+                    data:=post,
+                    form:=Posts,
+                    dataGridViewName:="DataGridViewPosts",
+                    RowKeys:=DataGridHelper.PostRowKeys
+                )
             Next
             Posts.Text = $"{sort} {listing} {limit} posts"
             Posts.Show()
@@ -91,43 +107,23 @@ Public Class DataGridViewer
         End If
     End Function
 
-    ''' <summary>
-    ''' Loads the comments of a specific user and updates the DataGridView in the Comments.form.
-    ''' </summary>
-    ''' <param name="username">The Reddit username for which to fetch comments' data.</param>
-    ''' <param name="form">The Comments.object that contains the DataGridView to be updated.</param>
-    ''' <returns>A Task representing the asynchronous operation.</returns>
-    Private Shared Sub PostComments(commentsList As JArray)
-        Dim isValid As Boolean = CoreUtils.IsValidData(data:=commentsList)
-
-        ' If the API data is valid, setup a DataGridView for the Posts.
-        If isValid Then
-            ' Iterate over each comment and add its data to the DataGridView.
-            For Each Comment As JObject In commentsList
-                AddToDataGridView(data:=Comment, form:=Comments, dataGridViewName:="DataGridViewComments", RowKeys:=DataGridHelper.CommentRowKeys)
-            Next
-            'Comments.Text = $"u/{username}'s {sort} {limit} comments"
-            Comments.Show()
-
-            ' Prompt to save data if the conditions are met.
-            'CoreUtils.PromptSaveData(data:=Comments, title:=$"User ({username}) comments")
-        End If
-    End Sub
-
 
     ''' <summary>
     ''' Asynchronously gets the user profile data and updates the DataGridView in the FormUserProfile form with it.
     ''' </summary>
     ''' <param name="username">The username to get the data for.</param>
     Private Shared Async Function AsyncLoadUserProfile(username As String) As Task
-        Dim ProfileData As JObject = Await apiHandler.AsyncGetUserProfile(username:=username)
+        Dim ProfileData As JObject = Await apiHandler.AsyncGetProfile(profileType:="user_profile", profileSource:=username)
         Dim IsValid As Boolean = CoreUtils.IsValidData(data:=ProfileData)
 
         If IsValid Then
             UserProfile.Text = $"User Profile - {username}"
 
 
-            SetupDataGrid(UserProfile.DataGridViewUserProfile, DataGridHelper.DefaultColumnHeaders)
+            SetupDataGrid(
+                UserProfile.DataGridViewUserProfile,
+                DataGridHelper.DefaultColumnHeaders
+            )
 
             ' Loop over each property and populate the DataGridView accordingly.
             For Each KeyValuePair In DataGridHelper.UserProfileHeaderMapping
@@ -164,7 +160,10 @@ Public Class DataGridViewer
 
 
 
-        SetupDataGrid(UserProfile.DataGridViewUserSubreddit, DataGridHelper.DefaultColumnHeaders)
+        SetupDataGrid(
+            UserProfile.DataGridViewUserSubreddit,
+            DataGridHelper.DefaultColumnHeaders
+        )
 
         ' Loop over each property and populate the DataGridView accordingly.
         For Each kvp In DataGridHelper.UserSubredditHeaderMapping
@@ -172,7 +171,10 @@ Public Class DataGridViewer
             Dim header = kvp.Value
 
             ' Add a row with the header and value.
-            UserProfile.DataGridViewUserSubreddit.Rows.Add(New Object() {header, If(UserSubredditData("subreddit")(key)?.ToString(), "N/A")})
+            UserProfile.DataGridViewUserSubreddit.Rows.Add(
+                New Object() {header, If(UserSubredditData("subreddit")(key)?.ToString(),
+                "N/A")}
+            )
         Next
     End Sub
 
@@ -182,19 +184,33 @@ Public Class DataGridViewer
     ''' <param name="username">The Reddit username for which to fetch post data.</param>
     ''' <param name="form">The Posts.object that contains the DataGridView to be updated.</param>
     ''' <returns>A Task representing the asynchronous operation.</returns>
-    Private Shared Async Function UserPosts(username As String) As Task
-        Dim sort As String = Main.ComboBoxUserPostsListing.Text
+    Private Shared Async Function AsyncLoadUserPosts(
+                                                    username As String,
+                                                    sortCriterion As String,
+                                                    postsLimit As Integer
+                                                ) As Task
+        Dim sort As String = Main.ComboBoxUserDataListing.Text
         Dim limit As Integer = Main.NumericUpDownUserDataLimit.Value
 
 
-        Dim postsList As JArray = Await apiHandler.AsyncGetUserPosts(username:=username, sort:=sort, limit:=limit)
+        Dim postsList As JArray = Await apiHandler.AsyncGetPosts(
+            postsType:="user_posts",
+            postsSource:=username,
+            sortCriterion:=sortCriterion,
+            postsLimit:=postsLimit
+          )
         Dim isValid As Boolean = CoreUtils.IsValidData(data:=postsList)
 
         ' If the API data is valid, setup a DataGridView for the Posts.
         If isValid Then
             ' Iterate over each post and add its data to the DataGridView.
             For Each post As JObject In postsList
-                AddToDataGridView(data:=post, form:=Posts, dataGridViewName:="DataGridViewPosts", RowKeys:=DataGridHelper.PostRowKeys)
+                AddToDataGridView(
+                    data:=post,
+                    form:=Posts,
+                    dataGridViewName:="DataGridViewPosts",
+                    RowKeys:=DataGridHelper.PostRowKeys
+                )
             Next
             Posts.Text = $"u/{username}'s {sort} {limit} posts"
             Posts.Show()
@@ -211,21 +227,32 @@ Public Class DataGridViewer
     ''' <param name="username">The Reddit username for which to fetch comments' data.</param>
     ''' <param name="form">The Comments.object that contains the DataGridView to be updated.</param>
     ''' <returns>A Task representing the asynchronous operation.</returns>
-    Private Shared Async Function UserComments(username As String) As Task
-        Dim sort As String = Main.ComboBoxUserPostsListing.Text
-        Dim limit As Integer = Main.NumericUpDownUserDataLimit.Value
+    Private Shared Async Function AsyncLoadUserComments(
+                                                       username As String,
+                                                       sortCriterion As String,
+                                                       commentsLimit As Integer
+                                                   ) As Task
 
-
-        Dim commentsList As JArray = Await apiHandler.AsyncGetUserComments(username:=username, sort:=sort, limit:=limit)
+        Dim commentsList As JArray = Await apiHandler.AsyncGetPosts(
+            postsType:="user_comments",
+            postsSource:=username,
+            sortCriterion:=sortCriterion,
+            postsLimit:=commentsLimit
+        )
         Dim isValid As Boolean = CoreUtils.IsValidData(data:=commentsList)
 
         ' If the API data is valid, setup a DataGridView for the Posts.
         If isValid Then
             ' Iterate over each comment and add its data to the DataGridView.
             For Each Comment As JObject In commentsList
-                AddToDataGridView(data:=Comment, form:=Comments, dataGridViewName:="DataGridViewComments", RowKeys:=DataGridHelper.CommentRowKeys)
+                AddToDataGridView(
+                    data:=Comment,
+                    form:=Comments,
+                    dataGridViewName:="DataGridViewComments",
+                    RowKeys:=DataGridHelper.CommentRowKeys
+                )
             Next
-            Comments.Text = $"u/{username}'s {sort} {limit} comments"
+            Comments.Text = $"u/{username}'s {sortCriterion} {commentsLimit} comments"
             Comments.Show()
 
             ' Prompt to save data if the conditions are met.
@@ -242,9 +269,17 @@ Public Class DataGridViewer
         If Main.RadioButtonUserProfile.Checked Then
             Await AsyncLoadUserProfile(username:=username)
         ElseIf Main.RadioButtonUserPosts.Checked Then
-            Await UserPosts(username:=username)
+            Await AsyncLoadUserPosts(
+                username:=username,
+                sortCriterion:=Main.ComboBoxUserDataListing.Text,
+                postsLimit:=Main.NumericUpDownUserDataLimit.Value
+            )
         ElseIf Main.RadioButtonUserComments.Checked Then
-            Await UserComments(username:=username)
+            Await AsyncLoadUserComments(
+                username:=username,
+                sortCriterion:=Main.ComboBoxUserDataListing.Text,
+                commentsLimit:=Main.NumericUpDownUserDataLimit.Value
+            )
         End If
     End Function
 
@@ -253,7 +288,7 @@ Public Class DataGridViewer
     ''' </summary>
     ''' <param name="username">The username to fetch data for.</param>
     Public Shared Async Function SubredditProfile(subreddit As String) As Task
-        Dim ProfileData As JObject = Await apiHandler.AsyncGetSubredditProfile(subreddit:=subreddit)
+        Dim ProfileData As JObject = Await apiHandler.AsyncGetProfile(profileType:="subreddit_profile", profileSource:=subreddit)
         Dim IsValid As Boolean = CoreUtils.IsValidData(data:=ProfileData)
         If IsValid Then
             MiscData.Text = $"Subreddit Profile - {subreddit}"
@@ -283,21 +318,32 @@ Public Class DataGridViewer
     ''' <param name="subreddit">The Subreddit for which to fetch post data.</param>
     ''' <param name="form">The Posts.object that contains the DataGridView to be updated.</param>
     ''' <returns>A Task representing the asynchronous operation.</returns>
-    Private Shared Async Function SubredditPosts(subreddit As String) As Task
-        Dim sort As String = Main.ComboBoxSubredditPostsListing.Text
-        Dim limit As Integer = Main.NumericUpDownSubredditDataLimit.Value
-
-        Dim postsList As JArray = Await apiHandler.AsyncGetSubredditPosts(subreddit:=subreddit, sort:=sort, limit:=limit)
+    Private Shared Async Function AsyncLoadSubredditPosts(
+                                                subreddit As String,
+                                                sortCriterion As String,
+                                                postsLimit As Integer
+                                            ) As Task
+        Dim postsList As JArray = Await apiHandler.AsyncGetPosts(
+            postsType:="subreddit_posts",
+            postsSource:=subreddit,
+            sortCriterion:=sortCriterion,
+            postsLimit:=postsLimit
+        )
         Dim isValid As Boolean = CoreUtils.IsValidData(data:=postsList)
 
         ' If the API data is valid, setup a DataGridView for the Posts.
         If isValid Then
             ' Iterate over each post and add its data to the DataGridView.
             For Each post As JObject In postsList
-                AddToDataGridView(data:=post, form:=Posts, dataGridViewName:="DataGridViewPosts", RowKeys:=DataGridHelper.PostRowKeys)
+                AddToDataGridView(
+                    data:=post,
+                    form:=Posts,
+                    dataGridViewName:="DataGridViewPosts",
+                    RowKeys:=DataGridHelper.PostRowKeys
+                )
             Next
 
-            Posts.Text = $"Showing {sort} {limit} posts from r/{subreddit}"
+            Posts.Text = $"Showing {sortCriterion} {postsLimit} posts from r/{subreddit}"
             Posts.Show()
 
             ' Prompt to save data if the conditions are met.
@@ -314,7 +360,11 @@ Public Class DataGridViewer
         If Main.RadioButtonSubredditProfile.Checked Then
             Await SubredditProfile(subreddit:=subreddit)
         ElseIf Main.RadioButtonSubredditPosts.Checked Then
-            Await SubredditPosts(subreddit:=subreddit)
+            Await AsyncLoadSubredditPosts(
+                subreddit:=subreddit,
+                sortCriterion:=Main.ComboBoxSubredditPostsListing.Text,
+                postsLimit:=Main.NumericUpDownSubredditPostsLimit.Value
+            )
         End If
     End Function
 
@@ -324,20 +374,32 @@ Public Class DataGridViewer
     ''' <param name="username">The Reddit username for which to fetch post data.</param>
     ''' <param name="form">The Posts.object that contains the DataGridView to be updated.</param>
     ''' <returns>A Task representing the asynchronous operation.</returns>
-    Public Shared Async Function LoadSearchResultsAsync(query As String, form As Posts) As Task
-        Dim sort As String = Main.ComboBoxSearchResultListing.Text
-        Dim limit As Integer = Main.NumericUpDownSearchResultLimit.Value
-
-        Dim Results As JArray = Await apiHandler.AsyncSearchPosts(query:=query, sort:=sort, limit:=limit)
+    Public Shared Async Function LoadSearchResultsAsync(
+                                                       query As String,
+                                                       form As Posts,
+                                                       sortCriterion As String,
+                                                       postsLimit As Integer
+                                                   ) As Task
+        Dim Results As JArray = Await apiHandler.AsyncGetPosts(
+            postsType:="search_posts",
+            postsSource:=query,
+            sortCriterion:=sortCriterion,
+            postsLimit:=postsLimit
+        )
         Dim isValid As Boolean = CoreUtils.IsValidData(data:=Results)
 
         ' If the API data is valid, setup a DataGridView for the Posts.
         If isValid Then
             ' Iterate over each post and add its data to the DataGridView.
             For Each Result As JObject In Results
-                AddToDataGridView(data:=Result, form:=form, dataGridViewName:="DataGridViewPosts", RowKeys:=DataGridHelper.PostRowKeys)
+                AddToDataGridView(
+                    data:=Result,
+                    form:=form,
+                    dataGridViewName:="DataGridViewPosts",
+                    RowKeys:=DataGridHelper.PostRowKeys
+                )
             Next
-            form.Text = $"Showing {limit} {sort} search results for `{query}`"
+            form.Text = $"Showing {postsLimit} {sortCriterion} search results for `{query}`"
             form.Show()
 
             ' Prompt to save data if the conditions are met.
@@ -350,18 +412,30 @@ Public Class DataGridViewer
     ''' </summary>
     ''' <param name="form">The Posts.object that contains the DataGridView to be updated.</param>
     ''' <returns>A Task representing the asynchronous operation.</returns>
-    Public Shared Async Function LoadFrontPagePostsAsync(form As Posts) As Task
+    Public Shared Async Function LoadFrontPagePostsAsync(
+                                                        form As Posts,
+                                                        sortCriterion As String,
+                                                        postsLimit As Integer
+                                                    ) As Task
         Dim sort As String = Main.ComboBoxFrontPageDataListing.Text
         Dim limit As Integer = Main.NumericUpDownFrontPageDataLimit.Value
 
-        Dim Posts As JArray = Await apiHandler.AsyncGetFrontPagePosts(sort:=sort, limit:=limit)
+        Dim Posts As JArray = Await apiHandler.AsyncGetPosts(
+            postsType:="front_page_posts",
+            sortCriterion:=sortCriterion,
+            postsLimit:=postsLimit)
         Dim isValid As Boolean = CoreUtils.IsValidData(data:=Posts)
 
         ' If the API data is valid, setup a DataGridView for the Posts.
         If isValid Then
             ' Iterate over each post and add its data to the DataGridView.
             For Each post As JObject In Posts
-                AddToDataGridView(data:=post, form:=form, dataGridViewName:="DataGridViewPosts", RowKeys:=DataGridHelper.PostRowKeys)
+                AddToDataGridView(
+                    data:=post,
+                    form:=form,
+                    dataGridViewName:="DataGridViewPosts",
+                    RowKeys:=DataGridHelper.PostRowKeys
+                )
             Next
 
             form.Text = $"{sort} {limit} posts from the front page"
