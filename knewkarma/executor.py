@@ -1,10 +1,7 @@
 import argparse
 
-from .brokers import Broker
 from .coreutils import log
 from .masonry import Masonry
-from .modules.subreddit import Subreddit
-from .modules.user import User
 
 
 class Executor:
@@ -19,27 +16,16 @@ class Executor:
         self.tree_masonry = tree_masonry
         self.arguments = arguments
         self.handlers = self.Handlers(executor=self)
-        self.data_broker = Broker()
 
     def execute_cli_arguments(self):
         """
         Executes a command-line arguments based cli of Knew Karma.
         """
         if self.arguments.mode == "user":
-            user = User(
-                username=self.arguments.username,
-                tree_masonry=self.tree_masonry,
-                data_broker=self.data_broker,
-            )
-            self.handlers.user_handler(user_object=user)
+            self.handlers.user_handler(username=self.arguments.username)
 
         elif self.arguments.mode == "subreddit":
-            subreddit = Subreddit(
-                subreddit=self.arguments.subreddit,
-                tree_masonry=self.tree_masonry,
-                data_broker=self.data_broker,
-            )
-            self.handlers.subreddit_handler(subreddit_object=subreddit)
+            self.handlers.subreddit_handler(subreddit=self.arguments.subreddit)
 
         elif self.arguments.mode == "search":
             self.tree_masonry.posts_tree(
@@ -66,8 +52,8 @@ class Executor:
 
     class Handlers:
         def __init__(self, executor):
-            self.arguments = executor.arguments
-            self.tree_masonry = executor.tree_masonry
+            self.arguments: argparse = executor.arguments
+            self.tree_masonry: Masonry = executor.tree_masonry
             self.data_sort_criterion: str = self.arguments.sort
             self.data_limit: int = self.arguments.limit
             self.save_to_json: bool = self.arguments.json
@@ -94,18 +80,23 @@ class Executor:
                 )
                 default_function()
 
-        def user_handler(self, user_object: User):
+        def user_handler(self, username: str):
             user_argument_map = {
-                "profile": lambda: user_object.profile(
+                "profile": lambda: self.tree_masonry.profile_tree(
+                    profile_type="user_profile",
+                    profile_source=username,
                     save_to_json=self.save_to_json,
                     save_to_csv=self.save_to_csv,
                 ),
-                "posts": lambda: user_object.posts(
-                    sort_criterion=self.data_sort_criterion,
+                "posts": lambda: self.tree_masonry.posts_tree(
+                    posts_source=username,
+                    posts_type="user_posts",
                     posts_limit=self.data_limit,
+                    sort_criterion=self.data_sort_criterion,
                     save_to_json=self.save_to_json,
                 ),
-                "comments": lambda: user_object.comments(
+                "comments": lambda: self.tree_masonry.user_comments_tree(
+                    username=username,
                     sort_criterion=self.data_sort_criterion,
                     comments_limit=self.data_limit,
                     save_to_json=self.save_to_json,
@@ -114,14 +105,19 @@ class Executor:
 
             self.execute_functions(argument_map=user_argument_map)
 
-        def subreddit_handler(self, subreddit_object: Subreddit):
+        def subreddit_handler(self, subreddit: str):
             subreddit_argument_map = {
-                "profile": lambda: subreddit_object.profile(
-                    save_to_json=self.save_to_json, save_to_csv=self.save_to_csv
+                "profile": lambda: self.tree_masonry.profile_tree(
+                    profile_type="subreddit_profile",
+                    profile_source=subreddit,
+                    save_to_json=self.save_to_json,
+                    save_to_csv=self.save_to_csv,
                 ),
-                "posts": lambda: subreddit_object.posts(
-                    sort_criterion=self.data_sort_criterion,
+                "posts": lambda: self.tree_masonry.posts_tree(
+                    posts_source=subreddit,
+                    posts_type="subreddit_posts",
                     posts_limit=self.data_limit,
+                    sort_criterion=self.data_sort_criterion,
                     save_to_json=self.save_to_json,
                 ),
             }
@@ -131,18 +127,18 @@ class Executor:
             posts_argument_map = {
                 "front_page": lambda: self.tree_masonry.posts_tree(
                     posts_type="front_page_posts",
-                    posts_limit=self.arguments.limit,
+                    posts_limit=self.data_limit,
                     show_author=True,
-                    sort_criterion=self.arguments.sort,
-                    save_to_json=self.arguments.json,
+                    sort_criterion=self.data_sort_criterion,
+                    save_to_json=self.save_to_json,
                 ),
                 "listing": lambda: self.tree_masonry.posts_tree(
                     posts_type="listing_posts",
                     posts_source=self.arguments.listing,
-                    posts_limit=self.arguments.limit,
+                    posts_limit=self.data_limit,
                     show_author=True,
-                    sort_criterion=self.arguments.sort,
-                    save_to_json=self.arguments.json,
+                    sort_criterion=self.data_sort_criterion,
+                    save_to_json=self.save_to_json,
                 ),
             }
             self.execute_functions(argument_map=posts_argument_map)
