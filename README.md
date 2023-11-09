@@ -1,6 +1,4 @@
-![knewkarma](https://github.com/bellingcat/knewkarma/assets/74001397/f75ec539-28c9-4fda-94b5-7237818246fe)
-
-
+![knewkarma](https://github.com/bellingcat/knewkarma/assets/74001397/dc6b680f-051b-4417-843f-b5390f483a75)
 
 A **Reddit** Data Analysis Toolkit.
 
