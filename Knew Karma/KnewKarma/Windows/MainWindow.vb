@@ -1,6 +1,6 @@
 ﻿Imports System.Globalization
 
-Public Class Main
+Public Class MainWindow
     Public Shared ReadOnly settings As New SettingsManager()
     Private bytesSentCounter As PerformanceCounter
     Private bytesReceivedCounter As PerformanceCounter
@@ -59,7 +59,7 @@ Public Class Main
                                             sender As Object,
                                             e As EventArgs
                                         ) Handles AboutToolStripMenuItem.Click
-        About.ShowDialog()
+        AboutWindow.ShowDialog()
     End Sub
 
     ''' <summary>
@@ -90,7 +90,7 @@ Public Class Main
         If query IsNot Nothing Then
             Await DataGridViewer.LoadSearchResultsAsync(
                 query:=query,
-                form:=Posts,
+                form:=PostsWindow,
                 sortCriterion:=ComboBoxSearchResultListing.Text,
                 postsLimit:=NumericUpDownSearchResultLimit.Value
             )
@@ -113,7 +113,7 @@ Public Class Main
             If query IsNot Nothing Then
                 Await DataGridViewer.LoadSearchResultsAsync(
                 query:=query,
-                form:=Posts,
+                form:=PostsWindow,
                 sortCriterion:=ComboBoxSearchResultListing.Text,
                 postsLimit:=NumericUpDownSearchResultLimit.Value
             )
@@ -269,7 +269,7 @@ Public Class Main
                                                     e As EventArgs
                                                 ) Handles ButtonFetchFrontPageData.Click
         Await DataGridViewer.LoadFrontPagePostsAsync(
-            form:=Posts,
+            form:=PostsWindow,
             sortCriterion:=ComboBoxSearchResultListing.Text,
             postsLimit:=NumericUpDownSearchResultLimit.Value
         )
@@ -283,7 +283,7 @@ Public Class Main
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
             Await DataGridViewer.LoadFrontPagePostsAsync(
-            form:=Posts,
+            form:=PostsWindow,
             sortCriterion:=ComboBoxSearchResultListing.Text,
             postsLimit:=NumericUpDownSearchResultLimit.Value
         )

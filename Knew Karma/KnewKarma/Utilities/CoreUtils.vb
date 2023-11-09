@@ -9,7 +9,7 @@ Public Class CoreUtils
     ''' Handles the enabling and disabling of various controls based on the state of radio buttons on the main form.
     ''' </summary>
     ''' <param name="form">The main form containing the radio buttons and controls to be manipulated.</param>
-    Public Shared Sub HandleRadioButtonChanges(form As Main)
+    Public Shared Sub HandleRadioButtonChanges(form As MainWindow)
         ' Check the state of user radio buttons and enable/disable relevant controls accordingly
         ' Depending on which radio button is selected, different sets of controls will be enabled or disabled
         ' to provide a more intuitive user experience and prevent invalid configurations.
@@ -18,15 +18,15 @@ Public Class CoreUtils
         If form.RadioButtonUserProfile.Checked Then
             ' If the User Profile radio button is checked, disable the user data limit and posts listing controls
             form.NumericUpDownUserDataLimit.Enabled = False
-            form.ComboBoxUserPostsListing.Enabled = False
+            form.ComboBoxUserDataListing.Enabled = False
         ElseIf form.RadioButtonUserPosts.Checked Then
             ' If the User Posts radio button is checked, enable the user data limit and posts listing controls
             form.NumericUpDownUserDataLimit.Enabled = True
-            form.ComboBoxUserPostsListing.Enabled = True
+            form.ComboBoxUserDataListing.Enabled = True
         ElseIf form.RadioButtonUserComments.Checked Then
             ' If the User Comments radio button is checked, enable the user data limit control and disable the posts listing control
             form.NumericUpDownUserDataLimit.Enabled = True
-            form.ComboBoxUserPostsListing.Enabled = True
+            form.ComboBoxUserDataListing.Enabled = True
         End If
 
         ' Handling Subreddit Radio Buttons
@@ -35,11 +35,11 @@ Public Class CoreUtils
 
         If form.RadioButtonSubredditProfile.Checked Then
             ' If the Subreddit Profile radio button is checked, disable the subreddit data limit and posts listing controls
-            form.NumericUpDownSubredditDataLimit.Enabled = False
+            form.NumericUpDownSubredditPostsLimit.Enabled = False
             form.ComboBoxSubredditPostsListing.Enabled = False
         ElseIf form.RadioButtonSubredditPosts.Checked Then
             ' If the Subreddit Posts radio button is checked, enable the subreddit data limit and posts listing controls
-            form.NumericUpDownSubredditDataLimit.Enabled = True
+            form.NumericUpDownSubredditPostsLimit.Enabled = True
             form.ComboBoxSubredditPostsListing.Enabled = True
         End If
     End Sub
@@ -51,7 +51,9 @@ Public Class CoreUtils
     ''' True if the dark mode is enabled, otherwise false.
     ''' </returns>
     Public Shared Function IsSystemDarkTheme() As Boolean
-        Dim registryKey As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Themes\Personalize")
+        Dim registryKey As RegistryKey = Registry.CurrentUser.OpenSubKey(
+            "Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+        )
         If registryKey IsNot Nothing Then
             Dim appsUseLightTheme As Object = registryKey.GetValue("AppsUseLightTheme")
             Return appsUseLightTheme IsNot Nothing AndAlso CType(appsUseLightTheme, Integer) = 0
@@ -66,7 +68,7 @@ Public Class CoreUtils
     ''' <param name="IsAutoCheck">Indicates whether the update check is triggered automatically.</param>
     ''' <returns>A task representing the asynchronous operation.</returns>
     Public Shared Async Function AsyncCheckUpdates() As Task
-        About.Version.Text = "Checking for Updates..."
+        AboutWindow.Version.Text = "Checking for Updates..."
         ' Creating a new instance of the ApiHandler class to interact with the API.
         Dim Api As New ApiHandler()
 
@@ -80,10 +82,10 @@ Public Class CoreUtils
 
             ' Checking if the current version is the latest version.
             If tagName = My.Application.Info.Version.ToString Then
-                About.Version.Text = $"Up-to-date ({My.Application.Info.Version})"
+                AboutWindow.Version.Text = $"Up-to-date ({My.Application.Info.Version})"
             Else
-                About.Version.Text = $"Updates found ({tagName})"
-                About.ButtonGetUpdates.Enabled = True
+                AboutWindow.Version.Text = $"Updates found ({tagName})"
+                AboutWindow.ButtonGetUpdates.Enabled = True
             End If
         End If
     End Function
@@ -110,8 +112,19 @@ Public Class CoreUtils
     ''' <param name="timestamp">The Unix timestamp to be converted.</param>
     ''' <returns>A formatted datetime string in the format "dd MMMM yyyy, hh:mm:ss.fff tt".</returns>
     Public Shared Function ConvertTimestampToDatetime(ByVal timestamp As Double) As String
-        Dim utcFromTimestamp As Date = New DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(timestamp)
-        Dim datetimeString As String = utcFromTimestamp.ToString("dd MMMM yyyy, hh:mm:ss tt", CultureInfo.InvariantCulture)
+        Dim utcFromTimestamp As Date = New DateTime(
+            1970,
+            1,
+            1,
+            0,
+            0,
+            0,
+            DateTimeKind.Utc
+        ).AddSeconds(timestamp)
+        Dim datetimeString As String = utcFromTimestamp.ToString(
+            "dd MMMM yyyy, hh:mm:ss tt",
+            CultureInfo.InvariantCulture
+        )
         Return datetimeString
     End Function
 
@@ -119,7 +132,8 @@ Public Class CoreUtils
     ''' Shows the license notice in a messagebox.
     ''' </summary>
     Public Shared Sub License()
-        MessageBox.Show($"{My.Application.Info.Copyright}
+        MessageBox.Show(
+            $"{My.Application.Info.Copyright}
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the ""Software""), to deal
@@ -136,7 +150,11 @@ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.", "MIT License", MessageBoxButtons.OK, MessageBoxIcon.Information)
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.",
+            "MIT License",
+            MessageBoxButtons.OK,
+            MessageBoxIcon.Information
+        )
     End Sub
 
     ''' <summary>
@@ -144,7 +162,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
     ''' If the directory does not exist, it creates one.
     ''' </summary>
     Public Shared Sub PathFinder()
-        Dim directoryPath As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Knew Karma")
+        Dim directoryPath As String = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "Knew Karma"
+        )
 
         If Not Directory.Exists(directoryPath) Then
             Directory.CreateDirectory(directoryPath)
@@ -157,11 +178,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
     ''' <param name="data">The data to save, represented as a JToken, which can accommodate both JArray and JObject.</param>
     Public Shared Sub PromptSaveData(data As JToken, title As String)
         ' Save profile data to JSON if the JSON toolStripMenuItem is checked.
-        If Main.settings.SaveToJson Then
+        If MainWindow.settings.SaveToJson Then
             SaveDataToJson(data:=data, title:=title)
         End If
         ' Save profile data to CSV if the CSV toolStripMenuItem is checked.
-        If Main.settings.SaveToCsv Then
+        If MainWindow.settings.SaveToCsv Then
             SaveDataToCSV(data:=data, title:=title)
         End If
     End Sub
@@ -184,7 +205,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
             ' Check if the data is not null and has values before proceeding to serialize it
             If data Is Nothing OrElse (TypeOf data Is JArray AndAlso Not CType(data, JArray).HasValues) OrElse (TypeOf data Is JObject AndAlso Not CType(data, JObject).HasValues) Then
-                MessageBox.Show("Empty or null data cannot be saved.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                MessageBox.Show(
+                    "Empty or null data cannot be saved.",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                )
                 Exit Sub
             End If
 
@@ -200,7 +226,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
             File.WriteAllText(fileName, json)
 
             ' Show a message indicating that the data has been successfully saved
-            MessageBox.Show($"{title} data saved to {fileName}", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show(
+                $"{title} data saved to {fileName}",
+                "Saved",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
+            )
         End If
     End Sub
 
@@ -235,7 +266,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
                 ' If headers are not obtained, show an error message and exit the subroutine
                 If headers Is Nothing OrElse Not headers.Any() Then
-                    MessageBox.Show("Unsupported data type or empty data.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    MessageBox.Show(
+                        "Unsupported data type or empty data.",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    )
                     Exit Sub
                 End If
 
@@ -257,7 +293,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
             End Using
 
             ' Show a message to indicate that the data has been successfully saved
-            MessageBox.Show($"{title} saved to {fileName}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show(
+                $"{title} saved to {fileName}",
+                "Success",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
+            )
         End If
     End Sub
 End Class
