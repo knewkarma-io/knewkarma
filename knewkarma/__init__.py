@@ -62,26 +62,21 @@ __user_examples__ = """
 ```
 knewkarma user USERNAME --profile
 ```
-> Runs by default if no option is specified.
 
-
-## Get User Comments (not sorted or limited)
+## Get User Comments (unsorted and unlimited)
 ```
 knewkarma user USERNAME --comments
 ```
 
-
-## Get User Posts (not sorted or limited)
+## Get User Posts (unsorted and unlimited)
 ```
 knewkarma user USERNAME --posts
 ```
-
 
 ## Get User Posts/Comments (sorted and limited)
 ```
 knewkarma --sort top --limit 20 user USERNAME --comments/--posts
 ```
-
 """
 
 __subreddit_examples__ = """
@@ -90,14 +85,11 @@ __subreddit_examples__ = """
 ```
 knewkarma subreddit SUBREDDIT_NAME --profile
 ```
-> Runs by default if no option is specified.
 
-
-## Get Subreddit Posts (not sorted or limited)
+## Get Subreddit Posts (unsorted and unlimited)
 ```
 knewkarma subreddit SUBREDDIT_NAME --posts
 ```
-
 
 ## Get Subreddit Posts (sorted and limited)
 ```
@@ -112,61 +104,50 @@ __post_examples__ = """
 ```
 knewkarma post POST_ID SUBREDDIT_NAME --profile
 ```
-> Runs by default if no option is specified.
-
 
 ## Get Post Data (with comments)
 ```
 knewkarma post POST_ID SUBREDDIT_NAME --comments
 ```
 
-
 ## Get Post's Comments (sorted and limited)
 ```
 knewkarma --sort top --limit 10 post POST_ID SUBREDDIT_NAME
 ```
-
 """
 
 __posts_examples__ = """
 # Examples
-## Get Posts from Reddit Front-Page (not sorted or limited)
+## Get Posts from Reddit Front-Page (unsorted and unlimited)
 ```
 knewkarma posts --front-page
 ```
-> Runs by default if no option is specified.
 
-
-## Get Posts from A Specified Listing (not sorted or limited)
+## Get Posts from A Specified Listing (unsorted and unlimited)
 ```
 knewkarma posts --listing best
 ```
-
 
 ## Get Posts from Reddit Front-Page (sorted and limited)
 ```
 knewkarma --sort top --limit 20 posts --front-page
 ```
 
-
 ## Get Posts from A Specified Listing (sorted and limited)
 ```
 knewkarma --sort top --limit 20 posts --listing best
 ```
-
 """
 
 __search_examples__ = """
 # Examples
-## Search for Posts (no sorting and limiting)
+## Search for Posts (unsorted and unlimited)
 ```
 knewkarma search QUERY_STRING
 ```
-
 
 ## Search for Posts (sorted and limited)
 ```
 knewkarma --sort top --limit 20 search QUERY_STRING
 ```
-
 """
