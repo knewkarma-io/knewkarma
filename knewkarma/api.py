@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, Literal
 
 import requests
 
@@ -14,61 +14,10 @@ class Api:
         base_github_api_endpoint: str,
     ):
         """
-        Initialise the API class with various Reddit API endpoints.
+        Initialise the API class with the base Reddit/GitHub API endpoints.
         """
-        self.updates_endpoint = (
-            f"{base_github_api_endpoint}/repos/bellingcat/knewkarma/releases/latest"
-        )
-        # :param username: The Reddit username
-        self.user_profile_endpoint = f"{base_reddit_endpoint}/user/%s/about.json"
-
-        # :param username: The Reddit username
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of posts to fetch
-        self.user_posts_endpoint = (
-            f"{base_reddit_endpoint}/user/%s/submitted.json?sort=%s&limit=%s"
-        )
-
-        # :param username: The Reddit username
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of comments to fetch
-        self.user_comments_endpoint = (
-            f"{base_reddit_endpoint}/user/%s/comments.json?sort=%s&limit=%s"
-        )
-
-        # :param subreddit: The subreddit name
-        self.subreddit_profile_endpoint = f"{base_reddit_endpoint}/r/%s/about.json"
-
-        # :param subreddit: The subreddit name
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of posts to fetch
-        self.subreddit_posts_endpoint = (
-            f"{base_reddit_endpoint}/r/%s.json?sort=%s&limit=%s"
-        )
-
-        # :param subreddit: The subreddit name
-        # :param post_id: The Reddit post ID
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of comments to fetch
-        self.post_comments_endpoint = (
-            f"{base_reddit_endpoint}/r/%s/comments/%s.json?sort=%s&limit=%s"
-        )
-
-        # :param query: Search query
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of search results to fetch
-        self.search_endpoint = (
-            f"{base_reddit_endpoint}/search.json?q=%s&sort=%s&limit=%s"
-        )
-
-        # :param limit: Number of popular posts to fetch
-        self.post_listings_endpoint = (
-            f"{base_reddit_endpoint}/r/%s.json?sort=%s&limit=%s"
-        )
-
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of front-page posts to fetch
-        self.front_page_endpoint = f"{base_reddit_endpoint}/.json?sort=%s&limit=%s"
+        self.base_reddit_endpoint = base_reddit_endpoint
+        self.base_github_api_endpoint = base_github_api_endpoint
 
     @staticmethod
     def get_data(endpoint: str) -> Optional[Union[dict, list, None]]:
@@ -100,6 +49,7 @@ class Api:
                                 error_message=error_message,
                             )
                         )
+                        return None
         except requests.exceptions.RequestException as error:
             log.error(
                 message(
@@ -108,6 +58,7 @@ class Api:
                     error_message=error,
                 )
             )
+            return None
         except Exception as error:
             log.critical(
                 message(
@@ -116,6 +67,7 @@ class Api:
                     error_message=error,
                 )
             )
+            return None
 
     @staticmethod
     def validate_data(
@@ -158,7 +110,9 @@ class Api:
         from . import CURRENT_FILE_DIRECTORY
 
         # Make a GET request to the GitHub API to get the latest release of the project.
-        response = self.get_data(endpoint=self.updates_endpoint)
+        response = self.get_data(
+            endpoint=f"{self.base_github_api_endpoint}/repos/bellingcat/knewkarma/releases/latest"
+        )
 
         if response.get("tag_name"):
             remote_version = response.get("tag_name")
@@ -195,90 +149,121 @@ class Api:
                         )
                     )
 
-    def get_user_profile(self, username: str) -> dict:
+    def get_profile(
+        self,
+        profile_source: str,
+        profile_type: str = Union[
+            Literal["user_profile"], Literal["subreddit_profile"]
+        ],
+    ) -> dict:
         """
-        Gets a specified Reddit user's profile data.
+        Retrieves profile data from a specified source.
 
-        :param username: Username to query.
-        :returns: A JSON object containing a user's profile if data is valid,
-           otherwise return an empty dictionary.
+        :param profile_type: Type of profile to retrieve.
+        :param profile_source: source from where the profile should be retrieved.
+        :return: A JSON object containing profile data.
         """
-        data = self.get_data(endpoint=self.user_profile_endpoint % username)
-        return self.validate_data(data=data.get("data"), valid_key="accept_followers")
+        profile_type_map = [
+            (
+                "user_profile",
+                f"{self.base_reddit_endpoint}/user/{profile_source}/about.json",
+            ),
+            (
+                "subreddit_profile",
+                f"{self.base_reddit_endpoint}/r/{profile_source}/about.json",
+            ),
+        ]
 
-    def get_subreddit_profile(self, subreddit: str) -> dict:
-        """
-        Gets a specified Reddit subreddit's profile data.
+        profile_endpoint = None
+        for item_name, item_endpoint in profile_type_map:
+            if item_name == profile_type:
+                profile_endpoint = item_endpoint
 
-        :param subreddit: Subreddit to query.
-        :returns: A JSON object containing a subreddit's profile if data is valid,
-           otherwise return an empty dictionary.
+        profile = self.get_data(endpoint=profile_endpoint)
+        return self.validate_data(data=profile.get("data"), valid_key="created_utc")
+
+    def get_posts(
+        self,
+        sort_criterion: str,
+        posts_limit: int,
+        posts_type: str = Union[
+            Literal["user_posts"],
+            Literal["user_comments"],
+            Literal["subreddit_posts"],
+            Literal["search_posts"],
+            Literal["listing_posts"],
+            Literal["front_page_posts"],
+        ],
+        posts_source: str = None,
+    ) -> list:
         """
-        data = self.get_data(endpoint=self.subreddit_profile_endpoint % subreddit)
-        return self.validate_data(data=data.get("data"), valid_key="subscribers")
+        Retrieves posts from a specified source.
+
+        :param posts_type: Type of posts to retrieve.
+        :param posts_source: Source from where the posts should be retrieved.
+        :param sort_criterion: Criterion by which the posts should be sorted.
+        :param posts_limit: Limit on the number of posts to retrieve.
+        :return: A list of JSON objects, each containing post data.
+        """
+        posts_type_map = [
+            (
+                "user_posts",
+                f"{self.base_reddit_endpoint}/user/{posts_source}/submitted.json"
+                f"?sort={sort_criterion}&limit={posts_limit}",
+            ),
+            (
+                "user_comments",
+                f"{self.base_reddit_endpoint}/user/{posts_source}/comments.json"
+                f"?sort={sort_criterion}&limit={posts_limit}",
+            ),
+            (
+                "subreddit_posts",
+                f"{self.base_reddit_endpoint}/r/{posts_source}.json"
+                f"?sort={sort_criterion}&limit={posts_limit}",
+            ),
+            (
+                "search_posts",
+                f"{self.base_reddit_endpoint}/search.json"
+                f"?q={posts_source}&sort={sort_criterion}&limit={posts_limit}",
+            ),
+            (
+                "listing_posts",
+                f"{self.base_reddit_endpoint}/r/{posts_source}.json"
+                f"?sort={sort_criterion}&limit={posts_limit}",
+            ),
+            (
+                "front_page_posts",
+                f"{self.base_reddit_endpoint}/.json"
+                f"?sort={sort_criterion}&limit={posts_limit}",
+            ),
+        ]
+        posts_endpoint = None
+        for item_name, item_endpoint in posts_type_map:
+            if posts_type == item_name:
+                posts_endpoint = item_endpoint
+
+        posts = self.get_data(endpoint=posts_endpoint)
+
+        return self.validate_data(data=posts.get("data").get("children"))
 
     def get_post_data(
-        self, subreddit: str, post_id: str, sort: str, limit: int
+        self, subreddit: str, post_id: str, sort_criterion: str, comments_limit: int
     ) -> tuple:
         """
         Gets a post's data.
 
         :param subreddit: The subreddit in which the post was posted.
         :param post_id: ID of the post.
-        :param sort: Sorting criterion ('new', 'hot', etc.).
-        :param limit: Maximum of comments to fetch.
+        :param sort_criterion: Sorting criterion ('new', 'hot', etc.).
+        :param comments_limit: Maximum of comments to fetch.
         :returns: A tuple of a post's data (post_information, list_of_comments) if valid,
            otherwise return a tuple containing an empty dict and list.
         """
         data = self.get_data(
-            endpoint=self.post_comments_endpoint % (subreddit, post_id, sort, limit)
+            endpoint=f"{self.base_reddit_endpoint}/r/{subreddit}/comments/{post_id}.json"
+            f"?sort={sort_criterion}&limit={comments_limit}"
         )
         return self.validate_data(
             data=data[0].get("data").get("children")[0].get("data"),
             valid_key="upvote_ratio",
         ), self.validate_data(data=data[1].get("data").get("children"))
-
-    def get_posts(
-        self,
-        sort_criterion: str,
-        posts_limit: int,
-        posts_type: str,
-        posts_source: str = None,
-    ) -> list:
-        posts_type_map = [
-            (
-                "user_posts",
-                self.user_posts_endpoint % (posts_source, sort_criterion, posts_limit),
-            ),
-            (
-                "user_comments",
-                self.user_comments_endpoint
-                % (posts_source, sort_criterion, posts_limit),
-            ),
-            (
-                "subreddit_posts",
-                self.subreddit_posts_endpoint
-                % (posts_source, sort_criterion, posts_limit),
-            ),
-            (
-                "search_posts",
-                self.search_endpoint % (posts_source, sort_criterion, posts_limit),
-            ),
-            (
-                "listing_posts",
-                self.post_listings_endpoint
-                % (posts_source, sort_criterion, posts_limit),
-            ),
-            (
-                "front_page_posts",
-                self.front_page_endpoint % (sort_criterion, posts_limit),
-            ),
-        ]
-        posts_endpoint = None
-        for post_type, endpoint in posts_type_map:
-            if post_type == posts_type:
-                posts_endpoint = endpoint
-
-        posts = self.get_data(endpoint=posts_endpoint)
-
-        return self.validate_data(data=posts.get("data").get("children"))
