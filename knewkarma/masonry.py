@@ -102,12 +102,67 @@ class Masonry:
 
             return target_tree
 
+    def profile_tree(
+        self,
+        profile_source: str,
+        profile_type: str,
+        save_to_json: bool = False,
+        save_to_csv: bool = False,
+    ):
+        raw_profile = self.api.get_profile(
+            profile_type=profile_type, profile_source=profile_source
+        )
+        if raw_profile:
+            if profile_type == "user_profile":
+                # Separate the profile data in categories
+                brokered_profile = self.data_broker.user_data(raw_data=raw_profile)
+                additional_data = [
+                    (
+                        raw_profile.get("subreddit").get("display_name"),
+                        brokered_profile[1],
+                    ),
+                    (
+                        "Verification",
+                        brokered_profile[2],
+                    ),
+                    ("Snoovatar", brokered_profile[3]),
+                    ("Karma", brokered_profile[4]),
+                ]
+            else:
+                brokered_profile = self.data_broker.subreddit_data(raw_data=raw_profile)
+                additional_data = [
+                    ("Allows", brokered_profile[1]),
+                    ("Banner", brokered_profile[2]),
+                    ("Header", brokered_profile[3]),
+                    ("Flairs", brokered_profile[4]),
+                ]
+
+            print(
+                self.create_tree(
+                    tree_title=raw_profile.get("public_description")
+                    if profile_type == "subreddit_profile"
+                    else raw_profile.get("subreddit").get("title"),
+                    tree_data=brokered_profile[0],
+                    additional_data=additional_data,
+                    additional_text=raw_profile.get("submit_text")
+                    if profile_type == "subreddit_profile"
+                    else None,
+                )
+            )
+
+            save_data(
+                data=raw_profile,
+                save_to_csv=save_to_csv,
+                save_to_json=save_to_json,
+                filename=f"{profile_source}_profile",
+            )
+
     def posts_tree(
         self,
         sort_criterion: str,
         posts_limit: int,
         posts_type: str,
-        save_to_json: bool,
+        save_to_json: bool = False,
         posts_source: str = None,
         show_author: bool = False,
     ):
@@ -150,6 +205,49 @@ class Masonry:
                 data=raw_posts[0],
                 save_to_json=save_to_json,
                 filename=f"{posts_source}_{posts_type}",
+            )
+
+    def user_comments_tree(
+        self,
+        username: str,
+        sort_criterion: str,
+        comments_limit: int,
+        save_to_json: bool,
+    ):
+        # Initialise a tree structure to visualise the results.
+        comments_tree = self.create_tree(
+            tree_title=f"Visualising {username}'s [green]{sort_criterion}[/] [cyan]{comments_limit}[/] comments"
+        )
+
+        # Get comments from the API and add filters accordingly
+        raw_comments = self.api.get_posts(
+            sort_criterion=sort_criterion,
+            posts_limit=comments_limit,
+            posts_type="user_comments",
+            posts_source=username,
+        )
+
+        if raw_comments:
+            for raw_comment in raw_comments:
+                raw_comment_data = raw_comment.get("data")
+                self.add_branch(
+                    target_tree=comments_tree,
+                    branch_title=convert_timestamp_to_datetime(
+                        timestamp=raw_comment_data.get("created")
+                    ),
+                    branch_data=self.data_broker.comment_data(
+                        raw_comment=raw_comment_data
+                    ),
+                    additional_text=raw_comment_data.get("body"),
+                )
+
+            # Print the visualised tree structure.
+            print(comments_tree)
+
+            save_data(
+                data=raw_comments[0],
+                save_to_json=save_to_json,
+                filename=f"{username}_comments",
             )
 
     def post_data_tree(
