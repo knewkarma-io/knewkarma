@@ -44,13 +44,19 @@ def create_parser() -> argparse.ArgumentParser:
     )
     user_parser.add_argument("username", help="Username to query")
     user_parser.add_argument(
+        "-p",
+        "--profile",
+        action="store_true",
+        help="Get user profile ([italic][green]default execution[/][/])",
+    )
+    user_parser.add_argument(
         "-c",
         "--comments",
         action="store_true",
-        help="Get a user's comments",
+        help="Get user comments",
     )
     user_parser.add_argument(
-        "-p", "--posts", action="store_true", help="Get a user's posts"
+        "-pp", "--posts", action="store_true", help="Get user posts"
     )
 
     # Subreddit mode
@@ -69,9 +75,15 @@ def create_parser() -> argparse.ArgumentParser:
     )
     subreddit_parser.add_argument(
         "-p",
+        "--profile",
+        action="store_true",
+        help="Get subreddit profile ([italic][green]default execution[/][/])",
+    )
+    subreddit_parser.add_argument(
+        "-pp",
         "--posts",
         action="store_true",
-        help="Get a subreddit's posts",
+        help="Get subreddit posts",
     )
 
     # Post mode
@@ -87,7 +99,17 @@ def create_parser() -> argparse.ArgumentParser:
     post_parser.add_argument("post_id", help="Post ID")
     post_parser.add_argument("post_subreddit", help="Source subreddit")
     post_parser.add_argument(
-        "-c", "--comments", dest="comments", action="store_true", help="Show comments"
+        "-p",
+        "--profile",
+        action="store_true",
+        help="Get post profile ([italic][green]default execution[/][/])",
+    )
+    post_parser.add_argument(
+        "-c",
+        "--comments",
+        dest="comments",
+        action="store_true",
+        help="Show post comments",
     )
 
     # Posts mode
@@ -99,6 +121,12 @@ def create_parser() -> argparse.ArgumentParser:
         ),
         epilog=Markdown(__posts_examples__),
         formatter_class=RichHelpFormatter,
+    )
+    posts_parser.add_argument(
+        "-f",
+        "--front-page",
+        help="Get posts from Reddit Front-Page ([italic][green]default execution[/][/])",
+        action="store_true",
     )
     posts_parser.add_argument(
         "-l",
