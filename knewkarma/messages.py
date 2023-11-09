@@ -9,11 +9,11 @@ error_messages = {
     "api_error": "API Error: {error_message}",
     "unexpected_error": "Unexpected Error: [red]{error_message}[/]",
 }
+critical_messages = {"unknown_critical": "[bold][red]{critical_message}[/][/]"}
 
 #: Dictionary of informational message templates
 info_messages = {
-    "program_started": "Started [bold]{program_name}[/] {program_version} "
-    "([italic][blue]{executor_title}[/][/]) at {start_time}...",
+    "program_started": "Started [bold]{program_name}[/] {program_version} at {start_time}...",
     "program_stopped": "Stopped in {run_time} seconds.",
     "update_found": "{program_name} {release_version} (from {current_version}) is available. "
     "To update, run: pip install --upgrade {program_call_name}",

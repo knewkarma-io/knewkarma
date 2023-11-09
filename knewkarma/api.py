@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, Literal
 
 import requests
 
@@ -14,61 +14,10 @@ class Api:
         base_github_api_endpoint: str,
     ):
         """
-        Initialise the API class with various Reddit API endpoints.
+        Initialise the API class with the base Reddit/GitHub API endpoints.
         """
-        self.updates_endpoint = (
-            f"{base_github_api_endpoint}/repos/bellingcat/knewkarma/releases/latest"
-        )
-        # :param username: The Reddit username
-        self.user_profile_endpoint = f"{base_reddit_endpoint}/user/%s/about.json"
-
-        # :param username: The Reddit username
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of posts to fetch
-        self.user_posts_endpoint = (
-            f"{base_reddit_endpoint}/user/%s/submitted.json?sort=%s&limit=%s"
-        )
-
-        # :param username: The Reddit username
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of comments to fetch
-        self.user_comments_endpoint = (
-            f"{base_reddit_endpoint}/user/%s/comments.json?sort=%s&limit=%s"
-        )
-
-        # :param subreddit: The subreddit name
-        self.subreddit_profile_endpoint = f"{base_reddit_endpoint}/r/%s/about.json"
-
-        # :param subreddit: The subreddit name
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of posts to fetch
-        self.subreddit_posts_endpoint = (
-            f"{base_reddit_endpoint}/r/%s.json?sort=%s&limit=%s"
-        )
-
-        # :param subreddit: The subreddit name
-        # :param post_id: The Reddit post ID
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of comments to fetch
-        self.post_comments_endpoint = (
-            f"{base_reddit_endpoint}/r/%s/comments/%s.json?sort=%s&limit=%s"
-        )
-
-        # :param query: Search query
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of search results to fetch
-        self.search_endpoint = (
-            f"{base_reddit_endpoint}/search.json?q=%s&sort=%s&limit=%s"
-        )
-
-        # :param limit: Number of popular posts to fetch
-        self.post_listings_endpoint = (
-            f"{base_reddit_endpoint}/r/%s.json?sort=%s&limit=%s"
-        )
-
-        # :param sort: Sorting criterion ('new', 'hot', etc.)
-        # :param limit: Number of front-page posts to fetch
-        self.front_page_endpoint = f"{base_reddit_endpoint}/.json?sort=%s&limit=%s"
+        self.base_reddit_endpoint = base_reddit_endpoint
+        self.base_github_api_endpoint = base_github_api_endpoint
 
     @staticmethod
     def get_data(endpoint: str) -> Optional[Union[dict, list, None]]:
@@ -100,6 +49,7 @@ class Api:
                                 error_message=error_message,
                             )
                         )
+                        return None
         except requests.exceptions.RequestException as error:
             log.error(
                 message(
@@ -108,12 +58,43 @@ class Api:
                     error_message=error,
                 )
             )
+            return None
         except Exception as error:
             log.critical(
                 message(
                     message_type="error",
                     message_key="unexpected_error",
                     error_message=error,
+                )
+            )
+            return None
+
+    @staticmethod
+    def validate_data(
+        data: Union[dict, list], valid_key: str = None
+    ) -> Union[dict, list]:
+        """
+        Validates the input data. If it's a dictionary and a valid_key is provided,
+        checks for the presence of the key in the dictionary. If it's a list, it
+        ensures the list is not empty.
+
+        :param data: The data to validate, which should be a dictionary, list or set.
+        :param valid_key: The key to check for in the data if it's a dictionary.
+        :return: The original data if valid, or an empty dictionary or list if invalid.
+        """
+        if isinstance(data, dict):
+            if valid_key:
+                return data if valid_key in data else {}
+            else:
+                return data  # Explicitly return the dictionary if valid_key is not provided
+        elif isinstance(data, list):
+            return data if data else []
+        else:
+            log.critical(
+                message(
+                    message_type="critical",
+                    message_key="unknown_critical",
+                    critical_message=f"Unknown data type ({type(data).__name__}), expected a list or dict.",
                 )
             )
 
@@ -126,12 +107,14 @@ class Api:
 
         from plyer import notification
 
-        from .coreutils import CURRENT_FILE_DIRECTORY
+        from . import CURRENT_FILE_DIRECTORY
 
         # Make a GET request to the GitHub API to get the latest release of the project.
-        response = self.get_data(endpoint=self.updates_endpoint)
+        response = self.get_data(
+            endpoint=f"{self.base_github_api_endpoint}/repos/bellingcat/knewkarma/releases/latest"
+        )
 
-        if response:
+        if response.get("tag_name"):
             remote_version = response.get("tag_name")
 
             # Check if the remote version tag matches the current version tag.
@@ -162,135 +145,125 @@ class Api:
                             program_name="Knew Karma",
                             program_call_name="knewkarma",
                             release_version=remote_version,
+                            current_version=__version__,
                         )
                     )
 
-    def get_user_profile(self, username: str) -> dict:
+    def get_profile(
+        self,
+        profile_source: str,
+        profile_type: str = Union[
+            Literal["user_profile"], Literal["subreddit_profile"]
+        ],
+    ) -> dict:
         """
-        Gets a specified Reddit user's profile data.
+        Retrieves profile data from a specified source.
 
-        :param username: Username to query.
-        :returns: A JSON object containing a user's profile if data is valid,
-           otherwise return an empty dictionary.
+        :param profile_type: Type of profile to retrieve.
+        :param profile_source: source from where the profile should be retrieved.
+        :return: A JSON object containing profile data.
         """
-        data = self.get_data(endpoint=self.user_profile_endpoint % username)
-        return data.get("data") if data else {}
+        profile_type_map = [
+            (
+                "user_profile",
+                f"{self.base_reddit_endpoint}/user/{profile_source}/about.json",
+            ),
+            (
+                "subreddit_profile",
+                f"{self.base_reddit_endpoint}/r/{profile_source}/about.json",
+            ),
+        ]
 
-    def get_user_posts(self, username: str, sort: str, limit: int) -> list:
-        """
-        Gets a specified Reddit user's posts.
+        profile_endpoint = None
+        for item_name, item_endpoint in profile_type_map:
+            if item_name == profile_type:
+                profile_endpoint = item_endpoint
 
-        :param username: Username to query.
-        :param sort: Sorting criterion ('new', 'hot', etc.).
-        :param limit: Number of posts to fetch.
-        :returns: A list of JSON objects containing post if data is valid,
-           otherwise return an empty list.
-        """
-        posts = self.get_data(
-            endpoint=self.user_posts_endpoint % (username, sort, limit)
-        )
-        return posts.get("data").get("children") if posts else []
+        profile = self.get_data(endpoint=profile_endpoint)
+        return self.validate_data(data=profile.get("data"), valid_key="created_utc")
 
-    def get_user_comments(self, username: str, sort: str, limit: int) -> list:
+    def get_posts(
+        self,
+        sort_criterion: str,
+        posts_limit: int,
+        posts_type: str = Union[
+            Literal["user_posts"],
+            Literal["user_comments"],
+            Literal["subreddit_posts"],
+            Literal["search_posts"],
+            Literal["listing_posts"],
+            Literal["front_page_posts"],
+        ],
+        posts_source: str = None,
+    ) -> list:
         """
-        Gets a specified Reddit user's comments.
+        Retrieves posts from a specified source.
 
-        :param username: Username to query.
-        :param sort: Sorting criterion ('new', 'hot', etc.).
-        :param limit: Number of comments to fetch.
-        :returns: A list of JSON objects containing comments' data if valid,
-           otherwise return an empty list.
+        :param posts_type: Type of posts to retrieve.
+        :param posts_source: Source from where the posts should be retrieved.
+        :param sort_criterion: Criterion by which the posts should be sorted.
+        :param posts_limit: Limit on the number of posts to retrieve.
+        :return: A list of JSON objects, each containing post data.
         """
-        comments = self.get_data(
-            endpoint=self.user_comments_endpoint % (username, sort, limit)
-        )
-        return comments.get("data").get("children") if comments else []
+        posts_type_map = [
+            (
+                "user_posts",
+                f"{self.base_reddit_endpoint}/user/{posts_source}/submitted.json"
+                f"?sort={sort_criterion}&limit={posts_limit}",
+            ),
+            (
+                "user_comments",
+                f"{self.base_reddit_endpoint}/user/{posts_source}/comments.json"
+                f"?sort={sort_criterion}&limit={posts_limit}",
+            ),
+            (
+                "subreddit_posts",
+                f"{self.base_reddit_endpoint}/r/{posts_source}.json"
+                f"?sort={sort_criterion}&limit={posts_limit}",
+            ),
+            (
+                "search_posts",
+                f"{self.base_reddit_endpoint}/search.json"
+                f"?q={posts_source}&sort={sort_criterion}&limit={posts_limit}",
+            ),
+            (
+                "listing_posts",
+                f"{self.base_reddit_endpoint}/r/{posts_source}.json"
+                f"?sort={sort_criterion}&limit={posts_limit}",
+            ),
+            (
+                "front_page_posts",
+                f"{self.base_reddit_endpoint}/.json"
+                f"?sort={sort_criterion}&limit={posts_limit}",
+            ),
+        ]
+        posts_endpoint = None
+        for item_name, item_endpoint in posts_type_map:
+            if posts_type == item_name:
+                posts_endpoint = item_endpoint
 
-    def get_subreddit_profile(self, subreddit: str) -> dict:
-        """
-        Gets a specified Reddit subreddit's profile data.
+        posts = self.get_data(endpoint=posts_endpoint)
 
-        :param subreddit: Subreddit to query.
-        :returns: A JSON object containing a subreddit's profile if data is valid,
-           otherwise return an empty dictionary.
-        """
-        data = self.get_data(endpoint=self.subreddit_profile_endpoint % subreddit)
-        return data.get("data") if data else {}
-
-    def get_subreddit_posts(self, subreddit: str, sort: str, limit: int) -> list:
-        """
-        Gets a specified Subreddit's posts.
-
-        :param subreddit: Subreddit to query.
-        :param sort: Sorting criterion ('new', 'hot', etc.).
-        :param limit: Number of posts to fetch.
-        :returns: A list of JSON objects containing posts' data if valid,
-           otherwise return an empty list.
-        """
-        posts = self.get_data(
-            endpoint=self.subreddit_posts_endpoint % (subreddit, sort, limit)
-        )
-        return posts.get("data").get("children") if posts else []
-
-    def get_search_results(self, query: str, sort: str, limit: int):
-        """
-        Gets posts that match a user-provided query.
-
-        :param query: Search query
-        :param sort: Posts' sorting criterion.
-        :param limit: Maximum number of posts to return.
-        """
-        results = self.get_data(self.search_endpoint % (query, sort, limit))
-        return results.get("data").get("children")
+        return self.validate_data(data=posts.get("data").get("children"))
 
     def get_post_data(
-        self, subreddit: str, post_id: str, sort: str, limit: int
+        self, subreddit: str, post_id: str, sort_criterion: str, comments_limit: int
     ) -> tuple:
         """
         Gets a post's data.
 
         :param subreddit: The subreddit in which the post was posted.
         :param post_id: ID of the post.
-        :param sort: Sorting criterion ('new', 'hot', etc.).
-        :param limit: Maximum of comments to fetch.
+        :param sort_criterion: Sorting criterion ('new', 'hot', etc.).
+        :param comments_limit: Maximum of comments to fetch.
         :returns: A tuple of a post's data (post_information, list_of_comments) if valid,
            otherwise return a tuple containing an empty dict and list.
         """
         data = self.get_data(
-            endpoint=self.post_comments_endpoint % (subreddit, post_id, sort, limit)
+            endpoint=f"{self.base_reddit_endpoint}/r/{subreddit}/comments/{post_id}.json"
+            f"?sort={sort_criterion}&limit={comments_limit}"
         )
-        return (
-            (
-                data[0].get("data").get("children")[0].get("data"),
-                data[1].get("data").get("children") if data else exit(),
-            )
-            if data[0] or data[1]
-            else ({}, [])
-        )
-
-    def get_post_listings(self, listing: str, sort: str, limit: int) -> list:
-        """
-        Gets posts from a specified listing.
-
-        :param listing: Listing to get posts from
-        :param sort: Sorting criterion ('new', 'hot', etc.).
-        :param limit: Maximum of comments to fetch.
-        :returns: A list of JSON objects containing posts' data if valid,
-           otherwise return an empty list.
-        """
-        posts = self.get_data(
-            endpoint=self.post_listings_endpoint % (listing, sort, limit)
-        )
-        return posts.get("data").get("children") if posts else []
-
-    def get_front_page_posts(self, sort: str, limit: int) -> list:
-        """
-        Gets posts from the Reddit front-page.
-
-        :param sort: Sorting criterion ('new', 'hot', etc.).
-        :param limit: Maximum of comments to fetch.
-        :returns: A list of JSON objects containing posts' data if valid,
-           otherwise return an empty list.
-        """
-        posts = self.get_data(endpoint=self.front_page_endpoint % (sort, limit))
-        return posts.get("data").get("children") if posts else []
+        return self.validate_data(
+            data=data[0].get("data").get("children")[0].get("data"),
+            valid_key="upvote_ratio",
+        ), self.validate_data(data=data[1].get("data").get("children"))

@@ -1,22 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Compile Update="Forms\Comments.vb">
+    <Compile Update="Windows\CommentsWindow.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Forms\About.vb">
+    <Compile Update="Windows\AboutWindow.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Forms\Main.vb">
+    <Compile Update="Windows\MainWindow.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Forms\Posts.vb">
+    <Compile Update="Windows\PostsWindow.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Forms\MiscData.vb">
+    <Compile Update="Windows\SubredditProfileWindow.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Forms\UserProfile.vb">
+    <Compile Update="Windows\UserProfileWindow.vb">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
