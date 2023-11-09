@@ -275,7 +275,10 @@ class Masonry:
         """
 
         raw_post, raw_comments = self.api.get_post_data(
-            post_id=post_id, subreddit=post_subreddit, sort=sort, limit=limit
+            post_id=post_id,
+            subreddit=post_subreddit,
+            sort_criterion=sort,
+            comments_limit=limit,
         )
 
         if raw_post:
