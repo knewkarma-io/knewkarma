@@ -32,7 +32,7 @@ knewkarma OPERATION_MODE POSITIONAL_MODE_ARGUMENT -OPTION_1OPTION_2OPTION_3
 ```
 MIT License
 
-Copyright (c) 2023 {__author__}
+Copyright © 2023 {__author__}
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
