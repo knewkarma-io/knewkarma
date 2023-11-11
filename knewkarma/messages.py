@@ -41,6 +41,7 @@ def message(message_type: str, message_key: str, **kwargs) -> str:
         "error": error_messages,
         "info": info_messages,
         "prompt": prompt_messages,
+        "critical": critical_messages,
     }
 
     template = message_dict.get(message_type, {}).get(message_key, "Message not found.")
