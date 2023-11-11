@@ -20,12 +20,12 @@ class Api:
         self.base_github_api_endpoint = base_github_api_endpoint
 
     @staticmethod
-    def get_data(endpoint: str) -> Optional[Union[dict, list, None]]:
+    def get_data(endpoint: str) -> Optional[Union[dict, list]]:
         """
         Fetches JSON data from a given API endpoint.
 
         :param endpoint: The API endpoint to fetch data from.
-        :return: Returns JSON data as a dictionary or list. Returns None if fetching fails.
+        :return: Returns JSON data as a dictionary or list. Returns an empty dict if fetching fails.
         """
         from sys import version as python_version
 
@@ -49,7 +49,7 @@ class Api:
                                 error_message=error_message,
                             )
                         )
-                        return None
+                        return {}
         except requests.exceptions.RequestException as error:
             log.error(
                 message(
@@ -58,7 +58,7 @@ class Api:
                     error_message=error,
                 )
             )
-            return None
+            return {}
         except Exception as error:
             log.critical(
                 message(
@@ -67,7 +67,7 @@ class Api:
                     error_message=error,
                 )
             )
-            return None
+            return {}
 
     @staticmethod
     def validate_data(
@@ -180,7 +180,7 @@ class Api:
                 profile_endpoint = item_endpoint
 
         profile = self.get_data(endpoint=profile_endpoint)
-        return self.validate_data(data=profile.get("data"), valid_key="created_utc")
+        return self.validate_data(data=profile.get("data", {}), valid_key="created_utc")
 
     def get_posts(
         self,
@@ -244,7 +244,7 @@ class Api:
 
         posts = self.get_data(endpoint=posts_endpoint)
 
-        return self.validate_data(data=posts.get("data").get("children"))
+        return self.validate_data(data=posts.get("data", {}).get("children", []))
 
     def get_post_data(
         self, subreddit: str, post_id: str, sort_criterion: str, comments_limit: int
