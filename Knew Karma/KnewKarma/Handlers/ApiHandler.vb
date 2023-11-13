@@ -1,8 +1,7 @@
 ﻿Imports System.Net.Http
 Imports Newtonsoft.Json.Linq
 Imports System.Runtime.InteropServices
-Imports System.Reflection
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel
+
 
 ''' <summary>
 ''' Class for making API calls to Reddit and or GitHub.

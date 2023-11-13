@@ -175,9 +175,9 @@ class Api:
         ]
 
         profile_endpoint = None
-        for item_name, item_endpoint in profile_type_map:
-            if item_name == profile_type:
-                profile_endpoint = item_endpoint
+        for type_name, type_endpoint in profile_type_map:
+            if type_name == profile_type:
+                profile_endpoint = type_endpoint
 
         profile = self.get_data(endpoint=profile_endpoint)
         return self.validate_data(data=profile.get("data", {}), valid_key="created_utc")
@@ -238,9 +238,9 @@ class Api:
             ),
         ]
         posts_endpoint = None
-        for item_name, item_endpoint in posts_type_map:
-            if posts_type == item_name:
-                posts_endpoint = item_endpoint
+        for type_name, type_endpoint in posts_type_map:
+            if type_name == posts_type:
+                posts_endpoint = type_endpoint
 
         posts = self.get_data(endpoint=posts_endpoint)
 
