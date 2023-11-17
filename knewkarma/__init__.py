@@ -1,32 +1,26 @@
 import os
 
-DATA_SORT_LISTINGS = ["controversial", "new", "top", "best", "hot", "rising"]
-POST_LISTINGS = ["all", "best", "controversial", "popular", "rising"]
+DATA_SORT_LISTINGS: list = ["controversial", "new", "top", "best", "hot", "rising"]
+POST_LISTINGS: list = ["all", "best", "controversial", "popular", "rising"]
 
 # Construct path to the program's directory
-PROGRAM_DIRECTORY = os.path.expanduser(os.path.join("~", "knewkarma"))
+PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma"))
 
 # Construct path to the current file's directory
-CURRENT_FILE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+CURRENT_FILE_DIRECTORY: str = os.path.dirname(os.path.abspath(__file__))
 
 # Construct paths to directories of CSV and JSON files.
-CSV_DIRECTORY = os.path.join(PROGRAM_DIRECTORY, "csv")
-JSON_DIRECTORY = os.path.join(PROGRAM_DIRECTORY, "json")
+CSV_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "csv")
+JSON_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "json")
 
 
-__author__ = "Richard Mwewa"
-__about__ = "https://about.me/rly0nheart"
-__version__ = "2.0.0.0"
-__description__ = """
+__author__: str = "Richard Mwewa"
+__about__: str = "https://about.me/rly0nheart"
+__version__: str = "2.1.0.0"
+__description__: str = """
 # Knew Karma
 > A **Reddit** Data Analysis Toolkit."""
-__epilog__ = f"""
-> Command-Line options can be mixed to get various data with a one-line command
-
-```
-knewkarma OPERATION_MODE POSITIONAL_MODE_ARGUMENT -OPTION_1OPTION_2OPTION_3
-```
-
+__epilog__: str = f"""
 # by [{__author__}]({__about__})
 
 ```
@@ -55,8 +49,8 @@ SOFTWARE.
 """
 
 
-__operations_description__ = "# **{}** Operations"
-__user_examples__ = """
+__operations_description__: str = "# **{}** Operations"
+__user_examples__: str = """
 # Examples
 ## Get User Profile
 ```
@@ -79,7 +73,7 @@ knewkarma --sort top --limit 20 user USERNAME --comments/--posts
 ```
 """
 
-__subreddit_examples__ = """
+__subreddit_examples__: str = """
 # Examples
 ## Get Subreddit Profile
 ```
@@ -98,7 +92,7 @@ knewkarma --sort new --limit 20 subreddit SUBREDDIT_NAME
 
 """
 
-__post_examples__ = """
+__post_examples__: str = """
 # Examples
 ## Get Post Data (without comments)
 ```
@@ -116,7 +110,7 @@ knewkarma --sort top --limit 10 post POST_ID SUBREDDIT_NAME
 ```
 """
 
-__posts_examples__ = """
+__posts_examples__: str = """
 # Examples
 ## Get Posts from Reddit Front-Page (unsorted and unlimited)
 ```
@@ -139,7 +133,7 @@ knewkarma --sort top --limit 20 posts --listing best
 ```
 """
 
-__search_examples__ = """
+__search_examples__: str = """
 # Examples
 ## Search for Posts (unsorted and unlimited)
 ```
