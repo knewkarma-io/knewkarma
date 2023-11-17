@@ -13,11 +13,11 @@ class Masonry:
         from .api import Api
         from .brokers import Broker
 
-        self.api = Api(
+        self.api: Api = Api(
             base_reddit_endpoint="https://www.reddit.com",
             base_github_api_endpoint="https://api.github.com",
         )
-        self.data_broker = Broker()
+        self.data_broker: Broker = Broker()
 
     def create_tree(
         self,
@@ -39,8 +39,8 @@ class Masonry:
         if not tree_data:
             return Tree(tree_title, style="bold", guide_style="bold bright_blue")
 
-        tree = Tree(tree_title, style="bold", guide_style="bold bright_blue")
-        data_types = [dict, list]
+        tree: Tree = Tree(tree_title, style="bold", guide_style="bold bright_blue")
+        data_types: list = [dict, list]
         if type(tree_data) in data_types:
             if isinstance(tree_data, dict):
                 for data_key, data_value in tree_data.items():
@@ -87,9 +87,9 @@ class Masonry:
         :param additional_text: Additional text to add at the end of the tree.
         :returns: A populated branch.
         """
-        data_types = [dict, list]
+        data_types: list = [dict, list]
         if type(branch_data) in data_types:
-            branch = target_tree.add(branch_title, guide_style="bold blue")
+            branch: Tree = target_tree.add(branch_title, guide_style="bold blue")
             if isinstance(branch_data, dict):
                 for data_key, data_value in branch_data.items():
                     branch.add(f"{data_key}: {data_value}", style="dim")
@@ -109,14 +109,16 @@ class Masonry:
         save_to_json: bool = False,
         save_to_csv: bool = False,
     ):
-        raw_profile = self.api.get_profile(
+        raw_profile: dict = self.api.get_profile(
             profile_type=profile_type, profile_source=profile_source
         )
         if raw_profile:
             if profile_type == "user_profile":
                 # Separate the profile data in categories
-                brokered_profile = self.data_broker.user_data(raw_data=raw_profile)
-                additional_data = [
+                brokered_profile: tuple = self.data_broker.user_data(
+                    raw_data=raw_profile
+                )
+                additional_data: list = [
                     (
                         raw_profile.get("subreddit").get("display_name"),
                         brokered_profile[1],
@@ -129,8 +131,10 @@ class Masonry:
                     ("Karma", brokered_profile[4]),
                 ]
             else:
-                brokered_profile = self.data_broker.subreddit_data(raw_data=raw_profile)
-                additional_data = [
+                brokered_profile: tuple = self.data_broker.subreddit_data(
+                    raw_data=raw_profile
+                )
+                additional_data: list = [
                     ("Allows", brokered_profile[1]),
                     ("Banner", brokered_profile[2]),
                     ("Header", brokered_profile[3]),
@@ -166,7 +170,7 @@ class Masonry:
         posts_source: str = None,
         show_author: bool = False,
     ):
-        raw_posts = self.api.get_posts(
+        raw_posts: list = self.api.get_posts(
             sort_criterion=sort_criterion,
             posts_limit=posts_limit,
             posts_type=posts_type,
@@ -174,20 +178,20 @@ class Masonry:
         )
 
         if raw_posts:
-            posts_tree = self.create_tree(
+            posts_tree: Tree = self.create_tree(
                 tree_title=f"Visualising {posts_limit} {posts_type} - {datetime.now()}"
             )
 
             for post in raw_posts:
                 # Set branch title to show the post author's username if the show_author is True.
                 if show_author:
-                    branch_title = (
+                    branch_title: str = (
                         f"[italic]{convert_timestamp_to_datetime(post.get('data').get('created'))} | by"
                         f" u/{post.get('data').get('author')}:[/] [bold]{post.get('data').get('title')}[/]"
                     )
                 else:
                     # Otherwise, set the title of the branch to the title of the post.
-                    branch_title = (
+                    branch_title: str = (
                         f"[italic]{convert_timestamp_to_datetime(post.get('data').get('created'))}:[/] "
                         f"[bold]{post.get('data').get('title')}[/]"
                     )
@@ -215,12 +219,12 @@ class Masonry:
         save_to_json: bool,
     ):
         # Initialise a tree structure to visualise the results.
-        comments_tree = self.create_tree(
+        comments_tree: Tree = self.create_tree(
             tree_title=f"Visualising {username}'s [green]{sort_criterion}[/] [cyan]{comments_limit}[/] comments"
         )
 
         # Get comments from the API and add filters accordingly
-        raw_comments = self.api.get_posts(
+        raw_comments: list = self.api.get_posts(
             sort_criterion=sort_criterion,
             posts_limit=comments_limit,
             posts_type="user_comments",
@@ -229,7 +233,7 @@ class Masonry:
 
         if raw_comments:
             for raw_comment in raw_comments:
-                raw_comment_data = raw_comment.get("data")
+                raw_comment_data: dict = raw_comment.get("data")
                 self.add_branch(
                     target_tree=comments_tree,
                     branch_title=convert_timestamp_to_datetime(
@@ -274,7 +278,7 @@ class Masonry:
 
         """
 
-        raw_post, raw_comments = self.api.get_post_data(
+        (raw_post, raw_comments) = self.api.get_post_data(
             post_id=post_id,
             subreddit=post_subreddit,
             sort_criterion=sort,
@@ -282,7 +286,7 @@ class Masonry:
         )
 
         if raw_post:
-            post_tree = self.create_tree(
+            post_tree: Tree = self.create_tree(
                 tree_title=f"{raw_post.get('title')} | by {raw_post.get('author')}",
                 tree_data=self.data_broker.post_data(raw_post=raw_post),
                 additional_text=raw_post.get("selftext"),
@@ -297,12 +301,12 @@ class Masonry:
 
             if show_comments:
                 if raw_comments:
-                    comments_branch = post_tree.add(
+                    comments_branch: Tree = post_tree.add(
                         f"[bold]Visualising [cyan]{limit}[/] [green]{sort}[/] comments for post {post_id}[/]"
                     )
                     raw_comments.pop()  # Remove last item from the list (it does not contain any comment data)
                     for raw_comment in raw_comments:
-                        raw_comment_data = raw_comment.get("data")
+                        raw_comment_data: dict = raw_comment.get("data")
                         self.add_branch(
                             target_tree=comments_branch,
                             branch_title=convert_timestamp_to_datetime(
