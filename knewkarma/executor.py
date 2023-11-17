@@ -1,6 +1,7 @@
 import argparse
 
-from .coreutils import log
+from rich.prompt import Prompt, Confirm
+
 from .masonry import Masonry
 
 
@@ -17,71 +18,103 @@ class Executor:
         self.arguments = arguments
         self.handlers = self.Handlers(executor=self)
 
-    def execute_cli_arguments(self):
-        """
-        Executes a command-line arguments based cli of Knew Karma.
-        """
-        if self.arguments.mode == "user":
-            self.handlers.user_handler(username=self.arguments.username)
+    def cli(self):
+        operation_mode: str = self.arguments.mode or Prompt.ask(
+            "Operation mode", choices=["user", "subreddit", "post", "posts", "search"]
+        )
+        if operation_mode == "user":
+            self.handlers.user_handler(
+                username=self.arguments.username
+                if hasattr(self.arguments, "username")
+                else Prompt.ask("Username", default="automoderator")
+            )
 
-        elif self.arguments.mode == "subreddit":
-            self.handlers.subreddit_handler(subreddit=self.arguments.subreddit)
+        elif operation_mode == "subreddit":
+            self.handlers.subreddit_handler(
+                subreddit=self.arguments.subreddit
+                if hasattr(self.arguments, "subreddit")
+                else Prompt.ask("Subreddit", default="osint")
+            )
 
-        elif self.arguments.mode == "search":
+        elif operation_mode == "search":
             self.tree_masonry.posts_tree(
                 posts_type="search_posts",
-                posts_source=self.arguments.query,
+                posts_source=self.arguments.query
+                if hasattr(self.arguments, "query")
+                else Prompt.ask("Search query", default="osint"),
                 show_author=True,
-                sort_criterion=self.arguments.sort,
-                posts_limit=self.arguments.limit,
-                save_to_json=self.arguments.json,
+                sort_criterion=self.arguments.sort or self.handlers.data_sort_criterion,
+                posts_limit=self.arguments.limit or self.handlers.data_limit,
+                save_to_json=self.arguments.json or self.handlers.save_to_json,
             )
 
-        elif self.arguments.mode == "post":
+        elif operation_mode == "post":
             self.tree_masonry.post_data_tree(
-                post_id=self.arguments.post_id,
-                post_subreddit=self.arguments.post_subreddit,
-                sort=self.arguments.sort,
-                limit=self.arguments.limit,
-                show_comments=self.arguments.comments,
-                save_to_csv=self.arguments.csv,
-                save_to_json=self.arguments.json,
+                post_id=self.arguments.post_id
+                if hasattr(self.arguments, "post_id")
+                else Prompt.ask("Post ID", default="12csg48"),
+                post_subreddit=self.arguments.post_subreddit
+                if hasattr(self.arguments, "post_subreddit")
+                else Prompt.ask("Post source subreddit", default="osint"),
+                sort=self.arguments.sort or self.handlers.data_sort_criterion,
+                limit=self.arguments.limit or self.handlers.data_limit,
+                show_comments=self.arguments.comments
+                if hasattr(self.arguments, "show_comments")
+                else Confirm.ask("Would you like to show comments?", default=False),
+                save_to_csv=self.arguments.csv or self.handlers.save_to_csv,
+                save_to_json=self.arguments.json or self.handlers.save_to_json,
             )
-        elif self.arguments.mode == "posts":
+        elif operation_mode == "posts":
             self.handlers.posts_handler()
 
     class Handlers:
         def __init__(self, executor):
+            from . import DATA_SORT_LISTINGS
+
             self.arguments: argparse = executor.arguments
             self.tree_masonry: Masonry = executor.tree_masonry
-            self.data_sort_criterion: str = self.arguments.sort
-            self.data_limit: int = self.arguments.limit
-            self.save_to_json: bool = self.arguments.json
-            self.save_to_csv: bool = self.arguments.csv
+            self.data_sort_criterion: str = self.arguments.sort or Prompt.ask(
+                "Set output (bulk) sort criterion",
+                choices=DATA_SORT_LISTINGS,
+                default="all",
+            )
+            self.data_limit: int = self.arguments.limit or Prompt.ask(
+                "Set output (bulk) limit", default=10
+            )
+            self.save_to_json: bool = self.arguments.json or Confirm.ask(
+                "Would you like to save output to a JSON file?", default=False
+            )
+            self.save_to_csv: bool = self.arguments.csv or Confirm.ask(
+                "Would you like to save output to a CSV file?", default=False
+            )
 
-        def execute_functions(self, argument_map: dict):
+        def get_action(self, actions_map: dict, default_action: str) -> str:
             """
-            Execute functions from a mapping if their corresponding command line arguments are True.
-            If no argument is provided, execute the first function from the argument_map.
+            Gets the action based on command-line arguments or interactive input.
 
-            :param argument_map: A dictionary mapping command line arguments to functions.
+            :param actions_map: A dictionary mapping action names to their corresponding functions.
+            :param default_action: The default action to choose if no command-line argument is provided.
+            :return: The chosen action name.
             """
-            executed = False
-            for argument, function in argument_map.items():
-                if getattr(self.arguments, argument, False):
-                    function()
-                    executed = True
+            # Determine action from CLI arguments, default to None if not found
+            action: str = next(
+                (
+                    action_name
+                    for action_name in actions_map
+                    if getattr(self.arguments, action_name, False)
+                ),
+                None,
+            )
 
-            # If no functions were executed, execute the first function by default
-            if not executed:
-                default_argument, default_function = next(iter(argument_map.items()))
-                log.warning(
-                    f"No specific argument provided, executing default ([italic]{default_argument}[/])..."
-                )
-                default_function()
+            # If no CLI argument for action, ask user interactively
+            return action or Prompt.ask(
+                "Select an action",
+                choices=list(actions_map.keys()),
+                default=default_action,
+            )
 
         def user_handler(self, username: str):
-            user_argument_map = {
+            user_actions_map: dict = {
                 "profile": lambda: self.tree_masonry.profile_tree(
                     profile_type="user_profile",
                     profile_source=username,
@@ -103,10 +136,14 @@ class Executor:
                 ),
             }
 
-            self.execute_functions(argument_map=user_argument_map)
+            action: str = self.get_action(
+                actions_map=user_actions_map, default_action="profile"
+            )
+
+            user_actions_map.get(action)()
 
         def subreddit_handler(self, subreddit: str):
-            subreddit_argument_map = {
+            subreddit_actions_map: dict = {
                 "profile": lambda: self.tree_masonry.profile_tree(
                     profile_type="subreddit_profile",
                     profile_source=subreddit,
@@ -121,10 +158,14 @@ class Executor:
                     save_to_json=self.save_to_json,
                 ),
             }
-            self.execute_functions(argument_map=subreddit_argument_map)
+
+            action: str = self.get_action(
+                actions_map=subreddit_actions_map, default_action="profile"
+            )
+            subreddit_actions_map.get(action)()
 
         def posts_handler(self):
-            posts_argument_map = {
+            posts_actions_map: dict = {
                 "front_page": lambda: self.tree_masonry.posts_tree(
                     posts_type="front_page_posts",
                     posts_limit=self.data_limit,
@@ -141,4 +182,7 @@ class Executor:
                     save_to_json=self.save_to_json,
                 ),
             }
-            self.execute_functions(argument_map=posts_argument_map)
+            action: str = self.get_action(
+                actions_map=posts_actions_map, default_action="front_page"
+            )
+            posts_actions_map.get(action)()
