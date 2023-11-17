@@ -30,7 +30,9 @@ def create_parser() -> argparse.ArgumentParser:
         formatter_class=RichHelpFormatter,
     )
 
-    subparsers = parser.add_subparsers(dest="mode", help="Operation mode")
+    subparsers = parser.add_subparsers(
+        dest="mode", help="Operation mode", required=False
+    )
 
     # User mode
     user_parser = subparsers.add_parser(
@@ -107,7 +109,7 @@ def create_parser() -> argparse.ArgumentParser:
     post_parser.add_argument(
         "-c",
         "--comments",
-        dest="comments",
+        dest="show_comments",
         action="store_true",
         help="Show post comments",
     )
