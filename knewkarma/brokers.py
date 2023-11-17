@@ -20,18 +20,18 @@ class Broker:
         from . import CURRENT_FILE_DIRECTORY
 
         # Construct path to the mapping data file
-        mapping_data_file = os.path.join(CURRENT_FILE_DIRECTORY, "data", data_file)
+        mapping_data_file: str = os.path.join(CURRENT_FILE_DIRECTORY, "data", data_file)
 
         # Load the mapping from the specified file
         with open(mapping_data_file, "r", encoding="utf-8") as file:
-            mapping_data = json.load(file)
+            mapping_data: dict = json.load(file)
 
         # Initialize an empty dictionary to hold the formatted data
         formatted_data = {}
 
         # Map API data to human-readable format using the mapping
         for api_data_key, mapping_data_key in mapping_data.items():
-            formatted_data[mapping_data_key] = api_data.get(api_data_key, "N/A")
+            formatted_data[mapping_data_key]: dict = api_data.get(api_data_key, "N/A")
 
         return formatted_data
 
@@ -51,19 +51,21 @@ class Broker:
         :param raw_data: Raw data from API.
         :returns: A tuple Re-formatted data
         """
-        profile = self.structure_raw_data(
+        profile: dict = self.structure_raw_data(
             api_data=raw_data, data_file="user/profile.json"
         )
-        subreddit = self.structure_raw_data(
+        subreddit: dict = self.structure_raw_data(
             api_data=raw_data.get("subreddit"), data_file="user/subreddit.json"
         )
-        verification = self.structure_raw_data(
+        verification: dict = self.structure_raw_data(
             api_data=raw_data, data_file="user/verified.json"
         )
-        snoovatar = self.structure_raw_data(
+        snoovatar: dict = self.structure_raw_data(
             api_data=raw_data, data_file="user/snoovatar.json"
         )
-        karma = self.structure_raw_data(api_data=raw_data, data_file="user/karma.json")
+        karma: dict = self.structure_raw_data(
+            api_data=raw_data, data_file="user/karma.json"
+        )
 
         return profile, subreddit, verification, snoovatar, karma
 
@@ -82,19 +84,19 @@ class Broker:
         :param raw_data: Raw data from API.
         :returns: A tuple of Re-formatted data
         """
-        profile = self.structure_raw_data(
+        profile: dict = self.structure_raw_data(
             api_data=raw_data, data_file="subreddit/profile.json"
         )
-        allows = self.structure_raw_data(
+        allows: dict = self.structure_raw_data(
             api_data=raw_data, data_file="subreddit/allows.json"
         )
-        banner = self.structure_raw_data(
+        banner: dict = self.structure_raw_data(
             api_data=raw_data, data_file="subreddit/banner.json"
         )
-        header = self.structure_raw_data(
+        header: dict = self.structure_raw_data(
             api_data=raw_data, data_file="subreddit/header.json"
         )
-        flairs = self.structure_raw_data(
+        flairs: dict = self.structure_raw_data(
             api_data=raw_data, data_file="subreddit/flairs.json"
         )
         return profile, allows, banner, header, flairs
@@ -112,7 +114,7 @@ class Broker:
         :returns: A dictionary of Re-formatted post data,
           else a dictionary containing profile data only.
         """
-        profile = self.structure_raw_data(
+        profile: dict = self.structure_raw_data(
             api_data=raw_post, data_file="post/profile.json"
         )
 
@@ -126,7 +128,7 @@ class Broker:
         ----------
         - shared/comment.json: Holds the structure for a comment's data.
         """
-        comment_data = self.structure_raw_data(
+        comment_data: dict = self.structure_raw_data(
             api_data=raw_comment, data_file="shared/comment.json"
         )
         return comment_data
