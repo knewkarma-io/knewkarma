@@ -41,7 +41,7 @@ class Api:
                     if response.status_code == 200:
                         return response.json()
                     else:
-                        error_message = response.json()
+                        error_message: dict = response.json()
                         log.error(
                             message(
                                 message_type="error",
@@ -110,17 +110,17 @@ class Api:
         from . import CURRENT_FILE_DIRECTORY
 
         # Make a GET request to the GitHub API to get the latest release of the project.
-        response = self.get_data(
+        response: dict = self.get_data(
             endpoint=f"{self.base_github_api_endpoint}/repos/bellingcat/knewkarma/releases/latest"
         )
 
         if response.get("tag_name"):
-            remote_version = response.get("tag_name")
+            remote_version: str = response.get("tag_name")
 
             # Check if the remote version tag matches the current version tag.
             if remote_version != __version__:
                 # Set icon file to show in the desktop notification
-                icon_file = "icon.ico" if os.name == "nt" else "icon.png"
+                icon_file: str = "icon.ico" if os.name == "nt" else "icon.png"
 
                 try:
                     # Notify user about the new release.
@@ -163,7 +163,7 @@ class Api:
         :param profile_source: source from where the profile should be retrieved.
         :return: A JSON object containing profile data.
         """
-        profile_type_map = [
+        profile_type_map: list = [
             (
                 "user_profile",
                 f"{self.base_reddit_endpoint}/user/{profile_source}/about.json",
@@ -179,7 +179,7 @@ class Api:
             if type_name == profile_type:
                 profile_endpoint = type_endpoint
 
-        profile = self.get_data(endpoint=profile_endpoint)
+        profile: dict = self.get_data(endpoint=profile_endpoint)
         return self.validate_data(data=profile.get("data", {}), valid_key="created_utc")
 
     def get_posts(
@@ -205,7 +205,7 @@ class Api:
         :param posts_limit: Limit on the number of posts to retrieve.
         :return: A list of JSON objects, each containing post data.
         """
-        posts_type_map = [
+        posts_type_map: list = [
             (
                 "user_posts",
                 f"{self.base_reddit_endpoint}/user/{posts_source}/submitted.json"
@@ -242,7 +242,7 @@ class Api:
             if type_name == posts_type:
                 posts_endpoint = type_endpoint
 
-        posts = self.get_data(endpoint=posts_endpoint)
+        posts: dict = self.get_data(endpoint=posts_endpoint)
 
         return self.validate_data(data=posts.get("data", {}).get("children", []))
 
@@ -259,7 +259,7 @@ class Api:
         :returns: A tuple of a post's data (post_information, list_of_comments) if valid,
            otherwise return a tuple containing an empty dict and list.
         """
-        data = self.get_data(
+        data: dict = self.get_data(
             endpoint=f"{self.base_reddit_endpoint}/r/{subreddit}/comments/{post_id}.json"
             f"?sort={sort_criterion}&limit={comments_limit}"
         )
