@@ -1,4 +1,6 @@
 def on_call():
+    import argparse
+
     from . import __version__
     from .coreutils import datetime, log, path_finder
     from .executor import Executor
@@ -12,14 +14,14 @@ def on_call():
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
     )
-    parser = create_parser()
-    tree_masonry = Masonry()
-    start_time = datetime.now()
+    parser: argparse.ArgumentParser = create_parser()
+    arguments: argparse = parser.parse_args()
+    tree_masonry: Masonry = Masonry()
+    start_time: datetime = datetime.now()
 
-    if parser.parse_args().mode:
-        executor = Executor(arguments=parser.parse_args(), tree_masonry=tree_masonry)
-        path_finder()
-        try:
+    path_finder()
+    try:
+        if arguments.mode:
             log.info(
                 message(
                     message_type="info",
@@ -30,21 +32,20 @@ def on_call():
                 )
             )
             tree_masonry.api.check_updates()
-            executor.execute_cli_arguments()
-        except KeyboardInterrupt:
-            log.warning(
-                message(
-                    message_type="warning",
-                    message_key="user_interruption",
-                )
+
+        Executor(arguments=arguments, tree_masonry=tree_masonry).cli()
+    except KeyboardInterrupt:
+        log.warning(
+            message(
+                message_type="warning",
+                message_key="user_interruption",
             )
-        finally:
-            log.info(
-                message(
-                    message_type="info",
-                    message_key="program_stopped",
-                    run_time=datetime.now() - start_time,
-                )
+        )
+    finally:
+        log.info(
+            message(
+                message_type="info",
+                message_key="program_stopped",
+                run_time=datetime.now() - start_time,
             )
-    else:
-        parser.print_usage()
+        )

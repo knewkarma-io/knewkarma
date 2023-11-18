@@ -12,7 +12,7 @@ def path_finder():
     """
     Creates file directories if they don't already exist.
     """
-    file_directories = [CSV_DIRECTORY, JSON_DIRECTORY]
+    file_directories: list = [CSV_DIRECTORY, JSON_DIRECTORY]
     for directory in file_directories:
         os.makedirs(directory, exist_ok=True)
 
@@ -59,8 +59,10 @@ def convert_timestamp_to_datetime(timestamp: float) -> str:
     :param timestamp: The Unix timestamp to be converted.
     :return: A formatted datetime string in the format "dd MMMM yyyy, hh:mm:ssAM/PM".
     """
-    utc_from_timestamp = datetime.fromtimestamp(timestamp)
-    datetime_object = utc_from_timestamp.strftime("%d %B %Y, %I:%M:%S%p")
+    utc_from_timestamp: datetime = datetime.fromtimestamp(timestamp)
+    datetime_object: utc_from_timestamp = utc_from_timestamp.strftime(
+        "%d %B %Y, %I:%M:%S%p"
+    )
     return datetime_object
 
 
@@ -85,4 +87,4 @@ def setup_logging(debug_mode: bool) -> logging.getLogger:
     return logging.getLogger("Knew Karma")
 
 
-log = setup_logging(debug_mode=create_parser().parse_args().debug)
+log: logging = setup_logging(debug_mode=create_parser().parse_args().debug)
