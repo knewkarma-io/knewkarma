@@ -21,6 +21,9 @@ __description__: str = """
 # Knew Karma
 > A **Reddit** Data Analysis Toolkit."""
 __epilog__: str = f"""
+> Call `knewkarma` without command-line arguments to invoke an interactive command-line interface.
+>> Calling it with only the `-d/--debug` flag will invoke an interactive command-line interface in debug mode.
+
 # by [{__author__}]({__about__})
 
 ```
