@@ -16,7 +16,7 @@ def on_call():
     )
     parser: argparse.ArgumentParser = create_parser()
     arguments: argparse = parser.parse_args()
-    masonry: Masonry = Masonry()
+    tree_masonry: Masonry = Masonry()
     start_time: datetime = datetime.now()
 
     path_finder()
@@ -31,9 +31,9 @@ def on_call():
                     start_time=start_time.strftime("%a %b %d %Y, %H:%M:%S"),
                 )
             )
-            masonry.api.check_updates()
+            tree_masonry.api.check_updates()
 
-        Executor(arguments=arguments, tree_masonry=masonry).cli()
+        Executor(arguments=arguments, tree_masonry=tree_masonry).cli()
     except KeyboardInterrupt:
         log.warning(
             message(
