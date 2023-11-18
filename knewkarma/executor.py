@@ -20,7 +20,8 @@ class Executor:
 
     def cli(self):
         operation_mode: str = self.arguments.mode or Prompt.ask(
-            "Operation mode", choices=["user", "subreddit", "post", "posts", "search"]
+            "Select target to get data from",
+            choices=["user", "subreddit", "post", "posts", "search"],
         )
         if operation_mode == "user":
             self.handlers.user_handler(
@@ -74,12 +75,12 @@ class Executor:
             self.arguments: argparse = executor.arguments
             self.tree_masonry: Masonry = executor.tree_masonry
             self.data_sort_criterion: str = self.arguments.sort or Prompt.ask(
-                "Set output (bulk) sort criterion",
+                "Set (bulk data) output  sort criterion",
                 choices=DATA_SORT_LISTINGS,
                 default="all",
             )
             self.data_limit: int = self.arguments.limit or Prompt.ask(
-                "Set output (bulk) limit", default=10
+                "Set (bulk data) output  limit", default=10
             )
             self.save_to_json: bool = self.arguments.json or Confirm.ask(
                 "Would you like to save output to a JSON file?", default=False
@@ -108,7 +109,7 @@ class Executor:
 
             # If no CLI argument for action, ask user interactively
             return action or Prompt.ask(
-                "Select an action",
+                "What type of data would you like to get?",
                 choices=list(actions_map.keys()),
                 default=default_action,
             )
