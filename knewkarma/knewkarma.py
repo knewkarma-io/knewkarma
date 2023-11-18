@@ -15,12 +15,13 @@ def on_call():
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
     )
     parser: argparse.ArgumentParser = create_parser()
+    arguments: argparse = parser.parse_args()
     masonry: Masonry = Masonry()
     start_time: datetime = datetime.now()
 
     path_finder()
     try:
-        if parser.parse_args().mode:
+        if arguments.mode:
             log.info(
                 message(
                     message_type="info",
@@ -32,7 +33,7 @@ def on_call():
             )
             masonry.api.check_updates()
 
-        Executor(arguments=parser.parse_args(), tree_masonry=masonry).cli()
+        Executor(arguments=arguments, tree_masonry=masonry).cli()
     except KeyboardInterrupt:
         log.warning(
             message(
