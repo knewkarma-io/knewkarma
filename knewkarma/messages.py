@@ -1,25 +1,25 @@
 #: Dictionary of general message templates
-warning_messages = {
+warning_messages: dict = {
     "user_interruption": "User interruption detected ([yellow]Ctrl+C[/])",
 }
 
 #: Dictionary of error message templates
-error_messages = {
+error_messages: dict = {
     "http_error": "HTTP Error: [yellow]{error_message}[/]",
     "api_error": "API Error: {error_message}",
     "unexpected_error": "Unexpected Error: [red]{error_message}[/]",
 }
-critical_messages = {"unknown_critical": "[bold][red]{critical_message}[/][/]"}
+critical_messages: dict = {"unknown_critical": "[bold][red]{critical_message}[/][/]"}
 
 #: Dictionary of informational message templates
-info_messages = {
+info_messages: dict = {
     "program_started": "Started [bold]{program_name}[/] {program_version} at {start_time}...",
     "program_stopped": "Stopped in {run_time} seconds.",
     "update_found": "{program_name} {release_version} (from {current_version}) is available. "
     "To update, run: pip install --upgrade {program_call_name}",
 }
 
-prompt_messages = {
+prompt_messages: dict = {
     "confirm": "[italic]Would you like to {prompt_message}?[/]",
     "set_output_limit": "[italic]Set bulk data output limit[/]",
     "set_output_sort_criterion": "[italic]Set bulk data sort criterion[/]",
@@ -36,7 +36,7 @@ def message(message_type: str, message_key: str, **kwargs) -> str:
     :param kwargs: Additional key-value pairs to fill in the message template.
     :return: The formatted message string.
     """
-    message_dict = {
+    message_dict: dict = {
         "warning": warning_messages,
         "error": error_messages,
         "info": info_messages,
@@ -44,5 +44,7 @@ def message(message_type: str, message_key: str, **kwargs) -> str:
         "critical": critical_messages,
     }
 
-    template = message_dict.get(message_type, {}).get(message_key, "Message not found.")
+    template: str = message_dict.get(message_type, {}).get(
+        message_key, "Message not found."
+    )
     return template.format(**kwargs)
