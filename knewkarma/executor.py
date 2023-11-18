@@ -75,12 +75,12 @@ class Executor:
             self.arguments: argparse = executor.arguments
             self.tree_masonry: Masonry = executor.tree_masonry
             self.data_sort_criterion: str = self.arguments.sort or Prompt.ask(
-                "Set (bulk data) output  sort criterion",
+                "Set (bulk data) output sort criterion",
                 choices=DATA_SORT_LISTINGS,
                 default="all",
             )
             self.data_limit: int = self.arguments.limit or Prompt.ask(
-                "Set (bulk data) output  limit", default=10
+                "Set (bulk data) output limit", default=10
             )
             self.save_to_json: bool = self.arguments.json or Confirm.ask(
                 "Would you like to save output to a JSON file?", default=False
