@@ -5,19 +5,17 @@ from rich import print
 from rich.text import Text
 from rich.tree import Tree
 
-from .coreutils import convert_timestamp_to_datetime, save_data
+from .coreutils import convert_timestamp_to_datetime, save_data, reformat_raw_data
 
 
 class Masonry:
     def __init__(self):
         from .api import Api
-        from .brokers import Broker
 
         self.api: Api = Api(
             base_reddit_endpoint="https://www.reddit.com",
             base_github_api_endpoint="https://api.github.com",
         )
-        self.data_broker: Broker = Broker()
 
     def create_tree(
         self,
@@ -114,31 +112,59 @@ class Masonry:
         )
         if raw_profile:
             if profile_type == "user_profile":
-                # Separate the profile data in categories
-                brokered_profile: tuple = self.data_broker.user_data(
-                    raw_data=raw_profile
+                formatted_profile: dict = reformat_raw_data(
+                    api_data=raw_profile, data_file="user/profile.json"
                 )
                 additional_data: list = [
                     (
                         raw_profile.get("subreddit").get("display_name"),
-                        brokered_profile[1],
+                        reformat_raw_data(raw_profile, data_file="user/subreddit.json"),
                     ),
                     (
                         "Verification",
-                        brokered_profile[2],
+                        reformat_raw_data(
+                            raw_profile, data_file="user/verification.json"
+                        ),
                     ),
-                    ("Snoovatar", brokered_profile[3]),
-                    ("Karma", brokered_profile[4]),
+                    (
+                        "Snoovatar",
+                        reformat_raw_data(raw_profile, data_file="user/snoovatar.json"),
+                    ),
+                    (
+                        "Karma",
+                        reformat_raw_data(raw_profile, data_file="user/karma.json"),
+                    ),
                 ]
             else:
-                brokered_profile: tuple = self.data_broker.subreddit_data(
-                    raw_data=raw_profile
+                formatted_profile: dict = reformat_raw_data(
+                    api_data=raw_profile, data_file="subreddit/profile.json"
                 )
+
                 additional_data: list = [
-                    ("Allows", brokered_profile[1]),
-                    ("Banner", brokered_profile[2]),
-                    ("Header", brokered_profile[3]),
-                    ("Flairs", brokered_profile[4]),
+                    (
+                        "Allows",
+                        reformat_raw_data(
+                            api_data=raw_profile, data_file="subreddit/allows.json"
+                        ),
+                    ),
+                    (
+                        "Banner",
+                        reformat_raw_data(
+                            api_data=raw_profile, data_file="subreddit/banner.json"
+                        ),
+                    ),
+                    (
+                        "Header",
+                        reformat_raw_data(
+                            api_data=raw_profile, data_file="subreddit/header.json"
+                        ),
+                    ),
+                    (
+                        "Flairs",
+                        reformat_raw_data(
+                            api_data=raw_profile, data_file="subreddit/flairs.json"
+                        ),
+                    ),
                 ]
 
             print(
@@ -146,7 +172,7 @@ class Masonry:
                     tree_title=raw_profile.get("public_description")
                     if profile_type == "subreddit_profile"
                     else raw_profile.get("subreddit").get("title"),
-                    tree_data=brokered_profile[0],
+                    tree_data=formatted_profile,
                     additional_data=additional_data,
                     additional_text=raw_profile.get("submit_text")
                     if profile_type == "subreddit_profile"
@@ -199,7 +225,9 @@ class Masonry:
                 self.add_branch(
                     branch_title=branch_title,
                     target_tree=posts_tree,
-                    branch_data=self.data_broker.post_data(raw_post=post.get("data")),
+                    branch_data=reformat_raw_data(
+                        api_data=post.get("data"), data_file="post/profile.json"
+                    ),
                     additional_text=post.get("data").get("selftext"),
                 )
 
@@ -239,8 +267,8 @@ class Masonry:
                     branch_title=convert_timestamp_to_datetime(
                         timestamp=raw_comment_data.get("created")
                     ),
-                    branch_data=self.data_broker.comment_data(
-                        raw_comment=raw_comment_data
+                    branch_data=reformat_raw_data(
+                        api_data=raw_comment_data, data_file="shared/comment.json"
                     ),
                     additional_text=raw_comment_data.get("body"),
                 )
@@ -288,7 +316,9 @@ class Masonry:
         if raw_post:
             post_tree: Tree = self.create_tree(
                 tree_title=f"{raw_post.get('title')} | by {raw_post.get('author')}",
-                tree_data=self.data_broker.post_data(raw_post=raw_post),
+                tree_data=reformat_raw_data(
+                    api_data=raw_post, data_file="post/profile.json"
+                ),
                 additional_text=raw_post.get("selftext"),
             )
 
@@ -312,8 +342,9 @@ class Masonry:
                             branch_title=convert_timestamp_to_datetime(
                                 timestamp=raw_comment_data.get("created")
                             ),
-                            branch_data=self.data_broker.comment_data(
-                                raw_comment=raw_comment_data
+                            branch_data=reformat_raw_data(
+                                api_data=raw_comment_data,
+                                data_file="shared/comment.json",
                             ),
                             additional_text=raw_comment_data.get("body"),
                         )

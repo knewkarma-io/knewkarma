@@ -4,7 +4,6 @@ import requests
 
 from . import __version__
 from .coreutils import log
-from .messages import message
 
 
 class Api:
@@ -42,31 +41,13 @@ class Api:
                         return response.json()
                     else:
                         error_message: dict = response.json()
-                        log.error(
-                            message(
-                                message_type="error",
-                                message_key="api_error",
-                                error_message=error_message,
-                            )
-                        )
+                        log.error(f"An API error occurred: {error_message}")
                         return {}
         except requests.exceptions.RequestException as error:
-            log.error(
-                message(
-                    message_type="error",
-                    message_key="http_error",
-                    error_message=error,
-                )
-            )
+            log.error(f"An HTTP error occurred: {error}")
             return {}
         except Exception as error:
-            log.critical(
-                message(
-                    message_type="error",
-                    message_key="unexpected_error",
-                    error_message=error,
-                )
-            )
+            log.critical(f"An unknown error occurred: {error}")
             return {}
 
     @staticmethod
@@ -91,11 +72,7 @@ class Api:
             return data if data else []
         else:
             log.critical(
-                message(
-                    message_type="critical",
-                    message_key="unknown_critical",
-                    critical_message=f"Unknown data type ({type(data).__name__}), expected a list or dict.",
-                )
+                f"Unknown data type ({type(data).__name__}), expected a list or dict."
             )
 
     def check_updates(self):
@@ -116,38 +93,23 @@ class Api:
 
         if response.get("tag_name"):
             remote_version: str = response.get("tag_name")
-
+            update_notice: str = (
+                f"A new release of Knew Karma is available ({__version__} -> {remote_version}). "
+                f"To update, run: pip install --upgrade knewkarma"
+            )
             # Check if the remote version tag matches the current version tag.
             if remote_version != __version__:
                 # Set icon file to show in the desktop notification
                 icon_file: str = "icon.ico" if os.name == "nt" else "icon.png"
-
                 try:
                     # Notify user about the new release.
                     notification.notify(
-                        title="Knew Karma",
-                        message=message(
-                            message_type="info",
-                            message_key="update_found",
-                            program_name="Knew Karma",
-                            program_call_name="knewkarma",
-                            release_version=remote_version,
-                            current_version=__version__,
-                        ),
+                        update_notice,
                         app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
                         timeout=60,
                     )
                 except NotImplementedError:  # Gets raised on Termux
-                    log.info(
-                        message(
-                            message_type="info",
-                            message_key="update_found",
-                            program_name="Knew Karma",
-                            program_call_name="knewkarma",
-                            release_version=remote_version,
-                            current_version=__version__,
-                        )
-                    )
+                    log.info(update_notice)
 
     def get_profile(
         self,
