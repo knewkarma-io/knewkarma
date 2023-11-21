@@ -94,7 +94,7 @@ class Api:
         if response.get("tag_name"):
             remote_version: str = response.get("tag_name")
             update_notice: str = (
-                f"A new release of Knew Karma is available ({__version__} -> {remote_version}). "
+                f"A new release of Knew Karma is available ({__version__} => {remote_version}). "
                 f"To update, run: pip install --upgrade knewkarma"
             )
             # Check if the remote version tag matches the current version tag.
