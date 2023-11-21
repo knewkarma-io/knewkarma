@@ -1,11 +1,10 @@
 def on_call():
     import argparse
 
+    from knewkarma.caller import Caller
     from . import __version__
     from .coreutils import datetime, log, path_finder
-    from .executor import Executor
     from .masonry import Masonry
-    from .messages import message
     from .parser import create_parser
 
     print(
@@ -22,30 +21,12 @@ def on_call():
     path_finder()
     try:
         if arguments.mode:
-            log.info(
-                message(
-                    message_type="info",
-                    message_key="program_started",
-                    program_name=f"Knew Karma",
-                    program_version=__version__,
-                    start_time=start_time.strftime("%a %b %d %Y, %H:%M:%S"),
-                )
-            )
+            log.info(f"Started [bold]Knew Karma[/] {__version__} at {start_time}...")
             tree_masonry.api.check_updates()
 
-        Executor(arguments=arguments, tree_masonry=tree_masonry).cli()
+        caller = Caller(arguments=arguments, tree_masonry=tree_masonry)
+        caller.call_cli()
     except KeyboardInterrupt:
-        log.warning(
-            message(
-                message_type="warning",
-                message_key="user_interruption",
-            )
-        )
+        log.warning(f"User interruption detected ([yellow]Ctrl+C[/])")
     finally:
-        log.info(
-            message(
-                message_type="info",
-                message_key="program_stopped",
-                run_time=datetime.now() - start_time,
-            )
-        )
+        log.info(f"Stopped in {datetime.now() - start_time} seconds.")
