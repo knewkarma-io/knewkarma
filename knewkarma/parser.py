@@ -15,7 +15,7 @@ def create_parser() -> argparse.ArgumentParser:
     from . import (
         __description__,
         __epilog__,
-        __post_examples__,
+        __post_example__,
         __posts_examples__,
         __search_examples__,
         __user_examples__,
@@ -95,24 +95,11 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             __operations_description__.format("Post"), style="argparse.text"
         ),
-        epilog=Markdown(__post_examples__),
+        epilog=Markdown(__post_example__),
         formatter_class=RichHelpFormatter,
     )
     post_parser.add_argument("post_id", help="Post ID")
     post_parser.add_argument("post_subreddit", help="Source subreddit")
-    post_parser.add_argument(
-        "-p",
-        "--profile",
-        action="store_true",
-        help="Get post profile ([italic][green]default execution[/][/])",
-    )
-    post_parser.add_argument(
-        "-c",
-        "--comments",
-        dest="show_comments",
-        action="store_true",
-        help="Show post comments",
-    )
 
     # Posts mode
     posts_parser = subparsers.add_parser(
