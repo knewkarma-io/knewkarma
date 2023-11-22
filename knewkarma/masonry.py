@@ -224,19 +224,19 @@ class Masonry:
         :param posts_source: Source of the posts' data.
         :param show_author: If True, includes the author's username in the visualisation.
         """
-        raw_posts: list = self.api.get_posts(
+        raw_posts: dict = self.api.get_posts(
             sort_criterion=sort_criterion,
             posts_limit=posts_limit,
             posts_type=posts_type,
             posts_source=posts_source,
         )
 
-        if raw_posts:
+        if raw_posts.get("children"):
             posts_tree: Tree = self.create_tree(
                 tree_title=f"Visualising {posts_limit} {posts_type} - {datetime.now()}"
             )
 
-            for post in raw_posts:
+            for post in raw_posts.get("children"):
                 # Set branch title to show the post author's username if the show_author is True.
                 if show_author:
                     branch_title: str = (
@@ -261,11 +261,11 @@ class Masonry:
 
             rich.print(posts_tree)
 
-            save_data(
-                data=raw_posts[0],
-                save_to_json=save_to_json,
-                filename=f"{posts_source}_{posts_type}",
-            )
+        save_data(
+            data=raw_posts,
+            save_to_json=save_to_json,
+            filename=f"{posts_source}_{posts_type}",
+        )
 
     def user_comments_tree(
         self,
@@ -290,15 +290,15 @@ class Masonry:
         )
 
         # Get comments from the API and add filters accordingly
-        raw_comments: list = self.api.get_posts(
+        raw_comments: dict = self.api.get_posts(
             sort_criterion=sort_criterion,
             posts_limit=comments_limit,
             posts_type="user_comments",
             posts_source=username,
         )
 
-        if raw_comments:
-            for raw_comment in raw_comments:
+        if raw_comments.get("children"):
+            for raw_comment in raw_comments.get("children"):
                 raw_comment_data: dict = raw_comment.get("data")
                 self.add_branch(
                     target_tree=comments_tree,
@@ -314,11 +314,11 @@ class Masonry:
             # Print the visualised tree structure.
             rich.print(comments_tree)
 
-            save_data(
-                data=raw_comments[0],
-                save_to_json=save_to_json,
-                filename=f"{username}_comments",
-            )
+        save_data(
+            data=raw_comments,
+            save_to_json=save_to_json,
+            filename=f"{username}_comments",
+        )
 
     def post_data_tree(
         self,
@@ -385,10 +385,10 @@ class Masonry:
                             additional_text=raw_comment_data.get("body"),
                         )
 
-                    save_data(
-                        data=raw_comments,
-                        save_to_json=save_to_json,
-                        filename=f"{raw_post.get('id')}_comments",
-                    )
+                save_data(
+                    data=raw_comments,
+                    save_to_json=save_to_json,
+                    filename=f"{raw_post.get('id')}_comments",
+                )
 
             rich.print(post_tree)

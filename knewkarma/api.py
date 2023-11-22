@@ -159,7 +159,7 @@ class Api:
             Literal["front_page_posts"],
         ],
         posts_source: str = None,
-    ) -> list:
+    ) -> dict:
         """
         Retrieves posts from a specified source.
 
@@ -208,7 +208,7 @@ class Api:
 
         posts: dict = self.get_data(endpoint=posts_endpoint)
 
-        return self.validate_data(data=posts.get("data", {}).get("children", []))
+        return self.validate_data(data=posts.get("data", {}))
 
     def get_post_data(
         self, subreddit: str, post_id: str, sort_criterion: str, comments_limit: int
