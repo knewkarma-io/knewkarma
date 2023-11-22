@@ -8,11 +8,11 @@ from . import CSV_DIRECTORY, JSON_DIRECTORY
 from .parser import create_parser
 
 
-def reformat_raw_data(api_data: dict, data_file: str) -> dict:
+def data_broker(api_data: dict, data_file: str) -> dict:
     """
-    Re-formats raw API data based on a key mapping from a JSON file.
+    Re-formats API data based on a key mapping from a JSON file.
 
-    :param api_data: Dictionary containing raw data from the API.
+    :param api_data: A JSON object containing raw data from the API.
     :param data_file: Path to the JSON file that contains the key mapping.
 
     :returns: A re-formatted JSON object with human-readable keys.

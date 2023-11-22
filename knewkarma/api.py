@@ -108,7 +108,9 @@ class Api:
                         app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
                         timeout=60,
                     )
-                except NotImplementedError:  # Gets raised on Termux
+                except (
+                    NotImplementedError
+                ):  # Gets raised on Termux and Raspbian (so far).
                     log.info(update_notice)
 
     def get_profile(
