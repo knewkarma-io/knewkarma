@@ -234,7 +234,7 @@ class Masonry:
         (raw_data, post_data, comments_list) = self.api.get_post_data(
             post_id=post_id,
             subreddit=post_subreddit,
-            sort_criterion=sort,
+            comments_sort_criterion=sort,
             comments_limit=limit,
         )
 
@@ -296,7 +296,7 @@ class Masonry:
         :param show_author: If True, includes the author's username in the visualisation.
         """
         posts_data, posts_list = self.api.get_posts(
-            sort_criterion=sort_criterion,
+            posts_sort_criterion=sort_criterion,
             posts_limit=posts_limit,
             posts_type=posts_type,
             posts_source=posts_source,

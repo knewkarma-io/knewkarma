@@ -181,6 +181,7 @@ class Caller:
                     posts_limit=self.data_limit,
                     sort_criterion=self.data_sort_criterion,
                     save_to_json=self.save_to_json,
+                    show_author=True,
                 ),
             }
 
