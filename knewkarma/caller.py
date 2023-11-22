@@ -94,7 +94,7 @@ class Caller:
                 default="all",
             )
             self.data_limit: int = self.arguments.limit or Prompt.ask(
-                "Set (bulk data) output limit", default=10
+                "Set (bulk data) output limit", default=50
             )
             self.save_to_json: bool = self.arguments.json or Confirm.ask(
                 "Would you like to save output to a JSON file?", default=False

@@ -160,7 +160,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-l",
         "--limit",
-        default=10,
+        default=50,
         type=int,
         help="Maximum number of bulk data to get (default: %(default)s)",
     )
