@@ -62,7 +62,7 @@ def save_data(
     # Save to JSON if save_json is True
     if save_to_json:
         with open(os.path.join(JSON_DIRECTORY, f"{filename}.json"), "w") as json_file:
-            json.dump(data, json_file)
+            json.dump(data, json_file, indent=4)
         log.info(f"JSON data saved to {json_file.name}")
 
     # Save to CSV if save_csv is True
