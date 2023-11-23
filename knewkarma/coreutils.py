@@ -3,6 +3,7 @@ import json
 import logging
 import os
 from datetime import datetime
+from typing import Union
 
 from . import CSV_DIRECTORY, JSON_DIRECTORY
 from .parser import create_parser
@@ -46,7 +47,7 @@ def path_finder():
 
 
 def save_data(
-    data: dict,
+    data: Union[dict, list],
     filename: str,
     save_to_json: bool = False,
     save_to_csv: bool = False,

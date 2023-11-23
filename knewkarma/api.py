@@ -159,7 +159,7 @@ class Api:
             Literal["front_page_posts"],
         ],
         posts_source: str = None,
-    ) -> tuple[dict, list]:
+    ) -> list:
         """
         Retrieves posts from a specified source.
 
@@ -167,7 +167,7 @@ class Api:
         :param posts_source: Source from where the posts should be retrieved.
         :param posts_sort_criterion: Criterion by which the posts should be sorted.
         :param posts_limit: Limit on the number of posts to retrieve.
-        :return: A tuple containing a JSON object of posts' data, and a list of posts
+        :return: A list of posts.
         """
         posts_type_map: list = [
             (
@@ -208,10 +208,7 @@ class Api:
 
         posts: dict = self.get_data(endpoint=posts_endpoint)
 
-        return (
-            self.validate_data(data=posts.get("data", {})),
-            self.validate_data(data=posts.get("data", {}).get("children")),
-        )
+        return self.validate_data(data=posts.get("data", {}).get("children"))
 
     def get_post_data(
         self,

@@ -295,7 +295,7 @@ class Masonry:
         :param posts_source: Source of the posts' data.
         :param show_author: If True, includes the author's username in the visualisation.
         """
-        posts_data, posts_list = self.api.get_posts(
+        posts_list: list = self.api.get_posts(
             posts_sort_criterion=sort_criterion,
             posts_limit=posts_limit,
             posts_type=posts_type,
@@ -332,7 +332,7 @@ class Masonry:
 
             rich.print(posts_tree)
             save_data(
-                data=posts_data,
+                data=posts_list,
                 save_to_json=save_to_json,
                 filename=f"{posts_source}_{posts_type}",
             )
@@ -354,8 +354,8 @@ class Masonry:
         :param comments_limit: The maximum number of comments to visualise.
         :param save_to_json: If True, saves the comments data to a JSON file.
         """
-        comments_data, comments_list = self.api.get_posts(
-            sort_criterion=sort_criterion,
+        comments_list: list = self.api.get_posts(
+            posts_sort_criterion=sort_criterion,
             posts_limit=comments_limit,
             posts_type="user_comments",
             posts_source=username,
@@ -366,8 +366,8 @@ class Masonry:
                 tree_title=f"{username}'s {sort_criterion} {comments_limit} comments"
             )
 
-            for raw_comment in comments_list:
-                raw_comment_data: dict = raw_comment.get("data")
+            for comment in comments_list:
+                raw_comment_data: dict = comment.get("data")
                 self.add_branch(
                     target_tree=comments_tree,
                     branch_title=convert_timestamp_to_datetime(
@@ -381,7 +381,7 @@ class Masonry:
 
             rich.print(comments_tree)
             save_data(
-                data=comments_data,
+                data=comments_list,
                 save_to_json=save_to_json,
                 filename=f"{username}_comments",
             )
