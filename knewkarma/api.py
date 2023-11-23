@@ -123,9 +123,7 @@ class Api:
     def get_profile(
         self,
         profile_source: str,
-        profile_type: str = Union[
-            Literal["user_profile"], Literal["subreddit_profile"]
-        ],
+        profile_type: str = Literal["user_profile", "subreddit_profile"],
     ) -> dict:
         """
         Retrieves profile data from a specified source.
@@ -157,13 +155,13 @@ class Api:
         self,
         posts_sort_criterion: str,
         posts_limit: int,
-        posts_type: str = Union[
-            Literal["user_posts"],
-            Literal["user_comments"],
-            Literal["subreddit_posts"],
-            Literal["search_posts"],
-            Literal["listing_posts"],
-            Literal["front_page_posts"],
+        posts_type: str = Literal[
+            "user_posts",
+            "user_comments",
+            "subreddit_posts",
+            "search_posts",
+            "listing_posts",
+            "front_page_posts",
         ],
         posts_source: str = None,
     ) -> list:
