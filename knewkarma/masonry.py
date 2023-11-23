@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Union
 
-import rich
+from rich import print as xprint
 from rich.text import Text
 from rich.tree import Tree
 
@@ -21,6 +21,13 @@ class Masonry:
             base_github_api_endpoint="https://api.github.com",
         )
 
+        # Tree/Branch styling
+        self.DIM = "dim"
+        self.BOLD = "bold"
+        self.ITALIC = "italic"
+        self.BOLD_BLUE = "bold blue"
+        self.BOLD_BRIGHT_BLUE = "bold bright_blue"
+
     def create_tree(
         self,
         tree_title: str,
@@ -39,17 +46,19 @@ class Masonry:
         :returns: A populated or emtpy tree structure.
         """
         if not tree_data:
-            return Tree(tree_title, style="bold", guide_style="bold bright_blue")
+            return Tree(tree_title, style=self.BOLD, guide_style=self.BOLD_BRIGHT_BLUE)
 
-        tree: Tree = Tree(tree_title, style="bold", guide_style="bold bright_blue")
+        tree: Tree = Tree(
+            tree_title, style=self.BOLD, guide_style=self.BOLD_BRIGHT_BLUE
+        )
         data_types: list = [dict, list]
         if type(tree_data) in data_types:
             if isinstance(tree_data, dict):
                 for data_key, data_value in tree_data.items():
-                    tree.add(f"{data_key}: {data_value}", style="dim")
+                    tree.add(f"{data_key}: {data_value}", style=self.DIM)
             else:
                 for count, item in enumerate(tree_data, start=1):
-                    tree.add(f"{count}: {item}", style="dim")
+                    tree.add(f"{count}: {item}", style=self.DIM)
 
             if additional_data:
                 for title, branch_data in additional_data:
@@ -69,12 +78,12 @@ class Masonry:
                                 )
 
             if additional_text:
-                tree.add(Text(additional_text), style="italic")
+                tree.add(Text(additional_text), style=self.ITALIC)
 
         return tree
 
-    @staticmethod
     def add_branch(
+        self,
         target_tree: Tree,
         branch_title: str,
         branch_data: Union[dict, list],
@@ -94,16 +103,16 @@ class Masonry:
         """
         data_types: list = [dict, list]
         if type(branch_data) in data_types:
-            branch: Tree = target_tree.add(branch_title, guide_style="bold blue")
+            branch: Tree = target_tree.add(branch_title, guide_style=self.BOLD_BLUE)
             if isinstance(branch_data, dict):
                 for data_key, data_value in branch_data.items():
-                    branch.add(f"{data_key}: {data_value}", style="dim")
+                    branch.add(f"{data_key}: {data_value}", style=self.DIM)
             else:
                 for count, item in enumerate(branch_data, start=1):
                     branch.add(f"{count}. {item}")
 
             if additional_text:
-                branch.add(Text(additional_text), style="italic")
+                branch.add(Text(additional_text), style=self.ITALIC)
 
             return target_tree
 
@@ -125,82 +134,145 @@ class Masonry:
         :param save_to_json: If True, saves the profile data to a JSON file.
         :param save_to_csv: If True, saves the profile data to a CSV file.
         """
-        raw_profile: dict = self.api.get_profile(
+        profile_data: dict = self.api.get_profile(
             profile_type=profile_type, profile_source=profile_source
         )
-        if raw_profile:
+        if profile_data:
             if profile_type == "user_profile":
                 formatted_profile: dict = data_broker(
-                    api_data=raw_profile, data_file="user/profile.json"
+                    api_data=profile_data, data_file="user/profile.json"
                 )
                 additional_data: list = [
                     (
-                        raw_profile.get("subreddit").get("display_name"),
-                        data_broker(raw_profile, data_file="user/subreddit.json"),
+                        profile_data.get("subreddit").get("display_name"),
+                        data_broker(profile_data, data_file="user/subreddit.json"),
                     ),
                     (
                         "Verification",
-                        data_broker(raw_profile, data_file="user/verification.json"),
+                        data_broker(profile_data, data_file="user/verification.json"),
                     ),
                     (
                         "Snoovatar",
-                        data_broker(raw_profile, data_file="user/snoovatar.json"),
+                        data_broker(profile_data, data_file="user/snoovatar.json"),
                     ),
                     (
                         "Karma",
-                        data_broker(raw_profile, data_file="user/karma.json"),
+                        data_broker(profile_data, data_file="user/karma.json"),
                     ),
                 ]
             else:
                 formatted_profile: dict = data_broker(
-                    api_data=raw_profile, data_file="subreddit/profile.json"
+                    api_data=profile_data, data_file="subreddit/profile.json"
                 )
 
                 additional_data: list = [
                     (
                         "Allows",
                         data_broker(
-                            api_data=raw_profile, data_file="subreddit/allows.json"
+                            api_data=profile_data, data_file="subreddit/allows.json"
                         ),
                     ),
                     (
                         "Banner",
                         data_broker(
-                            api_data=raw_profile, data_file="subreddit/banner.json"
+                            api_data=profile_data, data_file="subreddit/banner.json"
                         ),
                     ),
                     (
                         "Header",
                         data_broker(
-                            api_data=raw_profile, data_file="subreddit/header.json"
+                            api_data=profile_data, data_file="subreddit/header.json"
                         ),
                     ),
                     (
                         "Flairs",
                         data_broker(
-                            api_data=raw_profile, data_file="subreddit/flairs.json"
+                            api_data=profile_data, data_file="subreddit/flairs.json"
                         ),
                     ),
                 ]
 
-            rich.print(
+            xprint(
                 self.create_tree(
-                    tree_title=raw_profile.get("public_description")
+                    tree_title=profile_data.get("public_description")
                     if profile_type == "subreddit_profile"
-                    else raw_profile.get("subreddit").get("title"),
+                    else profile_data.get("subreddit").get("title"),
                     tree_data=formatted_profile,
                     additional_data=additional_data,
-                    additional_text=raw_profile.get("submit_text")
+                    additional_text=profile_data.get("submit_text")
                     if profile_type == "subreddit_profile"
                     else None,
                 )
             )
 
             save_data(
-                data=raw_profile,
+                data=profile_data,
                 save_to_csv=save_to_csv,
                 save_to_json=save_to_json,
-                filename=f"{profile_source}_profile",
+                filename=f"{profile_source}_{profile_type.upper()}",
+            )
+
+    def post_data_tree(
+        self,
+        post_id: str,
+        post_subreddit: str,
+        sort: str,
+        limit: int,
+        save_to_json: bool,
+    ):
+        """
+        Visualises a specific Reddit post's data in a tree structure.
+
+        This method includes options to sort, limit, and show comments, as well as to save the data.
+
+        :param post_id: ID of the post to visualise.
+        :param post_subreddit: Subreddit of the post.
+        :param sort: Criterion to sort the post data.
+        :param limit: The maximum number of items (comments/awards) to retrieve.
+        :param save_to_json: If True, saves the post data to a JSON file.
+        """
+
+        (raw_data, post_data, comments_list) = self.api.get_post_data(
+            post_id=post_id,
+            subreddit=post_subreddit,
+            comments_sort_criterion=sort,
+            comments_limit=limit,
+        )
+
+        if post_data:
+            post_tree: Tree = self.create_tree(
+                tree_title=f"{post_data.get('title')} | by {post_data.get('author')}",
+                tree_data=data_broker(
+                    api_data=post_data, data_file="post/profile.json"
+                ),
+                additional_text=post_data.get("selftext"),
+            )
+
+            if comments_list:
+                comments_branch: Tree = post_tree.add("Comments")
+
+                # Remove last item from the list
+                # (because it does not contain any comment data... trust me, I know😂)
+                comments_list.pop()
+                for comment in comments_list:
+                    comment_data: dict = comment.get("data")
+                    self.add_branch(
+                        target_tree=comments_branch,
+                        branch_title=convert_timestamp_to_datetime(
+                            timestamp=comment_data.get("created")
+                        ),
+                        branch_data=data_broker(
+                            api_data=comment_data,
+                            data_file="shared/comment.json",
+                        ),
+                        additional_text=comment_data.get("body"),
+                    )
+
+            xprint(post_tree)
+            save_data(
+                data=raw_data,
+                save_to_json=save_to_json,
+                filename=f"{post_data.get('id')}_POST_DATA",
             )
 
     def posts_tree(
@@ -224,30 +296,30 @@ class Masonry:
         :param posts_source: Source of the posts' data.
         :param show_author: If True, includes the author's username in the visualisation.
         """
-        raw_posts: dict = self.api.get_posts(
-            sort_criterion=sort_criterion,
+        posts_list: list = self.api.get_posts(
+            posts_sort_criterion=sort_criterion,
             posts_limit=posts_limit,
             posts_type=posts_type,
             posts_source=posts_source,
         )
 
-        if raw_posts.get("children"):
+        if posts_list:
             posts_tree: Tree = self.create_tree(
-                tree_title=f"Visualising {posts_limit} {posts_type} - {datetime.now()}"
+                tree_title=f"{posts_limit} {posts_type} - {datetime.now()}"
             )
 
-            for post in raw_posts.get("children"):
+            for post in posts_list:
                 # Set branch title to show the post author's username if the show_author is True.
                 if show_author:
                     branch_title: str = (
-                        f"[italic]{convert_timestamp_to_datetime(post.get('data').get('created'))} | by"
-                        f" u/{post.get('data').get('author')}:[/] [bold]{post.get('data').get('title')}[/]"
+                        f"{convert_timestamp_to_datetime(post.get('data').get('created'))} | by"
+                        f" u/{post.get('data').get('author')}: {post.get('data').get('title')}"
                     )
                 else:
                     # Otherwise, set the title of the branch to the title of the post.
                     branch_title: str = (
-                        f"[italic]{convert_timestamp_to_datetime(post.get('data').get('created'))}:[/] "
-                        f"[bold]{post.get('data').get('title')}[/]"
+                        f"{convert_timestamp_to_datetime(post.get('data').get('created'))}: "
+                        f"{post.get('data').get('title')}"
                     )
 
                 self.add_branch(
@@ -259,13 +331,12 @@ class Masonry:
                     additional_text=post.get("data").get("selftext"),
                 )
 
-            rich.print(posts_tree)
-
-        save_data(
-            data=raw_posts,
-            save_to_json=save_to_json,
-            filename=f"{posts_source}_{posts_type}",
-        )
+            xprint(posts_tree)
+            save_data(
+                data=posts_list,
+                save_to_json=save_to_json,
+                filename=f"{posts_source}_{posts_type.upper()}",
+            )
 
     def user_comments_tree(
         self,
@@ -284,22 +355,20 @@ class Masonry:
         :param comments_limit: The maximum number of comments to visualise.
         :param save_to_json: If True, saves the comments data to a JSON file.
         """
-        # Initialise a tree structure to visualise the results.
-        comments_tree: Tree = self.create_tree(
-            tree_title=f"Visualising {username}'s [green]{sort_criterion}[/] [cyan]{comments_limit}[/] comments"
-        )
-
-        # Get comments from the API and add filters accordingly
-        raw_comments: dict = self.api.get_posts(
-            sort_criterion=sort_criterion,
+        comments_list: list = self.api.get_posts(
+            posts_sort_criterion=sort_criterion,
             posts_limit=comments_limit,
             posts_type="user_comments",
             posts_source=username,
         )
 
-        if raw_comments.get("children"):
-            for raw_comment in raw_comments.get("children"):
-                raw_comment_data: dict = raw_comment.get("data")
+        if comments_list:
+            comments_tree: Tree = self.create_tree(
+                tree_title=f"{username}'s {sort_criterion} {comments_limit} comments"
+            )
+
+            for comment in comments_list:
+                raw_comment_data: dict = comment.get("data")
                 self.add_branch(
                     target_tree=comments_tree,
                     branch_title=convert_timestamp_to_datetime(
@@ -311,84 +380,9 @@ class Masonry:
                     additional_text=raw_comment_data.get("body"),
                 )
 
-            # Print the visualised tree structure.
-            rich.print(comments_tree)
-
-        save_data(
-            data=raw_comments,
-            save_to_json=save_to_json,
-            filename=f"{username}_comments",
-        )
-
-    def post_data_tree(
-        self,
-        post_id: str,
-        post_subreddit: str,
-        sort: str,
-        limit: int,
-        save_to_csv: bool,
-        save_to_json: bool,
-        show_comments: bool,
-    ):
-        """
-        Visualises a specific Reddit post's data in a tree structure.
-
-        This method includes options to sort, limit, and show comments, as well as to save the data.
-
-        :param post_id: ID of the post to visualise.
-        :param post_subreddit: Subreddit of the post.
-        :param sort: Criterion to sort the post data.
-        :param limit: The maximum number of items (comments/awards) to retrieve.
-        :param save_to_json: If True, saves the post data to a JSON file.
-        :param save_to_csv: If True, saves the post data to a CSV file.
-        :param show_comments: If True, includes a comments branch in the visualisation.
-        """
-
-        (raw_post, raw_comments) = self.api.get_post_data(
-            post_id=post_id,
-            subreddit=post_subreddit,
-            sort_criterion=sort,
-            comments_limit=limit,
-        )
-
-        if raw_post:
-            post_tree: Tree = self.create_tree(
-                tree_title=f"{raw_post.get('title')} | by {raw_post.get('author')}",
-                tree_data=data_broker(api_data=raw_post, data_file="post/profile.json"),
-                additional_text=raw_post.get("selftext"),
-            )
-
+            xprint(comments_tree)
             save_data(
-                data=raw_post,
-                save_to_csv=save_to_csv,
+                data=comments_list,
                 save_to_json=save_to_json,
-                filename=f"{raw_post.get('id')}_post_profile",
+                filename=f"{username}_COMMENTS",
             )
-
-            if show_comments:
-                if raw_comments:
-                    comments_branch: Tree = post_tree.add(
-                        f"[bold]Visualising [cyan]{limit}[/] [green]{sort}[/] comments for post {post_id}[/]"
-                    )
-                    raw_comments.pop()  # Remove last item from the list (it does not contain any comment data)
-                    for raw_comment in raw_comments:
-                        raw_comment_data: dict = raw_comment.get("data")
-                        self.add_branch(
-                            target_tree=comments_branch,
-                            branch_title=convert_timestamp_to_datetime(
-                                timestamp=raw_comment_data.get("created")
-                            ),
-                            branch_data=data_broker(
-                                api_data=raw_comment_data,
-                                data_file="shared/comment.json",
-                            ),
-                            additional_text=raw_comment_data.get("body"),
-                        )
-
-                save_data(
-                    data=raw_comments,
-                    save_to_json=save_to_json,
-                    filename=f"{raw_post.get('id')}_comments",
-                )
-
-            rich.print(post_tree)

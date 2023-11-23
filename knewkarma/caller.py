@@ -68,10 +68,6 @@ class Caller:
                 ),
                 sort=self.arguments.sort or self.handlers.data_sort_criterion,
                 limit=self.arguments.limit or self.handlers.data_limit,
-                show_comments=self.arguments.comments
-                if hasattr(self.arguments, "show_comments")
-                else Confirm.ask("Would you like to show comments?", default=False),
-                save_to_csv=self.arguments.csv or self.handlers.save_to_csv,
                 save_to_json=self.arguments.json or self.handlers.save_to_json,
             )
         elif operation_mode == "posts":
@@ -99,9 +95,10 @@ class Caller:
             self.save_to_json: bool = self.arguments.json or Confirm.ask(
                 "Would you like to save output to a JSON file?", default=False
             )
-            self.save_to_csv: bool = self.arguments.csv or Confirm.ask(
-                "Would you like to save output to a CSV file?", default=False
-            )
+            if not hasattr(self.arguments, "post_id"):
+                self.save_to_csv: bool = self.arguments.csv or Confirm.ask(
+                    "Would you like to save output to a CSV file?", default=False
+                )
 
         def get_action(self, actions_map: dict, default_action: str) -> str:
             """
@@ -184,6 +181,7 @@ class Caller:
                     posts_limit=self.data_limit,
                     sort_criterion=self.data_sort_criterion,
                     save_to_json=self.save_to_json,
+                    show_author=True,
                 ),
             }
 
