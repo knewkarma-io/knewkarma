@@ -12,14 +12,11 @@ class Masonry:
     def __init__(self):
         """
         Initialises the Masonry class by creating an API object for data retrieval.
-        The API endpoints are set for Reddit and GitHub API Endpoint.
+        The API endpoint is set for Reddit.
         """
         from .api import Api
 
-        self.api: Api = Api(
-            base_reddit_endpoint="https://www.reddit.com",
-            base_github_api_endpoint="https://api.github.com",
-        )
+        self.api: Api = Api(base_reddit_endpoint="https://www.reddit.com")
 
         # Tree/Branch styling
         self.DIM = "dim"
