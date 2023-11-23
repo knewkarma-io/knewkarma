@@ -7,16 +7,11 @@ from .coreutils import log
 
 
 class Api:
-    def __init__(
-        self,
-        base_reddit_endpoint: str,
-        base_github_api_endpoint: str,
-    ):
+    def __init__(self, base_reddit_endpoint: str):
         """
-        Initialise the API class with the base Reddit/GitHub API endpoints.
+        Initialise the API class with the base Reddit endpoint.
         """
         self.base_reddit_endpoint = base_reddit_endpoint
-        self.base_github_api_endpoint = base_github_api_endpoint
 
     @staticmethod
     def get_data(endpoint: str) -> Optional[Union[dict, list]]:
@@ -72,7 +67,7 @@ class Api:
             return data if data else []
         else:
             log.critical(
-                f"Unknown data type ({type(data).__name__}), expected a list or dict."
+                f"Unknown data type ({data}: {type(data).__name__}), expected a list or dict."
             )
 
     def check_updates(self):
@@ -85,18 +80,24 @@ class Api:
 
         from plyer import notification
 
-        from . import CURRENT_FILE_DIRECTORY
+        from . import CURRENT_FILE_DIRECTORY, __pypi_project_endpoint__
 
-        # Make a GET request to the GitHub API to get the latest release of the project.
-        response: dict = self.get_data(
-            endpoint=f"{self.base_github_api_endpoint}/repos/bellingcat/knewkarma/releases/latest"
-        )
+        # Make a GET request to PyPI to get the project's latest release.
+        response: dict = self.get_data(endpoint=__pypi_project_endpoint__)
+        release: dict = self.validate_data(data=response.get("info", {}))
 
-        if response.get("tag_name"):
-            remote_version: str = response.get("tag_name")
+        if release:
+            if release.get("name") != "knewkarma":
+                log.critical(
+                    f"PyPI project endpoint was modified "
+                    f"{__pypi_project_endpoint__}: knewkarma/__init__.py: Line 20"
+                )
+                exit()
+
+            remote_version: str = release.get("version")
             update_notice: str = (
-                f"A new release of Knew Karma is available ({__version__} => {remote_version}). "
-                f"To update, run: pip install --upgrade knewkarma"
+                f"A new release of Knew Karma is available (from {__version__} to {remote_version}). "
+                f"To update, run: pip install --upgrade {release.get('name')}"
             )
             # Check if the remote version tag matches the current version tag.
             if remote_version != __version__:
@@ -213,7 +214,7 @@ class Api:
 
         posts: dict = self.get_data(endpoint=posts_endpoint)
 
-        return self.validate_data(data=posts.get("data", {}).get("children"))
+        return self.validate_data(data=posts.get("data", {}).get("children", []))
 
     def get_post_data(
         self,
@@ -239,8 +240,8 @@ class Api:
         return (
             self.validate_data(data=data, valid_key="upvote_ratio"),
             self.validate_data(
-                data=data[0].get("data").get("children")[0].get("data"),
+                data=data[0].get("data", {}).get("children", [])[0].get("data", {}),
                 valid_key="upvote_ratio",
             ),
-            self.validate_data(data=data[1].get("data").get("children")),
+            self.validate_data(data=data[1].get("data", {}).get("children", [])),
         )
