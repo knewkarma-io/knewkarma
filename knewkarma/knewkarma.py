@@ -16,7 +16,10 @@ def on_call():
     path_finder()
     try:
         if arguments.mode:
-            log.info(f"Started [bold]Knew Karma[/] {__version__} at {start_time}...")
+            log.info(
+                f"Started [bold]Knew Karma[/] {__version__} at "
+                f"{start_time.strftime('%a %b %d %Y, %I:%M:%S %p')}..."
+            )
             tree_masonry.api.check_updates()
 
         caller = Caller(arguments=arguments, tree_masonry=tree_masonry)
