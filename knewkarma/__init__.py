@@ -16,7 +16,7 @@ JSON_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "json")
 
 __author__: str = "Richard Mwewa"
 __about__: str = "https://about.me/rly0nheart"
-__version__: str = "2.2.1.0"
+__version__: str = "2.3.0.0"
 __description__: str = """
 # Knew Karma
 > A **Reddit** Data Analysis Toolkit."""

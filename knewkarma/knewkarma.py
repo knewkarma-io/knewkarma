@@ -1,11 +1,8 @@
 def on_call():
-    import argparse
-
-    from knewkarma.caller import Caller
     from . import __version__
-    from .coreutils import datetime, log, path_finder
+    from .caller import Caller
+    from .coreutils import datetime, log, path_finder, arguments
     from .masonry import Masonry
-    from .parser import create_parser
 
     print(
         """
@@ -13,8 +10,6 @@ def on_call():
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
     )
-    parser: argparse.ArgumentParser = create_parser()
-    arguments: argparse = parser.parse_args()
     tree_masonry: Masonry = Masonry()
     start_time: datetime = datetime.now()
 

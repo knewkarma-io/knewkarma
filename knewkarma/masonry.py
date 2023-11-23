@@ -255,17 +255,17 @@ class Masonry:
                 # (because it does not contain any comment data... trust me, I know😂)
                 comments_list.pop()
                 for comment in comments_list:
-                    raw_comment_data: dict = comment.get("data")
+                    comment_data: dict = comment.get("data")
                     self.add_branch(
                         target_tree=comments_branch,
                         branch_title=convert_timestamp_to_datetime(
-                            timestamp=raw_comment_data.get("created")
+                            timestamp=comment_data.get("created")
                         ),
                         branch_data=data_broker(
-                            api_data=raw_comment_data,
+                            api_data=comment_data,
                             data_file="shared/comment.json",
                         ),
-                        additional_text=raw_comment_data.get("body"),
+                        additional_text=comment_data.get("body"),
                     )
 
             xprint(post_tree)
