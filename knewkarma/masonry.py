@@ -209,7 +209,7 @@ class Masonry:
                 data=profile_data,
                 save_to_csv=save_to_csv,
                 save_to_json=save_to_json,
-                filename=f"{profile_source}_profile",
+                filename=f"{profile_source}_{profile_type.upper()}",
             )
 
     def post_data_tree(
@@ -272,7 +272,7 @@ class Masonry:
             save_data(
                 data=raw_data,
                 save_to_json=save_to_json,
-                filename=f"{post_data.get('id')}_data",
+                filename=f"{post_data.get('id')}_POST_DATA",
             )
 
     def posts_tree(
@@ -335,7 +335,7 @@ class Masonry:
             save_data(
                 data=posts_list,
                 save_to_json=save_to_json,
-                filename=f"{posts_source}_{posts_type}",
+                filename=f"{posts_source}_{posts_type.upper()}",
             )
 
     def user_comments_tree(
@@ -384,5 +384,5 @@ class Masonry:
             save_data(
                 data=comments_list,
                 save_to_json=save_to_json,
-                filename=f"{username}_comments",
+                filename=f"{username}_COMMENTS",
             )

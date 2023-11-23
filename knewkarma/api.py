@@ -109,7 +109,7 @@ class Api:
                         timeout=60,
                     )
                 except (
-                    NotImplementedError
+                    NotImplementedError,
                 ):  # Gets raised on Termux and Raspbian (so far).
                     log.info(update_notice)
 
