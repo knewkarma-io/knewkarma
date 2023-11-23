@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Union
 
-import rich
+from rich import print as xprint
 from rich.text import Text
 from rich.tree import Tree
 
@@ -21,6 +21,7 @@ class Masonry:
             base_github_api_endpoint="https://api.github.com",
         )
 
+        # Tree/Branch styling
         self.DIM = "dim"
         self.BOLD = "bold"
         self.ITALIC = "italic"
@@ -191,7 +192,7 @@ class Masonry:
                     ),
                 ]
 
-            rich.print(
+            xprint(
                 self.create_tree(
                     tree_title=profile_data.get("public_description")
                     if profile_type == "subreddit_profile"
@@ -267,7 +268,7 @@ class Masonry:
                         additional_text=raw_comment_data.get("body"),
                     )
 
-            rich.print(post_tree)
+            xprint(post_tree)
             save_data(
                 data=raw_data,
                 save_to_json=save_to_json,
@@ -330,7 +331,7 @@ class Masonry:
                     additional_text=post.get("data").get("selftext"),
                 )
 
-            rich.print(posts_tree)
+            xprint(posts_tree)
             save_data(
                 data=posts_list,
                 save_to_json=save_to_json,
@@ -379,7 +380,7 @@ class Masonry:
                     additional_text=raw_comment_data.get("body"),
                 )
 
-            rich.print(comments_tree)
+            xprint(comments_tree)
             save_data(
                 data=comments_list,
                 save_to_json=save_to_json,
