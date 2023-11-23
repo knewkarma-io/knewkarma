@@ -16,7 +16,7 @@ JSON_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "json")
 
 __author__: str = "Richard Mwewa"
 __about__: str = "https://about.me/rly0nheart"
-__version__: str = "2.2.0.0"
+__version__: str = "2.3.0.0"
 __description__: str = """
 # Knew Karma
 > A **Reddit** Data Analysis Toolkit."""
@@ -95,21 +95,10 @@ knewkarma --sort new --limit 20 subreddit SUBREDDIT_NAME
 
 """
 
-__post_examples__: str = """
-# Examples
-## Get Post Data (without comments)
+__post_example__: str = """
+# Example
 ```
-knewkarma post POST_ID SUBREDDIT_NAME --profile
-```
-
-## Get Post Data (with comments)
-```
-knewkarma post POST_ID SUBREDDIT_NAME --comments
-```
-
-## Get Post's Comments (sorted and limited)
-```
-knewkarma --sort top --limit 10 post POST_ID SUBREDDIT_NAME
+knewkarma post POST_ID SUBREDDIT_NAME
 ```
 """
 

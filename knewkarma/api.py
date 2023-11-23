@@ -81,6 +81,7 @@ class Api:
         If there is, it shows a notification to the user about the release.
         """
         import os
+        import warnings
 
         from plyer import notification
 
@@ -102,12 +103,18 @@ class Api:
                 # Set icon file to show in the desktop notification
                 icon_file: str = "icon.ico" if os.name == "nt" else "icon.png"
                 try:
-                    # Notify user about the new release.
-                    notification.notify(
-                        update_notice,
-                        app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
-                        timeout=60,
-                    )
+                    # Catch and ignore all warnings (specific warning is at:
+                    # https://github.com/kivy/plyer/blob/
+                    # 8c0e11ff2e356ea677e96b0d7907d000c8f4bbd0/plyer/platforms/linux/notification.py#L99C8-L99C8)
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+
+                        # Notify user about the new release.
+                        notification.notify(
+                            update_notice,
+                            app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
+                            timeout=60,
+                        )
                 except (
                     NotImplementedError
                 ):  # Gets raised on Termux and Raspbian (so far).
@@ -116,9 +123,7 @@ class Api:
     def get_profile(
         self,
         profile_source: str,
-        profile_type: str = Union[
-            Literal["user_profile"], Literal["subreddit_profile"]
-        ],
+        profile_type: str = Literal["user_profile", "subreddit_profile"],
     ) -> dict:
         """
         Retrieves profile data from a specified source.
@@ -148,57 +153,57 @@ class Api:
 
     def get_posts(
         self,
-        sort_criterion: str,
+        posts_sort_criterion: str,
         posts_limit: int,
-        posts_type: str = Union[
-            Literal["user_posts"],
-            Literal["user_comments"],
-            Literal["subreddit_posts"],
-            Literal["search_posts"],
-            Literal["listing_posts"],
-            Literal["front_page_posts"],
+        posts_type: str = Literal[
+            "user_posts",
+            "user_comments",
+            "subreddit_posts",
+            "search_posts",
+            "listing_posts",
+            "front_page_posts",
         ],
         posts_source: str = None,
-    ) -> dict:
+    ) -> list:
         """
         Retrieves posts from a specified source.
 
         :param posts_type: Type of posts to retrieve.
         :param posts_source: Source from where the posts should be retrieved.
-        :param sort_criterion: Criterion by which the posts should be sorted.
+        :param posts_sort_criterion: Criterion by which the posts should be sorted.
         :param posts_limit: Limit on the number of posts to retrieve.
-        :return: A list of JSON objects, each containing post data.
+        :return: A list of posts.
         """
         posts_type_map: list = [
             (
                 "user_posts",
                 f"{self.base_reddit_endpoint}/user/{posts_source}/submitted.json"
-                f"?sort={sort_criterion}&limit={posts_limit}",
+                f"?sort={posts_sort_criterion}&limit={posts_limit}",
             ),
             (
                 "user_comments",
                 f"{self.base_reddit_endpoint}/user/{posts_source}/comments.json"
-                f"?sort={sort_criterion}&limit={posts_limit}",
+                f"?sort={posts_sort_criterion}&limit={posts_limit}",
             ),
             (
                 "subreddit_posts",
                 f"{self.base_reddit_endpoint}/r/{posts_source}.json"
-                f"?sort={sort_criterion}&limit={posts_limit}",
+                f"?sort={posts_sort_criterion}&limit={posts_limit}",
             ),
             (
                 "search_posts",
                 f"{self.base_reddit_endpoint}/search.json"
-                f"?q={posts_source}&sort={sort_criterion}&limit={posts_limit}",
+                f"?q={posts_source}&sort={posts_sort_criterion}&limit={posts_limit}",
             ),
             (
                 "listing_posts",
                 f"{self.base_reddit_endpoint}/r/{posts_source}.json"
-                f"?sort={sort_criterion}&limit={posts_limit}",
+                f"?sort={posts_sort_criterion}&limit={posts_limit}",
             ),
             (
                 "front_page_posts",
                 f"{self.base_reddit_endpoint}/.json"
-                f"?sort={sort_criterion}&limit={posts_limit}",
+                f"?sort={posts_sort_criterion}&limit={posts_limit}",
             ),
         ]
         posts_endpoint = None
@@ -208,26 +213,34 @@ class Api:
 
         posts: dict = self.get_data(endpoint=posts_endpoint)
 
-        return self.validate_data(data=posts.get("data", {}))
+        return self.validate_data(data=posts.get("data", {}).get("children"))
 
     def get_post_data(
-        self, subreddit: str, post_id: str, sort_criterion: str, comments_limit: int
+        self,
+        subreddit: str,
+        post_id: str,
+        comments_sort_criterion: str,
+        comments_limit: int,
     ) -> tuple:
         """
         Gets a post's data.
 
         :param subreddit: The subreddit in which the post was posted.
         :param post_id: ID of the post.
-        :param sort_criterion: Sorting criterion ('new', 'hot', etc.).
+        :param comments_sort_criterion: Criterion by which the post's comments' will be sorted.
         :param comments_limit: Maximum of comments to fetch.
-        :returns: A tuple of a post's data (post_information, list_of_comments) if valid,
-           otherwise return a tuple containing an empty dict and list.
+        :returns: A tuple of a post's data (raw_data, post_information, list_of_comments) if valid,
+           otherwise return a tuple containing an empty dict, dict and list.
         """
         data: dict = self.get_data(
             endpoint=f"{self.base_reddit_endpoint}/r/{subreddit}/comments/{post_id}.json"
-            f"?sort={sort_criterion}&limit={comments_limit}"
+            f"?sort={comments_sort_criterion}&limit={comments_limit}"
         )
-        return self.validate_data(
-            data=data[0].get("data").get("children")[0].get("data"),
-            valid_key="upvote_ratio",
-        ), self.validate_data(data=data[1].get("data").get("children"))
+        return (
+            self.validate_data(data=data, valid_key="upvote_ratio"),
+            self.validate_data(
+                data=data[0].get("data").get("children")[0].get("data"),
+                valid_key="upvote_ratio",
+            ),
+            self.validate_data(data=data[1].get("data").get("children")),
+        )
