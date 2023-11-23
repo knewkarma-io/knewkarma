@@ -81,6 +81,7 @@ class Api:
         If there is, it shows a notification to the user about the release.
         """
         import os
+        import warnings
 
         from plyer import notification
 
@@ -102,14 +103,20 @@ class Api:
                 # Set icon file to show in the desktop notification
                 icon_file: str = "icon.ico" if os.name == "nt" else "icon.png"
                 try:
-                    # Notify user about the new release.
-                    notification.notify(
-                        update_notice,
-                        app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
-                        timeout=60,
-                    )
+                    # Catch and ignore all warnings (specific warning is at:
+                    # https://github.com/kivy/plyer/blob/
+                    # 8c0e11ff2e356ea677e96b0d7907d000c8f4bbd0/plyer/platforms/linux/notification.py#L99C8-L99C8)
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+
+                        # Notify user about the new release.
+                        notification.notify(
+                            update_notice,
+                            app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
+                            timeout=60,
+                        )
                 except (
-                    NotImplementedError,
+                    NotImplementedError
                 ):  # Gets raised on Termux and Raspbian (so far).
                     log.info(update_notice)
 
