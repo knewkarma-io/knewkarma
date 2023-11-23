@@ -195,6 +195,8 @@ class Caller:
             """
             Handles data requests related to Reddit posts.
             """
+            from . import POST_LISTINGS
+
             # Map subreddit-related actions to corresponding functions
             posts_actions_map: dict = {
                 "front_page": lambda: self.tree_masonry.posts_tree(
@@ -206,7 +208,11 @@ class Caller:
                 ),
                 "listing": lambda: self.tree_masonry.posts_tree(
                     posts_type="listing_posts",
-                    posts_source=self.arguments.listing,
+                    posts_source=self.arguments.listing
+                    if hasattr(self.arguments, "listing")
+                    else Prompt.ask(
+                        "Select listing to get posts from", choices=POST_LISTINGS
+                    ),
                     posts_limit=self.data_limit,
                     show_author=True,
                     sort_criterion=self.data_sort_criterion,
@@ -219,3 +225,4 @@ class Caller:
                 actions_map=posts_actions_map, default_action="front_page"
             )
             posts_actions_map.get(action)()
+
