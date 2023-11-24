@@ -20,7 +20,7 @@ def on_call():
             f"{start_time.strftime('%a %b %d %Y, %I:%M:%S %p')}..."
         )
 
-        tree_masonry.api.check_updates()
+        tree_masonry.api.get_updates()
         executor = Executor(arguments=arguments, tree_masonry=tree_masonry)
         executor.executor_cli()
     except KeyboardInterrupt:

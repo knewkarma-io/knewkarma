@@ -70,12 +70,13 @@ class Api:
                 f"Unknown data type ({data}: {type(data).__name__}), expected a list or dict."
             )
 
-    def check_updates(self):
+    def get_updates(self):
         """
-        Checks if there's a new release of a project on GitHub.
-        If there is, it shows a notification to the user about the release.
+        Gets and compares the remote version with the local version.
+        Assumes version format: major.minor.patch.prefix
         """
         import os
+        import sys
         import warnings
 
         from plyer import notification
@@ -92,34 +93,50 @@ class Api:
                     f"PyPI project endpoint was modified "
                     f"{__pypi_project_endpoint__}: knewkarma/__init__.py: Line 20"
                 )
-                exit()
+                sys.exit()
 
             remote_version: str = release.get("version")
-            update_notice: str = (
-                f"A new release of Knew Karma is available (from {__version__} to {remote_version}). "
-                f"To update, run: pip install --upgrade {release.get('name')}"
-            )
-            # Check if the remote version tag matches the current version tag.
-            if remote_version != __version__:
-                # Set icon file to show in the desktop notification
-                icon_file: str = "icon.ico" if os.name == "nt" else "icon.png"
-                try:
-                    # Catch and ignore all warnings (specific warning is at:
-                    # https://github.com/kivy/plyer/blob/
-                    # 8c0e11ff2e356ea677e96b0d7907d000c8f4bbd0/plyer/platforms/linux/notification.py#L99C8-L99C8)
-                    with warnings.catch_warnings():
-                        warnings.simplefilter("ignore")
+            # Splitting the version strings into components
+            remote_parts = remote_version.split('.')
+            local_parts = __version__.split('.')
 
-                        # Notify user about the new release.
-                        notification.notify(
-                            update_notice,
-                            app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
-                            timeout=60,
-                        )
-                except (
-                        NotImplementedError
-                ):  # Gets raised on Termux and Raspbian (so far).
-                    log.info(update_notice)
+            update_message: str = ""
+            notification_timeout: int = 0
+            icon_file: str = "icon.ico" if os.name == "nt" else "icon.png"
+
+            # Check for differences in version parts
+            if remote_parts[0] != local_parts[0]:
+                update_message = (f"MAJOR update ({remote_version}) available."
+                                  f" It might introduce significant changes.")
+                notification_timeout = 60
+            elif remote_parts[1] != local_parts[1]:
+                update_message = (f"MINOR update ({remote_version}) available."
+                                  f" Includes small feature changes/improvements.")
+                notification_timeout = 50
+            elif remote_parts[2] != local_parts[2]:
+                update_message = (f"PATCH update ({remote_version}) available."
+                                  f" Generally for bug fixes and small tweaks.")
+                notification_timeout = 30
+            elif len(remote_parts) > 3 and len(local_parts) > 3 and remote_parts[3] != local_parts[3]:
+                update_message = (f"BUILD update ({remote_version}) available."
+                                  f" Might be for specific builds or special versions.")
+                notification_timeout = 15
+
+            try:
+                # Catch and ignore all warnings (specific warning is at:
+                # https://github.com/kivy/plyer/blob/
+                # 8c0e11ff2e356ea677e96b0d7907d000c8f4bbd0/plyer/platforms/linux/notification.py#L99C8-L99C8)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+
+                    # Notify user about the new release.
+                    notification.notify(
+                        update_message,
+                        app_icon=f"{os.path.join(CURRENT_FILE_DIRECTORY, 'icons', icon_file)}",
+                        timeout=notification_timeout,
+                    )
+            except NotImplementedError:  # Gets raised on systems that do not have a desktop environment
+                log.info(update_message)
 
     def get_profile(
             self,
