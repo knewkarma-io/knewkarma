@@ -51,7 +51,7 @@ class Caller:
                 posts_type="search_posts",
                 posts_source=self.arguments.query
                 if hasattr(self.arguments, "query")
-                else Prompt.ask(f"({operation_mode}) Search query", default="osint"),
+                else Prompt.ask(f"({operation_mode}) Query", default="osint"),
                 show_author=True,
                 sort_criterion=self.arguments.sort or self.handlers.data_sort_criterion,
                 posts_limit=self.arguments.limit or self.handlers.data_limit,
