@@ -213,7 +213,7 @@ class Executor:
                     posts_source=self.arguments.listing
                     if hasattr(self.arguments, "listing")
                     else Prompt.ask(
-                        "Select listing to get posts from", choices=POST_LISTINGS
+                        "(posts) Select listing to get posts from", choices=POST_LISTINGS
                     ),
                     posts_limit=self.data_limit,
                     show_author=True,
