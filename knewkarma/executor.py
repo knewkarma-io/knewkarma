@@ -2,13 +2,14 @@ import argparse
 
 from rich.prompt import Prompt, Confirm
 
+from . import OPERATION_MODES, DATA_SORT_CRITERION, POST_LISTINGS
 from .masonry import Masonry
 
 
-class Caller:
+class Executor:
     def __init__(self, arguments: argparse, tree_masonry: Masonry):
         """
-        Initializes the Caller class which is responsible for handling command-line arguments
+        Initializes the Executor class which is responsible for handling command-line arguments
         and invoking the appropriate methods based on user input.
 
         :param arguments: An argparse object containing command-line arguments.
@@ -19,14 +20,15 @@ class Caller:
         self.arguments = arguments
         self.handlers = self.Handlers(executor=self)
 
-    def call_cli(self):
+    def executor_cli(self):
         """
         Determines the operation mode based on command-line arguments or interactive input,
-        and calls the corresponding handler function.
+        and executes the corresponding handler function.
         """
         operation_mode: str = self.arguments.mode or Prompt.ask(
             "Select operation mode",
-            choices=["user", "subreddit", "post", "posts", "search"],
+            choices=OPERATION_MODES,
+            default="user",
         )
 
         # Call an appropriate handler based on the user-specified operation mode
@@ -49,7 +51,7 @@ class Caller:
                 posts_type="search_posts",
                 posts_source=self.arguments.query
                 if hasattr(self.arguments, "query")
-                else Prompt.ask(f"({operation_mode}) Search query", default="osint"),
+                else Prompt.ask(f"({operation_mode}) Query", default="osint"),
                 show_author=True,
                 sort_criterion=self.arguments.sort or self.handlers.data_sort_criterion,
                 posts_limit=self.arguments.limit or self.handlers.data_limit,
@@ -72,6 +74,10 @@ class Caller:
             )
         elif operation_mode == "posts":
             self.handlers.posts_handler()
+        elif operation_mode == "quit":
+            import sys
+
+            sys.exit()
 
     class Handlers:
         def __init__(self, executor):
@@ -80,13 +86,11 @@ class Caller:
 
             :param executor: The Caller instance that this Handlers class is a part of.
             """
-            from . import DATA_SORT_LISTINGS
-
             self.arguments: argparse = executor.arguments
             self.tree_masonry: Masonry = executor.tree_masonry
             self.data_sort_criterion: str = self.arguments.sort or Prompt.ask(
                 "Set (bulk data) output sort criterion",
-                choices=DATA_SORT_LISTINGS,
+                choices=DATA_SORT_CRITERION,
                 default="all",
             )
             self.data_limit: int = self.arguments.limit or Prompt.ask(
@@ -195,8 +199,6 @@ class Caller:
             """
             Handles data requests related to Reddit posts.
             """
-            from . import POST_LISTINGS
-
             # Map subreddit-related actions to corresponding functions
             posts_actions_map: dict = {
                 "front_page": lambda: self.tree_masonry.posts_tree(
@@ -211,7 +213,7 @@ class Caller:
                     posts_source=self.arguments.listing
                     if hasattr(self.arguments, "listing")
                     else Prompt.ask(
-                        "Select listing to get posts from", choices=POST_LISTINGS
+                        "(posts) Select listing to get posts from", choices=POST_LISTINGS
                     ),
                     posts_limit=self.data_limit,
                     show_author=True,
