@@ -90,19 +90,11 @@ class Executor:
             self.arguments: argparse = executor.arguments
             self.tree_masonry: Masonry = executor.tree_masonry
             self.data_sort_criterion: str = (
-                self.arguments.sort
-                if hasattr(self.arguments, "sort")
-                else Prompt.ask(
-                    "Set (bulk data) output sort criterion",
-                    choices=DATA_SORT_CRITERION,
-                    default="all",
-                ))
-            self.data_limit: int = (
-                self.arguments.limit
-                if hasattr(self.arguments, "limit")
-                else Prompt.ask(
-                    "Set (bulk data) output limit", default=50
-                ))
+                    self.arguments.sort or Prompt.ask("Set output sort criterion (bulk data)",
+                                                      choices=DATA_SORT_CRITERION,
+                                                      default="all",
+                                                      ))
+            self.data_limit: int = self.arguments.limit or Prompt.ask("Set output limit (bulk data)")
             self.save_to_json: bool = self.arguments.json or Confirm.ask(
                 "Would you like to save output to a JSON file?", default=False
             )
@@ -220,7 +212,9 @@ class Executor:
                     posts_source=self.arguments.listing
                     if hasattr(self.arguments, "listing")
                     else Prompt.ask(
-                        "(posts) Select listing to get posts from", choices=POST_LISTINGS
+                        "(posts) Select listing to get posts from",
+                        choices=POST_LISTINGS,
+                        default="all"
                     ),
                     posts_limit=self.data_limit,
                     show_author=True,
