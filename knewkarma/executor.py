@@ -86,16 +86,23 @@ class Executor:
 
             :param executor: The Caller instance that this Handlers class is a part of.
             """
+
             self.arguments: argparse = executor.arguments
             self.tree_masonry: Masonry = executor.tree_masonry
-            self.data_sort_criterion: str = self.arguments.sort or Prompt.ask(
-                "Set (bulk data) output sort criterion",
-                choices=DATA_SORT_CRITERION,
-                default="all",
-            )
-            self.data_limit: int = self.arguments.limit or Prompt.ask(
-                "Set (bulk data) output limit", default=50
-            )
+            self.data_sort_criterion: str = (
+                self.arguments.sort
+                if hasattr(self.arguments, "sort")
+                else Prompt.ask(
+                    "Set (bulk data) output sort criterion",
+                    choices=DATA_SORT_CRITERION,
+                    default="all",
+                ))
+            self.data_limit: int = (
+                self.arguments.limit
+                if hasattr(self.arguments, "limit")
+                else Prompt.ask(
+                    "Set (bulk data) output limit", default=50
+                ))
             self.save_to_json: bool = self.arguments.json or Confirm.ask(
                 "Would you like to save output to a JSON file?", default=False
             )
