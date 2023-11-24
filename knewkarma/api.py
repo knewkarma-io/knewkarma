@@ -1,4 +1,4 @@
-from typing import Optional, Union, Literal
+from typing import Union, Literal
 
 import requests
 
@@ -14,7 +14,7 @@ class Api:
         self.base_reddit_endpoint = base_reddit_endpoint
 
     @staticmethod
-    def get_data(endpoint: str) -> Optional[Union[dict, list]]:
+    def get_data(endpoint: str) -> Union[dict, list]:
         """
         Fetches JSON data from a given API endpoint.
 
@@ -26,11 +26,11 @@ class Api:
         try:
             with requests.Session() as session:
                 with session.get(
-                    url=endpoint,
-                    headers={
-                        "User-Agent": f"Knew-Karma/{__version__} "
-                        f"(Python {python_version}; +https://about.me/rly0nheart)"
-                    },
+                        url=endpoint,
+                        headers={
+                            "User-Agent": f"Knew-Karma/{__version__} "
+                                          f"(Python {python_version}; +https://about.me/rly0nheart)"
+                        },
                 ) as response:
                     if response.status_code == 200:
                         return response.json()
@@ -47,7 +47,7 @@ class Api:
 
     @staticmethod
     def validate_data(
-        data: Union[dict, list], valid_key: str = None
+            data: Union[dict, list], valid_key: str = None
     ) -> Union[dict, list]:
         """
         Validates the input data. If it's a dictionary and a valid_key is provided,
@@ -117,14 +117,14 @@ class Api:
                             timeout=60,
                         )
                 except (
-                    NotImplementedError
+                        NotImplementedError
                 ):  # Gets raised on Termux and Raspbian (so far).
                     log.info(update_notice)
 
     def get_profile(
-        self,
-        profile_source: str,
-        profile_type: str = Literal["user_profile", "subreddit_profile"],
+            self,
+            profile_source: str,
+            profile_type: str = Literal["user_profile", "subreddit_profile"],
     ) -> dict:
         """
         Retrieves profile data from a specified source.
@@ -153,18 +153,18 @@ class Api:
         return self.validate_data(data=profile.get("data", {}), valid_key="created_utc")
 
     def get_posts(
-        self,
-        posts_sort_criterion: str,
-        posts_limit: int,
-        posts_type: str = Literal[
-            "user_posts",
-            "user_comments",
-            "subreddit_posts",
-            "search_posts",
-            "listing_posts",
-            "front_page_posts",
-        ],
-        posts_source: str = None,
+            self,
+            posts_sort_criterion: str,
+            posts_limit: int,
+            posts_type: str = Literal[
+                "user_posts",
+                "user_comments",
+                "subreddit_posts",
+                "search_posts",
+                "listing_posts",
+                "front_page_posts",
+            ],
+            posts_source: str = None,
     ) -> list:
         """
         Retrieves posts from a specified source.
@@ -217,11 +217,11 @@ class Api:
         return self.validate_data(data=posts.get("data", {}).get("children", []))
 
     def get_post_data(
-        self,
-        subreddit: str,
-        post_id: str,
-        comments_sort_criterion: str,
-        comments_limit: int,
+            self,
+            subreddit: str,
+            post_id: str,
+            comments_sort_criterion: str,
+            comments_limit: int,
     ) -> tuple:
         """
         Gets a post's data.
@@ -235,7 +235,7 @@ class Api:
         """
         data: dict = self.get_data(
             endpoint=f"{self.base_reddit_endpoint}/r/{subreddit}/comments/{post_id}.json"
-            f"?sort={comments_sort_criterion}&limit={comments_limit}"
+                     f"?sort={comments_sort_criterion}&limit={comments_limit}"
         )
         return (
             self.validate_data(data=data, valid_key="upvote_ratio"),
