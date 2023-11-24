@@ -161,7 +161,7 @@ class Api:
             ),
         ]
 
-        profile_endpoint = None
+        profile_endpoint: str = ""
         for type_name, type_endpoint in profile_type_map:
             if type_name == profile_type:
                 profile_endpoint = type_endpoint
@@ -224,7 +224,7 @@ class Api:
                 f"?sort={posts_sort_criterion}&limit={posts_limit}",
             ),
         ]
-        posts_endpoint = None
+        posts_endpoint: str = ""
         for type_name, type_endpoint in posts_type_map:
             if type_name == posts_type:
                 posts_endpoint = type_endpoint
