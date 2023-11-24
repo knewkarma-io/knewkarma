@@ -2,7 +2,7 @@ import argparse
 
 from rich.prompt import Prompt, Confirm
 
-from . import OPERATION_MODE, DATA_SORT_LISTINGS, POST_LISTINGS
+from . import OPERATION_MODES, DATA_SORT_CRITERION, POST_LISTINGS
 from .masonry import Masonry
 
 
@@ -27,7 +27,8 @@ class Caller:
         """
         operation_mode: str = self.arguments.mode or Prompt.ask(
             "Select operation mode",
-            choices=OPERATION_MODE,
+            choices=OPERATION_MODES,
+            default="user",
         )
 
         # Call an appropriate handler based on the user-specified operation mode
@@ -89,7 +90,7 @@ class Caller:
             self.tree_masonry: Masonry = executor.tree_masonry
             self.data_sort_criterion: str = self.arguments.sort or Prompt.ask(
                 "Set (bulk data) output sort criterion",
-                choices=DATA_SORT_LISTINGS,
+                choices=DATA_SORT_CRITERION,
                 default="all",
             )
             self.data_limit: int = self.arguments.limit or Prompt.ask(
