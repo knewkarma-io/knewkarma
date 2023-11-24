@@ -1,7 +1,9 @@
 import os
 
+OPERATION_MODE: list = ["user", "subreddit", "post", "posts", "search", "quit"]
 DATA_SORT_LISTINGS: list = ["controversial", "new", "top", "best", "hot", "rising"]
 POST_LISTINGS: list = ["all", "best", "controversial", "popular", "rising"]
+
 
 # Construct path to the program's directory
 PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma"))
