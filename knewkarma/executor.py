@@ -6,10 +6,10 @@ from . import OPERATION_MODES, DATA_SORT_CRITERION, POST_LISTINGS
 from .masonry import Masonry
 
 
-class Caller:
+class Executor:
     def __init__(self, arguments: argparse, tree_masonry: Masonry):
         """
-        Initializes the Caller class which is responsible for handling command-line arguments
+        Initializes the Executor class which is responsible for handling command-line arguments
         and invoking the appropriate methods based on user input.
 
         :param arguments: An argparse object containing command-line arguments.
@@ -20,10 +20,10 @@ class Caller:
         self.arguments = arguments
         self.handlers = self.Handlers(executor=self)
 
-    def call_cli(self):
+    def executor_cli(self):
         """
         Determines the operation mode based on command-line arguments or interactive input,
-        and calls the corresponding handler function.
+        and executes the corresponding handler function.
         """
         operation_mode: str = self.arguments.mode or Prompt.ask(
             "Select operation mode",
