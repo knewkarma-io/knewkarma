@@ -147,16 +147,14 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-s",
         "--sort",
-        default="all",
         choices=DATA_SORT_CRITERION,
-        help="Bulk data sort criterion (default: %(default)s)",
+        help="Bulk data sort criterion",
     )
     parser.add_argument(
         "-l",
         "--limit",
-        default=50,
         type=int,
-        help="Maximum number of bulk data to get (default: %(default)s)",
+        help="Maximum number of bulk data to get",
     )
     parser.add_argument(
         "-j",

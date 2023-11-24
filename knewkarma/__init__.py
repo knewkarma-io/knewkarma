@@ -1,9 +1,8 @@
 import os
 
 OPERATION_MODES: list = ["user", "subreddit", "post", "posts", "search", "quit"]
-DATA_SORT_CRITERION: list = ["controversial", "new", "top", "best", "hot", "rising"]
+DATA_SORT_CRITERION: list = ["all", "controversial", "new", "top", "best", "hot", "rising"]
 POST_LISTINGS: list = ["all", "best", "controversial", "popular", "rising"]
-
 
 # Construct path to the program's directory
 PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma"))
@@ -14,7 +13,6 @@ CURRENT_FILE_DIRECTORY: str = os.path.dirname(os.path.abspath(__file__))
 # Construct paths to directories of CSV and JSON files.
 CSV_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "csv")
 JSON_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "json")
-
 
 __author__: str = "Richard Mwewa"
 __about__: str = "https://about.me/rly0nheart"
@@ -53,7 +51,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 """
-
 
 __operations_description__: str = "# **{}** Operations"
 __user_examples__: str = """
