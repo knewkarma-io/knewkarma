@@ -1,7 +1,7 @@
 import os
 
-OPERATION_MODE: list = ["user", "subreddit", "post", "posts", "search", "quit"]
-DATA_SORT_LISTINGS: list = ["controversial", "new", "top", "best", "hot", "rising"]
+OPERATION_MODES: list = ["user", "subreddit", "post", "posts", "search", "quit"]
+DATA_SORT_CRITERION: list = ["controversial", "new", "top", "best", "hot", "rising"]
 POST_LISTINGS: list = ["all", "best", "controversial", "popular", "rising"]
 
 
