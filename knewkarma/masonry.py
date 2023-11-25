@@ -134,7 +134,7 @@ class Masonry:
         profile_data: dict = self.api.get_profile(
             profile_type=profile_type, profile_source=profile_source
         )
-        xprint(profile_data)
+        
         if profile_data:
             if profile_type == "user_profile":
                 formatted_profile: dict = data_broker(
