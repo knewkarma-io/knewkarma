@@ -15,10 +15,11 @@ def on_call():
 
     path_finder()
     try:
-        log.info(
-            f"[bold]Knew Karma[/] {__version__} started at "
-            f"{start_time.strftime('%a %b %d %Y, %I:%M:%S %p')}..."
-        )
+        if arguments.mode:
+            log.info(
+                f"[bold]Knew Karma[/] {__version__} started at "
+                f"{start_time.strftime('%a %b %d %Y, %I:%M:%S %p')}..."
+            )
 
         tree_masonry.api.get_updates()
         executor = Executor(arguments=arguments, tree_masonry=tree_masonry)

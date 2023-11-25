@@ -53,8 +53,8 @@ class Executor:
                 if hasattr(self.arguments, "query")
                 else Prompt.ask(f"({operation_mode}) Query", default="osint"),
                 show_author=True,
-                sort_criterion=self.arguments.sort or self.handlers.data_sort_criterion,
-                posts_limit=self.arguments.limit or self.handlers.data_limit,
+                sort_criterion=self.arguments.sort_criterion or self.handlers.sort_criterion,
+                posts_limit=self.arguments.data_limit or self.handlers.data_limit,
                 save_to_json=self.arguments.json or self.handlers.save_to_json,
             )
 
@@ -68,7 +68,7 @@ class Executor:
                 else Prompt.ask(
                     f"({operation_mode}) Post source subreddit", default="osint"
                 ),
-                sort=self.arguments.sort or self.handlers.data_sort_criterion,
+                sort=self.arguments.sort or self.handlers.sort_criterion,
                 limit=self.arguments.limit or self.handlers.data_limit,
                 save_to_json=self.arguments.json or self.handlers.save_to_json,
             )
@@ -89,12 +89,13 @@ class Executor:
 
             self.arguments: argparse = executor.arguments
             self.tree_masonry: Masonry = executor.tree_masonry
-            self.data_sort_criterion: str = (
-                    self.arguments.sort or Prompt.ask("Set output sort criterion (bulk data)",
-                                                      choices=DATA_SORT_CRITERION,
-                                                      default="all",
-                                                      ))
-            self.data_limit: int = self.arguments.limit or Prompt.ask("Set output limit (bulk data)")
+            self.sort_criterion: str = (
+                    self.arguments.sort_criterion or Prompt.ask("Set (bulk) data sort criterion",
+                                                                choices=DATA_SORT_CRITERION,
+                                                                default="all",
+                                                                ))
+            self.data_limit: int = self.arguments.data_limit or Prompt.ask("Set (bulk) data output limit",
+                                                                           default="50")
             self.save_to_json: bool = self.arguments.json or Confirm.ask(
                 "Would you like to save output to a JSON file?", default=False
             )
@@ -146,12 +147,12 @@ class Executor:
                     posts_source=username,
                     posts_type="user_posts",
                     posts_limit=self.data_limit,
-                    sort_criterion=self.data_sort_criterion,
+                    sort_criterion=self.sort_criterion,
                     save_to_json=self.save_to_json,
                 ),
                 "comments": lambda: self.tree_masonry.user_comments_tree(
                     username=username,
-                    sort_criterion=self.data_sort_criterion,
+                    sort_criterion=self.sort_criterion,
                     comments_limit=self.data_limit,
                     save_to_json=self.save_to_json,
                 ),
@@ -182,7 +183,7 @@ class Executor:
                     posts_source=subreddit,
                     posts_type="subreddit_posts",
                     posts_limit=self.data_limit,
-                    sort_criterion=self.data_sort_criterion,
+                    sort_criterion=self.sort_criterion,
                     save_to_json=self.save_to_json,
                     show_author=True,
                 ),
@@ -204,7 +205,7 @@ class Executor:
                     posts_type="front_page_posts",
                     posts_limit=self.data_limit,
                     show_author=True,
-                    sort_criterion=self.data_sort_criterion,
+                    sort_criterion=self.sort_criterion,
                     save_to_json=self.save_to_json,
                 ),
                 "listing": lambda: self.tree_masonry.posts_tree(
@@ -218,7 +219,7 @@ class Executor:
                     ),
                     posts_limit=self.data_limit,
                     show_author=True,
-                    sort_criterion=self.data_sort_criterion,
+                    sort_criterion=self.sort_criterion,
                     save_to_json=self.save_to_json,
                 ),
             }
