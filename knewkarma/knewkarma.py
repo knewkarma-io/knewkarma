@@ -1,6 +1,6 @@
 def on_call():
     from . import __version__
-    from .caller import Caller
+    from .executor import Executor
     from .coreutils import datetime, log, path_finder, arguments
     from .masonry import Masonry
 
@@ -17,13 +17,13 @@ def on_call():
     try:
         if arguments.mode:
             log.info(
-                f"Started [bold]Knew Karma[/] {__version__} at "
+                f"[bold]Knew Karma[/] {__version__} started at "
                 f"{start_time.strftime('%a %b %d %Y, %I:%M:%S %p')}..."
             )
-            tree_masonry.api.check_updates()
 
-        caller = Caller(arguments=arguments, tree_masonry=tree_masonry)
-        caller.call_cli()
+        tree_masonry.api.get_updates()
+        executor = Executor(arguments=arguments, tree_masonry=tree_masonry)
+        executor.executor_cli()
     except KeyboardInterrupt:
         log.warning(f"User interruption detected ([yellow]Ctrl+C[/])")
     finally:

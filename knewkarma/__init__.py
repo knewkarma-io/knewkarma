@@ -1,6 +1,7 @@
 import os
 
-DATA_SORT_LISTINGS: list = ["controversial", "new", "top", "best", "hot", "rising"]
+OPERATION_MODES: list = ["user", "subreddit", "post", "posts", "search", "quit"]
+DATA_SORT_CRITERION: list = ["all", "controversial", "new", "top", "best", "hot", "rising"]
 POST_LISTINGS: list = ["all", "best", "controversial", "popular", "rising"]
 
 # Construct path to the program's directory
@@ -13,10 +14,10 @@ CURRENT_FILE_DIRECTORY: str = os.path.dirname(os.path.abspath(__file__))
 CSV_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "csv")
 JSON_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "json")
 
-
 __author__: str = "Richard Mwewa"
 __about__: str = "https://about.me/rly0nheart"
-__version__: str = "2.3.1.0"
+__version__: str = "2.4.0.0"
+__pypi_project_endpoint__: str = "https://pypi.org/pypi/knewkarma/json"
 __description__: str = """
 # Knew Karma
 > A **Reddit** Data Analysis Toolkit."""
@@ -50,7 +51,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 """
-
 
 __operations_description__: str = "# **{}** Operations"
 __user_examples__: str = """
