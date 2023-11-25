@@ -16,7 +16,7 @@ JSON_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "json")
 
 __author__: str = "Richard Mwewa"
 __about__: str = "https://about.me/rly0nheart"
-__version__: str = "2.4.0.0"
+__version__: str = "2.4.1.0"
 __pypi_project_endpoint__: str = "https://pypi.org/pypi/knewkarma/json"
 __description__: str = """
 # Knew Karma

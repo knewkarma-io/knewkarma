@@ -68,8 +68,8 @@ class Executor:
                 else Prompt.ask(
                     f"({operation_mode}) Post source subreddit", default="osint"
                 ),
-                sort=self.arguments.sort or self.handlers.sort_criterion,
-                limit=self.arguments.limit or self.handlers.data_limit,
+                sort=self.arguments.sort_criterion or self.handlers.sort_criterion,
+                limit=self.arguments.data_limit or self.handlers.data_limit,
                 save_to_json=self.arguments.json or self.handlers.save_to_json,
             )
         elif operation_mode == "posts":
