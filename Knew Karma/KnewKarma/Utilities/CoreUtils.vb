@@ -82,9 +82,9 @@ Public Class CoreUtils
 
             ' Checking if the current version is the latest version.
             If tagName = My.Application.Info.Version.ToString Then
-                AboutWindow.Version.Text = $"Up-to-date ({My.Application.Info.Version})"
+                AboutWindow.Version.Text = $"Up-to-date: {My.Application.Info.Version}"
             Else
-                AboutWindow.Version.Text = $"Updates found ({tagName})"
+                AboutWindow.Version.Text = $"Updates found: {tagName}"
                 AboutWindow.ButtonGetUpdates.Enabled = True
             End If
         End If
