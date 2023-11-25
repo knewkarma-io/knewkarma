@@ -10,7 +10,7 @@ from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
 from . import CSV_DIRECTORY, JSON_DIRECTORY
-from . import DATA_SORT_LISTINGS, POST_LISTINGS
+from . import DATA_SORT_CRITERION, POST_LISTINGS
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -147,16 +147,16 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-s",
         "--sort",
-        default="all",
-        choices=DATA_SORT_LISTINGS,
-        help="Bulk data sort criterion (default: %(default)s)",
+        dest="sort_criterion",
+        choices=DATA_SORT_CRITERION,
+        help="Bulk data sort criterion",
     )
     parser.add_argument(
         "-l",
         "--limit",
-        default=50,
+        dest="data_limit",
         type=int,
-        help="Maximum number of bulk data to get (default: %(default)s)",
+        help="Bulk data output limit",
     )
     parser.add_argument(
         "-j",
@@ -238,10 +238,10 @@ def path_finder():
 
 
 def save_data(
-    data: Union[dict, list],
-    filename: str,
-    save_to_json: bool = False,
-    save_to_csv: bool = False,
+        data: Union[dict, list],
+        filename: str,
+        save_to_json: bool = False,
+        save_to_csv: bool = False,
 ):
     """
     Save the given data to JSON and/or CSV files based on the arguments.
@@ -260,7 +260,7 @@ def save_data(
     # Save to CSV if save_csv is True
     if save_to_csv:
         with open(
-            os.path.join(CSV_DIRECTORY, f"{filename}.csv"), "w", newline=""
+                os.path.join(CSV_DIRECTORY, f"{filename}.csv"), "w", newline=""
         ) as csv_file:
             writer = csv.writer(csv_file)
             # Write the header based on keys from the first dictionary
