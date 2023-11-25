@@ -12,14 +12,11 @@ class Masonry:
     def __init__(self):
         """
         Initialises the Masonry class by creating an API object for data retrieval.
-        The API endpoints are set for Reddit and GitHub API Endpoint.
+        The API endpoint is set for Reddit.
         """
         from .api import Api
 
-        self.api: Api = Api(
-            base_reddit_endpoint="https://www.reddit.com",
-            base_github_api_endpoint="https://api.github.com",
-        )
+        self.api: Api = Api(base_reddit_endpoint="https://www.reddit.com")
 
         # Tree/Branch styling
         self.DIM = "dim"
@@ -29,11 +26,11 @@ class Masonry:
         self.BOLD_BRIGHT_BLUE = "bold bright_blue"
 
     def create_tree(
-        self,
-        tree_title: str,
-        tree_data: Union[dict, list] = None,
-        additional_text: str = None,
-        additional_data: [(str, Union[dict, list])] = None,
+            self,
+            tree_title: str,
+            tree_data: Union[dict, list] = None,
+            additional_text: str = None,
+            additional_data: [(str, Union[dict, list])] = None,
     ) -> Tree:
         """
         Creates a tree structure and populates it with the given data.
@@ -83,11 +80,11 @@ class Masonry:
         return tree
 
     def add_branch(
-        self,
-        target_tree: Tree,
-        branch_title: str,
-        branch_data: Union[dict, list],
-        additional_text: str = None,
+            self,
+            target_tree: Tree,
+            branch_title: str,
+            branch_data: Union[dict, list],
+            additional_text: str = None,
     ):
         """
         Adds a branch to an existing tree.
@@ -117,11 +114,11 @@ class Masonry:
             return target_tree
 
     def profile_tree(
-        self,
-        profile_source: str,
-        profile_type: str,
-        save_to_json: bool = False,
-        save_to_csv: bool = False,
+            self,
+            profile_source: str,
+            profile_type: str,
+            save_to_json: bool = False,
+            save_to_csv: bool = False,
     ):
         """
         Visualises a Reddit profile's data from a specified source into a tree structure.
@@ -137,6 +134,7 @@ class Masonry:
         profile_data: dict = self.api.get_profile(
             profile_type=profile_type, profile_source=profile_source
         )
+        xprint(profile_data)
         if profile_data:
             if profile_type == "user_profile":
                 formatted_profile: dict = data_broker(
@@ -145,7 +143,7 @@ class Masonry:
                 additional_data: list = [
                     (
                         profile_data.get("subreddit").get("display_name"),
-                        data_broker(profile_data, data_file="user/subreddit.json"),
+                        data_broker(profile_data.get("subreddit"), data_file="user/subreddit.json"),
                     ),
                     (
                         "Verification",
@@ -213,12 +211,12 @@ class Masonry:
             )
 
     def post_data_tree(
-        self,
-        post_id: str,
-        post_subreddit: str,
-        sort: str,
-        limit: int,
-        save_to_json: bool,
+            self,
+            post_id: str,
+            post_subreddit: str,
+            sort: str,
+            limit: int,
+            save_to_json: bool,
     ):
         """
         Visualises a specific Reddit post's data in a tree structure.
@@ -276,13 +274,13 @@ class Masonry:
             )
 
     def posts_tree(
-        self,
-        sort_criterion: str,
-        posts_limit: int,
-        posts_type: str,
-        save_to_json: bool = False,
-        posts_source: str = None,
-        show_author: bool = False,
+            self,
+            sort_criterion: str,
+            posts_limit: int,
+            posts_type: str,
+            save_to_json: bool = False,
+            posts_source: str = None,
+            show_author: bool = False,
     ):
         """
         Visualises Reddit posts' data from a specified source into a tree structure.
@@ -339,11 +337,11 @@ class Masonry:
             )
 
     def user_comments_tree(
-        self,
-        username: str,
-        sort_criterion: str,
-        comments_limit: int,
-        save_to_json: bool,
+            self,
+            username: str,
+            sort_criterion: str,
+            comments_limit: int,
+            save_to_json: bool,
     ):
         """
         Visualises a Reddit user's comments in a tree structure.
