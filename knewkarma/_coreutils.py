@@ -277,7 +277,9 @@ def save_data(
     if save_to_json:
         with open(os.path.join(JSON_DIRECTORY, f"{filename}.json"), "w") as json_file:
             json.dump(data, json_file, indent=4)
-        log.info(f"JSON data saved to [link file://{json_file.name}]{json_file.name}")
+        log.info(
+            f"{os.path.getsize(json_file.name)} bytes written to [link file://{json_file.name}]{json_file.name}"
+        )
 
     # Save to CSV if save_csv is True
     if save_to_csv:
@@ -291,7 +293,9 @@ def save_data(
 
             # Write each row
             writer.writerow(data.values())
-        log.info(f"CSV data saved to [link file://{csv_file.name}]{csv_file.name}")
+        log.info(
+            f"{os.path.getsize(csv_file.name)} bytes written to [link file://{csv_file.name}]{csv_file.name}"
+        )
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

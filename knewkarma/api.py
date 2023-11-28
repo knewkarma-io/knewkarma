@@ -2,7 +2,7 @@
 
 from typing import Union, Literal
 
-import requests
+import aiohttp
 
 from ._coreutils import log
 from ._metadata import (
@@ -25,7 +25,7 @@ class Api:
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
     @staticmethod
-    def _get_data(endpoint: str) -> Union[dict, list]:
+    async def _get_data(endpoint: str) -> Union[dict, list]:
         """
         Fetches JSON data from a given API endpoint asynchronously using aiohttp.
 
@@ -35,20 +35,22 @@ class Api:
         from sys import version as python_version
 
         try:
-            with requests.Session() as session:
-                with session.get(
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
                     endpoint,
                     headers={
                         "User-Agent": f"Knew-Karma/{version} "
                         f"(Python {python_version}; +https://about.me/rly0nheart)"
                     },
                 ) as response:
-                    if response.status_code == 200:
-                        return response.json()
+                    if response.status == 200:
+                        return await response.json()
                     else:
-                        log.error(f"An API error occurred: {response.json()}")
+                        error_message = await response.json()
+                        log.error(f"An API error occurred: {error_message}")
                         return {}
-        except requests.exceptions.ConnectionError as error:
+
+        except aiohttp.ClientConnectionError as error:
             log.error(f"An HTTP error occurred: {error}")
             return {}
         except Exception as error:
@@ -84,7 +86,7 @@ class Api:
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-    def get_updates(self):
+    async def get_updates(self):
         """
         Gets and compares the current program version with the remote version
         Assumes version format: major.minor.patch.prefix
@@ -92,7 +94,7 @@ class Api:
         import sys
 
         # Make a GET request to PyPI to get the project's latest release.
-        response: dict = self._get_data(endpoint=self._pypi_project_endpoint)
+        response: dict = await self._get_data(endpoint=self._pypi_project_endpoint)
         release: dict = self._validate_data(data=response.get("info", {}))
 
         if release:
@@ -144,7 +146,7 @@ class Api:
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-    def get_profile(
+    async def get_profile(
         self,
         profile_source: str,
         profile_type: str = Literal["user_profile", "subreddit_profile"],
@@ -172,14 +174,14 @@ class Api:
             if type_name == profile_type:
                 profile_endpoint = type_endpoint
 
-        profile: dict = self._get_data(endpoint=profile_endpoint)
+        profile: dict = await self._get_data(endpoint=profile_endpoint)
         return self._validate_data(
             data=profile.get("data", {}), valid_key="created_utc"
         )
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-    def _paginate_posts(
+    async def _paginate_posts(
         self,
         posts_endpoint: str,
         posts_limit: int = DEFAULT_DATA_LIMIT,
@@ -203,7 +205,7 @@ class Api:
             else:
                 endpoint_with_after = posts_endpoint
 
-            posts_data: dict = self._get_data(endpoint=endpoint_with_after)
+            posts_data: dict = await self._get_data(endpoint=endpoint_with_after)
             posts_children: list = posts_data.get("data", {}).get("children", [])
 
             # If there are no more posts, break out of the loop
@@ -217,7 +219,7 @@ class Api:
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-    def get_posts(
+    async def get_posts(
         self,
         posts_limit: int = DEFAULT_DATA_LIMIT,
         posts_sort: str = Literal[
@@ -285,14 +287,14 @@ class Api:
             if type_name == posts_type:
                 posts_endpoint = type_endpoint
 
-        all_posts = self._paginate_posts(posts_endpoint, posts_limit)
+        all_posts = await self._paginate_posts(posts_endpoint, posts_limit)
 
         # Return only the number of posts requested (posts_limit)
         return all_posts[:posts_limit]
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-    def get_post_data(
+    async def get_post_data(
         self,
         subreddit: str,
         post_id: str,
@@ -311,7 +313,7 @@ class Api:
         :returns: A tuple of a post's data (raw_data, post_information, list_of_comments) if valid,
            otherwise return a tuple containing an empty dict, dict and list.
         """
-        data: dict = self._get_data(
+        data: dict = await self._get_data(
             endpoint=f"{self._base_reddit_endpoint}/r/{subreddit}/comments/{post_id}.json"
             f"?sort={comments_sort}&limit={comments_limit}"
         )
