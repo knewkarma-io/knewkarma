@@ -102,7 +102,10 @@ class Cli:
         Determines the operation mode based on command-line arguments or interactive input,
         and executes the corresponding handler function.
         """
+        import asyncio
         from typing import Union, Callable
+
+        from ._coreutils import log
 
         if self._arguments.mode in self.argument_mapping:
             mode_action: Union[dict, Callable] = self.argument_mapping.get(
@@ -110,12 +113,21 @@ class Cli:
             )
             if isinstance(mode_action, dict):
                 for action_name, action_function in mode_action.items():
-                    if getattr(self._arguments, action_name):
-                        action_function()
-            elif callable(__obj=mode_action):
-                mode_action()
+                    if getattr(self._arguments, action_name) and hasattr(
+                        self._arguments, action_name
+                    ):
+                        asyncio.run(action_function())
+                        break
+                    else:
+                        log.warning(
+                            f"knewkarma {self._arguments.mode}: missing one or more expected argument(s): "
+                            f"{list(mode_action.keys())}"
+                        )
+                        break
+            elif callable(mode_action):
+                asyncio.run(mode_action())
             else:
-                print(
+                log.critical(
                     f"Unknown action type for {mode_action}: {type(mode_action).__name__}. "
                     f"Expected Dict or Callable."
                 )

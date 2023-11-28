@@ -2,6 +2,10 @@
 
 
 def on_call():
+    import asyncio
+    import cProfile
+    import pstats
+
     from . import api
     from ._cli import Cli
     from ._coreutils import datetime, log, path_finder, arguments, create_parser
@@ -24,10 +28,16 @@ def on_call():
                 f"[bold]Knew Karma[/] {version} started at "
                 f"{start_time.strftime('%a %b %d %Y, %I:%M:%S %p')}..."
             )
+            profiler = cProfile.Profile()
+            profiler.enable()
 
-            api.get_updates()
+            asyncio.run(api.get_updates())
             cli = Cli(arguments=arguments, tree_masonry=Masonry(api=api))
             cli.execute_cli()
+
+            profiler.disable()
+            stats = pstats.Stats(profiler)
+            stats.sort_stats("cumulative").print_stats(10)
         except KeyboardInterrupt:
             log.warning(f"User interruption detected ([yellow]Ctrl+C[/])")
         finally:

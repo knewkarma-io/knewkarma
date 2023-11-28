@@ -124,7 +124,7 @@ class Masonry:
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-    def profile_tree(
+    async def profile_tree(
         self,
         profile_source: str,
         profile_type: str,
@@ -142,7 +142,7 @@ class Masonry:
         :param save_to_json: If True, saves the profile data to a JSON file.
         :param save_to_csv: If True, saves the profile data to a CSV file.
         """
-        profile_data: dict = self._api.get_profile(
+        profile_data: dict = await self._api.get_profile(
             profile_type=profile_type, profile_source=profile_source
         )
 
@@ -226,7 +226,7 @@ class Masonry:
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-    def post_data_tree(
+    async def post_data_tree(
         self,
         post_id: str,
         post_subreddit: str,
@@ -246,7 +246,7 @@ class Masonry:
         :param save_to_json: If True, saves the post data to a JSON file.
         """
 
-        (raw_data, post_data, comments_list) = self._api.get_post_data(
+        (raw_data, post_data, comments_list) = await self._api.get_post_data(
             post_id=post_id,
             subreddit=post_subreddit,
             comments_sort=comments_sort,
@@ -291,7 +291,7 @@ class Masonry:
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-    def posts_tree(
+    async def posts_tree(
         self,
         sort_criterion: str,
         posts_limit: int,
@@ -312,7 +312,7 @@ class Masonry:
         :param posts_source: Source of the posts' data.
         :param show_author: If True, includes the author's username in the visualisation.
         """
-        posts_list: list = self._api.get_posts(
+        posts_list: list = await self._api.get_posts(
             posts_sort=sort_criterion,
             posts_limit=posts_limit,
             posts_type=posts_type,
@@ -358,7 +358,7 @@ class Masonry:
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-    def user_comments_tree(
+    async def user_comments_tree(
         self,
         username: str,
         sort_criterion: str,
@@ -375,7 +375,7 @@ class Masonry:
         :param comments_limit: The maximum number of comments to visualise.
         :param save_to_json: If True, saves the comments data to a JSON file.
         """
-        comments_list: list = self._api.get_posts(
+        comments_list: list = await self._api.get_posts(
             posts_sort=sort_criterion,
             posts_limit=comments_limit,
             posts_type="user_comments",
