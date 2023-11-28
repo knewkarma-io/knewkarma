@@ -1,4 +1,8 @@
-![carbon](https://github.com/bellingcat/knewkarma/assets/74001397/a7165335-89d4-4632-b3af-2f3bb03082bb)
+```
+┓┏┓         ┓┏┓         
+┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
+┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻
+```
 
 A **Reddit** Data Analysis Toolkit.
 
@@ -6,18 +10,47 @@ A **Reddit** Data Analysis Toolkit.
 
 # Feature Overview
 
-* **<ins>Knew Karma can get the following Reddit data from individual targets</ins>**:
+## Knew Karma CLI/GUI
+
+- [x] **<ins>Knew Karma can get the following Reddit data from individual targets</ins>**:
     * **User**: *Profile*, *Posts*, *Comments*
     * **Subreddit**: *Profile*, *Posts*
     * **Post**: *Data*, *Comments* (available only in the CLI)
-* **<ins>It can also get posts from various sources, such as</ins>**:
+- [x] **<ins>It can also get posts from various sources, such as</ins>**:
     * **Searching**: Allows getting posts that match the user-provided query from all over Reddit
     * **Reddit Front-Page**: Allows getting posts from the Reddit Front-Page
     * **Listing**: Allows getting posts from a user-specified Reddit Listing
-* **<ins>Bonus Features</ins>**
+- [x] **<ins>Bonus Features</ins>**
     * **CLI/GUI**
     * **Dark Mode** (*GUI Automatic/Manual*)
     * **Write data to files** (*JSON/CSV*)
+
+## Knew Karma Python Library
+
+```python
+from pprint import pprint
+
+from knewkarma import api
+
+# Get user profile
+username = "automoderator"
+user_profile = api.get_profile(profile_type="user_profile", profile_source=username)
+pprint(user_profile)
+
+# Get subreddit profile
+subreddit = "OSINT"
+subreddit_profile = api.get_profile(profile_type="subreddit_profile", profile_source=subreddit)
+pprint(subreddit_profile)
+
+# Get a post's data
+post_id = "12csg48"
+post_subreddit = "OSINT"
+post_data = api.get_post_data(post_id=post_id, subreddit=post_subreddit)
+pprint(post_data)
+```
+
+> More code examples/implementations are
+> available [here](https://github.com/bellingcat/knewkarma/tree/master/knewkarma/examples)
 
 # Documentation
 
@@ -25,3 +58,4 @@ A **Reddit** Data Analysis Toolkit.
 instructions.*
 ***
 [![me](https://github.com/bellingcat/knewkarma/assets/74001397/efd19c7e-9840-4969-b33c-04087e73e4da)](https://about.me/rly0nheart)
+

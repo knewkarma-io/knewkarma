@@ -1,3 +1,5 @@
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
 from datetime import datetime
 from typing import Union
 
@@ -5,18 +7,21 @@ from rich import print as xprint
 from rich.text import Text
 from rich.tree import Tree
 
-from .coreutils import convert_timestamp_to_datetime, data_broker, save_data
+from . import Api
+from ._coreutils import convert_timestamp_to_datetime, data_broker, save_data, log
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
 class Masonry:
-    def __init__(self):
+    def __init__(self, api: Api):
         """
         Initialises the Masonry class by creating an API object for data retrieval.
         The API endpoint is set for Reddit.
         """
-        from .api import Api
 
-        self.api: Api = Api(base_reddit_endpoint="https://www.reddit.com")
+        self._api = api
 
         # Tree/Branch styling
         self.DIM = "dim"
@@ -25,12 +30,14 @@ class Masonry:
         self.BOLD_BLUE = "bold blue"
         self.BOLD_BRIGHT_BLUE = "bold bright_blue"
 
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
     def create_tree(
-            self,
-            tree_title: str,
-            tree_data: Union[dict, list] = None,
-            additional_text: str = None,
-            additional_data: [(str, Union[dict, list])] = None,
+        self,
+        tree_title: str,
+        tree_data: Union[dict, list] = None,
+        additional_text: str = None,
+        additional_data: [(str, Union[dict, list])] = None,
     ) -> Tree:
         """
         Creates a tree structure and populates it with the given data.
@@ -79,12 +86,14 @@ class Masonry:
 
         return tree
 
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
     def add_branch(
-            self,
-            target_tree: Tree,
-            branch_title: str,
-            branch_data: Union[dict, list],
-            additional_text: str = None,
+        self,
+        target_tree: Tree,
+        branch_title: str,
+        branch_data: Union[dict, list],
+        additional_text: str = None,
     ):
         """
         Adds a branch to an existing tree.
@@ -113,12 +122,14 @@ class Masonry:
 
             return target_tree
 
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
     def profile_tree(
-            self,
-            profile_source: str,
-            profile_type: str,
-            save_to_json: bool = False,
-            save_to_csv: bool = False,
+        self,
+        profile_source: str,
+        profile_type: str,
+        save_to_json: bool = False,
+        save_to_csv: bool = False,
     ):
         """
         Visualises a Reddit profile's data from a specified source into a tree structure.
@@ -131,10 +142,10 @@ class Masonry:
         :param save_to_json: If True, saves the profile data to a JSON file.
         :param save_to_csv: If True, saves the profile data to a CSV file.
         """
-        profile_data: dict = self.api.get_profile(
+        profile_data: dict = self._api.get_profile(
             profile_type=profile_type, profile_source=profile_source
         )
-        
+
         if profile_data:
             if profile_type == "user_profile":
                 formatted_profile: dict = data_broker(
@@ -143,7 +154,10 @@ class Masonry:
                 additional_data: list = [
                     (
                         profile_data.get("subreddit").get("display_name"),
-                        data_broker(profile_data.get("subreddit"), data_file="user/subreddit.json"),
+                        data_broker(
+                            profile_data.get("subreddit"),
+                            data_file="user/subreddit.json",
+                        ),
                     ),
                     (
                         "Verification",
@@ -210,13 +224,15 @@ class Masonry:
                 filename=f"{profile_source}_{profile_type.upper()}",
             )
 
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
     def post_data_tree(
-            self,
-            post_id: str,
-            post_subreddit: str,
-            sort: str,
-            limit: int,
-            save_to_json: bool,
+        self,
+        post_id: str,
+        post_subreddit: str,
+        comments_limit: int,
+        comments_sort: str,
+        save_to_json: bool,
     ):
         """
         Visualises a specific Reddit post's data in a tree structure.
@@ -225,16 +241,16 @@ class Masonry:
 
         :param post_id: ID of the post to visualise.
         :param post_subreddit: Subreddit of the post.
-        :param sort: Criterion to sort the post data.
-        :param limit: The maximum number of items (comments/awards) to retrieve.
+        :param comments_sort: Criterion to sort the comments data by.
+        :param comments_limit: The maximum number of comments to retrieve.
         :param save_to_json: If True, saves the post data to a JSON file.
         """
 
-        (raw_data, post_data, comments_list) = self.api.get_post_data(
+        (raw_data, post_data, comments_list) = self._api.get_post_data(
             post_id=post_id,
             subreddit=post_subreddit,
-            comments_sort_criterion=sort,
-            comments_limit=limit,
+            comments_sort=comments_sort,
+            comments_limit=comments_limit,
         )
 
         if post_data:
@@ -273,14 +289,16 @@ class Masonry:
                 filename=f"{post_data.get('id')}_POST_DATA",
             )
 
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
     def posts_tree(
-            self,
-            sort_criterion: str,
-            posts_limit: int,
-            posts_type: str,
-            save_to_json: bool = False,
-            posts_source: str = None,
-            show_author: bool = False,
+        self,
+        sort_criterion: str,
+        posts_limit: int,
+        posts_type: str,
+        save_to_json: bool = False,
+        posts_source: str = None,
+        show_author: bool = False,
     ):
         """
         Visualises Reddit posts' data from a specified source into a tree structure.
@@ -294,8 +312,8 @@ class Masonry:
         :param posts_source: Source of the posts' data.
         :param show_author: If True, includes the author's username in the visualisation.
         """
-        posts_list: list = self.api.get_posts(
-            posts_sort_criterion=sort_criterion,
+        posts_list: list = self._api.get_posts(
+            posts_sort=sort_criterion,
             posts_limit=posts_limit,
             posts_type=posts_type,
             posts_source=posts_source,
@@ -335,13 +353,17 @@ class Masonry:
                 save_to_json=save_to_json,
                 filename=f"{posts_source}_{posts_type.upper()}",
             )
+        else:
+            log.info(f"No '{posts_type}' found for '{posts_source}'.")
+
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
     def user_comments_tree(
-            self,
-            username: str,
-            sort_criterion: str,
-            comments_limit: int,
-            save_to_json: bool,
+        self,
+        username: str,
+        sort_criterion: str,
+        comments_limit: int,
+        save_to_json: bool,
     ):
         """
         Visualises a Reddit user's comments in a tree structure.
@@ -353,8 +375,8 @@ class Masonry:
         :param comments_limit: The maximum number of comments to visualise.
         :param save_to_json: If True, saves the comments data to a JSON file.
         """
-        comments_list: list = self.api.get_posts(
-            posts_sort_criterion=sort_criterion,
+        comments_list: list = self._api.get_posts(
+            posts_sort=sort_criterion,
             posts_limit=comments_limit,
             posts_type="user_comments",
             posts_source=username,
@@ -384,3 +406,7 @@ class Masonry:
                 save_to_json=save_to_json,
                 filename=f"{username}_COMMENTS",
             )
+        else:
+            log.info(f"No comments found for user '{username}'")
+
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
