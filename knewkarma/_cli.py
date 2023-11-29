@@ -12,6 +12,8 @@ from ._coreutils import log, path_finder
 from ._masonry import Masonry
 from ._parser import create_parser, version
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
 parser = create_parser()
 arguments: argparse = parser.parse_args()
 tree_masonry: Masonry = Masonry(api=api)
