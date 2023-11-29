@@ -11,7 +11,7 @@ version: str = "3.0.0.0"
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 description: str = f"""
-# Knew Karma {version}
+# Knew Karma CLI {version}
 > A **Reddit** Data Analysis Toolkit."""
 epilog: str = f"""
 # by [{author}]({about})

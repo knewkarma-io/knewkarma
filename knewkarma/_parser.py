@@ -46,10 +46,10 @@ def create_parser() -> argparse.ArgumentParser:
         choices=["WALL", "CPU"],
     )
     parser.add_argument(
-        "-psc",
-        "--prof-sort",
-        dest="prof_sort_criterion",
-        help="profiler output sort criterion (default: %(default)s)",
+        "-pss",
+        "--prof-stats-sort",
+        dest="prof_stats_sort",
+        help="profiler stats sort criterion (default: %(default)s)",
         default="ncall",
         choices=[
             "ttot",
