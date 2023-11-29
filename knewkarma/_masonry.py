@@ -7,8 +7,8 @@ from rich import print as xprint
 from rich.text import Text
 from rich.tree import Tree
 
-from . import Api
 from ._coreutils import convert_timestamp_to_datetime, data_broker, save_data, log
+from .api import Api
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

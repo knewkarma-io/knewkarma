@@ -29,6 +29,7 @@ python = "^3.10"
 aiohttp = "*"
 rich = "*"
 rich-argparse = "*"
+yappi = "*"
 
 [tool.poetry.scripts]
 knewkarma = "knewkarma._cli:run_cli"
