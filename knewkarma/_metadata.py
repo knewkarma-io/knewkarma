@@ -10,15 +10,11 @@ version: str = "3.0.0.0"
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-description: str = """
-# Knew Karma
+description: str = f"""
+# Knew Karma {version}
 > A **Reddit** Data Analysis Toolkit."""
 epilog: str = f"""
-> Call `knewkarma` without command-line arguments to invoke an interactive command-line interface.
->> Calling it with only the `-d/--debug` flag will invoke an interactive command-line interface in debug mode.
-
 # by [{author}]({about})
-
 ```
 MIT License
 
@@ -131,19 +127,6 @@ knewkarma --sort top --limit 20 search QUERY_STRING
 """
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-OPERATION_MODES: list = ["user", "subreddit", "post", "posts", "search", "quit"]
-DEFAULT_DATA_LIMIT: int = 100
-DATA_SORT_CRITERION: list = [
-    "all",
-    "controversial",
-    "new",
-    "top",
-    "best",
-    "hot",
-    "rising",
-]
-POST_LISTINGS: list = ["all", "best", "controversial", "popular", "rising"]
 
 # Construct path to the program's directory
 PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma"))

@@ -6,14 +6,11 @@ import aiohttp
 
 from ._coreutils import log
 from ._metadata import (
-    DEFAULT_DATA_LIMIT,
     version,
 )
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
 class Api:
     def __init__(self, base_reddit_endpoint: str, pypi_project_endpoint: str):
         """
@@ -101,7 +98,7 @@ class Api:
             if release.get("name") != "knewkarma":
                 log.critical(
                     f"PyPI project endpoint was modified "
-                    f"{self._pypi_project_endpoint}: knewkarma/__init__.py: Line 7"
+                    f"{self._pypi_project_endpoint}: knewkarma/__init__.py: Line 15"
                 )
                 sys.exit()
 
@@ -184,26 +181,27 @@ class Api:
     async def _paginate_posts(
         self,
         posts_endpoint: str,
-        posts_limit: int = DEFAULT_DATA_LIMIT,
-        after: str = None,
+        limited_to: int,
     ) -> list:
         """
-        Paginates through posts data and retrieves posts until the specified limit is reached.
+        Paginates through posts' data and retrieves posts until the specified limit is reached.
 
         :param posts_endpoint: API endpoint for retrieving posts.
-        :param posts_limit: Limit on the number of posts to retrieve.
-        :param after: The 'after' parameter to paginate through posts.
+        :param limited_to: Limit of the number of posts to retrieve.
         :return: A list of posts.
         """
-        all_posts = []
-        use_after = posts_limit > 100  # Determine whether to use the 'after' parameter
+        all_posts: list = []
+        last_post_id: str = ""
 
-        while len(all_posts) < posts_limit:
+        # Determine whether to use the 'after' parameter
+        use_after: bool = limited_to > 100
+
+        while len(all_posts) < limited_to:
             # Make the API request with the 'after' parameter if it's provided and the limit is more than 100
-            if use_after and after:
-                endpoint_with_after = f"{posts_endpoint}&after={after}"
+            if use_after and last_post_id:
+                endpoint_with_after: str = f"{posts_endpoint}&after={last_post_id}"
             else:
-                endpoint_with_after = posts_endpoint
+                endpoint_with_after: str = posts_endpoint
 
             posts_data: dict = await self._get_data(endpoint=endpoint_with_after)
             posts_children: list = posts_data.get("data", {}).get("children", [])
@@ -213,7 +211,9 @@ class Api:
                 break
 
             all_posts.extend(self._validate_data(data=posts_children))
-            after = all_posts[-1]["data"]["id"]
+
+            # We use the id of the last post in the list to paginate to the next posts
+            last_post_id: str = all_posts[-1]["data"]["id"]
 
         return all_posts
 
@@ -221,8 +221,8 @@ class Api:
 
     async def get_posts(
         self,
-        posts_limit: int = DEFAULT_DATA_LIMIT,
-        posts_sort: str = Literal[
+        limited_to: int = 100,
+        sorted_by: str = Literal[
             "all",
             "controversial",
             "new",
@@ -245,41 +245,41 @@ class Api:
         Retrieves posts from a specified source.
 
         :param posts_type: Type of posts to retrieve.
-        :param posts_source: Source from where the posts should be retrieved.
-        :param posts_sort: Criterion by which the posts should be sorted.
-        :param posts_limit: Limit on the number of posts to retrieve.
-        :return: A list of posts.
+        :param posts_source: Source from where the posts/comments should be retrieved.
+        :param sorted_by: Criterion by which the posts should be sorted.
+        :param limited_to: Limit of the number of posts/comments to retrieve.
+        :return: A list of posts/comments.
         """
         posts_type_map: list = [
             (
                 "user_posts",
                 f"{self._base_reddit_endpoint}/user/{posts_source}/submitted.json"
-                f"?sort={posts_sort}&limit={posts_limit}",
+                f"?sort={sorted_by}&limit={limited_to}",
             ),
             (
                 "user_comments",
                 f"{self._base_reddit_endpoint}/user/{posts_source}/comments.json"
-                f"?sort={posts_sort}&limit={posts_limit}",
+                f"?sort={sorted_by}&limit={limited_to}",
             ),
             (
                 "subreddit_posts",
                 f"{self._base_reddit_endpoint}/r/{posts_source}.json"
-                f"?sort={posts_sort}&limit={posts_limit}",
+                f"?sort={sorted_by}&limit={limited_to}",
             ),
             (
                 "search_posts",
                 f"{self._base_reddit_endpoint}/search.json"
-                f"?q={posts_source}&sort={posts_sort}&limit={posts_limit}",
+                f"?q={posts_source}&sort={sorted_by}&limit={limited_to}",
             ),
             (
                 "listing_posts",
                 f"{self._base_reddit_endpoint}/r/{posts_source}.json"
-                f"?sort={posts_sort}&limit={posts_limit}",
+                f"?sort={sorted_by}&limit={limited_to}",
             ),
             (
                 "front_page_posts",
                 f"{self._base_reddit_endpoint}/.json"
-                f"?sort={posts_sort}&limit={posts_limit}",
+                f"?sort={sorted_by}&limit={limited_to}",
             ),
         ]
         posts_endpoint: str = ""
@@ -287,10 +287,12 @@ class Api:
             if type_name == posts_type:
                 posts_endpoint = type_endpoint
 
-        all_posts = await self._paginate_posts(posts_endpoint, posts_limit)
+        all_posts = await self._paginate_posts(
+            posts_endpoint=posts_endpoint, limited_to=limited_to
+        )
 
-        # Return only the number of posts requested (posts_limit)
-        return all_posts[:posts_limit]
+        # Return only the number of posts requested (limited_to)
+        return all_posts[:limited_to]
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -298,7 +300,7 @@ class Api:
         self,
         subreddit: str,
         post_id: str,
-        comments_limit: int = DEFAULT_DATA_LIMIT,
+        comments_limit: int = 100,
         comments_sort: str = Literal[
             "all", "controversial", "new", "top", "best", "hot", "rising"
         ],
