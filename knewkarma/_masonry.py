@@ -17,8 +17,9 @@ from ._coreutils import convert_timestamp_to_datetime, data_broker, save_data, l
 class Masonry:
     def __init__(self, api: Api):
         """
-        Initialises the Masonry class by creating an API object for data retrieval.
-        The API endpoint is set for Reddit.
+        Initialises the Masonry class responsible for visualising API data into tree structures.
+
+        :param api: API object from which data will be retrieved.
         """
 
         self._api = api
@@ -131,17 +132,6 @@ class Masonry:
         save_to_json: bool = False,
         save_to_csv: bool = False,
     ):
-        """
-        Visualises a Reddit profile's data from a specified source into a tree structure.
-
-        This method
-        can handle different types of profiles like user or subreddit profiles.
-
-        :param profile_source: Source of the profile data.
-        :param profile_type: Type of the profile (e.g., 'user_profile', 'subreddit_profile').
-        :param save_to_json: If True, saves the profile data to a JSON file.
-        :param save_to_csv: If True, saves the profile data to a CSV file.
-        """
         profile_data: dict = await self._api.get_profile(
             profile_type=profile_type, profile_source=profile_source
         )
@@ -234,18 +224,6 @@ class Masonry:
         comments_sort: str,
         save_to_json: bool,
     ):
-        """
-        Visualises a specific Reddit post's data in a tree structure.
-
-        This method includes options to sort, limit, and show comments, as well as to save the data.
-
-        :param post_id: ID of the post to visualise.
-        :param post_subreddit: Subreddit of the post.
-        :param comments_sort: Criterion to sort the comments data by.
-        :param comments_limit: The maximum number of comments to retrieve.
-        :param save_to_json: If True, saves the post data to a JSON file.
-        """
-
         (raw_data, post_data, comments_list) = await self._api.get_post_data(
             post_id=post_id,
             subreddit=post_subreddit,
@@ -293,35 +271,23 @@ class Masonry:
 
     async def posts_tree(
         self,
-        sort_criterion: str,
-        posts_limit: int,
+        sorted_by: str,
+        limited_to: int,
         posts_type: str,
         save_to_json: bool = False,
         posts_source: str = None,
         show_author: bool = False,
     ):
-        """
-        Visualises Reddit posts' data from a specified source into a tree structure.
-
-        This method includes options to sort, limit, and save the number of posts visualised.
-
-        :param sort_criterion: Criterion to sort the posts.
-        :param posts_limit: The maximum number of posts to visualise.
-        :param posts_type: Type of posts to visualise (e.g., 'hot', 'new').
-        :param save_to_json: If True, saves the posts data to a JSON file.
-        :param posts_source: Source of the posts' data.
-        :param show_author: If True, includes the author's username in the visualisation.
-        """
         posts_list: list = await self._api.get_posts(
-            posts_sort=sort_criterion,
-            posts_limit=posts_limit,
+            sorted_by=sorted_by,
+            limited_to=limited_to,
             posts_type=posts_type,
             posts_source=posts_source,
         )
 
         if posts_list:
             posts_tree: Tree = self.create_tree(
-                tree_title=f"{posts_limit} {posts_type} - {datetime.now()}"
+                tree_title=f"{limited_to} {posts_type} - {datetime.now()}"
             )
 
             for post in posts_list:
@@ -361,30 +327,20 @@ class Masonry:
     async def user_comments_tree(
         self,
         username: str,
-        sort_criterion: str,
-        comments_limit: int,
+        sorted_by: str,
+        limited_to: int,
         save_to_json: bool,
     ):
-        """
-        Visualises a Reddit user's comments in a tree structure.
-
-        This method includes options to sort and limit the number of comments to visualise.
-
-        :param username: Username whose comments are to be visualised.
-        :param sort_criterion: Criterion to sort the comments.
-        :param comments_limit: The maximum number of comments to visualise.
-        :param save_to_json: If True, saves the comments data to a JSON file.
-        """
         comments_list: list = await self._api.get_posts(
-            posts_sort=sort_criterion,
-            posts_limit=comments_limit,
+            sorted_by=sorted_by,
+            limited_to=limited_to,
             posts_type="user_comments",
             posts_source=username,
         )
 
         if comments_list:
             comments_tree: Tree = self.create_tree(
-                tree_title=f"{username}'s {sort_criterion} {comments_limit} comments"
+                tree_title=f"{username}'s {sorted_by} {limited_to} comments"
             )
 
             for comment in comments_list:

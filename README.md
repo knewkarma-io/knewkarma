@@ -33,20 +33,20 @@ from pprint import pprint
 from knewkarma import api
 
 # Get user profile
-username = "automoderator"
-user_profile = api.get_profile(profile_type="user_profile", profile_source=username)
-pprint(user_profile)
+>> > username = "automoderator"
+>> > user_profile = api.get_profile(profile_type="user_profile", profile_source=username)
+>> > pprint(user_profile)
 
 # Get subreddit profile
-subreddit = "OSINT"
-subreddit_profile = api.get_profile(profile_type="subreddit_profile", profile_source=subreddit)
-pprint(subreddit_profile)
+>> > subreddit = "OSINT"
+>> > subreddit_profile = api.get_profile(profile_type="subreddit_profile", profile_source=subreddit)
+>> > pprint(subreddit_profile)
 
 # Get a post's data
-post_id = "12csg48"
-post_subreddit = "OSINT"
-post_data = api.get_post_data(post_id=post_id, subreddit=post_subreddit)
-pprint(post_data)
+>> > post_id = "12csg48"
+>> > post_subreddit = "OSINT"
+>> > post_data = api.get_post_data(post_id=post_id, subreddit=post_subreddit)
+>> > pprint(post_data)
 ```
 
 > More code examples/implementations are

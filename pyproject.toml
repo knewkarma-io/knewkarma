@@ -26,9 +26,9 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-requests = "*"
+aiohttp = "*"
 rich = "*"
 rich-argparse = "*"
 
 [tool.poetry.scripts]
-knewkarma = "knewkarma._knewkarma:on_call"
+knewkarma = "knewkarma._cli:run_cli"
