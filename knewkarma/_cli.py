@@ -5,7 +5,7 @@ import asyncio
 from datetime import datetime
 
 import aiohttp
-import rich
+from rich.pretty import pprint
 
 from ._coreutils import log, save_data, pathfinder
 from ._parser import create_parser, version
@@ -22,20 +22,27 @@ async def setup_cli(arguments: argparse.Namespace):
 
     :param arguments: Argparse namespace object  containing parsed command-line arguments.
     """
-    data_limit: int = arguments.limit
+    data_timeframe: str = arguments.timeframe
     data_sorting: str = arguments.limit
+    data_limit: int = arguments.limit
 
     user = RedditUser(
         username=arguments.username if hasattr(arguments, "username") else None,
-        data_limit=data_limit,
+        data_timeframe=data_timeframe,
         data_sort=data_sorting,
+        data_limit=data_limit,
     )
     subreddit = RedditSub(
         subreddit=arguments.subreddit if hasattr(arguments, "subreddit") else None,
-        data_limit=data_limit,
+        data_timeframe=data_timeframe,
         data_sort=data_sorting,
+        data_limit=data_limit,
     )
-    posts = RedditPosts(limit=data_limit, sort=data_sorting)
+    posts = RedditPosts(
+        timeframe=data_timeframe,
+        sort=data_sorting,
+        limit=data_limit,
+    )
 
     # Mapping of command-line commands to their respective functions
     function_mapping: dict = {
@@ -62,10 +69,11 @@ async def setup_cli(arguments: argparse.Namespace):
             ),
         ],
     }
-    async with aiohttp.ClientSession() as request_session:
-        await get_updates(session=request_session)
 
-        if arguments.mode in function_mapping:
+    if arguments.mode in function_mapping:
+        async with aiohttp.ClientSession() as request_session:
+            await get_updates(session=request_session)
+
             mode_action = function_mapping.get(arguments.mode)
             is_executed: bool = False
 
@@ -73,7 +81,7 @@ async def setup_cli(arguments: argparse.Namespace):
                 if getattr(arguments, action, False):
                     call_function = await function(session=request_session)
 
-                    rich.print(call_function)
+                    pprint(call_function, expand_all=True)
                     is_executed = True
 
                     pathfinder()

@@ -6,6 +6,7 @@ from typing import List
 import aiohttp
 
 from . import api
+from ._coreutils import timestamp_to_utc
 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -26,7 +27,7 @@ class User:
     comment_karma: int
     link_karma: int
     total_karma: int
-    created_at: int
+    created_at: str
     subreddit: dict
     raw_data: dict
 
@@ -40,12 +41,10 @@ class Subreddit:
     icon_img: str
     subreddit_type: str
     subscribers: int
-    active_users: int
+    current_active_users: int
     is_nsfw: bool
     language: str
-    header_title: str
-    header_size: list
-    header_img: str
+    created_at: str
     raw_data: dict
 
 
@@ -73,7 +72,7 @@ class Post:
     permalink: str
     is_locked: bool
     is_archived: bool
-    created_at: int
+    created_at: str
     raw_post: dict
 
 
@@ -92,7 +91,7 @@ class Comment:
     is_stickied: bool
     is_locked: bool
     is_archived: bool
-    create_at: int
+    created_at: str
     subreddit: str
     subreddit_type: str
     post_id: str
@@ -107,10 +106,17 @@ class Comment:
 class RedditUser:
     # -------------------------------------------------------------- #
 
-    def __init__(self, username: str, data_limit: int, data_sort: str):
+    def __init__(
+        self,
+        username: str,
+        data_timeframe: str,
+        data_sort: str,
+        data_limit: int,
+    ):
         self._username = username
-        self._data_limit = data_limit
+        self._data_timeframe = data_timeframe
         self._data_sort = data_sort
+        self._data_limit = data_limit
 
     # -------------------------------------------------------------- #
 
@@ -133,7 +139,7 @@ class RedditUser:
             link_karma=user_profile.get("link_karma"),
             total_karma=user_profile.get("total_karma"),
             subreddit=user_profile.get("subreddit"),
-            created_at=user_profile.get("created"),
+            created_at=timestamp_to_utc(timestamp=user_profile.get("created")),
             raw_data=user_profile,
         )
 
@@ -143,6 +149,7 @@ class RedditUser:
         user_posts: list = await api.get_posts(
             posts_type="user_posts",
             posts_source=self._username,
+            timeframe=self._data_timeframe,
             sort=self._data_sort,
             limit=self._data_limit,
             session=session,
@@ -157,8 +164,9 @@ class RedditUser:
         raw_comments: list = await api.get_posts(
             posts_type="user_comments",
             posts_source=self._username,
-            limit=self._data_limit,
+            timeframe=self._data_timeframe,
             sort=self._data_sort,
+            limit=self._data_limit,
             session=session,
         )
 
@@ -179,7 +187,7 @@ class RedditUser:
                 is_stickied=comment_data.get("stickied"),
                 is_locked=comment_data.get("locked"),
                 is_archived=comment_data.get("archived"),
-                create_at=comment_data.get("created"),
+                created_at=timestamp_to_utc(timestamp=comment_data.get("created")),
                 subreddit=comment_data.get("subreddit_name_prefixed"),
                 subreddit_type=comment_data.get("subreddit_type"),
                 post_id=comment_data.get("link_id"),
@@ -197,10 +205,13 @@ class RedditUser:
 class RedditSub:
     # -------------------------------------------------------------- #
 
-    def __init__(self, subreddit: str, data_limit: int, data_sort: str):
+    def __init__(
+        self, subreddit: str, data_timeframe: str, data_sort: str, data_limit: int
+    ):
         self._subreddit = subreddit
-        self._data_limit = data_limit
+        self._data_timeframe = data_timeframe
         self._data_sort = data_sort
+        self._data_limit = data_limit
 
     # -------------------------------------------------------------- #
 
@@ -219,12 +230,10 @@ class RedditSub:
             icon_img=subreddit_profile.get("icon_img"),
             subreddit_type=subreddit_profile.get("subreddit_type"),
             subscribers=subreddit_profile.get("subscribers"),
-            active_users=subreddit_profile.get("accounts_active"),
+            current_active_users=subreddit_profile.get("accounts_active"),
             is_nsfw=subreddit_profile.get("over18"),
             language=subreddit_profile.get("lang"),
-            header_title=subreddit_profile.get("header_title"),
-            header_img=subreddit_profile.get("header_img"),
-            header_size=subreddit_profile.get("header_size"),
+            created_at=timestamp_to_utc(timestamp=subreddit_profile.get("created")),
             raw_data=subreddit_profile,
         )
 
@@ -234,6 +243,7 @@ class RedditSub:
         subreddit_posts: list = await api.get_posts(
             posts_type="subreddit_posts",
             posts_source=self._subreddit,
+            timeframe=self._data_timeframe,
             sort=self._data_sort,
             limit=self._data_limit,
             session=session,
@@ -248,9 +258,15 @@ class RedditSub:
 class RedditPosts:
     # -------------------------------------------------------------- #
 
-    def __init__(self, limit: int, sort: str):
-        self._limit = limit
+    def __init__(
+        self,
+        timeframe: str,
+        sort: str,
+        limit: int,
+    ):
+        self._timeframe = timeframe
         self._sort = sort
+        self._limit = limit
 
     # -------------------------------------------------------------- #
 
@@ -282,10 +298,11 @@ class RedditPosts:
                 permalink=post_data.get("permalink"),
                 is_locked=post_data.get("locked"),
                 is_archived=post_data.get("archived"),
-                created_at=post_data.get("created_utc"),
+                created_at=timestamp_to_utc(timestamp=post_data.get("created")),
                 raw_post=post_data,
             )
             posts_list.append(post)
+
         return posts_list
 
     # -------------------------------------------------------------- #
@@ -294,8 +311,9 @@ class RedditPosts:
         search_posts: list = await api.get_posts(
             posts_type="search_posts",
             posts_source=query,
-            limit=self._limit,
+            timeframe=self._timeframe,
             sort=self._sort,
+            limit=self._limit,
             session=session,
         )
 
@@ -309,8 +327,9 @@ class RedditPosts:
         listing_posts: list = await api.get_posts(
             posts_type="listing_posts",
             posts_source=listings_name,
-            limit=self._limit,
+            timeframe=self._timeframe,
             sort=self._sort,
+            limit=self._limit,
             session=session,
         )
 
@@ -321,8 +340,9 @@ class RedditPosts:
     async def front_page(self, session: aiohttp.ClientSession) -> List[Post]:
         front_page_posts: list = await api.get_posts(
             posts_type="front_page_posts",
-            limit=self._limit,
+            timeframe=self._timeframe,
             sort=self._sort,
+            limit=self._limit,
             session=session,
         )
 
