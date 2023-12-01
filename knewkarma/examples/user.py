@@ -5,10 +5,16 @@ import aiohttp
 from knewkarma import RedditUser
 
 
-# Define an asynchronous function to fetch User
-async def async_user(username: str, data_limit: int, data_sort: str):
-    # Initialize a RedditUser object with the specified username, data limit, and sorting criteria
-    user = RedditUser(username=username, data_limit=data_limit, data_sort=data_sort)
+async def async_user(
+    username: str, data_timeframe: str, data_limit: int, data_sort: str
+):
+    # Initialize a RedditUser object with the specified username, data timeframe, limit, and sorting criteria
+    user = RedditUser(
+        username=username,
+        data_timeframe=data_timeframe,
+        data_limit=data_limit,
+        data_sort=data_sort,
+    )
 
     # Establish an asynchronous HTTP session
     async with aiohttp.ClientSession() as session:
@@ -27,4 +33,10 @@ async def async_user(username: str, data_limit: int, data_sort: str):
 
 
 # Run the asynchronous function with a specified username, data limit, and sorting parameter
-asyncio.run(async_user(username="automoderator", data_limit=100, data_sort="all"))
+# timeframes: ["all", "hour", "day", "month", "year"]
+# sorting: ["all", "controversial", "new", "top", "best", "hot", "rising"]
+asyncio.run(
+    async_user(
+        username="automoderator", data_timeframe="year", data_limit=100, data_sort="all"
+    )
+)

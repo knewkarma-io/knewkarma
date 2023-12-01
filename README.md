@@ -1,4 +1,4 @@
-![carbon](https://github.com/bellingcat/knewkarma/assets/74001397/ccc5f890-6c0a-49a4-a6f7-afd398924e7a)
+![carbon](https://github.com/bellingcat/knewkarma/assets/74001397/3c1b4238-ea12-4742-974c-14dadd3a280a)
 
 A **Reddit** Data Analysis Toolkit.
 
@@ -35,9 +35,9 @@ from knewkarma import RedditUser
 
 
 # Define an asynchronous function to fetch User
-async def async_user(username: str, data_limit: int, data_sort: str):
-    # Initialize a RedditUser object with the specified username, data limit, and sorting criteria
-    user = RedditUser(username=username, data_limit=data_limit, data_sort=data_sort)
+async def async_user(username: str, data_timeframe: str, data_limit: int, data_sort: str):
+    # Initialize a RedditUser object with the specified username, data timeframe, limit, and sorting criteria
+    user = RedditUser(username=username, data_timeframe=data_timeframe, data_limit=data_limit, data_sort=data_sort)
 
     # Establish an asynchronous HTTP session
     async with aiohttp.ClientSession() as session:
@@ -56,7 +56,9 @@ async def async_user(username: str, data_limit: int, data_sort: str):
 
 
 # Run the asynchronous function with a specified username, data limit, and sorting parameter
-asyncio.run(async_user(username="automoderator", data_limit=100, data_sort="all"))
+# timeframes: ["all", "hour", "day", "month", "year"]
+# sorting: ["all", "controversial", "new", "top", "best", "hot", "rising"]
+asyncio.run(async_user(username="automoderator", data_timeframe="year", data_limit=100, data_sort="all"))
 ```
 
 ### Get Subreddit Data
@@ -67,11 +69,10 @@ import aiohttp
 from knewkarma import RedditSub
 
 
-# Define an asynchronous function to fetch Subreddit data
-async def async_subreddit(subreddit_name: str, data_limit: int, data_sort: str):
-    # Initialize a RedditSub object with the specified subreddit, data limit, and sorting criteria
+async def async_subreddit(subreddit_name: str, data_timeframe: str, data_limit: int, data_sort: str):
+    # Initialize a RedditSub object with the specified subreddit, data timeframe, limit, and sorting criteria
     subreddit = RedditSub(
-        subreddit=subreddit_name, data_limit=data_limit, data_sort=data_sort
+        subreddit=subreddit_name, data_timeframe=data_timeframe, data_limit=data_limit, data_sort=data_sort
     )
 
     # Create an asynchronous HTTP session
@@ -87,8 +88,10 @@ async def async_subreddit(subreddit_name: str, data_limit: int, data_sort: str):
 
 
 # Run the asynchronous function with specified subreddit name, data limit, and sorting criteria
+# timeframes: ["all", "hour", "day", "month", "year"]
+# sorting: ["all", "controversial", "new", "top", "best", "hot", "rising"]
 asyncio.run(
-    async_subreddit(subreddit_name="MachineLearning", data_limit=100, data_sort="top")
+    async_subreddit(subreddit_name="MachineLearning", data_timeframe="year", data_limit=100, data_sort="top")
 )
 ````
 
@@ -100,10 +103,9 @@ import aiohttp
 from knewkarma import RedditPosts
 
 
-# Define an asynchronous function to fetch Reddit posts
-async def async_posts(limit: int, sort: str):
-    # Initialize RedditPosts with the specified limit and sorting criteria
-    posts = RedditPosts(limit=limit, sort=sort)
+async def async_posts(timeframe: str, limit: int, sort: str):
+    # Initialize RedditPosts with the specified timeframe, limit and sorting criteria
+    posts = RedditPosts(timeframe=timeframe, limit=limit, sort=sort)
 
     # Create an asynchronous HTTP session
     async with aiohttp.ClientSession() as session:
@@ -120,7 +122,9 @@ async def async_posts(limit: int, sort: str):
 
 
 # Run the asynchronous function with a specified limit and sorting parameter
-asyncio.run(async_posts(limit=100, sort="all"))
+# timeframes: ["all", "hour", "day", "month", "year"]
+# sorting: ["all", "controversial", "new", "top", "best", "hot", "rising"]
+asyncio.run(async_posts(timeframe="year", limit=100, sort="all"))
 ```
 
 </details>
