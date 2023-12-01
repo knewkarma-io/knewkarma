@@ -5,7 +5,7 @@ import asyncio
 from datetime import datetime
 
 import aiohttp
-import rich
+from rich.pretty import pprint
 
 from ._coreutils import log, save_data, pathfinder
 from ._parser import create_parser, version
@@ -81,7 +81,7 @@ async def setup_cli(arguments: argparse.Namespace):
                 if getattr(arguments, action, False):
                     call_function = await function(session=request_session)
 
-                    rich.print(call_function)
+                    pprint(call_function, expand_all=True)
                     is_executed = True
 
                     pathfinder()
