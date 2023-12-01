@@ -9,9 +9,7 @@ from ._metadata import (
     version,
     description,
     epilog,
-    post_example,
     posts_examples,
-    search_examples,
     user_examples,
     subreddit_examples,
     operations_description,
@@ -19,6 +17,8 @@ from ._metadata import (
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
 def create_parser() -> argparse.ArgumentParser:
     """
     Creates and configures an argument parser for the command line arguments.
@@ -34,7 +34,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--runtime-prof",
         dest="runtime_profiler",
-        help="enable runtime profiler.",
+        help="([bold][green]dev[/][/]) enable runtime profiler.",
         action="store_true",
     )
     parser.add_argument(
@@ -122,19 +122,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="Get subreddit posts",
     )
 
-    # Post parser
-    post_parser = subparsers.add_parser(
-        "post",
-        help="Post operations",
-        description=Markdown(
-            operations_description.format("Post"), style="argparse.text"
-        ),
-        epilog=Markdown(post_example),
-        formatter_class=RichHelpFormatter,
-    )
-    post_parser.add_argument("post_id", help="Post ID")
-    post_parser.add_argument("post_subreddit", help="Source subreddit")
-
     # Posts parser
     posts_parser = subparsers.add_parser(
         "posts",
@@ -144,6 +131,11 @@ def create_parser() -> argparse.ArgumentParser:
         ),
         epilog=Markdown(posts_examples),
         formatter_class=RichHelpFormatter,
+    )
+    posts_parser.add_argument(
+        "-s",
+        "--search",
+        help="Search posts",
     )
     posts_parser.add_argument(
         "-f",
@@ -158,18 +150,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="Get posts from a specified listing",
         choices=["best", "controversial", "popular", "rising"],
     )
-
-    # Search parser
-    search_parser = subparsers.add_parser(
-        "search",
-        help="Search posts",
-        description=Markdown(
-            operations_description.format("Search"), style="argparse.text"
-        ),
-        epilog=Markdown(search_examples),
-        formatter_class=RichHelpFormatter,
-    )
-    search_parser.add_argument("query", help="Search query")
 
     # Global parser
     parser.add_argument(

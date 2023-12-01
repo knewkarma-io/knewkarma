@@ -45,22 +45,17 @@ user_examples: str = """
 # Examples
 ## Get User Profile
 ```
-knewkarma user USERNAME --profile
+knewkarma user automoderator --profile
 ```
 
-## Get User Comments (unsorted and unlimited)
+## Get User Comments
 ```
-knewkarma user USERNAME --comments
-```
-
-## Get User Posts (unsorted and unlimited)
-```
-knewkarma user USERNAME --posts
+knewkarma user automoderator --comments
 ```
 
-## Get User Posts/Comments (sorted and limited)
+## Get User Posts
 ```
-knewkarma --sort top --limit 20 user USERNAME --comments/--posts
+knewkarma user automoderator --posts
 ```
 """
 
@@ -68,61 +63,30 @@ subreddit_examples: str = """
 # Examples
 ## Get Subreddit Profile
 ```
-knewkarma subreddit SUBREDDIT_NAME --profile
+knewkarma subreddit MachineLearning --profile
 ```
 
-## Get Subreddit Posts (unsorted and unlimited)
+## Get Subreddit Posts
 ```
-knewkarma subreddit SUBREDDIT_NAME --posts
-```
-
-## Get Subreddit Posts (sorted and limited)
-```
-knewkarma --sort new --limit 20 subreddit SUBREDDIT_NAME
-```
-
-"""
-
-post_example: str = """
-# Example
-```
-knewkarma post POST_ID SUBREDDIT_NAME
+knewkarma subreddit MachineLearning --posts
 ```
 """
 
 posts_examples: str = """
 # Examples
-## Get Posts from Reddit Front-Page (unsorted and unlimited)
+## Get Posts from Reddit Front-Page
 ```
 knewkarma posts --front-page
+```
+
+## Search posts
+```
+knewkarma posts --search "covid-19"
 ```
 
 ## Get Posts from A Specified Listing (unsorted and unlimited)
 ```
 knewkarma posts --listing best
-```
-
-## Get Posts from Reddit Front-Page (sorted and limited)
-```
-knewkarma --sort top --limit 20 posts --front-page
-```
-
-## Get Posts from A Specified Listing (sorted and limited)
-```
-knewkarma --sort top --limit 20 posts --listing best
-```
-"""
-
-search_examples: str = """
-# Examples
-## Search for Posts (unsorted and unlimited)
-```
-knewkarma search QUERY_STRING
-```
-
-## Search for Posts (sorted and limited)
-```
-knewkarma --sort top --limit 20 search QUERY_STRING
 ```
 """
 
@@ -130,9 +94,6 @@ knewkarma --sort top --limit 20 search QUERY_STRING
 
 # Construct path to the program's directory
 PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma"))
-
-# Construct path to the current file's directory
-CURRENT_FILE_DIRECTORY: str = os.path.dirname(os.path.abspath(__file__))
 
 # Construct paths to directories of CSV and JSON files.
 CSV_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "csv")

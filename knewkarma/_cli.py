@@ -3,17 +3,22 @@
 import argparse
 import asyncio
 from datetime import datetime
-from typing import Union, Callable, Dict
+from typing import Callable, Dict
+from uuid import uuid4
 
+import aiohttp
+import rich
 import yappi
 
-from . import api
-from ._coreutils import log
-from ._masonry import Masonry
+from ._coreutils import log, save_data, pathfinder
 from ._parser import create_parser, version
+from .api import get_updates
+from .base import RedditUser, RedditSub, RedditPosts
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
 def profiler(enable: bool, arguments: argparse):
     """
     Enables/Disables the profiler
@@ -35,9 +40,11 @@ def profiler(enable: bool, arguments: argparse):
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-def setup_cli(
-    cli_arguments: argparse,
-    argument_mapping: Dict[str, Union[Callable, Dict[str, Callable]]],
+
+
+async def setup_cli(
+    cli_arguments: argparse.Namespace,
+    argument_mapping: Dict[str, Dict[str, Callable]],
 ):
     # Create a custom Namespace object to store profiler options
     profiler_arguments = argparse.Namespace(
@@ -45,119 +52,100 @@ def setup_cli(
         stats_sort=cli_arguments.prof_stats_sort,
         clock_type=cli_arguments.prof_clock_type,
     )
+
     if cli_arguments.mode in argument_mapping:
-        mode_action: Union[dict, Callable] = argument_mapping.get(cli_arguments.mode)
+        mode_action = argument_mapping.get(cli_arguments.mode)
 
-        call_function: callable = None
+        for action_name, action_function in mode_action.items():
+            if getattr(cli_arguments, action_name, False):
+                profiler(enable=True, arguments=profiler_arguments)
 
-        if isinstance(mode_action, dict):
-            for action_name, action_function in mode_action.items():
-                if getattr(cli_arguments, action_name) and hasattr(
-                    cli_arguments, action_name
-                ):
-                    call_function = action_function
-                    break
-                else:
-                    log.warning(
-                        f"knewkarma {cli_arguments.mode}: missing one or more expected argument(s): "
-                        f"{list(mode_action.keys())}"
+                async with aiohttp.ClientSession() as session:
+                    await get_updates(session=session)
+
+                    function_data = (
+                        await action_function(session=session)
+                        if isinstance(await action_function(session=session), dict)
+                        else [
+                            data.__dict__
+                            for data in await action_function(session=session)
+                        ]
                     )
-                    break
-        elif callable(mode_action):
-            call_function = mode_action
-        else:
-            log.critical(
-                f"Unknown action type for {mode_action}: {type(mode_action).__name__}. "
-                f"Expected Dict or Callable."
-            )
 
-        profiler(enable=True, arguments=profiler_arguments)
-        asyncio.run(call_function())
-        profiler(enable=False, arguments=profiler_arguments)
+                    pathfinder()
+                    save_data(
+                        data=function_data,
+                        filename=f"{uuid4()}_{cli_arguments.mode.upper()}_{action_name}",
+                        save_to_json=cli_arguments.json,
+                        save_to_csv=cli_arguments.csv,
+                    )
+
+                    rich.print(function_data)
+
+                profiler(enable=False, arguments=profiler_arguments)
+                break
+        else:
+            log.warning(
+                f"knewkarma {cli_arguments.mode}: missing one or more expected argument(s)."
+            )
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
 def run_cli():
     parser = create_parser()
     arguments: argparse = parser.parse_args()
-    tree_masonry: Masonry = Masonry(api=api)
 
     data_limit: int = arguments.limit
     data_sorting: str = arguments.limit
-    save_to_json: bool = arguments.json
-    save_to_csv: bool = arguments.csv
+
+    user = RedditUser(
+        username=arguments.username if hasattr(arguments, "username") else None,
+        data_limit=data_limit,
+        data_sort=data_sorting,
+    )
+    subreddit = RedditSub(
+        subreddit=arguments.subreddit if hasattr(arguments, "subreddit") else None,
+        data_limit=data_limit,
+        data_sort=data_sorting,
+    )
+    posts = RedditPosts(limit=data_limit, sort=data_sorting)
 
     start_time: datetime = datetime.now()
     argument_mapping: dict = {
         "user": {
-            "profile": lambda: tree_masonry.profile_tree(
-                profile_type="user_profile",
-                profile_source=arguments.username,
-                save_to_json=save_to_json,
-                save_to_csv=save_to_csv,
+            "profile": lambda session: user.profile(
+                session=session,
             ),
-            "posts": lambda: tree_masonry.posts_tree(
-                posts_type="user_posts",
-                posts_source=arguments.username,
-                limited_to=data_limit,
-                sorted_by=data_sorting,
-                save_to_json=save_to_json,
+            "posts": lambda session: user.posts(
+                session=session,
             ),
-            "comments": lambda: tree_masonry.user_comments_tree(
-                username=arguments.username,
-                limited_to=data_limit,
-                sorted_by=data_sorting,
-                save_to_json=save_to_json,
+            "comments": lambda session: user.comments(
+                session=session,
             ),
         },
         "subreddit": {
-            "profile": lambda: tree_masonry.profile_tree(
-                profile_type="subreddit_profile",
-                profile_source=arguments.subreddit,
-                save_to_json=save_to_json,
-                save_to_csv=save_to_csv,
+            "profile": lambda session: subreddit.profile(
+                session=session,
             ),
-            "posts": lambda: tree_masonry.posts_tree(
-                posts_type="subreddit_posts",
-                posts_source=arguments.subreddit,
-                show_author=True,
-                limited_to=data_limit,
-                sorted_by=data_sorting,
-                save_to_json=save_to_json,
+            "posts": lambda session: subreddit.posts(
+                session=session,
             ),
         },
         "posts": {
-            "front_page": lambda: tree_masonry.posts_tree(
-                posts_type="front_page_posts",
-                show_author=True,
-                limited_to=data_limit,
-                sorted_by=data_sorting,
-                save_to_json=save_to_json,
+            "front_page": lambda session: posts.front_page(
+                session=session,
             ),
-            "listing": lambda: tree_masonry.posts_tree(
-                posts_type="listing_posts",
-                posts_source=arguments.listing,
-                show_author=True,
-                limited_to=data_limit,
-                sorted_by=data_sorting,
-                save_to_json=save_to_json,
+            "search": lambda session: posts.search(
+                query=arguments.search,
+                session=session,
+            ),
+            "listing": lambda session: posts.listing(
+                listings_name=arguments.listing,
+                session=session,
             ),
         },
-        "post": lambda: tree_masonry.post_data_tree(
-            post_id=arguments.post_id,
-            post_subreddit=arguments.post_subreddit,
-            comments_limit=data_limit,
-            comments_sort=data_sorting,
-            save_to_json=save_to_json,
-        ),
-        "search": lambda: tree_masonry.posts_tree(
-            posts_type="search_posts",
-            posts_source=arguments.query,
-            show_author=True,
-            limited_to=data_limit,
-            sorted_by=data_sorting,
-            save_to_json=save_to_json,
-        ),
     }
 
     if arguments.mode:
@@ -175,7 +163,9 @@ def run_cli():
                 f"[bold]Knew Karma CLI[/] {version} started at "
                 f"{start_time.strftime('%a %b %d %Y, %I:%M:%S %p')}..."
             )
-            setup_cli(cli_arguments=arguments, argument_mapping=argument_mapping)
+            asyncio.run(
+                setup_cli(cli_arguments=arguments, argument_mapping=argument_mapping)
+            )
         except KeyboardInterrupt:
             log.warning(f"User interruption detected ([yellow]Ctrl+C[/])")
         finally:
