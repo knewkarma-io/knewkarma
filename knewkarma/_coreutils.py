@@ -4,11 +4,9 @@ import csv
 import json
 import logging
 import os
-from datetime import datetime
-from typing import Union
+from typing import Union, List
 
 from ._metadata import (
-    CURRENT_FILE_DIRECTORY,
     CSV_DIRECTORY,
     JSON_DIRECTORY,
 )
@@ -18,59 +16,15 @@ from ._parser import create_parser
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def convert_timestamp_to_datetime(timestamp: float) -> str:
+def pathfinder():
     """
-    Converts a Unix timestamp to a formatted datetime string.
-
-    :param timestamp: The Unix timestamp to be converted.
-    :return: A formatted datetime string in the format "dd MMMM yyyy, hh:mm:ssAM/PM".
+    Creates file directories in the specified target_directory, if they don't already exist.
     """
-    utc_from_timestamp: datetime = datetime.fromtimestamp(timestamp)
-    datetime_object: utc_from_timestamp = utc_from_timestamp.strftime(
-        "%d %B %Y, %I:%M:%S%p"
-    )
-    return datetime_object
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-def data_broker(api_data: dict, data_file: str) -> dict:
-    """
-    Re-formats API data based on a key mapping from a JSON file.
-
-    :param api_data: A JSON object containing raw data from the API.
-    :param data_file: Path to the JSON file that contains the key mapping.
-
-    :returns: A re-formatted JSON object with human-readable keys.
-    """
-
-    # Construct path to the mapping data file
-    mapping_data_file: str = os.path.join(CURRENT_FILE_DIRECTORY, "data", data_file)
-
-    # Load the mapping from the specified file
-    with open(mapping_data_file, "r", encoding="utf-8") as file:
-        mapping_data: dict = json.load(file)
-
-    # Initialize an empty dictionary to hold the formatted data
-    formatted_data = {}
-
-    # Map API data to human-readable format using the mapping
-    for api_data_key, mapping_data_key in mapping_data.items():
-        formatted_data[mapping_data_key]: dict = api_data.get(api_data_key, "N/A")
-
-    return formatted_data
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-def path_finder():
-    """
-    Creates file directories if they don't already exist.
-    """
-    file_directories: list = [CSV_DIRECTORY, JSON_DIRECTORY]
-    for directory in file_directories:
+    directories: list = [
+        CSV_DIRECTORY,
+        JSON_DIRECTORY,
+    ]
+    for directory in directories:
         os.makedirs(directory, exist_ok=True)
 
 
@@ -78,7 +32,7 @@ def path_finder():
 
 
 def save_data(
-    data: Union[dict, list],
+    data: Union[dict, List[dict]],
     filename: str,
     save_to_json: bool = False,
     save_to_csv: bool = False,
@@ -86,34 +40,32 @@ def save_data(
     """
     Save the given data to JSON and/or CSV files based on the arguments.
 
-    :param data: The data to be saved, which is a list of dictionaries.
+    :param data: The data to be saved, which can be a dict or a list of dicts.
     :param filename: The base filename to use when saving.
     :param save_to_json: A boolean value to indicate whether to save data as a JSON file.
     :param save_to_csv: A boolean value to indicate whether to save data as a CSV file.
     """
-    # Save to JSON if save_json is True
     if save_to_json:
-        with open(os.path.join(JSON_DIRECTORY, f"{filename}.json"), "w") as json_file:
+        json_path = os.path.join(JSON_DIRECTORY, f"{filename}.json")
+        with open(json_path, "w") as json_file:
             json.dump(data, json_file, indent=4)
-        log.info(
-            f"{os.path.getsize(json_file.name)} bytes written to [link file://{json_file.name}]{json_file.name}"
-        )
+        log.info(f"{os.path.getsize(json_file.name)} bytes written to {json_file.name}")
 
-    # Save to CSV if save_csv is True
     if save_to_csv:
-        with open(
-            os.path.join(CSV_DIRECTORY, f"{filename}.csv"), "w", newline=""
-        ) as csv_file:
+        csv_path = os.path.join(CSV_DIRECTORY, f"{filename}.csv")
+        with open(csv_path, "w", newline="") as csv_file:
             writer = csv.writer(csv_file)
-            # Write the header based on keys from the first dictionary
-            header = data.keys()
-            writer.writerow(header)
-
-            # Write each row
-            writer.writerow(data.values())
-        log.info(
-            f"{os.path.getsize(csv_file.name)} bytes written to [link file://{csv_file.name}]{csv_file.name}"
-        )
+            if isinstance(data, dict):
+                writer.writerow(data.keys())
+                writer.writerow(data.values())
+            elif isinstance(data, list):
+                if data:
+                    writer.writerow(
+                        data[0].keys()
+                    )  # header from keys of the first item
+                    for item in data:
+                        writer.writerow(item.values())
+        log.info(f"{os.path.getsize(csv_file.name)} bytes written to {csv_file.name}")
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

@@ -1,15 +1,20 @@
 import asyncio
-from pprint import pprint
 
-from knewkarma import api
+import aiohttp
 
-posts_listing = "all"  # ["best", "controversial", "popular", "rising"]
+from knewkarma import RedditPosts
 
-if __name__ == "__main__":
-    front_page_posts = asyncio.run(api.get_posts(posts_type="front_page_posts"))
-    listing_posts = asyncio.run(
-        api.get_posts(posts_type="listing_posts", posts_source=posts_listing)
-    )
 
-    pprint(front_page_posts)
-    pprint(listing_posts)
+async def async_posts(limit: int, sort: str):
+    posts = RedditPosts(limit=limit, sort=sort)
+    async with aiohttp.ClientSession() as session:
+        front_page_posts = await posts.front_page(session=session)
+        listing_posts = await posts.listing(listings_name="best", session=session)
+        search_results = await posts.search(query="covid-19", session=session)
+
+        print(front_page_posts)
+        print(listing_posts)
+        print(search_results)
+
+
+asyncio.run(async_posts(limit=100, sort="all"))
