@@ -68,7 +68,7 @@ Public Class ApiHandler
 
 
     ''' <summary>
-    ''' Asynchronously retrieves posts from a specified source.
+    ''' Asynchronously retrieves posts from a specified source with pagination.
     ''' </summary>
     ''' <param name="sortCriterion">The criterion by which the posts should be sorted.</param>
     ''' <param name="postsLimit">The limit on the number of posts to retrieve.</param>
@@ -81,28 +81,49 @@ Public Class ApiHandler
                                        ByVal postsType As String,
                                        Optional ByVal postsSource As String = Nothing
                                    ) As Task(Of JArray)
-        Dim postsTypeMap As New List(Of Tuple(Of String, String)) From {
-            Tuple.Create("user_posts", $"{BASE_ENDPOINT}/user/{postsSource}/submitted.json?sort={sortCriterion}&limit={postsLimit}"),
-            Tuple.Create("user_comments", $"{BASE_ENDPOINT}/user/{postsSource}/comments.json?sort={sortCriterion}&limit={postsLimit}"),
-            Tuple.Create("subreddit_posts", $"{BASE_ENDPOINT}/r/{postsSource}.json?sort={sortCriterion}&limit={postsLimit}"),
-            Tuple.Create("search_posts", $"{BASE_ENDPOINT}/search.json?q={postsSource}&sort={sortCriterion}&limit={postsLimit}"),
-            Tuple.Create("listing_posts", $"{BASE_ENDPOINT}/r/{postsSource}.json?sort={sortCriterion}&limit={postsLimit}"),
-            Tuple.Create("front_page_posts", $"{BASE_ENDPOINT}/.json?sort={sortCriterion}&limit={postsLimit}")
+        Dim postsTypeMap As New Dictionary(Of String, String) From {
+            {"user_posts", $"{BASE_ENDPOINT}/user/{postsSource}/submitted.json?sort={sortCriterion}&limit={postsLimit}"},
+            {"user_comments", $"{BASE_ENDPOINT}/user/{postsSource}/comments.json?sort={sortCriterion}&limit={postsLimit}"},
+            {"subreddit_posts", $"{BASE_ENDPOINT}/r/{postsSource}.json?sort={sortCriterion}&limit={postsLimit}"},
+            {"search_posts", $"{BASE_ENDPOINT}/search.json?q={postsSource}&sort={sortCriterion}&limit={postsLimit}"},
+            {"listing_posts", $"{BASE_ENDPOINT}/r/{postsSource}.json?sort={sortCriterion}&limit={postsLimit}"},
+            {"front_page_posts", $"{BASE_ENDPOINT}/.json?sort={sortCriterion}&limit={postsLimit}"}
         }
 
-        Dim postsEndpoint As String = Nothing
+        If Not postsTypeMap.ContainsKey(postsType) Then
+            Throw New ArgumentException($"Invalid post type: {postsType}")
+        End If
 
-        For Each Type In postsTypeMap
-            If Type.Item1 = postsType Then
-                postsEndpoint = Type.Item2
-                Exit For
+        Dim postsEndpoint As String = postsTypeMap(postsType)
+        Return Await PaginatedPosts(postsEndpoint, postsLimit)
+    End Function
+
+    ''' <summary>
+    ''' Retrieves posts in a paginated manner until the specified limit is reached.
+    ''' </summary>
+    ''' <param name="endpoint">The API endpoint for retrieving posts.</param>
+    ''' <param name="limit">The limit on the number of posts to retrieve.</param>
+    ''' <returns>A Task(Of JArray) representing the asynchronous operation, which upon completion returns a JArray of posts.</returns>
+    Private Async Function PaginatedPosts(endpoint As String, limit As Integer) As Task(Of JArray)
+        Dim allPosts As New JArray()
+        Dim lastPostId As String = ""
+        Dim useAfter As Boolean = limit > 100
+
+        While allPosts.Count < limit
+            Dim endpointWithAfter As String = If(useAfter And Not String.IsNullOrEmpty(lastPostId), $"{endpoint}&after={lastPostId}", endpoint)
+            Dim postsData As JObject = Await AsyncGetData(endpoint:=endpointWithAfter)
+            Dim postsChildren As JArray = postsData("data")("children")
+
+            If postsChildren.Count = 0 Then
+                Exit While
             End If
-        Next
 
-        Dim posts As JObject = Await AsyncGetData(endpoint:=postsEndpoint)
+            allPosts.Merge(postsChildren)
 
-        Return If(posts IsNot Nothing AndAlso posts?("data") IsNot Nothing, posts?("data")?("children"), New JArray())
+            lastPostId = postsChildren.Last("data")("id").ToString()
+        End While
 
+        Return allPosts
     End Function
 
 
