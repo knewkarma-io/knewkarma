@@ -3,7 +3,6 @@
 import argparse
 import asyncio
 from datetime import datetime
-from typing import Callable, Dict, Tuple
 
 import aiohttp
 import rich
@@ -17,41 +16,12 @@ from .base import RedditUser, RedditSub, RedditPosts
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def setup_cli(
-    arguments: argparse.Namespace,
-    function_mapping: Dict[str, Tuple[str, Callable]],
-):
-    mode_action = function_mapping.get(arguments.mode)
-    is_executed: bool = False
-    for action, function in mode_action:
-        if getattr(arguments, action, False):
-            async with aiohttp.ClientSession() as session:
-                await get_updates(session=session)
-                call_function = await function(session=session)
+async def setup_cli(arguments: argparse.Namespace):
+    """
+    Sets up the command-line interface and executes the specified actions.
 
-                rich.print(call_function)
-                is_executed = True
-
-                pathfinder()
-                save_data(
-                    data=call_function,
-                    to_json=arguments.json,
-                    to_csv=arguments.csv,
-                )
-
-    if not is_executed:
-        log.warning(
-            f"knewkarma {arguments.mode}: missing one or more expected argument(s)."
-        )
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-def execute_cli():
-    parser = create_parser()
-    arguments: argparse = parser.parse_args()
-
+    :param arguments: Argparse namespace object  containing parsed command-line arguments.
+    """
     data_limit: int = arguments.limit
     data_sorting: str = arguments.limit
 
@@ -67,7 +37,7 @@ def execute_cli():
     )
     posts = RedditPosts(limit=data_limit, sort=data_sorting)
 
-    start_time: datetime = datetime.now()
+    # Mapping of command-line commands to their respective functions
     function_mapping: dict = {
         "user": [
             ("profile", lambda session: user.profile(session=session)),
@@ -92,7 +62,42 @@ def execute_cli():
             ),
         ],
     }
+    async with aiohttp.ClientSession() as request_session:
+        await get_updates(session=request_session)
 
+        if arguments.mode in function_mapping:
+            mode_action = function_mapping.get(arguments.mode)
+            is_executed: bool = False
+
+            for action, function in mode_action:
+                if getattr(arguments, action, False):
+                    call_function = await function(session=request_session)
+
+                    rich.print(call_function)
+                    is_executed = True
+
+                    pathfinder()
+                    save_data(
+                        data=call_function,
+                        to_json=arguments.json,
+                        to_csv=arguments.csv,
+                    )
+
+            if not is_executed:
+                log.warning(
+                    f"knewkarma {arguments.mode}: missing one or more expected argument(s)."
+                )
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
+def execute_cli():
+    """Main entrypoint for the Knew Karma command-line interface."""
+    parser = create_parser()
+    arguments: argparse = parser.parse_args()
+
+    start_time: datetime = datetime.now()
     if arguments.mode:
         print(
             """
@@ -100,22 +105,21 @@ def execute_cli():
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
         )
-        if arguments.mode in function_mapping:
-            try:
-                start_time: datetime = datetime.now()
 
-                log.info(
-                    f"[bold]Knew Karma CLI[/] {version} started at "
-                    f"{start_time.strftime('%a %b %d %Y, %I:%M:%S %p')}..."
-                )
-                asyncio.run(
-                    setup_cli(arguments=arguments, function_mapping=function_mapping)
-                )
-            except KeyboardInterrupt:
-                log.warning(f"User interruption detected ([yellow]Ctrl+C[/])")
-            finally:
-                log.info(f"Stopped in {datetime.now() - start_time} seconds.")
+        try:
+            start_time: datetime = datetime.now()
+
+            log.info(
+                f"[bold]Knew Karma CLI[/] {version} started at "
+                f"{start_time.strftime('%a %b %d %Y, %I:%M:%S %p')}..."
+            )
+            asyncio.run(setup_cli(arguments=arguments))
+        except KeyboardInterrupt:
+            log.warning(f"User interruption detected ([yellow]Ctrl+C[/])")
+        finally:
+            log.info(f"Stopped in {datetime.now() - start_time} seconds.")
     else:
+        # Display usage information if no mode is provided
         parser.print_usage()
 
 
