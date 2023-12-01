@@ -13,9 +13,6 @@
     <Compile Update="Windows\PostsWindow.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Windows\SubredditProfileWindow.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Update="Windows\UserProfileWindow.vb">
       <SubType>Form</SubType>
     </Compile>
