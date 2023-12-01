@@ -32,4 +32,4 @@ rich-argparse = "*"
 yappi = "*"
 
 [tool.poetry.scripts]
-knewkarma = "knewkarma._cli:run_cli"
+knewkarma = "knewkarma._cli:execute_cli"

@@ -5,7 +5,7 @@ import argparse
 from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
-from ._metadata import (
+from .metadata import (
     version,
     description,
     epilog,
@@ -25,80 +25,100 @@ def create_parser() -> argparse.ArgumentParser:
 
     :return: A configured argparse.ArgumentParser object ready to parse the command line arguments.
     """
+    # ---------------------------------------------------------- #
 
     parser = argparse.ArgumentParser(
         description=Markdown(description, style="argparse.text"),
         epilog=Markdown(epilog, style="argparse.text"),
         formatter_class=RichHelpFormatter,
     )
+    subparsers = parser.add_subparsers(
+        dest="mode", help="operation mode", required=False
+    )
     parser.add_argument(
-        "--runtime-prof",
-        dest="runtime_profiler",
-        help="([bold][green]dev[/][/]) enable runtime profiler.",
+        "-l",
+        "--limit",
+        type=int,
+        default=100,
+        help="(bulk) data output limit",
+    )
+
+    parser.add_argument(
+        "-s",
+        "--sort",
+        type=str,
+        default="all",
+        choices=[
+            "all",
+            "best",
+            "controversial",
+            "hot",
+            "new",
+            "rising",
+            "top",
+        ],
+        help="(bulk) data sort criterion",
+    )
+
+    parser.add_argument(
+        "-j",
+        "--json",
+        help="write output to a specified json file",
+    )
+    parser.add_argument(
+        "-c",
+        "--csv",
+        help="write output to a specified csv file",
+    )
+    parser.add_argument(
+        "-d",
+        "--debug",
+        help="([bold][green]dev[/][/]) run knew karma in debug mode.",
         action="store_true",
     )
     parser.add_argument(
-        "-pct",
-        "--prof-clock-type",
-        dest="prof_clock_type",
-        help="set profiler clock type (default: %(default)s)",
-        default="CPU",
-        choices=["WALL", "CPU"],
-    )
-    parser.add_argument(
-        "-pss",
-        "--prof-stats-sort",
-        dest="prof_stats_sort",
-        help="profiler stats sort criterion (default: %(default)s)",
-        default="ncall",
-        choices=[
-            "ttot",
-            "tsub",
-            "tavg",
-            "ncall",
-            "name",
-            "lineno",
-            "builtin",
-            "threadid",
-            "tt_perc",
-            "tsub_perc",
-        ],
-    )
-    subparsers = parser.add_subparsers(
-        dest="mode", help="Operation mode", required=False
+        "-v",
+        "--version",
+        version=f"Knew Karma {version}",
+        action="version",
     )
 
-    # User parser
+    # ---------------------------------------------------------- #
+
     user_parser = subparsers.add_parser(
         "user",
-        help="User operations",
+        help="user operations",
         description=Markdown(
             operations_description.format("User"), style="argparse.text"
         ),
         epilog=Markdown(user_examples),
         formatter_class=RichHelpFormatter,
     )
-    user_parser.add_argument("username", help="Username to query")
+    user_parser.add_argument("username", help="username")
     user_parser.add_argument(
         "-p",
         "--profile",
         action="store_true",
-        help="Get user profile ([italic][green]default execution[/][/])",
+        help="get profile from the specified username",
     )
     user_parser.add_argument(
         "-c",
         "--comments",
         action="store_true",
-        help="Get user comments",
+        help="get comments from the specified username",
     )
     user_parser.add_argument(
-        "-pp", "--posts", action="store_true", help="Get user posts"
+        "-pp",
+        "--posts",
+        action="store_true",
+        help="get posts from the specified username",
     )
 
-    # Subreddit parser
+    # ---------------------------------------------------------- #
+
     subreddit_parser = subparsers.add_parser(
         "subreddit",
-        help="Subreddit operations",
+        help="subreddit operations",
         description=Markdown(
             operations_description.format("Subreddit"), style="argparse.text"
         ),
@@ -107,25 +127,26 @@ def create_parser() -> argparse.ArgumentParser:
     )
     subreddit_parser.add_argument(
         "subreddit",
-        help="Subreddit to query",
+        help="subreddit name",
     )
     subreddit_parser.add_argument(
         "-p",
         "--profile",
         action="store_true",
-        help="Get subreddit profile ([italic][green]default execution[/][/])",
+        help="get profile from the specified subreddit",
     )
     subreddit_parser.add_argument(
         "-pp",
         "--posts",
         action="store_true",
-        help="Get subreddit posts",
+        help="get posts from the specified subreddit",
     )
 
-    # Posts parser
+    # ---------------------------------------------------------- #
+
     posts_parser = subparsers.add_parser(
         "posts",
-        help="Posts operations",
+        help="posts operations",
         description=Markdown(
             operations_description.format("Posts"), style="argparse.text"
         ),
@@ -135,68 +156,20 @@ def create_parser() -> argparse.ArgumentParser:
     posts_parser.add_argument(
         "-s",
         "--search",
-        help="Search posts",
+        help="get posts that match a specified search query",
     )
     posts_parser.add_argument(
         "-f",
         "--front-page",
-        help="Get posts from Reddit Front-Page ([italic][green]default execution[/][/])",
+        help="get posts from the reddit front-page",
         action="store_true",
     )
     posts_parser.add_argument(
         "-l",
         "--listing",
         default="all",
-        help="Get posts from a specified listing",
+        help="get posts from a specified listing",
         choices=["best", "controversial", "popular", "rising"],
-    )
-
-    # Global parser
-    parser.add_argument(
-        "-s",
-        "--sort",
-        type=str,
-        default="all",
-        choices=[
-            "controversial",
-            "new",
-            "top",
-            "best",
-            "hot",
-            "rising",
-        ],
-        help="Bulk data sort criterion",
-    )
-    parser.add_argument(
-        "-l",
-        "--limit",
-        type=int,
-        default=100,
-        help="Bulk data output limit",
-    )
-    parser.add_argument(
-        "-j",
-        "--json",
-        help="Write data to a JSON file.",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-c",
-        "--csv",
-        help="Write data to a CSV file.",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-d",
-        "--debug",
-        help="Run Knew Karma in debug mode.",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-v",
-        "--version",
-        version=version,
-        action="version",
     )
 
     return parser

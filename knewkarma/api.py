@@ -5,22 +5,22 @@ from typing import Union, Literal
 import aiohttp
 
 from ._coreutils import log
-from ._metadata import (
+from .metadata import (
     version,
 )
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 BASE_REDDIT_ENDPOINT: str = "https://www.reddit.com"
-PYPI_PROJECT_ENDPOINT: str = "https://pypi.org/project/knewkarma/json"
+PYPI_PROJECT_ENDPOINT: str = "https://pypi.org/pypi/knewkarma/json"
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def _get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict, list]:
+async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict, list]:
     """
-    Fetches JSON data from a given API endpoint asynchronously using aiohttp.
+    Fetches JSON data from a given API endpoint.
 
     :param session: aiohttp session to use for the request.
     :param endpoint: The API endpoint to fetch data from.
@@ -54,26 +54,31 @@ async def _get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def _validate_data(data: Union[dict, list], valid_key: str = None) -> Union[dict, list]:
+def process_response(
+    response_data: Union[dict, list], valid_key: str = None
+) -> Union[dict, list]:
     """
-    Validates the input data. If it's a dictionary and a valid_key is provided,
-    checks for the presence of the key in the dictionary. If it's a list, it
-    ensures the list is not empty.
+    Processes and validates the API response data.
 
-    :param data: The data to validate, which should be a dictionary, list or set.
+    If it's a dictionary and a valid_key is provided,
+    checks for the presence of the key in the response dictionary.
+
+    If it's a list, it ensures the list is not empty.
+
+    :param response_data: The API response data to validate, which should be a dictionary or list.
     :param valid_key: The key to check for in the data if it's a dictionary.
     :return: The original data if valid, or an empty dictionary or list if invalid.
     """
-    if isinstance(data, dict):
+    if isinstance(response_data, dict):
         if valid_key:
-            return data if valid_key in data else {}
+            return response_data if valid_key in response_data else {}
         else:
-            return data  # Explicitly return the dictionary if valid_key is not provided
-    elif isinstance(data, list):
-        return data if data else []
+            return response_data  # Explicitly return the dictionary if valid_key is not provided
+    elif isinstance(response_data, list):
+        return response_data if response_data else []
     else:
         log.critical(
-            f"Unknown data type ({data}: {type(data).__name__}), expected a list or dict."
+            f"Unknown data type ({response_data}: {type(response_data)}), expected a list or dict."
         )
 
 
@@ -82,23 +87,18 @@ def _validate_data(data: Union[dict, list], valid_key: str = None) -> Union[dict
 
 async def get_updates(session: aiohttp.ClientSession):
     """
-    Gets and compares the current program version with the remote version
+    Gets and compares the current program version with the remote version.
+
     Assumes version format: major.minor.patch.prefix
+
+    :param session: aiohttp session to use for the request.
     """
-    import sys
 
     # Make a GET request to PyPI to get the project's latest release.
-    response: dict = await _get_data(endpoint=PYPI_PROJECT_ENDPOINT, session=session)
-    release: dict = _validate_data(data=response.get("info", {}))
+    response: dict = await get_data(endpoint=PYPI_PROJECT_ENDPOINT, session=session)
+    release: dict = process_response(response_data=response.get("info", {}))
 
     if release:
-        if release.get("name") != "knewkarma":
-            log.critical(
-                f"PyPI project endpoint was modified "
-                f"{PYPI_PROJECT_ENDPOINT}: knewkarma/__init__.py: Line 15"
-            )
-            sys.exit()
-
         remote_version: str = release.get("version")
         # Splitting the version strings into components
         remote_parts: list = remote_version.split(".")
@@ -147,6 +147,13 @@ async def get_profile(
     session: aiohttp.ClientSession,
     profile_type: str = Literal["user_profile", "subreddit_profile"],
 ) -> dict:
+    """
+    Gets profile data from the specified profile_type and profile_source.
+
+    :param profile_source: Source to get profile data from.
+    :param session: aiohttp session to use for the request.
+    :param profile_type: The type of profile that is to be fetched.
+    """
     # Use a dictionary for direct mapping
     source_map: dict = {
         "user_profile": f"{BASE_REDDIT_ENDPOINT}/user/{profile_source}/about.json",
@@ -154,13 +161,15 @@ async def get_profile(
     }
 
     # Get the endpoint directly from the dictionary
-    endpoint: str = source_map.get(profile_type, "user")
+    endpoint: str = source_map.get(profile_type, "")
 
     if not endpoint:
-        raise ValueError(f"Invalid source type: {profile_type}")
+        raise ValueError(f"Invalid profile type in {source_map}: {profile_type}")
 
-    profile = await _get_data(endpoint=endpoint, session=session)
-    return _validate_data(data=profile.get("data", {}), valid_key="created_utc")
+    profile_data = await get_data(endpoint=endpoint, session=session)
+    return process_response(
+        response_data=profile_data.get("data", {}), valid_key="created_utc"
+    )
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -188,6 +197,15 @@ async def get_posts(
     ],
     posts_source: str = None,
 ) -> list:
+    """
+    Gets a specified number of posts, with a specified sorting criterion, from the specified source.
+
+    :param session: aiohttp session to use for the request.
+    :param limit: Maximum number of posts to get.
+    :param sort: Posts' sort criterion.
+    :param posts_type: Type of posts to be fetched
+    :param posts_source: Source from where posts will be fetched.
+    """
     source_map = {
         "user_posts": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/submitted.json?sort={sort}&limit={limit}",
         "user_comments": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/comments.json?sort={sort}&limit={limit}",
@@ -200,9 +218,9 @@ async def get_posts(
     endpoint = source_map.get(posts_type, "")
 
     if not endpoint:
-        raise ValueError(f"Invalid posts type: {posts_type}")
+        raise ValueError(f"Invalid profile type in {source_map}: {posts_type}")
 
-    all_posts = await _paginate_posts(
+    all_posts = await paginated_posts(
         posts_endpoint=endpoint, limit=limit, session=session
     )
 
@@ -212,15 +230,16 @@ async def get_posts(
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def _paginate_posts(
+async def paginated_posts(
     posts_endpoint: str, limit: int, session: aiohttp.ClientSession
 ) -> list:
     """
-    Paginates through posts' data and retrieves posts until the specified limit is reached.
+    Paginates and retrieves posts until the specified limit is reached.
 
     :param posts_endpoint: API endpoint for retrieving posts.
     :param limit: Limit of the number of posts to retrieve.
-    :return: A list of posts.
+    :param session: aiohttp session to use for the request.
+    :return: A list of all posts.
     """
     all_posts: list = []
     last_post_id: str = ""
@@ -235,16 +254,14 @@ async def _paginate_posts(
         else:
             endpoint_with_after: str = posts_endpoint
 
-        posts_data: dict = await _get_data(
-            endpoint=endpoint_with_after, session=session
-        )
+        posts_data: dict = await get_data(endpoint=endpoint_with_after, session=session)
         posts_children: list = posts_data.get("data", {}).get("children", [])
 
         # If there are no more posts, break out of the loop
         if not posts_children:
             break
 
-        all_posts.extend(_validate_data(data=posts_children))
+        all_posts.extend(process_response(response_data=posts_children))
 
         # We use the id of the last post in the list to paginate to the next posts
         last_post_id: str = all_posts[-1].get("data").get("id")
