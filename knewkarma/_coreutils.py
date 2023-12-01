@@ -4,12 +4,29 @@ import csv
 import json
 import logging
 import os
+from datetime import datetime
 
 from ._parser import create_parser
 from .metadata import (
     CSV_DIRECTORY,
     JSON_DIRECTORY,
 )
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
+def timestamp_to_utc(timestamp: int) -> str:
+    """
+    Converts a UNIX timestamp to a formatted datetime.utc string.
+
+    :param timestamp: The UNIX timestamp to be converted.
+    :return: A formatted datetime.utc string in the format "dd MMMM yyyy, hh:mm:ssAM/PM"
+    """
+    utc_from_timestamp: datetime = datetime.utcfromtimestamp(timestamp)
+    datetime_string: str = utc_from_timestamp.strftime("%d %B %Y, %I:%M:%S%p")
+
+    return datetime_string
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

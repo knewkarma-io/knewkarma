@@ -109,19 +109,19 @@ async def get_updates(session: aiohttp.ClientSession):
         # Check for differences in version parts
         if remote_parts[0] != local_parts[0]:
             update_message = (
-                f"MAJOR update ({remote_version}) available."
+                f"MAJOR update ({remote_version}) available:"
                 f" It might introduce significant changes."
             )
 
         elif remote_parts[1] != local_parts[1]:
             update_message = (
-                f"MINOR update ({remote_version}) available."
+                f"MINOR update ({remote_version}) available:"
                 f" Includes small feature changes/improvements."
             )
 
         elif remote_parts[2] != local_parts[2]:
             update_message = (
-                f"PATCH update ({remote_version}) available."
+                f"PATCH update ({remote_version}) available:"
                 f" Generally for bug fixes and small tweaks."
             )
 
@@ -176,8 +176,9 @@ async def get_profile(
 
 
 async def get_posts(
-    session: aiohttp.ClientSession,
     limit: int,
+    session: aiohttp.ClientSession,
+    timeframe: str = Literal["all", "hour", "day", "week", "month", "year"],
     sort: str = Literal[
         "all",
         "controversial",
@@ -200,6 +201,7 @@ async def get_posts(
     """
     Gets a specified number of posts, with a specified sorting criterion, from the specified source.
 
+    :param timeframe: Timeframe from which to get posts.
     :param session: aiohttp session to use for the request.
     :param limit: Maximum number of posts to get.
     :param sort: Posts' sort criterion.
@@ -207,12 +209,14 @@ async def get_posts(
     :param posts_source: Source from where posts will be fetched.
     """
     source_map = {
-        "user_posts": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/submitted.json?sort={sort}&limit={limit}",
-        "user_comments": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/comments.json?sort={sort}&limit={limit}",
-        "subreddit_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?sort={sort}&limit={limit}",
-        "search_posts": f"{BASE_REDDIT_ENDPOINT}/search.json?q={posts_source}&sort={sort}&limit={limit}",
-        "listing_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?sort={sort}&limit={limit}",
-        "front_page_posts": f"{BASE_REDDIT_ENDPOINT}/.json?sort={sort}&limit={limit}",
+        "user_posts": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/"
+        f"submitted.json?sort={sort}&limit={limit}&t={timeframe}",
+        "user_comments": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/"
+        f"comments.json?sort={sort}&limit={limit}&t={timeframe}",
+        "subreddit_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?sort={sort}&limit={limit}&t={timeframe}",
+        "search_posts": f"{BASE_REDDIT_ENDPOINT}/search.json?q={posts_source}&sort={sort}&limit={limit}&t={timeframe}",
+        "listing_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?sort={sort}&limit={limit}&t={timeframe}",
+        "front_page_posts": f"{BASE_REDDIT_ENDPOINT}/.json?sort={sort}&limit={limit}&t={timeframe}",
     }
 
     endpoint = source_map.get(posts_type, "")

@@ -6,13 +6,13 @@ from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
 from .metadata import (
-    version,
     description,
     epilog,
     posts_examples,
     user_examples,
     subreddit_examples,
     operations_description,
+    version,
 )
 
 
@@ -40,9 +40,16 @@ def create_parser() -> argparse.ArgumentParser:
         "--limit",
         type=int,
         default=100,
-        help="(bulk) data output limit",
+        help="(bulk) data output limit (default: %(default)s)",
     )
-
+    parser.add_argument(
+        "-t",
+        "--timeframe",
+        type=str,
+        default="all",
+        choices=["all", "hour", "day", "week", "month", "year"],
+        help="timeframe to get (bulk) data from (default: %(default)s)",
+    )
     parser.add_argument(
         "-s",
         "--sort",
@@ -57,23 +64,25 @@ def create_parser() -> argparse.ArgumentParser:
             "rising",
             "top",
         ],
-        help="(bulk) data sort criterion",
+        help="(bulk) data sort criterion (default: %(default)s)",
     )
 
     parser.add_argument(
         "-j",
         "--json",
+        metavar="FILENAME",
         help="write output to a specified json file",
     )
     parser.add_argument(
         "-c",
         "--csv",
+        metavar="FILENAME",
         help="write output to a specified csv file",
     )
     parser.add_argument(
         "-d",
         "--debug",
-        help="([bold][green]dev[/][/]) run knew karma in debug mode.",
+        help="[bold][green]dev[/][/]: run knew karma in debug mode.",
         action="store_true",
     )
     parser.add_argument(
