@@ -24,13 +24,13 @@ Partial Class MainWindow
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
         Dim resources As ComponentModel.ComponentResourceManager = New ComponentModel.ComponentResourceManager(GetType(MainWindow))
-        Dim TreeNode8 As TreeNode = New TreeNode("Subreddit")
-        Dim TreeNode9 As TreeNode = New TreeNode("User")
-        Dim TreeNode10 As TreeNode = New TreeNode("Front Page")
-        Dim TreeNode11 As TreeNode = New TreeNode("Listings")
-        Dim TreeNode12 As TreeNode = New TreeNode("Search")
-        Dim TreeNode13 As TreeNode = New TreeNode("Posts", New TreeNode() {TreeNode10, TreeNode11, TreeNode12})
-        Dim TreeNode14 As TreeNode = New TreeNode("Username", New TreeNode() {TreeNode8, TreeNode9, TreeNode13})
+        Dim TreeNode1 As TreeNode = New TreeNode("Subreddit")
+        Dim TreeNode2 As TreeNode = New TreeNode("User")
+        Dim TreeNode3 As TreeNode = New TreeNode("Front Page")
+        Dim TreeNode4 As TreeNode = New TreeNode("Listings")
+        Dim TreeNode5 As TreeNode = New TreeNode("Search")
+        Dim TreeNode6 As TreeNode = New TreeNode("Posts", New TreeNode() {TreeNode3, TreeNode4, TreeNode5})
+        Dim TreeNode7 As TreeNode = New TreeNode("Username", New TreeNode() {TreeNode1, TreeNode2, TreeNode6})
         TextBoxQuery = New TextBox()
         ButtonSearch = New Button()
         ContextMenuStripRightClick = New ContextMenuStrip(components)
@@ -494,12 +494,13 @@ Partial Class MainWindow
         ' 
         NumericUpDownSearchResultLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownSearchResultLimit.Location = New Point(130, 41)
+        NumericUpDownSearchResultLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         NumericUpDownSearchResultLimit.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
         NumericUpDownSearchResultLimit.Name = "NumericUpDownSearchResultLimit"
         NumericUpDownSearchResultLimit.ReadOnly = True
         NumericUpDownSearchResultLimit.Size = New Size(79, 22)
         NumericUpDownSearchResultLimit.TabIndex = 17
-        NumericUpDownSearchResultLimit.Value = New Decimal(New Integer() {10, 0, 0, 0})
+        NumericUpDownSearchResultLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
         ' 
         ' GroupBoxFrontPageDataFiltering
         ' 
@@ -539,12 +540,13 @@ Partial Class MainWindow
         ' 
         NumericUpDownFrontPageDataLimit.Font = New Font("Segoe UI Variable Text Semibold", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownFrontPageDataLimit.Location = New Point(130, 41)
+        NumericUpDownFrontPageDataLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         NumericUpDownFrontPageDataLimit.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
         NumericUpDownFrontPageDataLimit.Name = "NumericUpDownFrontPageDataLimit"
         NumericUpDownFrontPageDataLimit.ReadOnly = True
         NumericUpDownFrontPageDataLimit.Size = New Size(79, 22)
         NumericUpDownFrontPageDataLimit.TabIndex = 17
-        NumericUpDownFrontPageDataLimit.Value = New Decimal(New Integer() {10, 0, 0, 0})
+        NumericUpDownFrontPageDataLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
         ' 
         ' ButtonFetchFrontPageData
         ' 
@@ -597,12 +599,13 @@ Partial Class MainWindow
         NumericUpDownSubredditPostsLimit.Enabled = False
         NumericUpDownSubredditPostsLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownSubredditPostsLimit.Location = New Point(130, 41)
+        NumericUpDownSubredditPostsLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         NumericUpDownSubredditPostsLimit.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
         NumericUpDownSubredditPostsLimit.Name = "NumericUpDownSubredditPostsLimit"
         NumericUpDownSubredditPostsLimit.ReadOnly = True
         NumericUpDownSubredditPostsLimit.Size = New Size(79, 22)
         NumericUpDownSubredditPostsLimit.TabIndex = 17
-        NumericUpDownSubredditPostsLimit.Value = New Decimal(New Integer() {10, 0, 0, 0})
+        NumericUpDownSubredditPostsLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
         ' 
         ' ButtonFetchSubredditData
         ' 
@@ -671,12 +674,13 @@ Partial Class MainWindow
         NumericUpDownUserDataLimit.Enabled = False
         NumericUpDownUserDataLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownUserDataLimit.Location = New Point(130, 41)
+        NumericUpDownUserDataLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         NumericUpDownUserDataLimit.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
         NumericUpDownUserDataLimit.Name = "NumericUpDownUserDataLimit"
         NumericUpDownUserDataLimit.ReadOnly = True
         NumericUpDownUserDataLimit.Size = New Size(79, 22)
         NumericUpDownUserDataLimit.TabIndex = 17
-        NumericUpDownUserDataLimit.Value = New Decimal(New Integer() {10, 0, 0, 0})
+        NumericUpDownUserDataLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
         ' 
         ' ButtonFetchUserData
         ' 
@@ -711,21 +715,21 @@ Partial Class MainWindow
         TreeView1.HotTracking = True
         TreeView1.Location = New Point(12, 12)
         TreeView1.Name = "TreeView1"
-        TreeNode8.Name = "childSubreddit"
-        TreeNode8.Text = "Subreddit"
-        TreeNode9.Name = "childUser"
-        TreeNode9.Text = "User"
-        TreeNode10.Name = "subchildFrontPage"
-        TreeNode10.Text = "Front Page"
-        TreeNode11.Name = "subchildListings"
-        TreeNode11.Text = "Listings"
-        TreeNode12.Name = "subchildSearch"
-        TreeNode12.Text = "Search"
-        TreeNode13.Name = "childPosts"
-        TreeNode13.Text = "Posts"
-        TreeNode14.Name = "MainRoot"
-        TreeNode14.Text = "Username"
-        TreeView1.Nodes.AddRange(New TreeNode() {TreeNode14})
+        TreeNode1.Name = "childSubreddit"
+        TreeNode1.Text = "Subreddit"
+        TreeNode2.Name = "childUser"
+        TreeNode2.Text = "User"
+        TreeNode3.Name = "subchildFrontPage"
+        TreeNode3.Text = "Front Page"
+        TreeNode4.Name = "subchildListings"
+        TreeNode4.Text = "Listings"
+        TreeNode5.Name = "subchildSearch"
+        TreeNode5.Text = "Search"
+        TreeNode6.Name = "childPosts"
+        TreeNode6.Text = "Posts"
+        TreeNode7.Name = "MainRoot"
+        TreeNode7.Text = "Username"
+        TreeView1.Nodes.AddRange(New TreeNode() {TreeNode7})
         TreeView1.ShowNodeToolTips = True
         TreeView1.Size = New Size(129, 186)
         TreeView1.TabIndex = 17
@@ -922,12 +926,13 @@ Partial Class MainWindow
         ' 
         NumericUpDownPostListingsLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownPostListingsLimit.Location = New Point(130, 41)
+        NumericUpDownPostListingsLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         NumericUpDownPostListingsLimit.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
         NumericUpDownPostListingsLimit.Name = "NumericUpDownPostListingsLimit"
         NumericUpDownPostListingsLimit.ReadOnly = True
         NumericUpDownPostListingsLimit.Size = New Size(79, 22)
         NumericUpDownPostListingsLimit.TabIndex = 17
-        NumericUpDownPostListingsLimit.Value = New Decimal(New Integer() {10, 0, 0, 0})
+        NumericUpDownPostListingsLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
         ' 
         ' GroupBoxPostListings
         ' 
@@ -991,7 +996,7 @@ Partial Class MainWindow
         NotifyIcon1.Text = "Knew Karma"
         NotifyIcon1.Visible = True
         ' 
-        ' Main
+        ' MainWindow
         ' 
         AccessibleRole = AccessibleRole.Window
         AutoScaleDimensions = New SizeF(7F, 16F)
@@ -1012,7 +1017,7 @@ Partial Class MainWindow
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         MaximizeBox = False
         MinimizeBox = False
-        Name = "Main"
+        Name = "MainWindow"
         StartPosition = FormStartPosition.CenterScreen
         ContextMenuStripRightClick.ResumeLayout(False)
         GroupBoxSearchResultsFiltering.ResumeLayout(False)
