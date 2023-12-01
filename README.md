@@ -1,83 +1,13 @@
-```
-┓┏┓         ┓┏┓         
-┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
-┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻
-```
+![carbon](https://github.com/bellingcat/knewkarma/assets/74001397/e6417166-9c55-4284-93ed-3489f096d0aa)
 
 A **Reddit** Data Analysis Toolkit.
 
 [![.Net](https://img.shields.io/badge/Visual%20Basic%20.NET-5C2D91?style=flat&logo=.net&logoColor=white)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3A%22Visual+Basic+.NET%22&type=code) [![Python](https://img.shields.io/badge/Python-3670A0?style=flat&logo=python&logoColor=ffdd54)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3APython&type=code) [![Docker](https://img.shields.io/badge/Dockefile-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3ADockerfile&type=code) [![PyPI - Version](https://img.shields.io/pypi/v/knewkarma?style=flat&logo=pypi&logoColor=ffdd54&label=PyPI&labelColor=3670A0&color=3670A0)](https://pypi.org/project/knewkarma)  [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/_rly0nheart)
+***
 
-## Feature Overview
+# Feature Overview
 
-### Knew Karma CLI/GUI
-
-<details>
-    <summary style="text-decoration: underline;">Preview </summary>
-
-```commandline
-Usage: knewkarma [-h] [--runtime-prof] [-pct {WALL,CPU}]
-                 [-pss {ttot,tsub,tavg,ncall,name,lineno,builtin,threadid,tt_perc,tsub_perc}]
-                 [-s {controversial,new,top,best,hot,rising}] [-l LIMIT] [-j]
-                 [-c] [-d] [-v]
-                 {user,subreddit,posts} ...
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃                           Knew Karma CLI                                   ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-▌ A Reddit Data Analysis Toolkit.
-
-Positional Arguments:
-  {user,subreddit,posts}
-                        Operation mode
-    user                User operations
-    subreddit           Subreddit operations
-    posts               Posts operations
-
-Options:
-  -h, --help            show this help message and exit
-  --runtime-prof        (dev) enable runtime profiler.
-  -pct, --prof-clock-type {WALL,CPU}
-                        set profiler clock type (default: CPU)
-  -pss, --prof-stats-sort {ttot,tsub,tavg,ncall,name,lineno,builtin,threadid,tt_perc,tsub_perc}
-                        profiler stats sort criterion (default: ncall)
-  -s, --sort {controversial,new,top,best,hot,rising}
-                        Bulk data sort criterion
-  -l, --limit LIMIT     Bulk data output limit
-  -j, --json            Write data to a JSON file.
-  -c, --csv             Write data to a CSV file.
-  -d, --debug           Run Knew Karma in debug mode.
-  -v, --version         show program's version number and exit
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃                              by Richard Mwewa                              ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
- MIT License
-
- Copyright © 2023 Richard Mwewa
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to dea
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in a
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
- SOFTWARE.
-```
-
-</details>
+## Knew Karma CLI/GUI
 
 - [x] **<ins>Knew Karma can get the following Reddit data from individual targets</ins>**:
     * **User**: *Profile*, *Posts*, *Comments*
@@ -91,12 +21,12 @@ Options:
     * **Dark Mode** (*GUI Automatic/Manual*)
     * **Write data to files** (*JSON/CSV*)
 
-### Knew Karma Python Library
+## Knew Karma Python Library
 
 <details>
     <summary style="text-decoration: underline;">Code Examples</summary>
 
-#### Get User Data
+### Get User Data
 
 ```python
 import asyncio
@@ -129,7 +59,7 @@ async def async_user(username: str, data_limit: int, data_sort: str):
 asyncio.run(async_user(username="automoderator", data_limit=100, data_sort="all"))
 ```
 
-#### Get Subreddit Data
+### Get Subreddit Data
 
 ````python
 import asyncio
@@ -162,7 +92,7 @@ asyncio.run(
 )
 ````
 
-#### Get Posts
+### Get Posts
 
 ```python
 import asyncio
@@ -195,7 +125,7 @@ asyncio.run(async_posts(limit=100, sort="all"))
 
 </details>
 
-## Documentation
+# Documentation
 
 *[Refer to the Wiki](https://github.com/bellingcat/knewkarma/wiki) for Installation, Usage and Uninstallation
 instructions.*
