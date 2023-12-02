@@ -119,7 +119,7 @@ def execute_cli():
 
             log.info(
                 f"[bold]Knew Karma CLI[/] {version} started at "
-                f"{start_time.strftime('%a %b %d %Y, %I:%M:%S %p')}..."
+                f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}..."
             )
             asyncio.run(setup_cli(arguments=arguments))
         except KeyboardInterrupt:
