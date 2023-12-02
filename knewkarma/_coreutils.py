@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 
 from ._parser import create_parser
-from .metadata import (
+from .project import (
     CSV_DIRECTORY,
     JSON_DIRECTORY,
 )

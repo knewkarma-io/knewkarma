@@ -5,9 +5,7 @@ from typing import Union, Literal
 import aiohttp
 
 from ._coreutils import log
-from .metadata import (
-    version,
-)
+from .project import version, about_author
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -33,7 +31,7 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
             endpoint,
             headers={
                 "User-Agent": f"Knew-Karma/{version} "
-                f"(Python {python_version}; +https://about.me/rly0nheart)"
+                f"(Python {python_version}; +{about_author})"
             },
         ) as response:
             if response.status == 200:
@@ -258,14 +256,16 @@ async def paginated_posts(
         else:
             endpoint_with_after: str = posts_endpoint
 
-        posts_data: dict = await get_data(endpoint=endpoint_with_after, session=session)
-        posts_children: list = posts_data.get("data", {}).get("children", [])
+        raw_posts_data: dict = await get_data(
+            endpoint=endpoint_with_after, session=session
+        )
+        posts_list: list = raw_posts_data.get("data", {}).get("children", [])
 
         # If there are no more posts, break out of the loop
-        if not posts_children:
+        if not posts_list:
             break
 
-        all_posts.extend(process_response(response_data=posts_children))
+        all_posts.extend(process_response(response_data=posts_list))
 
         # We use the id of the last post in the list to paginate to the next posts
         last_post_id: str = all_posts[-1].get("data").get("id")
