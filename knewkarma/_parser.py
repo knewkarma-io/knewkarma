@@ -5,7 +5,7 @@ import argparse
 from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
-from .metadata import (
+from .project import (
     description,
     epilog,
     posts_examples,
@@ -40,7 +40,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--limit",
         type=int,
         default=100,
-        help="(bulk) data output limit (default: %(default)s)",
+        help="[green]bulk data[/] output limit (default: %(default)s)",
     )
     parser.add_argument(
         "-t",
@@ -48,7 +48,7 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default="all",
         choices=["all", "hour", "day", "week", "month", "year"],
-        help="timeframe to get (bulk) data from (default: %(default)s)",
+        help="timeframe to get [green]bulk data[/] from (default: %(default)s)",
     )
     parser.add_argument(
         "-s",
@@ -64,7 +64,7 @@ def create_parser() -> argparse.ArgumentParser:
             "rising",
             "top",
         ],
-        help="(bulk) data sort criterion (default: %(default)s)",
+        help="[green]bulk data[/] sort criterion (default: %(default)s)",
     )
 
     parser.add_argument(
@@ -82,7 +82,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-d",
         "--debug",
-        help="[bold][green]dev[/][/]: run knew karma in debug mode.",
+        help="([bold][blue]dev[/][/]) run knew karma in debug mode",
         action="store_true",
     )
     parser.add_argument(
