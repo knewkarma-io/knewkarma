@@ -40,7 +40,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--limit",
         type=int,
         default=100,
-        help="[green]bulk data[/] output limit (default: %(default)s)",
+        help="([bold][green]bulk[/][/]) data output limit (default: %(default)s)",
     )
     parser.add_argument(
         "-t",
@@ -48,7 +48,7 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default="all",
         choices=["all", "hour", "day", "week", "month", "year"],
-        help="timeframe to get [green]bulk data[/] from (default: %(default)s)",
+        help="timeframe to get ([bold][green]bulk[/][/]) data from (default: %(default)s)",
     )
     parser.add_argument(
         "-s",
@@ -64,7 +64,7 @@ def create_parser() -> argparse.ArgumentParser:
             "rising",
             "top",
         ],
-        help="[green]bulk data[/] sort criterion (default: %(default)s)",
+        help="([bold][green]bulk[/][/]) sort criterion (default: %(default)s)",
     )
 
     parser.add_argument(
