@@ -42,10 +42,10 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
                 return {}
 
     except aiohttp.ClientConnectionError as error:
-        log.error(f"An HTTP error occurred: {error}")
+        log.error(f"An HTTP error occurred: [red]{error}[/]")
         return {}
     except Exception as error:
-        log.critical(f"An unknown error occurred: {error}")
+        log.critical(f"An unknown error occurred: [red]{error}[/]")
         return {}
 
 
