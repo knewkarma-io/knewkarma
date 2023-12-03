@@ -1,11 +1,11 @@
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 import argparse
 
 from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
-from .metadata import (
+from ._project import (
     description,
     epilog,
     posts_examples,
@@ -16,7 +16,7 @@ from .metadata import (
 )
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -25,7 +25,7 @@ def create_parser() -> argparse.ArgumentParser:
 
     :return: A configured argparse.ArgumentParser object ready to parse the command line arguments.
     """
-    # ---------------------------------------------------------- #
+    # -------------------------------------------------------------------- #
 
     parser = argparse.ArgumentParser(
         description=Markdown(description, style="argparse.text"),
@@ -40,7 +40,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--limit",
         type=int,
         default=100,
-        help="(bulk) data output limit (default: %(default)s)",
+        help="([bold][green]bulk[/][/]) data output limit (default: %(default)s)",
     )
     parser.add_argument(
         "-t",
@@ -48,7 +48,7 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default="all",
         choices=["all", "hour", "day", "week", "month", "year"],
-        help="timeframe to get (bulk) data from (default: %(default)s)",
+        help="timeframe to get ([bold][green]bulk[/][/]) data from (default: %(default)s)",
     )
     parser.add_argument(
         "-s",
@@ -64,25 +64,25 @@ def create_parser() -> argparse.ArgumentParser:
             "rising",
             "top",
         ],
-        help="(bulk) data sort criterion (default: %(default)s)",
+        help="([bold][green]bulk[/][/]) sort criterion (default: %(default)s)",
     )
 
     parser.add_argument(
         "-j",
         "--json",
         metavar="FILENAME",
-        help="write output to a specified json file",
+        help="write output to a json file",
     )
     parser.add_argument(
         "-c",
         "--csv",
         metavar="FILENAME",
-        help="write output to a specified csv file",
+        help="write output to a csv file",
     )
     parser.add_argument(
         "-d",
         "--debug",
-        help="[bold][green]dev[/][/]: run knew karma in debug mode.",
+        help="([bold][blue]dev[/][/]) run knew karma in debug mode",
         action="store_true",
     )
     parser.add_argument(
@@ -92,7 +92,7 @@ def create_parser() -> argparse.ArgumentParser:
         action="version",
     )
 
-    # ---------------------------------------------------------- #
+    # -------------------------------------------------------------------- #
 
     user_parser = subparsers.add_parser(
         "user",
@@ -123,7 +123,7 @@ def create_parser() -> argparse.ArgumentParser:
         help="get posts from the specified username",
     )
 
-    # ---------------------------------------------------------- #
+    # -------------------------------------------------------------------- #
 
     subreddit_parser = subparsers.add_parser(
         "subreddit",
@@ -151,7 +151,7 @@ def create_parser() -> argparse.ArgumentParser:
         help="get posts from the specified subreddit",
     )
 
-    # ---------------------------------------------------------- #
+    # -------------------------------------------------------------------- #
 
     posts_parser = subparsers.add_parser(
         "posts",
@@ -184,4 +184,4 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

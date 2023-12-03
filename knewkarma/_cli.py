@@ -2,6 +2,7 @@
 
 import argparse
 import asyncio
+import os
 from datetime import datetime
 
 import aiohttp
@@ -9,6 +10,7 @@ from rich.pretty import pprint
 
 from ._coreutils import log, save_data, pathfinder
 from ._parser import create_parser, version
+from ._project import PROGRAM_DIRECTORY
 from .api import get_updates
 from .base import RedditUser, RedditSub, RedditPosts
 
@@ -22,9 +24,13 @@ async def setup_cli(arguments: argparse.Namespace):
 
     :param arguments: Argparse namespace object  containing parsed command-line arguments.
     """
+    # -------------------------------------------------------------------- #
+
     data_timeframe: str = arguments.timeframe
     data_sorting: str = arguments.limit
     data_limit: int = arguments.limit
+
+    # -------------------------------------------------------------------- #
 
     user = RedditUser(
         username=arguments.username if hasattr(arguments, "username") else None,
@@ -43,6 +49,8 @@ async def setup_cli(arguments: argparse.Namespace):
         sort=data_sorting,
         limit=data_limit,
     )
+
+    # -------------------------------------------------------------------- #
 
     # Mapping of command-line commands to their respective functions
     function_mapping: dict = {
@@ -70,6 +78,8 @@ async def setup_cli(arguments: argparse.Namespace):
         ],
     }
 
+    # -------------------------------------------------------------------- #
+
     if arguments.mode in function_mapping:
         async with aiohttp.ClientSession() as request_session:
             await get_updates(session=request_session)
@@ -84,12 +94,26 @@ async def setup_cli(arguments: argparse.Namespace):
                     pprint(call_function, expand_all=True)
                     is_executed = True
 
-                    pathfinder()
-                    save_data(
-                        data=call_function,
-                        to_json=arguments.json,
-                        to_csv=arguments.csv,
-                    )
+                    # -------------------------------------------------------------------- #
+
+                    if arguments.csv or arguments.json:
+                        target_directory: str = os.path.join(
+                            PROGRAM_DIRECTORY, f"{arguments.mode}_{action}"
+                        )
+                        pathfinder(
+                            directories=[
+                                os.path.join(target_directory, "csv"),
+                                os.path.join(target_directory, "json"),
+                            ]
+                        )
+                        save_data(
+                            data=call_function,
+                            save_to_dir=target_directory,
+                            save_json=arguments.json,
+                            save_csv=arguments.csv,
+                        )
+
+                    # -------------------------------------------------------------------- #
 
             if not is_executed:
                 log.warning(
@@ -102,10 +126,15 @@ async def setup_cli(arguments: argparse.Namespace):
 
 def execute_cli():
     """Main entrypoint for the Knew Karma command-line interface."""
+
+    # -------------------------------------------------------------------- #
+
     parser = create_parser()
     arguments: argparse = parser.parse_args()
-
     start_time: datetime = datetime.now()
+
+    # -------------------------------------------------------------------- #
+
     if arguments.mode:
         print(
             """
@@ -114,18 +143,23 @@ def execute_cli():
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
         )
 
+        # -------------------------------------------------------------------- #
+
         try:
             start_time: datetime = datetime.now()
 
             log.info(
                 f"[bold]Knew Karma CLI[/] {version} started at "
-                f"{start_time.strftime('%a %b %d %Y, %I:%M:%S %p')}..."
+                f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}..."
             )
             asyncio.run(setup_cli(arguments=arguments))
         except KeyboardInterrupt:
             log.warning(f"User interruption detected ([yellow]Ctrl+C[/])")
         finally:
             log.info(f"Stopped in {datetime.now() - start_time} seconds.")
+
+        # -------------------------------------------------------------------- #
+
     else:
         # Display usage information if no mode is provided
         parser.print_usage()
