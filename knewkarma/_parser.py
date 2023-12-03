@@ -1,11 +1,11 @@
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 import argparse
 
 from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
-from .project import (
+from ._project import (
     description,
     epilog,
     posts_examples,
@@ -16,7 +16,7 @@ from .project import (
 )
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -25,7 +25,7 @@ def create_parser() -> argparse.ArgumentParser:
 
     :return: A configured argparse.ArgumentParser object ready to parse the command line arguments.
     """
-    # ---------------------------------------------------------- #
+    # -------------------------------------------------------------------- #
 
     parser = argparse.ArgumentParser(
         description=Markdown(description, style="argparse.text"),
@@ -71,13 +71,13 @@ def create_parser() -> argparse.ArgumentParser:
         "-j",
         "--json",
         metavar="FILENAME",
-        help="write output to a specified json file",
+        help="write output to a json file",
     )
     parser.add_argument(
         "-c",
         "--csv",
         metavar="FILENAME",
-        help="write output to a specified csv file",
+        help="write output to a csv file",
     )
     parser.add_argument(
         "-d",
@@ -92,7 +92,7 @@ def create_parser() -> argparse.ArgumentParser:
         action="version",
     )
 
-    # ---------------------------------------------------------- #
+    # -------------------------------------------------------------------- #
 
     user_parser = subparsers.add_parser(
         "user",
@@ -123,7 +123,7 @@ def create_parser() -> argparse.ArgumentParser:
         help="get posts from the specified username",
     )
 
-    # ---------------------------------------------------------- #
+    # -------------------------------------------------------------------- #
 
     subreddit_parser = subparsers.add_parser(
         "subreddit",
@@ -151,7 +151,7 @@ def create_parser() -> argparse.ArgumentParser:
         help="get posts from the specified subreddit",
     )
 
-    # ---------------------------------------------------------- #
+    # -------------------------------------------------------------------- #
 
     posts_parser = subparsers.add_parser(
         "posts",
@@ -184,4 +184,4 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

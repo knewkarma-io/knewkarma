@@ -5,7 +5,7 @@ from typing import Union, Literal
 import aiohttp
 
 from ._coreutils import log
-from .project import version, about_author
+from ._project import version, about_author
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -104,6 +104,8 @@ async def get_updates(session: aiohttp.ClientSession):
 
         update_message: str = ""
 
+        # ---------------------------------------------------------- #
+
         # Check for differences in version parts
         if remote_parts[0] != local_parts[0]:
             update_message = (
@@ -111,17 +113,23 @@ async def get_updates(session: aiohttp.ClientSession):
                 f" It might introduce significant changes."
             )
 
+        # ---------------------------------------------------------- #
+
         elif remote_parts[1] != local_parts[1]:
             update_message = (
                 f"MINOR update ({remote_version}) available:"
                 f" Includes small feature changes/improvements."
             )
 
+        # ---------------------------------------------------------- #
+
         elif remote_parts[2] != local_parts[2]:
             update_message = (
                 f"PATCH update ({remote_version}) available:"
                 f" Generally for bug fixes and small tweaks."
             )
+
+        # ---------------------------------------------------------- #
 
         elif (
             len(remote_parts) > 3
@@ -132,6 +140,8 @@ async def get_updates(session: aiohttp.ClientSession):
                 f"BUILD update ({remote_version}) available."
                 f" Might be for specific builds or special versions."
             )
+
+        # ---------------------------------------------------------- #
 
         if update_message:
             log.info(update_message)
@@ -250,11 +260,15 @@ async def paginated_posts(
     use_after: bool = limit > 100
 
     while len(all_posts) < limit:
+        # ---------------------------------------------------------- #
+
         # Make the API request with the 'after' parameter if it's provided and the limit is more than 100
         if use_after and last_post_id:
             endpoint_with_after: str = f"{posts_endpoint}&after={last_post_id}"
         else:
             endpoint_with_after: str = posts_endpoint
+
+        # ---------------------------------------------------------- #
 
         raw_posts_data: dict = await get_data(
             endpoint=endpoint_with_after, session=session
@@ -269,6 +283,8 @@ async def paginated_posts(
 
         # We use the id of the last post in the list to paginate to the next posts
         last_post_id: str = all_posts[-1].get("data").get("id")
+
+        # ---------------------------------------------------------- #
 
     return all_posts
 
