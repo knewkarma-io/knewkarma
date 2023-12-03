@@ -5,9 +5,7 @@ from typing import Union, Literal
 import aiohttp
 
 from ._coreutils import log
-from .metadata import (
-    version,
-)
+from ._project import version, about_author
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -33,7 +31,7 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
             endpoint,
             headers={
                 "User-Agent": f"Knew-Karma/{version} "
-                f"(Python {python_version}; +https://about.me/rly0nheart)"
+                f"(Python {python_version}; +{about_author})"
             },
         ) as response:
             if response.status == 200:
@@ -44,10 +42,10 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
                 return {}
 
     except aiohttp.ClientConnectionError as error:
-        log.error(f"An HTTP error occurred: {error}")
+        log.error(f"An HTTP error occurred: [red]{error}[/]")
         return {}
     except Exception as error:
-        log.critical(f"An unknown error occurred: {error}")
+        log.critical(f"An unknown error occurred: [red]{error}[/]")
         return {}
 
 
@@ -106,6 +104,8 @@ async def get_updates(session: aiohttp.ClientSession):
 
         update_message: str = ""
 
+        # ---------------------------------------------------------- #
+
         # Check for differences in version parts
         if remote_parts[0] != local_parts[0]:
             update_message = (
@@ -113,17 +113,23 @@ async def get_updates(session: aiohttp.ClientSession):
                 f" It might introduce significant changes."
             )
 
+        # ---------------------------------------------------------- #
+
         elif remote_parts[1] != local_parts[1]:
             update_message = (
                 f"MINOR update ({remote_version}) available:"
                 f" Includes small feature changes/improvements."
             )
 
+        # ---------------------------------------------------------- #
+
         elif remote_parts[2] != local_parts[2]:
             update_message = (
                 f"PATCH update ({remote_version}) available:"
                 f" Generally for bug fixes and small tweaks."
             )
+
+        # ---------------------------------------------------------- #
 
         elif (
             len(remote_parts) > 3
@@ -134,6 +140,8 @@ async def get_updates(session: aiohttp.ClientSession):
                 f"BUILD update ({remote_version}) available."
                 f" Might be for specific builds or special versions."
             )
+
+        # ---------------------------------------------------------- #
 
         if update_message:
             log.info(update_message)
@@ -252,23 +260,31 @@ async def paginated_posts(
     use_after: bool = limit > 100
 
     while len(all_posts) < limit:
+        # ---------------------------------------------------------- #
+
         # Make the API request with the 'after' parameter if it's provided and the limit is more than 100
         if use_after and last_post_id:
             endpoint_with_after: str = f"{posts_endpoint}&after={last_post_id}"
         else:
             endpoint_with_after: str = posts_endpoint
 
-        posts_data: dict = await get_data(endpoint=endpoint_with_after, session=session)
-        posts_children: list = posts_data.get("data", {}).get("children", [])
+        # ---------------------------------------------------------- #
+
+        raw_posts_data: dict = await get_data(
+            endpoint=endpoint_with_after, session=session
+        )
+        posts_list: list = raw_posts_data.get("data", {}).get("children", [])
 
         # If there are no more posts, break out of the loop
-        if not posts_children:
+        if not posts_list:
             break
 
-        all_posts.extend(process_response(response_data=posts_children))
+        all_posts.extend(process_response(response_data=posts_list))
 
         # We use the id of the last post in the list to paginate to the next posts
         last_post_id: str = all_posts[-1].get("data").get("id")
+
+        # ---------------------------------------------------------- #
 
     return all_posts
 

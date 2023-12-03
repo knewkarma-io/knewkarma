@@ -1,109 +1,20 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-from dataclasses import dataclass
 from typing import List
 
 import aiohttp
 
-from . import api
 from ._coreutils import timestamp_to_utc
-
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-@dataclass
-class User:
-    name: str
-    id: str
-    is_verified: bool
-    has_verified_email: bool
-    is_blocked: bool
-    is_gold: bool
-    is_mod: bool
-    is_employee: bool
-    hidden_from_bots: bool
-    accepts_followers: bool
-    comment_karma: int
-    link_karma: int
-    total_karma: int
-    created_at: str
-    subreddit: dict
-    raw_data: dict
-
-
-@dataclass
-class Subreddit:
-    name: str
-    id: str
-    description: str
-    submit_text: str
-    icon_img: str
-    subreddit_type: str
-    subscribers: int
-    current_active_users: int
-    is_nsfw: bool
-    language: str
-    created_at: str
-    raw_data: dict
-
-
-@dataclass
-class Post:
-    id: str
-    thumbnail: str
-    title: str
-    text: str
-    author: str
-    subreddit: str
-    subreddit_id: str
-    subreddit_type: str
-    upvotes: int
-    upvote_ratio: float
-    downvotes: int
-    gilded: int
-    is_nsfw: bool
-    is_shareable: bool
-    is_edited: bool
-    comments: int
-    hide_from_bots: bool
-    score: float
-    domain: str
-    permalink: str
-    is_locked: bool
-    is_archived: bool
-    created_at: str
-    raw_post: dict
-
-
-@dataclass
-class Comment:
-    id: str
-    text: str
-    author: str
-    upvotes: int
-    downvotes: int
-    is_nsfw: bool
-    is_edited: bool
-    score: float
-    hidden_score: bool
-    gilded: int
-    is_stickied: bool
-    is_locked: bool
-    is_archived: bool
-    created_at: str
-    subreddit: str
-    subreddit_type: str
-    post_id: str
-    post_title: str
-    author_is_premium: bool
-    raw_data: dict
+from .api import get_profile, get_posts
+from .data import User, Subreddit, Comment, Post
 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
 class RedditUser:
+    """Represents a Reddit user and provides methods for getting data from the specified user."""
+
     # -------------------------------------------------------------- #
 
     def __init__(
@@ -113,6 +24,16 @@ class RedditUser:
         data_sort: str,
         data_limit: int,
     ):
+        """
+        Initialises a RedditUser instance for getting profile, posts and comments data from the specified user.
+
+        :param username: Username of the user to get data from.
+        :param data_timeframe: The timeframe from which to get posts/comments
+            (choices: 'all', 'hour', 'day', 'week', 'month', 'year').
+        :param data_sort: Sort criterion for the retrieved posts/comments
+            (choices: 'all', 'best', 'controversial', 'hot', 'new', 'rising', 'top').
+        :param data_limit: The maximum number of user posts/comments to retrieve.
+        """
         self._username = username
         self._data_timeframe = data_timeframe
         self._data_sort = data_sort
@@ -121,7 +42,13 @@ class RedditUser:
     # -------------------------------------------------------------- #
 
     async def profile(self, session: aiohttp.ClientSession) -> User:
-        user_profile: dict = await api.get_profile(
+        """
+        Gets a user's profile data.
+
+        :param session: aiohttp session to use for the request.
+        :return: A User object containing user profile data.
+        """
+        user_profile: dict = await get_profile(
             profile_type="user_profile", profile_source=self._username, session=session
         )
         return User(
@@ -137,6 +64,7 @@ class RedditUser:
             accepts_followers=user_profile.get("accept_followers"),
             comment_karma=user_profile.get("comment_karma"),
             link_karma=user_profile.get("link_karma"),
+            awardee_karma=user_profile.get("awardee_karma"),
             total_karma=user_profile.get("total_karma"),
             subreddit=user_profile.get("subreddit"),
             created_at=timestamp_to_utc(timestamp=user_profile.get("created")),
@@ -146,7 +74,13 @@ class RedditUser:
     # -------------------------------------------------------------- #
 
     async def posts(self, session: aiohttp.ClientSession) -> List[Post]:
-        user_posts: list = await api.get_posts(
+        """
+        Gets a user's posts.
+
+        :param session: aiohttp session to use for the request.
+        :return: A list of Post objects, each containing a post's data.
+        """
+        user_posts: list = await get_posts(
             posts_type="user_posts",
             posts_source=self._username,
             timeframe=self._data_timeframe,
@@ -160,8 +94,14 @@ class RedditUser:
     # -------------------------------------------------------------- #
 
     async def comments(self, session: aiohttp.ClientSession) -> List[Comment]:
+        """
+        Gets a user's comments.
+
+        :param session: aiohttp session to use for the request.
+        :return:A list of Comment objects, each containing a comment's data.
+        """
         comments_list: list = []
-        raw_comments: list = await api.get_posts(
+        raw_comments: list = await get_posts(
             posts_type="user_comments",
             posts_source=self._username,
             timeframe=self._data_timeframe,
@@ -203,11 +143,23 @@ class RedditUser:
 
 
 class RedditSub:
+    """Represents a Subreddit and provides methods for getting data from the specified subreddit."""
+
     # -------------------------------------------------------------- #
 
     def __init__(
         self, subreddit: str, data_timeframe: str, data_sort: str, data_limit: int
     ):
+        """
+        Initialises a RedditSub instance for getting profile and posts from the specified subreddit.
+
+        :param subreddit: Name of the subreddit to get data from.
+        :param data_timeframe: The timeframe from which to get posts
+            (choices: 'all', 'hour', 'day', 'week', 'month', 'year').
+        :param data_sort: Sort criterion for the retrieved posts
+            (choices: 'all', 'best', 'controversial', 'hot', 'new', 'rising', 'top').
+        :param data_limit: The maximum number of subreddit posts to retrieve.
+        """
         self._subreddit = subreddit
         self._data_timeframe = data_timeframe
         self._data_sort = data_sort
@@ -216,7 +168,13 @@ class RedditSub:
     # -------------------------------------------------------------- #
 
     async def profile(self, session: aiohttp.ClientSession) -> Subreddit:
-        subreddit_profile: dict = await api.get_profile(
+        """
+        Gets a subreddit's profile data.
+
+        :param session: aiohttp session to use for the request.
+        :return: A Subreddit object containing subreddit profile data.
+        """
+        subreddit_profile: dict = await get_profile(
             profile_type="subreddit_profile",
             profile_source=self._subreddit,
             session=session,
@@ -240,7 +198,13 @@ class RedditSub:
     # -------------------------------------------------------------- #
 
     async def posts(self, session: aiohttp.ClientSession) -> List[Post]:
-        subreddit_posts: list = await api.get_posts(
+        """
+        Gets a subreddit's posts.
+
+        :param session: aiohttp session to use for the request.
+        :return: A list of Post objects, each containing a post's data.
+        """
+        subreddit_posts: list = await get_posts(
             posts_type="subreddit_posts",
             posts_source=self._subreddit,
             timeframe=self._data_timeframe,
@@ -256,6 +220,8 @@ class RedditSub:
 
 
 class RedditPosts:
+    """Represents Reddit posts and provides method for getting posts from various sources."""
+
     # -------------------------------------------------------------- #
 
     def __init__(
@@ -264,6 +230,15 @@ class RedditPosts:
         sort: str,
         limit: int,
     ):
+        """
+        Initializes a RedditPosts instance for getting posts from various sources.
+
+        :param timeframe: The timeframe from which to get posts
+            (choices: 'all', 'hour', 'day', 'week', 'month', 'year').
+        :param sort: Sort criterion for the retrieved posts
+            (choices: 'all', 'best', 'controversial', 'hot', 'new', 'rising', 'top').
+        :param limit: The maximum number of posts to retrieve.
+        """
         self._timeframe = timeframe
         self._sort = sort
         self._limit = limit
@@ -308,7 +283,14 @@ class RedditPosts:
     # -------------------------------------------------------------- #
 
     async def search(self, query: str, session: aiohttp.ClientSession) -> List[Post]:
-        search_posts: list = await api.get_posts(
+        """
+        Searches for posts on Reddit based on a search query.
+
+        :param query: Search query.
+        :param session: aiohttp session to use for the request.
+        :return: A list of Post objects, each containing a post's data.
+        """
+        search_posts: list = await get_posts(
             posts_type="search_posts",
             posts_source=query,
             timeframe=self._timeframe,
@@ -324,7 +306,15 @@ class RedditPosts:
     async def listing(
         self, listings_name: str, session: aiohttp.ClientSession
     ) -> List[Post]:
-        listing_posts: list = await api.get_posts(
+        """
+        Gets posts from a specified listing.
+
+        :param listings_name: name of listing to get posts from
+            (choices: 'all', 'best', 'controversial', 'popular', 'rising')
+        :param session: aiohttp session to use for the request.
+        :return: A list of Post objects, each containing a post's data.
+        """
+        listing_posts: list = await get_posts(
             posts_type="listing_posts",
             posts_source=listings_name,
             timeframe=self._timeframe,
@@ -338,7 +328,13 @@ class RedditPosts:
     # -------------------------------------------------------------- #
 
     async def front_page(self, session: aiohttp.ClientSession) -> List[Post]:
-        front_page_posts: list = await api.get_posts(
+        """
+        Gets posts from the Reddit front-page.
+
+        :param session: aiohttp session to use for the request.
+        :return: A list of Post objects, each containing a post's data.
+        """
+        front_page_posts: list = await get_posts(
             posts_type="front_page_posts",
             timeframe=self._timeframe,
             sort=self._sort,

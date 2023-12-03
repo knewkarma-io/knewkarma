@@ -1,20 +1,20 @@
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 import os
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 author: str = "Richard Mwewa"
-about: str = "https://about.me/rly0nheart"
-version: str = "3.1.0.0"
+about_author: str = "https://about.me/rly0nheart"
+version: str = "3.2.0.0"
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 description: str = f"""
 # Knew Karma CLI {version}
 > A **Reddit** Data Analysis Toolkit."""
 epilog: str = f"""
-# by [{author}]({about})
+# by [{author}]({about_author})
 ```
 MIT License
 
@@ -84,19 +84,15 @@ knewkarma posts --front-page
 knewkarma posts --search "covid-19"
 ```
 
-## Get Posts from A Specified Listing (unsorted and unlimited)
+## Get Posts from A Specified Listing
 ```
 knewkarma posts --listing best
 ```
 """
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 # Construct path to the program's directory
-PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma"))
+PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma-data"))
 
-# Construct paths to directories of CSV and JSON files.
-CSV_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "csv")
-JSON_DIRECTORY: str = os.path.join(PROGRAM_DIRECTORY, "json")
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
