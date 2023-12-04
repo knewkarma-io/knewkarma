@@ -62,8 +62,52 @@ Public Class ApiHandler
     ''' <summary>
     ''' Asynchronously fetches the program's update information from GitHub.
     ''' <summary>
-    Public Async Function AsyncGetUpdates() As Task(Of JObject)
-        Return Await AsyncGetData(endpoint:="https://api.github.com/repos/bellingcat/knewkarma/releases/latest")
+    Public Async Function AsyncGetUpdates() As Task
+        AboutWindow.Version.Text = "Checking for updates..."
+        ' Making an asynchronous request to check for updates.
+        Dim data As JObject = Await AsyncGetData(endpoint:="https://api.github.com/repos/rly0nheart/knewkarma/releases/latest")
+
+        ' Checking if data is not null before proceeding with extracting information from it.
+        If data IsNot Nothing Then
+            ' Extracting the tag name, body, and HTML URL from the data.
+            Dim tagName As String = data("tag_name")?.ToString
+
+            ' Checking if the current version is the latest version.
+            If tagName = My.Application.Info.Version.ToString Then
+                AboutWindow.Version.Text = $"Up-to-date: {My.Application.Info.Version}"
+            Else
+                AboutWindow.Version.Text = $"Updates found: {tagName}"
+                AboutWindow.ButtonGetUpdates.Enabled = True
+            End If
+        End If
+    End Function
+
+
+    ''' <summary>
+    ''' Asynchronously retrieves profile data from a specified source.
+    ''' </summary>
+    ''' <param name="profileType">The type of profile to retrieve.</param>
+    ''' <param name="profileSource">The source from where the profile should be fetched (e.g., specific user or subreddit).</param>
+    ''' <returns>A Task(Of JObject) representing the asynchronous operation, which upon completion returns a Jobject of profile data.</returns>
+    Public Async Function AsyncGetProfile(
+                                         profileType As String, profileSource As String) As Task(Of JObject)
+        Dim profileTypeMap As New List(Of Tuple(Of String, String)) From {
+            Tuple.Create("user_profile", $"{BASE_ENDPOINT}/user/{profileSource}/about.json"),
+            Tuple.Create("subreddit_profile", $"{BASE_ENDPOINT}/r/{profileSource}/about.json")
+        }
+
+        Dim profileEndpoint As String = Nothing
+
+        For Each Type In profileTypeMap
+            If Type.Item1 = profileType Then
+                profileEndpoint = Type.Item2
+                Exit For
+            End If
+        Next
+
+        Dim profile As JObject = Await AsyncGetData(endpoint:=profileEndpoint)
+
+        Return If(profile IsNot Nothing AndAlso profile?("data") IsNot Nothing, profile?("data"), New JObject())
     End Function
 
 
@@ -95,23 +139,13 @@ Public Class ApiHandler
         End If
 
         Dim postsEndpoint As String = postsTypeMap(postsType)
-        Return Await PaginatedPosts(postsEndpoint, postsLimit)
-    End Function
-
-    ''' <summary>
-    ''' Retrieves posts in a paginated manner until the specified limit is reached.
-    ''' </summary>
-    ''' <param name="endpoint">The API endpoint for retrieving posts.</param>
-    ''' <param name="limit">The limit on the number of posts to retrieve.</param>
-    ''' <returns>A Task(Of JArray) representing the asynchronous operation, which upon completion returns a JArray of posts.</returns>
-    Private Async Function PaginatedPosts(endpoint As String, limit As Integer) As Task(Of JArray)
         Dim allPosts As New JArray()
-        Dim lastPostId As String = ""
-        Dim useAfter As Boolean = limit > 100
+        Dim lastPostId As String = String.Empty
+        Dim paginatePosts As Boolean = postsLimit > 100
 
-        While allPosts.Count < limit
-            Dim endpointWithAfter As String = If(useAfter And Not String.IsNullOrEmpty(lastPostId), $"{endpoint}&after={lastPostId}", endpoint)
-            Dim postsData As JObject = Await AsyncGetData(endpoint:=endpointWithAfter)
+        While allPosts.Count < postsLimit
+            Dim paginationEndpoint As String = If(paginatePosts And Not String.IsNullOrEmpty(lastPostId), $"{postsEndpoint}&after={lastPostId}", postsEndpoint)
+            Dim postsData As JObject = Await AsyncGetData(endpoint:=paginationEndpoint)
             Dim postsChildren As JArray = postsData("data")("children")
 
             If postsChildren.Count = 0 Then
@@ -125,32 +159,5 @@ Public Class ApiHandler
 
         Return allPosts
     End Function
-
-
-    ''' <summary>
-    ''' Asynchronously retrieves profile data from a specified source.
-    ''' </summary>
-    ''' <param name="profileType">The type of profile to retrieve.</param>
-    ''' <param name="profileSource">The source from where the profile should be fetched (e.g., specific user or subreddit).</param>
-    ''' <returns>A Task(Of JObject) representing the asynchronous operation, which upon completion returns a Jobject of profile data.</returns>
-    Public Async Function AsyncGetProfile(
-                                         profileType As String, profileSource As String) As Task(Of JObject)
-        Dim profileTypeMap As New List(Of Tuple(Of String, String)) From {
-            Tuple.Create("user_profile", $"{BASE_ENDPOINT}/user/{profileSource}/about.json"),
-            Tuple.Create("subreddit_profile", $"{BASE_ENDPOINT}/r/{profileSource}/about.json")
-        }
-
-        Dim profileEndpoint As String = Nothing
-
-        For Each Type In profileTypeMap
-            If Type.Item1 = profileType Then
-                profileEndpoint = Type.Item2
-                Exit For
-            End If
-        Next
-
-        Dim profile As JObject = Await AsyncGetData(endpoint:=profileEndpoint)
-
-        Return If(profile IsNot Nothing AndAlso profile?("data") IsNot Nothing, profile?("data"), New JObject())
-    End Function
 End Class
+
