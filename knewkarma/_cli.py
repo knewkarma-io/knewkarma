@@ -113,6 +113,8 @@ async def setup_cli(arguments: argparse.Namespace):
                             save_csv=arguments.csv,
                         )
 
+                    break
+
                     # -------------------------------------------------------------------- #
 
             if not is_executed:
@@ -124,7 +126,7 @@ async def setup_cli(arguments: argparse.Namespace):
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def execute_cli():
+def execute():
     """Main entrypoint for the Knew Karma command-line interface."""
 
     # -------------------------------------------------------------------- #

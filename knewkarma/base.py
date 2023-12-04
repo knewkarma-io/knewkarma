@@ -4,7 +4,7 @@ from typing import List
 
 import aiohttp
 
-from ._coreutils import timestamp_to_utc
+from ._coreutils import unix_timestamp_to_utc
 from .api import get_profile, get_posts
 from .data import User, Subreddit, Comment, Post
 
@@ -67,7 +67,7 @@ class RedditUser:
             awardee_karma=user_profile.get("awardee_karma"),
             total_karma=user_profile.get("total_karma"),
             subreddit=user_profile.get("subreddit"),
-            created_at=timestamp_to_utc(timestamp=user_profile.get("created")),
+            created_at=unix_timestamp_to_utc(timestamp=user_profile.get("created")),
             raw_data=user_profile,
         )
 
@@ -127,7 +127,7 @@ class RedditUser:
                 is_stickied=comment_data.get("stickied"),
                 is_locked=comment_data.get("locked"),
                 is_archived=comment_data.get("archived"),
-                created_at=timestamp_to_utc(timestamp=comment_data.get("created")),
+                created_at=unix_timestamp_to_utc(timestamp=comment_data.get("created")),
                 subreddit=comment_data.get("subreddit_name_prefixed"),
                 subreddit_type=comment_data.get("subreddit_type"),
                 post_id=comment_data.get("link_id"),
@@ -191,7 +191,9 @@ class RedditSub:
             current_active_users=subreddit_profile.get("accounts_active"),
             is_nsfw=subreddit_profile.get("over18"),
             language=subreddit_profile.get("lang"),
-            created_at=timestamp_to_utc(timestamp=subreddit_profile.get("created")),
+            created_at=unix_timestamp_to_utc(
+                timestamp=subreddit_profile.get("created")
+            ),
             raw_data=subreddit_profile,
         )
 
@@ -273,7 +275,7 @@ class RedditPosts:
                 permalink=post_data.get("permalink"),
                 is_locked=post_data.get("locked"),
                 is_archived=post_data.get("archived"),
-                created_at=timestamp_to_utc(timestamp=post_data.get("created")),
+                created_at=unix_timestamp_to_utc(timestamp=post_data.get("created")),
                 raw_post=post_data,
             )
             posts_list.append(post)

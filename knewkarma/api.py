@@ -10,7 +10,9 @@ from ._project import version, about_author
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 BASE_REDDIT_ENDPOINT: str = "https://www.reddit.com"
-PYPI_PROJECT_ENDPOINT: str = "https://pypi.org/pypi/knewkarma/json"
+GITHUB_RELEASE_ENDPOINT: str = (
+    "https://api.github.com/repos/rly0nheart/knewkarma/releases/latest"
+)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -91,13 +93,18 @@ async def get_updates(session: aiohttp.ClientSession):
 
     :param session: aiohttp session to use for the request.
     """
+    import rich
+    from rich.markdown import Markdown
 
     # Make a GET request to PyPI to get the project's latest release.
-    response: dict = await get_data(endpoint=PYPI_PROJECT_ENDPOINT, session=session)
-    release: dict = process_response(response_data=response.get("info", {}))
+    response: dict = await get_data(endpoint=GITHUB_RELEASE_ENDPOINT, session=session)
+    release: dict = process_response(response_data=response, valid_key="tag_name")
 
     if release:
-        remote_version: str = release.get("version")
+        remote_version: str = release.get("tag_name")
+        markup_release_notes: str = release.get("body")
+        markdown_release_notes = Markdown(markup=markup_release_notes)
+
         # Splitting the version strings into components
         remote_parts: list = remote_version.split(".")
         local_parts: list = version.split(".")
@@ -109,7 +116,7 @@ async def get_updates(session: aiohttp.ClientSession):
         # Check for differences in version parts
         if remote_parts[0] != local_parts[0]:
             update_message = (
-                f"MAJOR update ({remote_version}) available:"
+                f"[bold][red]MAJOR[/][/] update ({remote_version}) available:"
                 f" It might introduce significant changes."
             )
 
@@ -117,7 +124,7 @@ async def get_updates(session: aiohttp.ClientSession):
 
         elif remote_parts[1] != local_parts[1]:
             update_message = (
-                f"MINOR update ({remote_version}) available:"
+                f"[bold][blue]MINOR[/][/] update ({remote_version}) available:"
                 f" Includes small feature changes/improvements."
             )
 
@@ -125,7 +132,7 @@ async def get_updates(session: aiohttp.ClientSession):
 
         elif remote_parts[2] != local_parts[2]:
             update_message = (
-                f"PATCH update ({remote_version}) available:"
+                f"[bold][green]PATCH[/][/] update ({remote_version}) available:"
                 f" Generally for bug fixes and small tweaks."
             )
 
@@ -137,7 +144,7 @@ async def get_updates(session: aiohttp.ClientSession):
             and remote_parts[3] != local_parts[3]
         ):
             update_message = (
-                f"BUILD update ({remote_version}) available."
+                f"[bold][cyan]BUILD[/][/] update ({remote_version}) available."
                 f" Might be for specific builds or special versions."
             )
 
@@ -145,6 +152,7 @@ async def get_updates(session: aiohttp.ClientSession):
 
         if update_message:
             log.info(update_message)
+            rich.print(markdown_release_notes)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -227,51 +235,32 @@ async def get_posts(
         "front_page_posts": f"{BASE_REDDIT_ENDPOINT}/.json?sort={sort}&limit={limit}&t={timeframe}",
     }
 
+    # ---------------------------------------------------------- #
+
     endpoint = source_map.get(posts_type, "")
 
     if not endpoint:
         raise ValueError(f"Invalid profile type in {source_map}: {posts_type}")
 
-    all_posts = await paginated_posts(
-        posts_endpoint=endpoint, limit=limit, session=session
-    )
-
-    return all_posts[:limit]
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-async def paginated_posts(
-    posts_endpoint: str, limit: int, session: aiohttp.ClientSession
-) -> list:
-    """
-    Paginates and retrieves posts until the specified limit is reached.
-
-    :param posts_endpoint: API endpoint for retrieving posts.
-    :param limit: Limit of the number of posts to retrieve.
-    :param session: aiohttp session to use for the request.
-    :return: A list of all posts.
-    """
     all_posts: list = []
     last_post_id: str = ""
 
     # Determine whether to use the 'after' parameter
-    use_after: bool = limit > 100
+    paginate_posts: bool = limit > 100
+
+    # ---------------------------------------------------------- #
 
     while len(all_posts) < limit:
-        # ---------------------------------------------------------- #
-
         # Make the API request with the 'after' parameter if it's provided and the limit is more than 100
-        if use_after and last_post_id:
-            endpoint_with_after: str = f"{posts_endpoint}&after={last_post_id}"
+        if paginate_posts and last_post_id:
+            pagination_endpoint: str = f"{endpoint}&after={last_post_id}"
         else:
-            endpoint_with_after: str = posts_endpoint
+            pagination_endpoint: str = endpoint
 
         # ---------------------------------------------------------- #
 
         raw_posts_data: dict = await get_data(
-            endpoint=endpoint_with_after, session=session
+            endpoint=pagination_endpoint, session=session
         )
         posts_list: list = raw_posts_data.get("data", {}).get("children", [])
 
