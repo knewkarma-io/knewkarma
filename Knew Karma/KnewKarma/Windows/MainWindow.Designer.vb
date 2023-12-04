@@ -23,7 +23,7 @@ Partial Class MainWindow
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
-        Dim resources As ComponentModel.ComponentResourceManager = New ComponentModel.ComponentResourceManager(GetType(MainWindow))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainWindow))
         Dim TreeNode1 As TreeNode = New TreeNode("Subreddit")
         Dim TreeNode2 As TreeNode = New TreeNode("User")
         Dim TreeNode3 As TreeNode = New TreeNode("Front Page")
@@ -495,7 +495,7 @@ Partial Class MainWindow
         NumericUpDownSearchResultLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownSearchResultLimit.Location = New Point(130, 41)
         NumericUpDownSearchResultLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        NumericUpDownSearchResultLimit.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
+        NumericUpDownSearchResultLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
         NumericUpDownSearchResultLimit.Name = "NumericUpDownSearchResultLimit"
         NumericUpDownSearchResultLimit.ReadOnly = True
         NumericUpDownSearchResultLimit.Size = New Size(79, 22)
@@ -541,7 +541,7 @@ Partial Class MainWindow
         NumericUpDownFrontPageDataLimit.Font = New Font("Segoe UI Variable Text Semibold", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownFrontPageDataLimit.Location = New Point(130, 41)
         NumericUpDownFrontPageDataLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        NumericUpDownFrontPageDataLimit.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
+        NumericUpDownFrontPageDataLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
         NumericUpDownFrontPageDataLimit.Name = "NumericUpDownFrontPageDataLimit"
         NumericUpDownFrontPageDataLimit.ReadOnly = True
         NumericUpDownFrontPageDataLimit.Size = New Size(79, 22)
@@ -600,7 +600,7 @@ Partial Class MainWindow
         NumericUpDownSubredditPostsLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownSubredditPostsLimit.Location = New Point(130, 41)
         NumericUpDownSubredditPostsLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        NumericUpDownSubredditPostsLimit.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
+        NumericUpDownSubredditPostsLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
         NumericUpDownSubredditPostsLimit.Name = "NumericUpDownSubredditPostsLimit"
         NumericUpDownSubredditPostsLimit.ReadOnly = True
         NumericUpDownSubredditPostsLimit.Size = New Size(79, 22)
@@ -675,7 +675,7 @@ Partial Class MainWindow
         NumericUpDownUserDataLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownUserDataLimit.Location = New Point(130, 41)
         NumericUpDownUserDataLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        NumericUpDownUserDataLimit.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
+        NumericUpDownUserDataLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
         NumericUpDownUserDataLimit.Name = "NumericUpDownUserDataLimit"
         NumericUpDownUserDataLimit.ReadOnly = True
         NumericUpDownUserDataLimit.Size = New Size(79, 22)
@@ -927,7 +927,7 @@ Partial Class MainWindow
         NumericUpDownPostListingsLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownPostListingsLimit.Location = New Point(130, 41)
         NumericUpDownPostListingsLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        NumericUpDownPostListingsLimit.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
+        NumericUpDownPostListingsLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
         NumericUpDownPostListingsLimit.Name = "NumericUpDownPostListingsLimit"
         NumericUpDownPostListingsLimit.ReadOnly = True
         NumericUpDownPostListingsLimit.Size = New Size(79, 22)

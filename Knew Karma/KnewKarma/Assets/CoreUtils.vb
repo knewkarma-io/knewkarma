@@ -62,33 +62,6 @@ Public Class CoreUtils
         End If
     End Function
 
-    ''' <summary>
-    ''' Asynchronously checks for available updates and optionally displays a message to the user.
-    ''' </summary>
-    ''' <param name="IsAutoCheck">Indicates whether the update check is triggered automatically.</param>
-    ''' <returns>A task representing the asynchronous operation.</returns>
-    Public Shared Async Function AsyncCheckUpdates() As Task
-        AboutWindow.Version.Text = "Checking for Updates..."
-        ' Creating a new instance of the ApiHandler class to interact with the API.
-        Dim Api As New ApiHandler()
-
-        ' Making an asynchronous request to check for updates.
-        Dim data As JObject = Await Api.AsyncGetUpdates()
-
-        ' Checking if data is not null before proceeding with extracting information from it.
-        If data IsNot Nothing Then
-            ' Extracting the tag name, body, and HTML URL from the data.
-            Dim tagName As String = data("tag_name")?.ToString
-
-            ' Checking if the current version is the latest version.
-            If tagName = My.Application.Info.Version.ToString Then
-                AboutWindow.Version.Text = $"Up-to-date: {My.Application.Info.Version}"
-            Else
-                AboutWindow.Version.Text = $"Updates found: {tagName}"
-                AboutWindow.ButtonGetUpdates.Enabled = True
-            End If
-        End If
-    End Function
 
     ''' <summary>
     ''' Checks whether the given JSON data (either JObject or JArray) is null or empty.
@@ -107,11 +80,11 @@ Public Class CoreUtils
     End Function
 
     ''' <summary>
-    ''' Converts a Unix timestamp with possible decimal points to a formatted datetime string.
+    ''' Converts a Unix timestamp with possible decimal points to a formatted datetime.utc string.
     ''' </summary>
     ''' <param name="timestamp">The Unix timestamp to be converted.</param>
     ''' <returns>A formatted datetime string in the format "dd MMMM yyyy, hh:mm:ss.fff tt".</returns>
-    Public Shared Function ConvertTimestampToDatetime(ByVal timestamp As Double) As String
+    Public Shared Function UnixTimestampToUtc(ByVal timestamp As Double) As String
         Dim utcFromTimestamp As Date = New DateTime(
             1970,
             1,
