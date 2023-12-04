@@ -51,7 +51,7 @@ Public Class DataGridViewer
             ' Special handling for the "created" timestamp
             If RowKey = "created" Then
                 Dim timestamp As Double = CDbl(data("data")(RowKey))
-                value = CoreUtils.ConvertTimestampToDatetime(timestamp)
+                value = CoreUtils.UnixTimestampToUtc(timestamp:=timestamp)
             Else
                 value = If(data("data")(RowKey)?.ToString(), "N/A")
             End If
