@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: "nuget"
     schedule:
       interval: "daily"
-    directory: "Knew Karma"
+    directory: "Knew Karma GUI"
     ignore:
       - dependency-name: "Newtonsoft.Json"
   - package-ecosystem: "pip"
