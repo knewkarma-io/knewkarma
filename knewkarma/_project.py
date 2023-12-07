@@ -6,7 +6,7 @@ import os
 
 author: str = "Richard Mwewa"
 about_author: str = "https://about.me/rly0nheart"
-version: str = "3.3.1.0"
+version: str = "3.3.2.0"
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 

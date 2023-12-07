@@ -110,11 +110,12 @@ class RedditUser:
             session=session,
         )
 
-        for raw_comment in raw_comments:
+        for comment_index, raw_comment in enumerate(raw_comments, start=1):
             comment_data: dict = raw_comment.get("data")
             comment = Comment(
+                index=comment_index,
+                body=comment_data.get("body"),
                 id=comment_data.get("id"),
-                text=comment_data.get("body"),
                 author=comment_data.get("author"),
                 author_is_premium=comment_data.get("author_premium"),
                 upvotes=comment_data.get("ups"),
@@ -250,13 +251,14 @@ class RedditPosts:
     @staticmethod
     def process_posts(raw_posts: list) -> List[Post]:
         posts_list: list = []
-        for raw_post in raw_posts:
+        for post_index, raw_post in enumerate(raw_posts, start=1):
             post_data = raw_post.get("data")
             post = Post(
-                id=post_data.get("id"),
-                thumbnail=post_data.get("thumbnail"),
+                index=post_index,
                 title=post_data.get("title"),
-                text=post_data.get("selftext"),
+                thumbnail=post_data.get("thumbnail"),
+                id=post_data.get("id"),
+                body=post_data.get("selftext"),
                 author=post_data.get("author"),
                 subreddit=post_data.get("subreddit"),
                 subreddit_id=post_data.get("subreddit_id"),

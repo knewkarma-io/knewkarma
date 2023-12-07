@@ -50,10 +50,11 @@ class Subreddit:
 
 @dataclass
 class Post:
-    id: str
-    thumbnail: str
+    index: int
     title: str
-    text: str
+    thumbnail: str
+    id: str
+    body: str
     author: str
     subreddit: str
     subreddit_id: str
@@ -81,8 +82,9 @@ class Post:
 
 @dataclass
 class Comment:
+    index: int
+    body: str
     id: str
-    text: str
     author: str
     upvotes: int
     downvotes: int

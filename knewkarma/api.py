@@ -117,7 +117,7 @@ async def get_updates(session: aiohttp.ClientSession):
         if remote_parts[0] != local_parts[0]:
             update_message = (
                 f"[bold][red]MAJOR[/][/] update ({remote_version}) available:"
-                f" It might introduce significant changes."
+                f" Introduces significant and important changes."
             )
 
         # ---------------------------------------------------------- #
