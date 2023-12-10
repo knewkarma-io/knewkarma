@@ -161,7 +161,7 @@ async def get_updates(session: aiohttp.ClientSession):
 async def get_profile(
     profile_source: str,
     session: aiohttp.ClientSession,
-    profile_type: str = Literal["user_profile", "subreddit_profile"],
+    profile_type: Literal["user_profile", "subreddit_profile"],
 ) -> dict:
     """
     Gets profile data from the specified profile_type and profile_source.
@@ -194,8 +194,8 @@ async def get_profile(
 async def get_posts(
     limit: int,
     session: aiohttp.ClientSession,
-    timeframe: str = Literal["all", "hour", "day", "week", "month", "year"],
-    sort: str = Literal[
+    timeframe: Literal["all", "hour", "day", "week", "month", "year"],
+    sort: Literal[
         "all",
         "controversial",
         "new",
@@ -204,7 +204,7 @@ async def get_posts(
         "hot",
         "rising",
     ],
-    posts_type: str = Literal[
+    posts_type: Literal[
         "user_posts",
         "user_comments",
         "subreddit_posts",
