@@ -30,7 +30,7 @@ Public Class ApiHandler
             Using httpClient As New HttpClient()
                 httpClient.DefaultRequestHeaders.Add(
                     "User-Agent",
-                    $"Knew-Karma/{appVersion} ({dotNetVersion}; +https://about.me/rly0nheart)"
+                    $"Knew-Karma/{appVersion} ({dotNetVersion}; +https://rly0nheart.github.io)"
                 )
 
                 Dim response As HttpResponseMessage = Await httpClient.GetAsync(endpoint)

@@ -5,7 +5,7 @@ import os
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 author: str = "Richard Mwewa"
-about_author: str = "https://about.me/rly0nheart"
+about_author: str = "https://rly0nheart.github.io"
 version: str = "3.3.2.0"
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
