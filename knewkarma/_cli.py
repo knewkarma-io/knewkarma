@@ -18,7 +18,7 @@ from .base import RedditUser, RedditSub, RedditPosts
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def setup_cli(arguments: argparse.Namespace):
+async def stage_cli(arguments: argparse.Namespace):
     """
     Sets up the command-line interface and executes the specified actions.
 
@@ -126,7 +126,7 @@ async def setup_cli(arguments: argparse.Namespace):
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def execute():
+def run_cli():
     """Main entrypoint for the Knew Karma command-line interface."""
 
     # -------------------------------------------------------------------- #
@@ -152,7 +152,7 @@ def execute():
             f"[bold]Knew Karma CLI[/] {version} started at "
             f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}..."
         )
-        asyncio.run(setup_cli(arguments=arguments))
+        asyncio.run(stage_cli(arguments=arguments))
     except KeyboardInterrupt:
         log.warning(f"User interruption detected ([yellow]Ctrl+C[/])")
     finally:

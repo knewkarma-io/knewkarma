@@ -5,7 +5,7 @@ from typing import Union, Literal
 import aiohttp
 
 from ._coreutils import log
-from ._project import version, about_author
+from ._project import version, about_author, DATA_SORT_CRITERION, DATA_TIMEFRAME
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -194,16 +194,8 @@ async def get_profile(
 async def get_posts(
     limit: int,
     session: aiohttp.ClientSession,
-    timeframe: Literal["all", "hour", "day", "week", "month", "year"],
-    sort: Literal[
-        "all",
-        "controversial",
-        "new",
-        "top",
-        "best",
-        "hot",
-        "rising",
-    ],
+    timeframe: DATA_TIMEFRAME,
+    sort: DATA_SORT_CRITERION,
     posts_type: Literal[
         "user_posts",
         "user_comments",

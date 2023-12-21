@@ -5,6 +5,7 @@ from typing import List
 import aiohttp
 
 from ._coreutils import unix_timestamp_to_utc
+from ._project import DATA_TIMEFRAME, DATA_SORT_CRITERION
 from .api import get_profile, get_posts
 from .data import User, Subreddit, Comment, Post
 
@@ -20,9 +21,9 @@ class RedditUser:
     def __init__(
         self,
         username: str,
-        data_timeframe: str,
-        data_sort: str,
         data_limit: int,
+        data_timeframe: DATA_TIMEFRAME = "all",
+        data_sort: DATA_SORT_CRITERION = "all",
     ):
         """
         Initialises a RedditUser instance for getting profile, posts and comments data from the specified user.
@@ -152,7 +153,11 @@ class RedditSub:
     # -------------------------------------------------------------- #
 
     def __init__(
-        self, subreddit: str, data_timeframe: str, data_sort: str, data_limit: int
+        self,
+        subreddit: str,
+        data_limit: int,
+        data_timeframe: DATA_TIMEFRAME = "all",
+        data_sort: DATA_SORT_CRITERION = "all",
     ):
         """
         Initialises a RedditSub instance for getting profile and posts from the specified subreddit.
@@ -232,9 +237,9 @@ class RedditPosts:
 
     def __init__(
         self,
-        timeframe: str,
-        sort: str,
         limit: int,
+        timeframe: DATA_TIMEFRAME = "all",
+        sort: DATA_SORT_CRITERION = "all",
     ):
         """
         Initializes a RedditPosts instance for getting posts from various sources.
