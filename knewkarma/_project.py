@@ -1,12 +1,13 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 import os
+from typing import Literal
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 author: str = "Richard Mwewa"
 about_author: str = "https://rly0nheart.github.io"
-version: str = "3.3.2.0"
+version: str = "3.4.0.0"
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -94,5 +95,16 @@ knewkarma posts --listing best
 
 # Construct path to the program's directory
 PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma-data"))
+
+DATA_SORT_CRITERION: Literal[
+    "controversial",
+    "new",
+    "top",
+    "best",
+    "hot",
+    "rising",
+]
+
+DATA_TIMEFRAME = Literal["hour", "day", "week", "month", "year"]
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
