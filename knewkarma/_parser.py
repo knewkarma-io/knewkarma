@@ -33,7 +33,7 @@ def create_parser() -> argparse.ArgumentParser:
         formatter_class=RichHelpFormatter,
     )
     subparsers = parser.add_subparsers(
-        dest="mode", help="operation mode", required=False
+        dest="mode", help="operation mode", required=True
     )
     parser.add_argument(
         "-l",

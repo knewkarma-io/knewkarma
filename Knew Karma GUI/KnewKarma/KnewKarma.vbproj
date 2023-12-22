@@ -9,14 +9,14 @@
     <Company>Richard Mwewa</Company>
     <Description>A Reddit Data Analysis Toolkit.</Description>
     <Copyright>© 2023 Richard Mwewa. All rights reserved.</Copyright>
-    <PackageProjectUrl>https://github.com/bellingcat/knewkarma/wiki</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/bellingcat/knewkarma</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/bellingcat/knewkarma</RepositoryUrl>
-    <AssemblyVersion>3.3.0.0</AssemblyVersion>
-    <FileVersion>3.3.0.0</FileVersion>
+    <AssemblyVersion>3.4.0.0</AssemblyVersion>
+    <FileVersion>3.4.0.0</FileVersion>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>3.3.0</Version>
+    <Version>3.4.0</Version>
     <PackageTags>reddit;scraper;reddit-scraper;osint;reddit-data</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
     <AnalysisLevel>6.0-recommended</AnalysisLevel>

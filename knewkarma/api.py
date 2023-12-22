@@ -5,7 +5,7 @@ from typing import Union, Literal
 import aiohttp
 
 from ._coreutils import log
-from ._project import version, about_author
+from ._project import version, about_author, DATA_SORT_CRITERION, DATA_TIMEFRAME
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -117,7 +117,7 @@ async def get_updates(session: aiohttp.ClientSession):
         if remote_parts[0] != local_parts[0]:
             update_message = (
                 f"[bold][red]MAJOR[/][/] update ({remote_version}) available:"
-                f" It might introduce significant changes."
+                f" Introduces significant and important changes."
             )
 
         # ---------------------------------------------------------- #
@@ -161,7 +161,7 @@ async def get_updates(session: aiohttp.ClientSession):
 async def get_profile(
     profile_source: str,
     session: aiohttp.ClientSession,
-    profile_type: str = Literal["user_profile", "subreddit_profile"],
+    profile_type: Literal["user_profile", "subreddit_profile"],
 ) -> dict:
     """
     Gets profile data from the specified profile_type and profile_source.
@@ -194,17 +194,9 @@ async def get_profile(
 async def get_posts(
     limit: int,
     session: aiohttp.ClientSession,
-    timeframe: str = Literal["all", "hour", "day", "week", "month", "year"],
-    sort: str = Literal[
-        "all",
-        "controversial",
-        "new",
-        "top",
-        "best",
-        "hot",
-        "rising",
-    ],
-    posts_type: str = Literal[
+    timeframe: DATA_TIMEFRAME,
+    sort: DATA_SORT_CRITERION,
+    posts_type: Literal[
         "user_posts",
         "user_comments",
         "subreddit_posts",
