@@ -4,7 +4,7 @@ from typing import List
 
 import aiohttp
 
-from ._project import DATA_TIMEFRAME, DATA_SORT_CRITERION, POSTS_LISTINGS
+from ._meta import DATA_TIMEFRAME, DATA_SORT_CRITERION, POSTS_LISTINGS
 from ._utils import unix_timestamp_to_utc
 from .api import get_profile, get_posts
 from .data import User, Subreddit, Comment, Post

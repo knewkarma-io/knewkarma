@@ -6,7 +6,7 @@ from typing import get_args
 from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
-from ._project import (
+from ._meta import (
     description,
     epilog,
     posts_examples,

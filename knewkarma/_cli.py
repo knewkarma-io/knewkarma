@@ -8,8 +8,8 @@ from datetime import datetime
 import aiohttp
 from rich.pretty import pprint
 
+from ._meta import PROGRAM_DIRECTORY
 from ._parser import create_parser, version
-from ._project import PROGRAM_DIRECTORY
 from ._utils import log, save_data, pathfinder
 from .api import get_updates
 from .base import RedditUser, RedditSub, RedditPosts
