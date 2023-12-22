@@ -4,7 +4,7 @@ from typing import Union, Literal
 
 import aiohttp
 
-from ._project import version, about_author, DATA_SORT_CRITERION, DATA_TIMEFRAME
+from ._meta import version, about_author, DATA_SORT_CRITERION, DATA_TIMEFRAME
 from ._utils import log
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
