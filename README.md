@@ -137,5 +137,5 @@ asyncio.run(async_posts())
 *[Refer to the Wiki](https://github.com/bellingcat/knewkarma/wiki) for Installation, Usage and Uninstallation
 instructions.*
 ***
-[![me](https://github.com/bellingcat/knewkarma/assets/74001397/efd19c7e-9840-4969-b33c-04087e73e4da)](https://about.me/rly0nheart)
+[![me](https://github.com/bellingcat/knewkarma/assets/74001397/efd19c7e-9840-4969-b33c-04087e73e4da)](https://rly0nheart.github.io)
 
