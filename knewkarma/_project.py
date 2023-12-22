@@ -7,7 +7,7 @@ from typing import Literal
 
 author: str = "Richard Mwewa"
 about_author: str = "https://rly0nheart.github.io"
-version: str = "3.4.0.0"
+version: str = "3.5.0.0"
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -96,7 +96,7 @@ knewkarma posts --listing best
 # Construct path to the program's directory
 PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma-data"))
 
-DATA_SORT_CRITERION: Literal[
+DATA_SORT_CRITERION = Literal[
     "controversial",
     "new",
     "top",
@@ -104,7 +104,7 @@ DATA_SORT_CRITERION: Literal[
     "hot",
     "rising",
 ]
-
+POSTS_LISTINGS = Literal["best", "controversial", "popular", "rising"]
 DATA_TIMEFRAME = Literal["hour", "day", "week", "month", "year"]
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

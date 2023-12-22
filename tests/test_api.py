@@ -54,8 +54,8 @@ async def test_get_posts():
         user_posts: list = await get_posts(
             posts_type="user_posts",
             posts_source=TEST_USERNAME,
-            sort="all",
-            timeframe="all",
+            sort="top",
+            timeframe="year",
             limit=100,
             session=session,
         )
@@ -100,7 +100,6 @@ async def test_get_posts():
             posts_type="search_posts",
             posts_source="covid-19",
             sort="controversial",
-            timeframe="all",
             limit=5,
             session=session,
         )
