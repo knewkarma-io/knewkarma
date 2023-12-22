@@ -5,6 +5,7 @@ from typing import List
 import aiohttp
 
 from ._coreutils import unix_timestamp_to_utc
+from ._project import DATA_TIMEFRAME, DATA_SORT_CRITERION
 from .api import get_profile, get_posts
 from .data import User, Subreddit, Comment, Post
 
@@ -20,9 +21,9 @@ class RedditUser:
     def __init__(
         self,
         username: str,
-        data_timeframe: str,
-        data_sort: str,
         data_limit: int,
+        data_timeframe: DATA_TIMEFRAME = "all",
+        data_sort: DATA_SORT_CRITERION = "all",
     ):
         """
         Initialises a RedditUser instance for getting profile, posts and comments data from the specified user.
@@ -110,31 +111,35 @@ class RedditUser:
             session=session,
         )
 
-        for raw_comment in raw_comments:
+        for comment_index, raw_comment in enumerate(raw_comments, start=1):
             comment_data: dict = raw_comment.get("data")
-            comment = Comment(
-                id=comment_data.get("id"),
-                text=comment_data.get("body"),
-                author=comment_data.get("author"),
-                author_is_premium=comment_data.get("author_premium"),
-                upvotes=comment_data.get("ups"),
-                downvotes=comment_data.get("downs"),
-                is_nsfw=comment_data.get("over_18"),
-                is_edited=comment_data.get("edited"),
-                score=comment_data.get("score"),
-                hidden_score=comment_data.get("score_hidden"),
-                gilded=comment_data.get("gilded"),
-                is_stickied=comment_data.get("stickied"),
-                is_locked=comment_data.get("locked"),
-                is_archived=comment_data.get("archived"),
-                created_at=unix_timestamp_to_utc(timestamp=comment_data.get("created")),
-                subreddit=comment_data.get("subreddit_name_prefixed"),
-                subreddit_type=comment_data.get("subreddit_type"),
-                post_id=comment_data.get("link_id"),
-                post_title=comment_data.get("link_title"),
-                raw_data=comment_data,
+            comments_list.append(
+                Comment(
+                    index=comment_index,
+                    body=comment_data.get("body"),
+                    id=comment_data.get("id"),
+                    author=comment_data.get("author"),
+                    author_is_premium=comment_data.get("author_premium"),
+                    upvotes=comment_data.get("ups"),
+                    downvotes=comment_data.get("downs"),
+                    is_nsfw=comment_data.get("over_18"),
+                    is_edited=comment_data.get("edited"),
+                    score=comment_data.get("score"),
+                    hidden_score=comment_data.get("score_hidden"),
+                    gilded=comment_data.get("gilded"),
+                    is_stickied=comment_data.get("stickied"),
+                    is_locked=comment_data.get("locked"),
+                    is_archived=comment_data.get("archived"),
+                    created_at=unix_timestamp_to_utc(
+                        timestamp=comment_data.get("created")
+                    ),
+                    subreddit=comment_data.get("subreddit_name_prefixed"),
+                    subreddit_type=comment_data.get("subreddit_type"),
+                    post_id=comment_data.get("link_id"),
+                    post_title=comment_data.get("link_title"),
+                    raw_data=comment_data,
+                )
             )
-            comments_list.append(comment)
 
         return comments_list
 
@@ -148,7 +153,11 @@ class RedditSub:
     # -------------------------------------------------------------- #
 
     def __init__(
-        self, subreddit: str, data_timeframe: str, data_sort: str, data_limit: int
+        self,
+        subreddit: str,
+        data_limit: int,
+        data_timeframe: DATA_TIMEFRAME = "all",
+        data_sort: DATA_SORT_CRITERION = "all",
     ):
         """
         Initialises a RedditSub instance for getting profile and posts from the specified subreddit.
@@ -228,9 +237,9 @@ class RedditPosts:
 
     def __init__(
         self,
-        timeframe: str,
-        sort: str,
         limit: int,
+        timeframe: DATA_TIMEFRAME = "all",
+        sort: DATA_SORT_CRITERION = "all",
     ):
         """
         Initializes a RedditPosts instance for getting posts from various sources.
@@ -250,35 +259,39 @@ class RedditPosts:
     @staticmethod
     def process_posts(raw_posts: list) -> List[Post]:
         posts_list: list = []
-        for raw_post in raw_posts:
+        for post_index, raw_post in enumerate(raw_posts, start=1):
             post_data = raw_post.get("data")
-            post = Post(
-                id=post_data.get("id"),
-                thumbnail=post_data.get("thumbnail"),
-                title=post_data.get("title"),
-                text=post_data.get("selftext"),
-                author=post_data.get("author"),
-                subreddit=post_data.get("subreddit"),
-                subreddit_id=post_data.get("subreddit_id"),
-                subreddit_type=post_data.get("subreddit_type"),
-                upvotes=post_data.get("ups"),
-                upvote_ratio=post_data.get("upvote_ratio"),
-                downvotes=post_data.get("downs"),
-                gilded=post_data.get("gilded"),
-                is_nsfw=post_data.get("over_18"),
-                is_shareable=post_data.get("is_reddit_media_domain"),
-                is_edited=post_data.get("edited"),
-                comments=post_data.get("num_comments"),
-                hide_from_bots=post_data.get("is_robot_indexable"),
-                score=post_data.get("score"),
-                domain=post_data.get("domain"),
-                permalink=post_data.get("permalink"),
-                is_locked=post_data.get("locked"),
-                is_archived=post_data.get("archived"),
-                created_at=unix_timestamp_to_utc(timestamp=post_data.get("created")),
-                raw_post=post_data,
+            posts_list.append(
+                Post(
+                    index=post_index,
+                    title=post_data.get("title"),
+                    thumbnail=post_data.get("thumbnail"),
+                    id=post_data.get("id"),
+                    body=post_data.get("selftext"),
+                    author=post_data.get("author"),
+                    subreddit=post_data.get("subreddit"),
+                    subreddit_id=post_data.get("subreddit_id"),
+                    subreddit_type=post_data.get("subreddit_type"),
+                    upvotes=post_data.get("ups"),
+                    upvote_ratio=post_data.get("upvote_ratio"),
+                    downvotes=post_data.get("downs"),
+                    gilded=post_data.get("gilded"),
+                    is_nsfw=post_data.get("over_18"),
+                    is_shareable=post_data.get("is_reddit_media_domain"),
+                    is_edited=post_data.get("edited"),
+                    comments=post_data.get("num_comments"),
+                    hide_from_bots=post_data.get("is_robot_indexable"),
+                    score=post_data.get("score"),
+                    domain=post_data.get("domain"),
+                    permalink=post_data.get("permalink"),
+                    is_locked=post_data.get("locked"),
+                    is_archived=post_data.get("archived"),
+                    created_at=unix_timestamp_to_utc(
+                        timestamp=post_data.get("created")
+                    ),
+                    raw_post=post_data,
+                )
             )
-            posts_list.append(post)
 
         return posts_list
 

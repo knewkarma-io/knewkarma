@@ -18,7 +18,7 @@ from .base import RedditUser, RedditSub, RedditPosts
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def setup_cli(arguments: argparse.Namespace):
+async def stage_cli(arguments: argparse.Namespace):
     """
     Sets up the command-line interface and executes the specified actions.
 
@@ -126,45 +126,39 @@ async def setup_cli(arguments: argparse.Namespace):
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def execute():
+def run_cli():
     """Main entrypoint for the Knew Karma command-line interface."""
 
     # -------------------------------------------------------------------- #
 
-    parser = create_parser()
-    arguments: argparse = parser.parse_args()
+    arguments: argparse = create_parser().parse_args()
     start_time: datetime = datetime.now()
 
     # -------------------------------------------------------------------- #
 
-    if arguments.mode:
-        print(
-            """
+    print(
+        """
 ┓┏┓         ┓┏┓         
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
+    )
+
+    # -------------------------------------------------------------------- #
+
+    try:
+        start_time: datetime = datetime.now()
+
+        log.info(
+            f"[bold]Knew Karma CLI[/] {version} started at "
+            f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}..."
         )
+        asyncio.run(stage_cli(arguments=arguments))
+    except KeyboardInterrupt:
+        log.warning(f"User interruption detected ([yellow]Ctrl+C[/])")
+    finally:
+        log.info(f"Stopped in {datetime.now() - start_time} seconds.")
 
-        # -------------------------------------------------------------------- #
-
-        try:
-            start_time: datetime = datetime.now()
-
-            log.info(
-                f"[bold]Knew Karma CLI[/] {version} started at "
-                f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}..."
-            )
-            asyncio.run(setup_cli(arguments=arguments))
-        except KeyboardInterrupt:
-            log.warning(f"User interruption detected ([yellow]Ctrl+C[/])")
-        finally:
-            log.info(f"Stopped in {datetime.now() - start_time} seconds.")
-
-        # -------------------------------------------------------------------- #
-
-    else:
-        # Display usage information if no mode is provided
-        parser.print_usage()
+    # -------------------------------------------------------------------- #
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

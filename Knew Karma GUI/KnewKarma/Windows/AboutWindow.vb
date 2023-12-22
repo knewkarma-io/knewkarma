@@ -50,7 +50,7 @@
     ''' <param name="sender">The source of the event.</param>
     ''' <param name="e">The event data.</param>
     Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles Copyright.LinkClicked, Copyright.LinkClicked
-        Shell("cmd.exe /c start https://about.me/rly0nheart")
+        Shell("cmd.exe /c start https://rly0nheart.github.io")
     End Sub
 
     Private Sub ButtonCheckforUpdates_Click(sender As Object, e As EventArgs) Handles ButtonGetUpdates.Click
