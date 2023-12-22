@@ -4,8 +4,8 @@ from typing import List
 
 import aiohttp
 
-from ._coreutils import unix_timestamp_to_utc
-from ._project import DATA_TIMEFRAME, DATA_SORT_CRITERION
+from ._project import DATA_TIMEFRAME, DATA_SORT_CRITERION, POSTS_LISTINGS
+from ._utils import unix_timestamp_to_utc
 from .api import get_profile, get_posts
 from .data import User, Subreddit, Comment, Post
 
@@ -21,33 +21,25 @@ class RedditUser:
     def __init__(
         self,
         username: str,
-        data_limit: int,
-        data_timeframe: DATA_TIMEFRAME = "all",
-        data_sort: DATA_SORT_CRITERION = "all",
     ):
         """
         Initialises a RedditUser instance for getting profile, posts and comments data from the specified user.
 
         :param username: Username of the user to get data from.
-        :param data_timeframe: The timeframe from which to get posts/comments
-            (choices: 'all', 'hour', 'day', 'week', 'month', 'year').
-        :param data_sort: Sort criterion for the retrieved posts/comments
-            (choices: 'all', 'best', 'controversial', 'hot', 'new', 'rising', 'top').
-        :param data_limit: The maximum number of user posts/comments to retrieve.
+        :type username: str
         """
         self._username = username
-        self._data_timeframe = data_timeframe
-        self._data_sort = data_sort
-        self._data_limit = data_limit
 
     # -------------------------------------------------------------- #
 
     async def profile(self, session: aiohttp.ClientSession) -> User:
         """
-        Gets a user's profile data.
+        Returns a user's profile data.
 
         :param session: aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession
         :return: A User object containing user profile data.
+        :rtype: User
         """
         user_profile: dict = await get_profile(
             profile_type="user_profile", profile_source=self._username, session=session
@@ -74,19 +66,33 @@ class RedditUser:
 
     # -------------------------------------------------------------- #
 
-    async def posts(self, session: aiohttp.ClientSession) -> List[Post]:
+    async def posts(
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: DATA_SORT_CRITERION = "all",
+        timeframe: DATA_TIMEFRAME = "all",
+    ) -> list[Post]:
         """
-        Gets a user's posts.
+        Returns a user's posts.
 
-        :param session: aiohttp session to use for the request.
-        :return: A list of Post objects, each containing a post's data.
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession.
+        :param limit: Maximum number of posts to return.
+        :type limit: int
+        :param sort: Sort criterion for the posts.
+        :type sort: str
+        :param timeframe: Timeframe from which to get posts.
+        :type timeframe: str
+        :return: A list of Post objects, each containing data about a post.
+        :rtype: list[Post]
         """
         user_posts: list = await get_posts(
             posts_type="user_posts",
             posts_source=self._username,
-            timeframe=self._data_timeframe,
-            sort=self._data_sort,
-            limit=self._data_limit,
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
             session=session,
         )
 
@@ -94,20 +100,34 @@ class RedditUser:
 
     # -------------------------------------------------------------- #
 
-    async def comments(self, session: aiohttp.ClientSession) -> List[Comment]:
+    async def comments(
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: DATA_SORT_CRITERION = "all",
+        timeframe: DATA_TIMEFRAME = "all",
+    ) -> list[Comment]:
         """
-        Gets a user's comments.
+        Returns a user's comments.
 
-        :param session: aiohttp session to use for the request.
-        :return:A list of Comment objects, each containing a comment's data.
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession.
+        :param limit: Maximum number of comments to return.
+        :type limit: int
+        :param sort: Sort criterion for the comments.
+        :type sort: str
+        :param timeframe: Timeframe from which to get comments.
+        :type timeframe: str
+        :return: A list of Comment objects, each containing data about a comment.
+        :rtype: list[Comment]
         """
         comments_list: list = []
         raw_comments: list = await get_posts(
             posts_type="user_comments",
             posts_source=self._username,
-            timeframe=self._data_timeframe,
-            sort=self._data_sort,
-            limit=self._data_limit,
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
             session=session,
         )
 
@@ -155,33 +175,25 @@ class RedditSub:
     def __init__(
         self,
         subreddit: str,
-        data_limit: int,
-        data_timeframe: DATA_TIMEFRAME = "all",
-        data_sort: DATA_SORT_CRITERION = "all",
     ):
         """
         Initialises a RedditSub instance for getting profile and posts from the specified subreddit.
 
         :param subreddit: Name of the subreddit to get data from.
-        :param data_timeframe: The timeframe from which to get posts
-            (choices: 'all', 'hour', 'day', 'week', 'month', 'year').
-        :param data_sort: Sort criterion for the retrieved posts
-            (choices: 'all', 'best', 'controversial', 'hot', 'new', 'rising', 'top').
-        :param data_limit: The maximum number of subreddit posts to retrieve.
+        :type subreddit: str
         """
         self._subreddit = subreddit
-        self._data_timeframe = data_timeframe
-        self._data_sort = data_sort
-        self._data_limit = data_limit
 
     # -------------------------------------------------------------- #
 
     async def profile(self, session: aiohttp.ClientSession) -> Subreddit:
         """
-        Gets a subreddit's profile data.
+        Returns a subreddit's profile data.
 
         :param session: aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession
         :return: A Subreddit object containing subreddit profile data.
+        :rtype: Subreddit
         """
         subreddit_profile: dict = await get_profile(
             profile_type="subreddit_profile",
@@ -208,19 +220,33 @@ class RedditSub:
 
     # -------------------------------------------------------------- #
 
-    async def posts(self, session: aiohttp.ClientSession) -> List[Post]:
+    async def posts(
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: DATA_SORT_CRITERION = "all",
+        timeframe: DATA_TIMEFRAME = "all",
+    ) -> List[Post]:
         """
-        Gets a subreddit's posts.
+        Returns a subreddit's posts.
 
-        :param session: aiohttp session to use for the request.
-        :return: A list of Post objects, each containing a post's data.
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession.
+        :param limit: Maximum number of posts to return.
+        :type limit: int
+        :param sort: Sort criterion for the posts.
+        :type sort: str
+        :param timeframe: Timeframe from which to get posts.
+        :type timeframe: str
+        :return: A list of Post objects, each containing data about a post.
+        :rtype: list[Post]
         """
         subreddit_posts: list = await get_posts(
             posts_type="subreddit_posts",
             posts_source=self._subreddit,
-            timeframe=self._data_timeframe,
-            sort=self._data_sort,
-            limit=self._data_limit,
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
             session=session,
         )
 
@@ -232,29 +258,6 @@ class RedditSub:
 
 class RedditPosts:
     """Represents Reddit posts and provides method for getting posts from various sources."""
-
-    # -------------------------------------------------------------- #
-
-    def __init__(
-        self,
-        limit: int,
-        timeframe: DATA_TIMEFRAME = "all",
-        sort: DATA_SORT_CRITERION = "all",
-    ):
-        """
-        Initializes a RedditPosts instance for getting posts from various sources.
-
-        :param timeframe: The timeframe from which to get posts
-            (choices: 'all', 'hour', 'day', 'week', 'month', 'year').
-        :param sort: Sort criterion for the retrieved posts
-            (choices: 'all', 'best', 'controversial', 'hot', 'new', 'rising', 'top').
-        :param limit: The maximum number of posts to retrieve.
-        """
-        self._timeframe = timeframe
-        self._sort = sort
-        self._limit = limit
-
-    # -------------------------------------------------------------- #
 
     @staticmethod
     def process_posts(raw_posts: list) -> List[Post]:
@@ -297,20 +300,36 @@ class RedditPosts:
 
     # -------------------------------------------------------------- #
 
-    async def search(self, query: str, session: aiohttp.ClientSession) -> List[Post]:
+    @staticmethod
+    async def search(
+        session: aiohttp.ClientSession,
+        query: str,
+        limit: int,
+        sort: DATA_SORT_CRITERION = "all",
+        timeframe: DATA_TIMEFRAME = "all",
+    ) -> List[Post]:
         """
-        Searches for posts on Reddit based on a search query.
+        Returns posts that match a specified query..
 
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession.
         :param query: Search query.
-        :param session: aiohttp session to use for the request.
-        :return: A list of Post objects, each containing a post's data.
+        :type query: str
+        :param limit: Maximum number of posts to return.
+        :type limit: int
+        :param sort: Sort criterion for the posts.
+        :type sort: str
+        :param timeframe: Timeframe from which to get posts.
+        :type timeframe: str
+        :return: A list of Post objects, each containing data about a post.
+        :rtype: list[Post]
         """
         search_posts: list = await get_posts(
             posts_type="search_posts",
             posts_source=query,
-            timeframe=self._timeframe,
-            sort=self._sort,
-            limit=self._limit,
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
             session=session,
         )
 
@@ -318,23 +337,36 @@ class RedditPosts:
 
     # -------------------------------------------------------------- #
 
+    @staticmethod
     async def listing(
-        self, listings_name: str, session: aiohttp.ClientSession
+        session: aiohttp.ClientSession,
+        listings_name: POSTS_LISTINGS,
+        limit: int,
+        sort: DATA_SORT_CRITERION = "all",
+        timeframe: DATA_TIMEFRAME = "all",
     ) -> List[Post]:
         """
-        Gets posts from a specified listing.
+        Returns posts from a specified listing.
 
-        :param listings_name: name of listing to get posts from
-            (choices: 'all', 'best', 'controversial', 'popular', 'rising')
-        :param session: aiohttp session to use for the request.
-        :return: A list of Post objects, each containing a post's data.
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession.
+        :param listings_name: Listing to get posts from..
+        :type listings_name: str
+        :param limit: Maximum number of posts to return.
+        :type limit: int
+        :param sort: Sort criterion for the posts.
+        :type sort: str
+        :param timeframe: Timeframe from which to get posts.
+        :type timeframe: str
+        :return: A list of Post objects, each containing data about a post.
+        :rtype: list[Post]
         """
         listing_posts: list = await get_posts(
             posts_type="listing_posts",
             posts_source=listings_name,
-            timeframe=self._timeframe,
-            sort=self._sort,
-            limit=self._limit,
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
             session=session,
         )
 
@@ -342,18 +374,32 @@ class RedditPosts:
 
     # -------------------------------------------------------------- #
 
-    async def front_page(self, session: aiohttp.ClientSession) -> List[Post]:
+    @staticmethod
+    async def front_page(
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: DATA_SORT_CRITERION = "all",
+        timeframe: DATA_TIMEFRAME = "all",
+    ) -> List[Post]:
         """
-        Gets posts from the Reddit front-page.
+        Returns posts from the Reddit front-page.
 
-        :param session: aiohttp session to use for the request.
-        :return: A list of Post objects, each containing a post's data.
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession.
+        :param limit: Maximum number of posts to return.
+        :type limit: int
+        :param sort: Sort criterion for the posts.
+        :type sort: str
+        :param timeframe: Timeframe from which to get posts.
+        :type timeframe: str
+        :return: A list of Post objects, each containing data about a post.
+        :rtype: list[Post]
         """
         front_page_posts: list = await get_posts(
             posts_type="front_page_posts",
-            timeframe=self._timeframe,
-            sort=self._sort,
-            limit=self._limit,
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
             session=session,
         )
 

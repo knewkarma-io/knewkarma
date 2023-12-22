@@ -4,8 +4,8 @@ from typing import Union, Literal
 
 import aiohttp
 
-from ._coreutils import log
 from ._project import version, about_author, DATA_SORT_CRITERION, DATA_TIMEFRAME
+from ._utils import log
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -20,11 +20,14 @@ GITHUB_RELEASE_ENDPOINT: str = (
 
 async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict, list]:
     """
-    Fetches JSON data from a given API endpoint.
+    Asynchronously fetches JSON data from a given API endpoint.
 
     :param session: aiohttp session to use for the request.
+    :type session: aiohttp.ClientSession
     :param endpoint: The API endpoint to fetch data from.
+    :type endpoint: str
     :return: Returns JSON data as a dictionary or list. Returns an empty dict if fetching fails.
+    :rtype: Union[dict, list]
     """
     from sys import version as python_version
 
@@ -66,8 +69,11 @@ def process_response(
     If it's a list, it ensures the list is not empty.
 
     :param response_data: The API response data to validate, which should be a dictionary or list.
+    :type response_data: Union[dict, list]
     :param valid_key: The key to check for in the data if it's a dictionary.
+    :type valid_key: str
     :return: The original data if valid, or an empty dictionary or list if invalid.
+    :rtype: Union[dict, list]
     """
     if isinstance(response_data, dict):
         if valid_key:
@@ -87,11 +93,12 @@ def process_response(
 
 async def get_updates(session: aiohttp.ClientSession):
     """
-    Gets and compares the current program version with the remote version.
+    Asynchronously gets and compares the current program version with the remote version.
 
     Assumes version format: major.minor.patch.prefix
 
     :param session: aiohttp session to use for the request.
+    :type session: aiohttp.ClientSession
     """
     import rich
     from rich.markdown import Markdown
@@ -159,16 +166,20 @@ async def get_updates(session: aiohttp.ClientSession):
 
 
 async def get_profile(
-    profile_source: str,
     session: aiohttp.ClientSession,
+    profile_source: str,
     profile_type: Literal["user_profile", "subreddit_profile"],
 ) -> dict:
     """
-    Gets profile data from the specified profile_type and profile_source.
+    Asynchronously gets profile data from the specified profile_type and profile_source.
 
     :param profile_source: Source to get profile data from.
-    :param session: aiohttp session to use for the request.
+    :type profile_source: str
     :param profile_type: The type of profile that is to be fetched.
+    :type profile_type: str
+    :param session: aiohttp session to use for the request.
+    :return: A dictionary object containing profile data from a selected source.
+    :rtype: dict
     """
     # Use a dictionary for direct mapping
     source_map: dict = {
@@ -192,10 +203,7 @@ async def get_profile(
 
 
 async def get_posts(
-    limit: int,
     session: aiohttp.ClientSession,
-    timeframe: DATA_TIMEFRAME,
-    sort: DATA_SORT_CRITERION,
     posts_type: Literal[
         "user_posts",
         "user_comments",
@@ -204,17 +212,28 @@ async def get_posts(
         "listing_posts",
         "front_page_posts",
     ],
+    limit: int,
     posts_source: str = None,
-) -> list:
+    timeframe: DATA_TIMEFRAME = "all",
+    sort: DATA_SORT_CRITERION = "all",
+) -> list[dict]:
     """
-    Gets a specified number of posts, with a specified sorting criterion, from the specified source.
+    Asynchronously gets a specified number of posts, with a specified sorting criterion, from the specified source.
 
-    :param timeframe: Timeframe from which to get posts.
-    :param session: aiohttp session to use for the request.
-    :param limit: Maximum number of posts to get.
-    :param sort: Posts' sort criterion.
-    :param posts_type: Type of posts to be fetched
+    :param posts_type: Type of posts to be fetched.
+    :type posts_type: str
     :param posts_source: Source from where posts will be fetched.
+    :type posts_source: str
+    :param limit: Maximum number of posts to get.
+    :type limit: int
+    :param sort: Posts' sort criterion.
+    :type sort: str
+    :param timeframe: Timeframe from which to get posts.
+    :type timeframe: str
+    :param session: aiohttp session to use for the request.
+    :type session: aiohttp.ClientSession
+    :return: A list of dictionaries, each containing data of a post.
+    :rtype: list[dict]
     """
     source_map = {
         "user_posts": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/"

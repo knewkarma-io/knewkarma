@@ -19,7 +19,9 @@ def unix_timestamp_to_utc(timestamp: int) -> str:
     Converts a UNIX timestamp to a formatted datetime.utc string.
 
     :param timestamp: The UNIX timestamp to be converted.
+    :type timestamp: int
     :return: A formatted datetime.utc string in the format "dd MMMM yyyy, hh:mm:ssAM/PM"
+    :rtype: str
     """
     utc_from_timestamp: datetime = datetime.utcfromtimestamp(timestamp)
     datetime_string: str = utc_from_timestamp.strftime("%d %B %Y, %I:%M:%S%p")
@@ -37,6 +39,7 @@ def filename_timestamp() -> str:
 
     :return: The formatted timestamp as a string. The format is "%d-%B-%Y-%I-%M-%S%p" for Windows
              and "%d-%B-%Y-%I:%M:%S%p" for non-Windows systems.
+    :rtype: str
 
     Example
     -------
@@ -59,6 +62,7 @@ def pathfinder(directories: list[str]):
     Creates directories in knewkarma-data directory of the user's home folder.
 
     :param directories: A list of file directories to create.
+    :type directories: list[str]
     """
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
@@ -77,9 +81,13 @@ def save_data(
     Save the given (Reddit) data to a JSON/CSV file based on the save_csv and save_json parameters.
 
     :param data: The data to be saved, which can be a dict or a list of dicts.
+    :type data: Union[User, Subreddit, List[Union[Post, Comment]]]
     :param save_to_dir: Directory to save data to.
+    :type save_to_dir: str
     :param save_json: Used to get the True value and the filename for the created JSON file if specified.
+    :type save_json: bool
     :param save_csv: Used to get the True value and the filename for the created CSV file if specified.
+    :type save_csv: bool
     """
     # -------------------------------------------------------------------- #
 
@@ -137,7 +145,9 @@ def setup_logging(debug_mode: bool) -> logging.getLogger:
     Configure and return a logging object with the specified log level.
 
     :param debug_mode: A boolean value indicating whether log level should be set to DEBUG.
+    :type debug_mode: bool
     :return: A logging object configured with the specified log level.
+    :rtype: logging.getLogger
     """
     from rich.logging import RichHandler
 
