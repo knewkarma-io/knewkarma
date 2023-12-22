@@ -1,11 +1,12 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 import argparse
+from typing import get_args
 
 from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
-from ._project import (
+from ._meta import (
     description,
     epilog,
     posts_examples,
@@ -13,6 +14,9 @@ from ._project import (
     subreddit_examples,
     operations_description,
     version,
+    POSTS_LISTINGS,
+    DATA_TIMEFRAME,
+    DATA_SORT_CRITERION,
 )
 
 
@@ -24,6 +28,7 @@ def create_parser() -> argparse.ArgumentParser:
     Creates and configures an argument parser for the command line arguments.
 
     :return: A configured argparse.ArgumentParser object ready to parse the command line arguments.
+    :rtype: argparse.ArgumentParser
     """
     # -------------------------------------------------------------------- #
 
@@ -33,7 +38,8 @@ def create_parser() -> argparse.ArgumentParser:
         formatter_class=RichHelpFormatter,
     )
     subparsers = parser.add_subparsers(
-        dest="mode", help="operation mode", required=True
+        dest="mode",
+        help="operation mode",
     )
     parser.add_argument(
         "-l",
@@ -47,7 +53,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--timeframe",
         type=str,
         default="all",
-        choices=["all", "hour", "day", "week", "month", "year"],
+        choices=list(get_args(DATA_TIMEFRAME)),
         help="timeframe to get ([bold][green]bulk[/][/]) data from (default: %(default)s)",
     )
     parser.add_argument(
@@ -55,15 +61,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--sort",
         type=str,
         default="all",
-        choices=[
-            "all",
-            "best",
-            "controversial",
-            "hot",
-            "new",
-            "rising",
-            "top",
-        ],
+        choices=list(get_args(DATA_SORT_CRITERION)),
         help="([bold][green]bulk[/][/]) sort criterion (default: %(default)s)",
     )
 
@@ -178,7 +176,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--listing",
         default="all",
         help="get posts from a specified listing",
-        choices=["best", "controversial", "popular", "rising"],
+        choices=list(get_args(POSTS_LISTINGS)),
     )
 
     return parser
