@@ -7,7 +7,7 @@ from typing import Literal
 
 author: str = "Richard Mwewa"
 about_author: str = "https://rly0nheart.github.io"
-version: str = "3.5.0.0"
+version: str = "3.5.1.0"
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -15,14 +15,12 @@ description: str = f"""
 # Knew Karma CLI {version}
 > A **Reddit** Data Analysis Toolkit."""
 epilog: str = f"""
-# by [{author}]({about_author})
+# Copyright © 2023-2024 [{author}]({about_author})
 ```
 MIT License
 
-Copyright © 2023 {author}
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
+of Knew Karma and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is

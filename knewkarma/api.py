@@ -166,25 +166,25 @@ async def get_updates(session: aiohttp.ClientSession):
 
 
 async def get_profile(
-    session: aiohttp.ClientSession,
+    profile_type: Literal["user", "subreddit"],
     profile_source: str,
-    profile_type: Literal["user_profile", "subreddit_profile"],
+    session: aiohttp.ClientSession,
 ) -> dict:
     """
-    Asynchronously gets profile data from the specified profile_type and profile_source.
+    Asynchronously fetches a profile from the specified source.
 
     :param profile_source: Source to get profile data from.
     :type profile_source: str
     :param profile_type: The type of profile that is to be fetched.
     :type profile_type: str
     :param session: aiohttp session to use for the request.
-    :return: A dictionary object containing profile data from a selected source.
+    :return: A dictionary object containing profile data from the specified source.
     :rtype: dict
     """
     # Use a dictionary for direct mapping
     source_map: dict = {
-        "user_profile": f"{BASE_REDDIT_ENDPOINT}/user/{profile_source}/about.json",
-        "subreddit_profile": f"{BASE_REDDIT_ENDPOINT}/r/{profile_source}/about.json",
+        "user": f"{BASE_REDDIT_ENDPOINT}/user/{profile_source}/about.json",
+        "subreddit": f"{BASE_REDDIT_ENDPOINT}/r/{profile_source}/about.json",
     }
 
     # Get the endpoint directly from the dictionary
@@ -203,7 +203,6 @@ async def get_profile(
 
 
 async def get_posts(
-    session: aiohttp.ClientSession,
     posts_type: Literal[
         "user_posts",
         "user_comments",
@@ -213,6 +212,7 @@ async def get_posts(
         "front_page_posts",
     ],
     limit: int,
+    session: aiohttp.ClientSession,
     posts_source: str = None,
     timeframe: DATA_TIMEFRAME = "all",
     sort: DATA_SORT_CRITERION = "all",
