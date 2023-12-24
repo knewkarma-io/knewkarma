@@ -42,7 +42,7 @@ class RedditUser:
         :rtype: User
         """
         user_profile: dict = await get_profile(
-            profile_type="user_profile", profile_source=self._username, session=session
+            profile_type="user", profile_source=self._username, session=session
         )
         return User(
             name=user_profile.get("name"),
@@ -196,7 +196,7 @@ class RedditSub:
         :rtype: Subreddit
         """
         subreddit_profile: dict = await get_profile(
-            profile_type="subreddit_profile",
+            profile_type="subreddit",
             profile_source=self._subreddit,
             session=session,
         )
