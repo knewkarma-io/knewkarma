@@ -5,11 +5,11 @@ import pytest
 
 from conftest import (
     TEST_USERNAME,
-    TEST_SUBREDDIT,
     TEST_USER_ID,
     TEST_USER_CREATED_TIMESTAMP,
-    TEST_SUBREDDIT_CREATED_TIMESTAMP,
-    TEST_SUBREDDIT_ID,
+    TEST_COMMUNITY,
+    TEST_COMMUNITY_ID,
+    TEST_COMMUNITY_CREATED_TIMESTAMP,
 )
 from knewkarma.api import get_profile, get_posts
 
@@ -23,7 +23,7 @@ async def test_get_profile():
         # ------------------------------------------------------------- #
 
         user_profile: dict = await get_profile(
-            profile_type="user_profile",
+            profile_type="user",
             profile_source=TEST_USERNAME,
             session=session,
         )
@@ -33,14 +33,14 @@ async def test_get_profile():
 
         # ------------------------------------------------------------- #
 
-        subreddit_profile: dict = await get_profile(
-            profile_type="subreddit_profile",
-            profile_source=TEST_SUBREDDIT,
+        community_profile: dict = await get_profile(
+            profile_type="community",
+            profile_source=TEST_COMMUNITY,
             session=session,
         )
 
-        assert subreddit_profile.get("id") == TEST_SUBREDDIT_ID
-        assert subreddit_profile.get("created") == TEST_SUBREDDIT_CREATED_TIMESTAMP
+        assert community_profile.get("id") == TEST_COMMUNITY_ID
+        assert community_profile.get("created") == TEST_COMMUNITY_CREATED_TIMESTAMP
 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -66,18 +66,18 @@ async def test_get_posts():
 
         # ------------------------------------------------------------- #
 
-        subreddit_posts: list = await get_posts(
-            posts_type="subreddit_posts",
-            posts_source=TEST_SUBREDDIT,
+        community_posts: list = await get_posts(
+            posts_type="community_posts",
+            posts_source=TEST_COMMUNITY,
             sort="top",
             timeframe="week",
             limit=200,
             session=session,
         )
 
-        assert isinstance(subreddit_posts, list)
-        assert len(subreddit_posts) == 200
-        assert subreddit_posts[0].get("data").get("subreddit") == TEST_SUBREDDIT
+        assert isinstance(community_posts, list)
+        assert len(community_posts) == 200
+        assert community_posts[0].get("data").get("subreddit") == TEST_COMMUNITY
 
         # ------------------------------------------------------------- #
 
