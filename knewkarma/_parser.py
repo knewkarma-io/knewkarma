@@ -46,6 +46,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--limit",
         type=int,
         default=100,
+        metavar="NUMBER",
         help="([bold][green]bulk[/][/]) data output limit (default: %(default)s)",
     )
     parser.add_argument(
