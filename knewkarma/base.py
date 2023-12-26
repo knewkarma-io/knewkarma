@@ -334,7 +334,7 @@ class RedditCommunity:
         :rtype: list[Post]
         """
         community_posts: list = await get_posts(
-            posts_type="community_posts",
+            posts_type="community",
             posts_source=self._community,
             limit=limit,
             sort=sort,
@@ -417,7 +417,7 @@ class RedditPosts:
         :rtype: list[Post]
         """
         search_posts: list = await get_posts(
-            posts_type="search_posts",
+            posts_type="search",
             posts_source=query,
             limit=limit,
             sort=sort,
@@ -454,7 +454,7 @@ class RedditPosts:
         :rtype: list[Post]
         """
         listing_posts: list = await get_posts(
-            posts_type="listing_posts",
+            posts_type="listing",
             posts_source=listings_name,
             limit=limit,
             sort=sort,
@@ -485,7 +485,7 @@ class RedditPosts:
         :rtype: list[Post]
         """
         new_posts: list = await get_posts(
-            posts_type="new_posts",
+            posts_type="new",
             limit=limit,
             sort=sort,
             session=session,
@@ -515,7 +515,7 @@ class RedditPosts:
         :rtype: list[Post]
         """
         front_page_posts: list = await get_posts(
-            posts_type="front_page_posts",
+            posts_type="front_page",
             limit=limit,
             sort=sort,
             timeframe=timeframe,

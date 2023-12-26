@@ -217,13 +217,13 @@ async def get_profile(
 
 async def get_posts(
     posts_type: Literal[
+        "new",
+        "front_page",
+        "search",
+        "listing",
+        "community",
         "user_posts",
         "user_comments",
-        "community_posts",
-        "search_posts",
-        "listing_posts",
-        "front_page_posts",
-        "new_posts",
     ],
     limit: int,
     session: aiohttp.ClientSession,
@@ -250,13 +250,13 @@ async def get_posts(
     :rtype: list[dict]
     """
     source_map = {
+        "new": f"{BASE_REDDIT_ENDPOINT}/new.json",
+        "front_page": f"{BASE_REDDIT_ENDPOINT}/.json",
+        "search": f"{BASE_REDDIT_ENDPOINT}/search.json?q={posts_source}",
+        "listing": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?",
+        "community": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json",
         "user_posts": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/submitted.json",
         "user_comments": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/comments.json",
-        "community_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json",
-        "search_posts": f"{BASE_REDDIT_ENDPOINT}/search.json?q={posts_source}",
-        "listing_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?",
-        "front_page_posts": f"{BASE_REDDIT_ENDPOINT}/.json",
-        "new_posts": f"{BASE_REDDIT_ENDPOINT}/new.json",
     }
 
     # ---------------------------------------------------------- #
