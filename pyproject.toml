@@ -37,4 +37,4 @@ pytest-asyncio = "*"
 pytest-html = "*"
 
 [tool.poetry.scripts]
-knewkarma = "knewkarma._cli:run"
+knewkarma = "knewkarma._cli:stage_and_start"

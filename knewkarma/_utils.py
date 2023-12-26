@@ -21,7 +21,7 @@ def dataframe(
         Dict,
         List[Union[Post, Comment, Community, PreviewCommunity]],
     ],
-    save_to_dir: str,
+    to_dir: str,
     save_json: Union[bool, str] = False,
     save_csv: Union[bool, str] = False,
 ) -> pd.DataFrame:
@@ -30,7 +30,7 @@ def dataframe(
 
     :param data: Data to be converted into a DataFrame. This can be a User, Community, dictionary,
                  or a list of Post, Comment, Community, or PreviewCommunity objects.
-    :param save_to_dir: Directory path where the JSON/CSV file will be saved.
+    :param to_dir: Directory path where the JSON/CSV file will be saved.
     :param save_json: If provided, the DataFrame will be saved as a JSON file. This can be a boolean or a string.
                       If it's a string, it will be used as the base name for the file.
     :param save_csv: If provided, the DataFrame will be saved as a CSV file. This can be a boolean or a string.
@@ -55,9 +55,7 @@ def dataframe(
 
     pd.set_option("display.max_rows", None)
     df = pd.DataFrame(data)
-    save_dataframe(
-        df=df, save_csv=save_csv, save_json=save_json, save_to_dir=save_to_dir
-    )
+    save_dataframe(df=df, save_csv=save_csv, save_json=save_json, to_dir=to_dir)
 
     return df.loc[:, df.columns != "raw_data"]  # Exclude 'raw_data' column if it exists
 
@@ -69,7 +67,7 @@ def save_dataframe(
     df: pd.DataFrame,
     save_csv: str,
     save_json: str,
-    save_to_dir: str,
+    to_dir: str,
 ):
     """
     Saves a pandas DataFrame to JSON and/or CSV files.
@@ -80,23 +78,23 @@ def save_dataframe(
     :type save_csv: str
     :param save_json: The base name for the JSON file. If provided, saves the DataFrame to a JSON file.
     :type save_json: str
-    :param save_to_dir: The directory where the files will be saved.
-    :type save_to_dir: str
+    :param to_dir: The directory where the files will be saved.
+    :type to_dir: str
     """
     if save_csv:
         csv_filename = f"{save_csv.upper()}-{filename_timestamp()}.csv"
-        csv_filepath = os.path.join(save_to_dir, "csv", csv_filename)
+        csv_filepath = os.path.join(to_dir, "csv", csv_filename)
         df.to_csv(csv_filepath, index=False)
         log.info(
-            f"{os.path.getsize(csv_filepath)} bytes written to [link file://{csv_filename}]{csv_filename}"
+            f"{os.path.getsize(csv_filepath)} bytes written to [link file://{csv_filepath}]{csv_filepath}"
         )
 
     if save_json:
         json_filename = f"{save_json.upper()}-{filename_timestamp()}.json"
-        json_filepath = os.path.join(save_to_dir, "json", json_filename)
+        json_filepath = os.path.join(to_dir, "json", json_filename)
         df.to_json(json_filepath, orient="records", lines=True, indent=4)
         log.info(
-            f"{os.path.getsize(json_filepath)} bytes written to [link file://{json_filename}]{json_filename}"
+            f"{os.path.getsize(json_filepath)} bytes written to [link file://{json_filepath}]{json_filepath}"
         )
 
 

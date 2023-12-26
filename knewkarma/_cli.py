@@ -8,22 +8,85 @@ from datetime import datetime
 import aiohttp
 import rich
 
+from . import RedditUser, RedditCommunity, RedditPosts
 from ._meta import PROGRAM_DIRECTORY
 from ._parser import create_parser, version
 from ._utils import dataframe, log, pathfinder
-from .base import RedditUser, RedditCommunity, RedditPosts
+from .api import get_updates
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def stage_and_execute(arguments: argparse.Namespace):
+async def execute_functions(arguments: argparse.Namespace, function_mapping: dict):
     """
-    Stages the command-line interface and executes command-line arguments based on user-input.
+    Executes command-line arguments' functions based on user-input.
 
     :param arguments: Argparse namespace object  containing parsed command-line arguments.
     :type arguments: argparse.Namespace
+    :param function_mapping: Mapping of command-line commands to their respective functions
+    :type function_mapping: dict
     """
+
+    async with aiohttp.ClientSession() as request_session:
+        await get_updates(session=request_session)
+
+        mode_action = function_mapping.get(arguments.mode)
+        is_executed: bool = False
+        file_dir: str = ""
+        for action, function in mode_action:
+            if getattr(arguments, action, False):
+                # ------------------------------------------------------------ #
+
+                if arguments.csv or arguments.json:
+                    file_dir = os.path.join(PROGRAM_DIRECTORY, arguments.mode, action)
+                    pathfinder(
+                        directories=[
+                            os.path.join(file_dir, "csv"),
+                            os.path.join(file_dir, "json"),
+                        ]
+                    )
+
+                # --------------------------------------------------------------- #
+
+                call_function = await function(session=request_session)
+                if call_function:
+                    rich.print(
+                        dataframe(
+                            data=call_function,
+                            save_csv=arguments.csv,
+                            save_json=arguments.json,
+                            to_dir=file_dir,
+                        )
+                    )
+
+                is_executed = True
+
+                break
+
+                # ------------------------------------------------------------- #
+
+        if not is_executed:
+            log.warning(
+                f"knewkarma {arguments.mode}: missing one or more expected argument(s)."
+            )
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
+def stage_and_start():
+    """
+    Main entrypoint for the Knew Karma command-line interface.
+    """
+    # -------------------------------------------------------------------- #
+
+    parser = create_parser()
+    arguments: argparse = parser.parse_args()
+
+    start_time: datetime = datetime.now()
+
+    # -------------------------------------------------------------------- #
 
     limit: int = arguments.limit
     sort = arguments.sort
@@ -41,7 +104,6 @@ async def stage_and_execute(arguments: argparse.Namespace):
 
     # ------------------------------------------------------------------------ #
 
-    # Mapping of command-line commands to their respective functions
     function_mapping: dict = {
         "user": [
             ("profile", lambda session: user.profile(session=session)),
@@ -115,71 +177,6 @@ async def stage_and_execute(arguments: argparse.Namespace):
 
     # ------------------------------------------------------------------------ #
 
-    async with aiohttp.ClientSession() as request_session:
-        # await get_updates(session=request_session)
-
-        mode_action = function_mapping.get(arguments.mode)
-        is_executed: bool = False
-
-        for action, function in mode_action:
-            if getattr(arguments, action, False):
-                call_function = await function(session=request_session)
-
-                # ------------------------------------------------------------- #
-
-                target_directory: str = ""
-
-                if arguments.csv or arguments.json:
-                    target_directory = os.path.join(
-                        PROGRAM_DIRECTORY, f"{arguments.mode}_{action}"
-                    )
-                    pathfinder(
-                        directories=[
-                            os.path.join(target_directory, "csv"),
-                            os.path.join(target_directory, "json"),
-                        ]
-                    )
-
-                # ------------------------------------------------------------- #
-
-                if call_function:
-                    rich.print(
-                        dataframe(
-                            data=call_function,
-                            save_csv=arguments.csv,
-                            save_json=arguments.json,
-                            save_to_dir=target_directory,
-                        )
-                    )
-
-                is_executed = True
-
-                break
-
-                # ------------------------------------------------------------- #
-
-        if not is_executed:
-            log.warning(
-                f"knewkarma {arguments.mode}: missing one or more expected argument(s)."
-            )
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-def run():
-    """
-    Main entrypoint for the Knew Karma command-line interface.
-    """
-    # -------------------------------------------------------------------- #
-
-    parser = create_parser()
-    arguments: argparse = parser.parse_args()
-
-    start_time: datetime = datetime.now()
-
-    # -------------------------------------------------------------------- #
-
     if arguments.mode:
         print(
             """
@@ -194,7 +191,11 @@ def run():
                 f"[bold]Knew Karma CLI[/] {version} started at "
                 f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}..."
             )
-            asyncio.run(stage_and_execute(arguments=arguments))
+            asyncio.run(
+                execute_functions(
+                    arguments=arguments, function_mapping=function_mapping
+                )
+            )
         except KeyboardInterrupt:
             log.warning(f"User interruption detected ([yellow]Ctrl+C[/])")
         finally:
