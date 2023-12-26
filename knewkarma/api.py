@@ -1,5 +1,6 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
+import asyncio
+import random
 from typing import Union, Literal
 
 import aiohttp
@@ -18,40 +19,52 @@ GITHUB_RELEASE_ENDPOINT: str = (
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict, list]:
+async def get_data(
+    session: aiohttp.ClientSession, endpoint: str, max_retries: int = 3
+) -> Union[dict, list]:
     """
-    Asynchronously fetches JSON data from a given API endpoint.
+    Asynchronously fetches JSON data from a given API endpoint, with retries for rate limiting.
 
     :param session: aiohttp session to use for the request.
-    :type session: aiohttp.ClientSession
     :param endpoint: The API endpoint to fetch data from.
-    :type endpoint: str
+    :param max_retries: Maximum number of retries for rate-limited requests.
     :return: Returns JSON data as a dictionary or list. Returns an empty dict if fetching fails.
-    :rtype: Union[dict, list]
     """
     from sys import version as python_version
 
-    try:
-        async with session.get(
-            endpoint,
-            headers={
-                "User-Agent": f"Knew-Karma/{version} "
-                f"(Python {python_version}; +{about_author})"
-            },
-        ) as response:
-            if response.status == 200:
-                return await response.json()
-            else:
-                error_message = await response.json()
-                log.error(f"An API error occurred: {error_message}")
-                return {}
+    retries = 0
+    while retries < max_retries:
+        try:
+            async with session.get(
+                endpoint,
+                headers={
+                    "User-Agent": f"Knew-Karma/{version} (Python {python_version}; +{about_author})"
+                },
+            ) as response:
+                if response.status == 200:
+                    return await response.json()
+                elif response.status == 429:
+                    retries += 1
+                    wait = (
+                        2**retries + random.random()
+                    )  # Exponential backoff with jitter
+                    log.warning(
+                        f"Rate limit exceeded. Retrying in {wait:.2f} seconds..."
+                    )
+                    await asyncio.sleep(wait)
+                else:
+                    error_message = await response.json()
+                    log.error(f"An API error occurred: {error_message}")
+                    return {}
+        except aiohttp.ClientConnectionError as error:
+            log.error(f"An HTTP error occurred: [red]{error}[/]")
+            return {}
+        except Exception as error:
+            log.critical(f"An unknown error occurred: [red]{error}[/]")
+            return {}
 
-    except aiohttp.ClientConnectionError as error:
-        log.error(f"An HTTP error occurred: [red]{error}[/]")
-        return {}
-    except Exception as error:
-        log.critical(f"An unknown error occurred: [red]{error}[/]")
-        return {}
+    log.error("Max retries reached. Returning empty response.")
+    return {}
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -166,7 +179,7 @@ async def get_updates(session: aiohttp.ClientSession):
 
 
 async def get_profile(
-    profile_type: Literal["user", "subreddit"],
+    profile_type: Literal["user", "community"],
     profile_source: str,
     session: aiohttp.ClientSession,
 ) -> dict:
@@ -184,7 +197,7 @@ async def get_profile(
     # Use a dictionary for direct mapping
     source_map: dict = {
         "user": f"{BASE_REDDIT_ENDPOINT}/user/{profile_source}/about.json",
-        "subreddit": f"{BASE_REDDIT_ENDPOINT}/r/{profile_source}/about.json",
+        "community": f"{BASE_REDDIT_ENDPOINT}/r/{profile_source}/about.json",
     }
 
     # Get the endpoint directly from the dictionary
@@ -206,7 +219,7 @@ async def get_posts(
     posts_type: Literal[
         "user_posts",
         "user_comments",
-        "subreddit_posts",
+        "community_posts",
         "search_posts",
         "listing_posts",
         "front_page_posts",
@@ -240,7 +253,7 @@ async def get_posts(
         f"submitted.json?sort={sort}&limit={limit}&t={timeframe}",
         "user_comments": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/"
         f"comments.json?sort={sort}&limit={limit}&t={timeframe}",
-        "subreddit_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?sort={sort}&limit={limit}&t={timeframe}",
+        "community_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?sort={sort}&limit={limit}&t={timeframe}",
         "search_posts": f"{BASE_REDDIT_ENDPOINT}/search.json?q={posts_source}&sort={sort}&limit={limit}&t={timeframe}",
         "listing_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?sort={sort}&limit={limit}&t={timeframe}",
         "front_page_posts": f"{BASE_REDDIT_ENDPOINT}/.json?sort={sort}&limit={limit}&t={timeframe}",

@@ -1,5 +1,5 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-from .base import RedditUser, RedditSub, RedditPosts
+from .base import RedditUser, RedditCommunity, RedditPosts
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

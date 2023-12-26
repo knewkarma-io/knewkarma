@@ -7,7 +7,7 @@ from typing import Literal
 
 author: str = "Richard Mwewa"
 about_author: str = "https://rly0nheart.github.io"
-version: str = "3.5.1.0"
+version: str = "4.0.0.0"
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -42,38 +42,48 @@ SOFTWARE.
 operations_description: str = "# **{}** Operations"
 user_examples: str = """
 # Examples
-## Get User Profile
+## Get user profile
 ```
-knewkarma user automoderator --profile
-```
-
-## Get User Comments
-```
-knewkarma user automoderator --comments
+knewkarma user  AutoModerator --profile
 ```
 
-## Get User Posts
+## Get user comments
 ```
-knewkarma user automoderator --posts
+knewkarma user  AutoModerator --comments
+```
+
+## Get user comments
+```
+knewkarma user  AutoModerator --posts
+```
+
+## Get communities moderated by user
+```
+knewkarma user TheRealKSi --moderated-communities
+```
+
+## Get user's top n communities based on community frequency in n posts
+```
+knewkarma --limit 500 user TheRealKSi --top-communities 10
 ```
 """
 
-subreddit_examples: str = """
+community_examples: str = """
 # Examples
-## Get Subreddit Profile
+## Get community profile
 ```
-knewkarma subreddit MachineLearning --profile
+knewkarma community MachineLearning --profile
 ```
 
-## Get Subreddit Posts
+## Get community posts
 ```
-knewkarma subreddit MachineLearning --posts
+knewkarma community MachineLearning --posts
 ```
 """
 
 posts_examples: str = """
 # Examples
-## Get Posts from Reddit Front-Page
+## Get posts from Reddit Front-Page
 ```
 knewkarma posts --front-page
 ```
@@ -83,7 +93,7 @@ knewkarma posts --front-page
 knewkarma posts --search "covid-19"
 ```
 
-## Get Posts from A Specified Listing
+## Get posts from specified listing
 ```
 knewkarma posts --listing best
 ```

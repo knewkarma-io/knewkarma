@@ -7,11 +7,11 @@ from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
 from ._meta import (
+    community_examples,
     description,
     epilog,
     posts_examples,
     user_examples,
-    subreddit_examples,
     operations_description,
     version,
     POSTS_LISTINGS,
@@ -103,50 +103,66 @@ def create_parser() -> argparse.ArgumentParser:
     )
     user_parser.add_argument("username", help="username")
     user_parser.add_argument(
-        "-p",
-        "--profile",
-        action="store_true",
-        help="get profile from the specified username",
-    )
-    user_parser.add_argument(
         "-c",
         "--comments",
+        help="get a user's comments",
         action="store_true",
-        help="get comments from the specified username",
     )
+    user_parser.add_argument(
+        "-p",
+        "--profile",
+        help="get a user's profile",
+        action="store_true",
+    )
+
     user_parser.add_argument(
         "-pp",
         "--posts",
         action="store_true",
-        help="get posts from the specified username",
+        help="get a user's posts",
+    )
+    user_parser.add_argument(
+        "-mc",
+        "--moderated-communities",
+        dest="moderated_communities",
+        help="get communities moderated by the user",
+        action="store_true",
+    )
+    user_parser.add_argument(
+        "-tc",
+        "--top-communities",
+        dest="top_communities",
+        metavar="TOP_N",
+        type=int,
+        help="get a user's top n communities based on community frequency in n posts",
     )
 
     # -------------------------------------------------------------------- #
 
-    subreddit_parser = subparsers.add_parser(
-        "subreddit",
-        help="subreddit operations",
+    community_parser = subparsers.add_parser(
+        "community",
+        help="community operations",
         description=Markdown(
-            operations_description.format("Subreddit"), style="argparse.text"
+            operations_description.format("Community/Subreddit"), style="argparse.text"
         ),
-        epilog=Markdown(subreddit_examples),
+        epilog=Markdown(community_examples),
         formatter_class=RichHelpFormatter,
     )
-    subreddit_parser.add_argument(
-        "subreddit",
-        help="subreddit name",
+    community_parser.add_argument(
+        "community",
+        help="community name",
     )
-    subreddit_parser.add_argument(
+    community_parser.add_argument(
         "-p",
         "--profile",
         action="store_true",
-        help="get profile from the specified subreddit",
+        help="get a community's profile",
     )
-    subreddit_parser.add_argument(
+    community_parser.add_argument(
         "-pp",
         "--posts",
         action="store_true",
-        help="get posts from the specified subreddit",
+        help="get a community's posts",
     )
 
     # -------------------------------------------------------------------- #

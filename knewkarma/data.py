@@ -22,7 +22,7 @@ class User:
     awardee_karma: int
     total_karma: int
     created_at: str
-    subreddit: dict
+    community: dict
     raw_data: dict
 
 
@@ -30,17 +30,20 @@ class User:
 
 
 @dataclass
-class Subreddit:
+class Community:
     name: str
     id: str
     description: str
     submit_text: str
-    icon_img: str
-    subreddit_type: str
+    icon: str
+    # icon_img: str
+    community_type: str
     subscribers: int
     current_active_users: int
     is_nsfw: bool
     language: str
+    whitelist_status: str
+    url: str
     created_at: str
     raw_data: dict
 
@@ -49,16 +52,34 @@ class Subreddit:
 
 
 @dataclass
+class PreviewCommunity:
+    name: str
+    icon: str
+    # id: str
+    # description: str
+    # submit_text: str
+    # icon_img: str
+    community_type: str
+    subscribers: int
+    # current_active_users: int
+    # is_nsfw: bool
+    # language: str
+    whitelist_status: str
+    url: str
+    created_at: str
+    raw_data: dict
+
+
+@dataclass
 class Post:
-    index: int
     title: str
-    thumbnail: str
-    id: str
     body: str
+    id: str
+    thumbnail: str
     author: str
-    subreddit: str
-    subreddit_id: str
-    subreddit_type: str
+    community: str
+    community_id: str
+    community_type: str
     upvotes: int
     upvote_ratio: float
     downvotes: int
@@ -74,7 +95,7 @@ class Post:
     is_locked: bool
     is_archived: bool
     created_at: str
-    raw_post: dict
+    raw_data: dict
 
 
 # -------------------------------------------------------------------- #
@@ -82,7 +103,6 @@ class Post:
 
 @dataclass
 class Comment:
-    index: int
     body: str
     id: str
     author: str
@@ -97,8 +117,8 @@ class Comment:
     is_locked: bool
     is_archived: bool
     created_at: str
-    subreddit: str
-    subreddit_type: str
+    community: str
+    community_type: str
     post_id: str
     post_title: str
     author_is_premium: bool

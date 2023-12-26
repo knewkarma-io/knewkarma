@@ -11,7 +11,7 @@ A **Reddit** Data Analysis Toolkit.
 
 - [x] **<ins>Knew Karma can get the following Reddit data from individual targets</ins>**:
     * **User**: *Profile*, *Posts*, *Comments*
-    * **Subreddit**: *Profile*, *Posts*
+    * **Community/Subreddit**: *Profile*, *Posts*
 - [x] **<ins>It can also get posts from various sources, such as</ins>**:
     * **Searching**: Allows getting posts that match the user-provided query from all over Reddit
     * **Reddit Front-Page**: Allows getting posts from the Reddit Front-Page
@@ -55,43 +55,51 @@ async def async_user(username: str):
         comments = await user.comments(limit=200, sort="top", timeframe="year",
                                        session=session)
 
+        # Fetch user's top n communities based on post frequency
+        top_communities = await user.top_communities(top_n=10, limit=500, session=session)
+
+        # Fetch communities moderated by user
+        moderated_communities = await user.moderated_communities(session=session)
+
         print(profile)
+        print(top_communities)
+        print(moderated_communities)
         print(posts)
         print(comments)
 
 
-asyncio.run(async_user(username="automoderator"))
+asyncio.run(async_user(username="TheRealKSi"))
 ```
 
-### Get Subreddit Data
+### Get Community Data
 
 ````python
 import asyncio
 import aiohttp
-from knewkarma import RedditSub
+from knewkarma import RedditCommunity
 
 
-async def async_subreddit(subreddit_name: str):
-    # Initialize RedditSub with the specified subreddit
-    subreddit = RedditSub(
-        subreddit=subreddit_name)
+async def async_community(community_name: str):
+    # Initialize RedditSub with the specified community
+    community = RedditCommunity(
+        community=community_name)
 
     # Create an asynchronous HTTP session
     async with aiohttp.ClientSession() as session:
-        # Fetch subreddit's profile
-        profile = await subreddit.profile(session=session)
+        # Fetch community's profile
+        profile = await community.profile(session=session)
 
-        # Fetch subreddit's posts
+        # Fetch community's posts
         # timeframes: ["hour", "day", "month", "year"]. Leave parameter unspecified to get from all timeframes.
         # sorting: ["controversial", "new", "top", "best", "hot", "rising"]. Leave parameter unspecified to get from all sort criteria.
-        posts = await subreddit.posts(limit=100, sort="top", timeframe="month", session=session)
+        posts = await community.posts(limit=100, sort="top", timeframe="month", session=session)
 
         print(profile)
         print(posts)
 
 
 asyncio.run(
-    async_subreddit(subreddit_name="MachineLearning")
+    async_community(community_name="MachineLearning")
 )
 ````
 
