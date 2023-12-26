@@ -467,6 +467,33 @@ class RedditPosts:
     # ---------------------------------------------------------------- #
 
     @staticmethod
+    async def new(
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: DATA_SORT_CRITERION = "all",
+    ) -> List[Post]:
+        """
+        Returns new posts.
+
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession.
+        :param limit: Maximum number of posts to return.
+        :type limit: int
+        :param sort: Sort criterion for the posts.
+        :type sort: str
+        :return: A list of Post objects, each containing data about a post.
+        :rtype: list[Post]
+        """
+        new_posts: list = await get_posts(
+            posts_type="new_posts",
+            limit=limit,
+            sort=sort,
+            session=session,
+        )
+
+        return RedditPosts.process_posts(raw_posts=new_posts)
+
+    @staticmethod
     async def front_page(
         session: aiohttp.ClientSession,
         limit: int,

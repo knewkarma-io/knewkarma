@@ -146,6 +146,7 @@ def stage_and_start():
             ),
         ],
         "posts": [
+            ("new", lambda session: posts.new(limit=limit, sort=sort, session=session)),
             (
                 "front_page",
                 lambda session: posts.front_page(

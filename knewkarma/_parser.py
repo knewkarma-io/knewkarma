@@ -177,15 +177,21 @@ def create_parser() -> argparse.ArgumentParser:
         formatter_class=RichHelpFormatter,
     )
     posts_parser.add_argument(
-        "-s",
-        "--search",
-        help="get posts that match a specified search query",
+        "-n",
+        "--new",
+        help="get new posts",
+        action="store_true",
     )
     posts_parser.add_argument(
         "-f",
         "--front-page",
         help="get posts from the reddit front-page",
         action="store_true",
+    )
+    posts_parser.add_argument(
+        "-s",
+        "--search",
+        help="get posts that match a specified search query",
     )
     posts_parser.add_argument(
         "-l",

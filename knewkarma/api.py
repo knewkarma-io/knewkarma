@@ -223,6 +223,7 @@ async def get_posts(
         "search_posts",
         "listing_posts",
         "front_page_posts",
+        "new_posts",
     ],
     limit: int,
     session: aiohttp.ClientSession,
@@ -249,20 +250,28 @@ async def get_posts(
     :rtype: list[dict]
     """
     source_map = {
-        "user_posts": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/"
-        f"submitted.json?sort={sort}&limit={limit}&t={timeframe}",
-        "user_comments": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/"
-        f"comments.json?sort={sort}&limit={limit}&t={timeframe}",
-        "community_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?sort={sort}&limit={limit}&t={timeframe}",
-        "search_posts": f"{BASE_REDDIT_ENDPOINT}/search.json?q={posts_source}&sort={sort}&limit={limit}&t={timeframe}",
-        "listing_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?sort={sort}&limit={limit}&t={timeframe}",
-        "front_page_posts": f"{BASE_REDDIT_ENDPOINT}/.json?sort={sort}&limit={limit}&t={timeframe}",
+        "user_posts": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/submitted.json",
+        "user_comments": f"{BASE_REDDIT_ENDPOINT}/user/{posts_source}/comments.json",
+        "community_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json",
+        "search_posts": f"{BASE_REDDIT_ENDPOINT}/search.json?q={posts_source}",
+        "listing_posts": f"{BASE_REDDIT_ENDPOINT}/r/{posts_source}.json?",
+        "front_page_posts": f"{BASE_REDDIT_ENDPOINT}/.json",
+        "new_posts": f"{BASE_REDDIT_ENDPOINT}/new.json",
     }
 
     # ---------------------------------------------------------- #
 
     endpoint = source_map.get(posts_type, "")
+    if posts_type == "search_posts":
+        endpoint += f"&limit={limit}&sort={sort}&t={timeframe}"
+    elif posts_type == "new_posts":
+        endpoint += f"?limit={limit}&sort={sort}"
+    else:
+        endpoint += f"?limit={limit}&sort={sort}&t={timeframe}"
 
+    # ---------------------------------------------------------- #
+
+    print(f"ENDPOINT IS: {endpoint}")
     if not endpoint:
         raise ValueError(f"Invalid profile type in {source_map}: {posts_type}")
 
