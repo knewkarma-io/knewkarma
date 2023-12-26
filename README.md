@@ -10,11 +10,12 @@ A **Reddit** Data Analysis Toolkit.
 ## Knew Karma CLI/GUI
 
 - [x] **<ins>Knew Karma can get the following Reddit data from individual targets</ins>**:
-    * **User**: *Profile*, *Posts*, *Comments*
+    * **User**: *Profile*, *Posts*, *Comments*, *Top n Communities/Subreddits*, *Moderated Communities*
     * **Community/Subreddit**: *Profile*, *Posts*
 - [x] **<ins>It can also get posts from various sources, such as</ins>**:
-    * **Searching**: Allows getting posts that match the user-provided query from all over Reddit
+    * **New**: Allows getting new posts
     * **Reddit Front-Page**: Allows getting posts from the Reddit Front-Page
+    * **Searching**: Allows getting posts that match the user-provided query from all over Reddit
     * **Listing**: Allows getting posts from a user-specified Reddit Listing
 - [x] **<ins>Bonus Features</ins>**
     * **Fully Async (both in the CLI and GUI)**
@@ -120,6 +121,10 @@ async def async_posts():
         # timeframes: ["hour", "day", "month", "year"]. Leave parameter unspecified to get from all timeframes.
         # sorting: ["controversial", "new", "top", "best", "hot", "rising"]. Leave parameter unspecified to get from all sort criteria.
 
+        # Fetch new posts
+        # Does not need the timeframe parameter.
+        new_posts = await posts.new(limit=120, session=session)
+
         # Fetch front page posts
         front_page_posts = await posts.front_page(limit=50, sort="top", timeframe="hour", session=session)
 
@@ -130,6 +135,7 @@ async def async_posts():
         # Fetch posts that match the specified search query 'covid-19'
         search_results = await posts.search(query="covid-19", limit=300, session=session)
 
+        print(new_posts)
         print(front_page_posts)
         print(listing_posts)
         print(search_results)

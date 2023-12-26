@@ -83,6 +83,11 @@ knewkarma community MachineLearning --posts
 
 posts_examples: str = """
 # Examples
+## Get new posts
+```
+knewkarma posts --new
+```
+
 ## Get posts from Reddit Front-Page
 ```
 knewkarma posts --front-page
