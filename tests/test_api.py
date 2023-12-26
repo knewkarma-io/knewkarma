@@ -67,7 +67,7 @@ async def test_get_posts():
         # ------------------------------------------------------------- #
 
         community_posts: list = await get_posts(
-            posts_type="community_posts",
+            posts_type="community",
             posts_source=TEST_COMMUNITY,
             sort="top",
             timeframe="week",
@@ -82,7 +82,7 @@ async def test_get_posts():
         # ------------------------------------------------------------- #
 
         listing_posts: list = await get_posts(
-            posts_type="listing_posts",
+            posts_type="listing",
             posts_source="best",
             sort="hot",
             timeframe="month",
@@ -97,7 +97,7 @@ async def test_get_posts():
         # ------------------------------------------------------------- #
 
         search_posts: list = await get_posts(
-            posts_type="search_posts",
+            posts_type="search",
             posts_source="covid-19",
             sort="controversial",
             limit=5,
@@ -113,8 +113,15 @@ async def test_get_posts():
 
         # ------------------------------------------------------------- #
 
+        new_posts: list = await get_posts(posts_type="new", limit=120, session=session)
+
+        assert isinstance(new_posts, list)
+        assert len(new_posts) == 120
+
+        # ------------------------------------------------------------- #
+
         front_page_posts: list = await get_posts(
-            posts_type="front_page_posts",
+            posts_type="front_page",
             sort="top",
             timeframe="hour",
             limit=3,
