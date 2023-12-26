@@ -1,6 +1,4 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-import asyncio
-import random
 from typing import Union, Literal
 
 import aiohttp
@@ -19,52 +17,40 @@ GITHUB_RELEASE_ENDPOINT: str = (
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def get_data(
-    session: aiohttp.ClientSession, endpoint: str, max_retries: int = 3
-) -> Union[dict, list]:
+async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict, list]:
     """
-    Asynchronously fetches JSON data from a given API endpoint, with retries for rate limiting.
+    Asynchronously fetches JSON data from a given API endpoint.
 
     :param session: aiohttp session to use for the request.
+    :type session: aiohttp.ClientSession
     :param endpoint: The API endpoint to fetch data from.
-    :param max_retries: Maximum number of retries for rate-limited requests.
+    :type endpoint: str
     :return: Returns JSON data as a dictionary or list. Returns an empty dict if fetching fails.
+    :rtype: Union[dict, list]
     """
     from sys import version as python_version
 
-    retries = 0
-    while retries < max_retries:
-        try:
-            async with session.get(
-                endpoint,
-                headers={
-                    "User-Agent": f"Knew-Karma/{version} (Python {python_version}; +{about_author})"
-                },
-            ) as response:
-                if response.status == 200:
-                    return await response.json()
-                elif response.status == 429:
-                    retries += 1
-                    wait = (
-                        2**retries + random.random()
-                    )  # Exponential backoff with jitter
-                    log.warning(
-                        f"Rate limit exceeded. Retrying in {wait:.2f} seconds..."
-                    )
-                    await asyncio.sleep(wait)
-                else:
-                    error_message = await response.json()
-                    log.error(f"An API error occurred: {error_message}")
-                    return {}
-        except aiohttp.ClientConnectionError as error:
-            log.error(f"An HTTP error occurred: [red]{error}[/]")
-            return {}
-        except Exception as error:
-            log.critical(f"An unknown error occurred: [red]{error}[/]")
-            return {}
+    try:
+        async with session.get(
+            endpoint,
+            headers={
+                "User-Agent": f"Knew-Karma/{version} "
+                f"(Python {python_version}; +{about_author})"
+            },
+        ) as response:
+            if response.status == 200:
+                return await response.json()
+            else:
+                error_message = await response.json()
+                log.error(f"An API error occurred: {error_message}")
+                return {}
 
-    log.error("Max retries reached. Returning empty response.")
-    return {}
+    except aiohttp.ClientConnectionError as error:
+        log.error(f"An HTTP error occurred: [red]{error}[/]")
+        return {}
+    except Exception as error:
+        log.critical(f"An unknown error occurred: [red]{error}[/]")
+        return {}
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -271,7 +257,6 @@ async def get_posts(
 
     # ---------------------------------------------------------- #
 
-    print(f"ENDPOINT IS: {endpoint}")
     if not endpoint:
         raise ValueError(f"Invalid profile type in {source_map}: {posts_type}")
 
@@ -301,10 +286,20 @@ async def get_posts(
         if not posts_list:
             break
 
-        all_posts.extend(process_response(response_data=posts_list))
+        # Calculate the remaining posts needed to reach the limit
+        needed_posts_count = limit - len(all_posts)
+
+        # Append only the necessary number of posts to reach the limit
+        all_posts.extend(
+            process_response(response_data=posts_list[:needed_posts_count])
+        )
 
         # We use the id of the last post in the list to paginate to the next posts
         last_post_id: str = all_posts[-1].get("data").get("id")
+
+        # If the remaining posts needed is less than the limit, break out of the loop
+        if needed_posts_count <= 0:
+            break
 
         # ---------------------------------------------------------- #
 
