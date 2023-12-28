@@ -15,7 +15,7 @@ description: str = f"""
 # Knew Karma CLI {version}
 > **Reddit** Data Analysis Toolkit."""
 epilog: str = f"""
-# Copyright © 2023-2024 [{author}]({about_author})
+# Copyright © 2024 [{author}]({about_author}). All rights reserved.
 ```
 MIT License
 
