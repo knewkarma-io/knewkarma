@@ -6,13 +6,11 @@
 and analysing Reddit data. It includes both Command-Line Interface (CLI) and Graphical User Interface (GUI) options,
 making it adaptable for various user preferences.
 
-## Feature Overview
-
-### Knew Karma CLI/GUI
+## Knew Karma CLI/GUI
 
 Knew Karma offers a variety of features for accessing and analyzing Reddit data, including:
 
-#### User Data
+### User Data
 
 - **Profile** — Retrieves user profile information.
 - **Posts** — Retrieves posts created by a user.
@@ -20,28 +18,28 @@ Knew Karma offers a variety of features for accessing and analyzing Reddit data,
 - **Top n Communities** — Identifies top communities based on user activity.
 - **Moderated Communities** — Lists communities moderated by the user.
 
-#### Community (Subreddit) Data
+### Community (Subreddit) Data
 
 - **Profile** — Retrieves community profile information.
 - **Posts** — Retrieves posts from a specified community.
 - **Wiki Pages** — Lists wiki pages in a community.
 - **Wiki Page Data** — Retrieves content from specific wiki pages.
 
-#### Communities (Subreddits) Data
+### Communities (Subreddits) Data
 
 - **All** — Retrieves all communities.
 - **Default** — Retrieves default communities.
 - **New** — Retrieves new communities.
 - **Popular** — Retrieves popular communities.
 
-#### Posts Data
+### Posts Data
 
 - **New** — Retrieves new posts.
 - **Reddit Front-Page** — Retrieves front-page posts.
 - **Search** — Searches for posts based on queries.
 - **Listing** — Retrieves posts from specified Reddit listings.
 
-#### Search/Discovery
+### Search/Discovery
 
 - **Users** — Searches for users.
 - **Communities** — Searches for communities.
@@ -55,7 +53,7 @@ Knew Karma also serves as a Python library for integration into other projects. 
 illustrating how to use Knew Karma in different scenarios:
 
 <details>
-    <summary style="text-decoration: underline;">Code Examples</summary>
+    <summary>Code Examples</summary>
 
 ### User Data
 
