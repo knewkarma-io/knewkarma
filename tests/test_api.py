@@ -11,7 +11,53 @@ from conftest import (
     TEST_COMMUNITY_ID,
     TEST_COMMUNITY_CREATED_TIMESTAMP,
 )
-from knewkarma._api import get_profile, get_posts, search
+from knewkarma._api import get_profile, search, get_communities, get_posts
+
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
+@pytest.mark.asyncio
+async def test_search():
+    async with aiohttp.ClientSession() as session:
+        # --------------------------------------------------------------- #
+
+        search_posts: list[dict] = await search(
+            _type="posts",
+            query="covid-19",
+            limit=5,
+            session=session,
+        )
+
+        assert isinstance(search_posts, list)
+        assert len(search_posts) == 5
+        assert (
+            "covid-19" in search_posts[0].get("data").get("selftext").lower()
+            or search_posts[0].get("data").get("title").lower()
+        )
+
+        # --------------------------------------------------------------- #
+
+        search_communities: list[dict] = await search(
+            _type="communities", query="ask", limit=13, session=session
+        )
+
+        assert isinstance(search_communities, list)
+        assert len(search_communities) == 13
+        assert "ask" in search_communities[0].get("data").get("display_name").lower()
+
+        # --------------------------------------------------------------- #
+
+        search_users: list[dict] = await search(
+            _type="users",
+            query="john",
+            limit=22,
+            session=session,
+        )
+
+        assert isinstance(search_users, list)
+        assert len(search_users) == 22
+        assert "john" in search_users[1].get("data").get("name").lower()
 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -41,6 +87,49 @@ async def test_get_profile():
 
         assert community_profile.get("id") == TEST_COMMUNITY_ID
         assert community_profile.get("created") == TEST_COMMUNITY_CREATED_TIMESTAMP
+
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
+@pytest.mark.asyncio
+async def test_get_communities():
+    async with aiohttp.ClientSession() as session:
+        # --------------------------------------------------------------- #
+
+        all_communities = await get_communities(_type="all", limit=100, session=session)
+
+        assert isinstance(all_communities, list)
+        assert "subreddit_type" in all_communities[0].get("data")
+        assert len(all_communities) == 100
+
+        # --------------------------------------------------------------- #
+
+        default_communities = await get_communities(
+            _type="default", limit=150, session=session
+        )
+
+        assert isinstance(default_communities, list)
+        assert "community_icon" in default_communities[1].get("data")
+        assert len(default_communities) == 150
+
+        # --------------------------------------------------------------- #
+
+        new_communities = await get_communities(_type="new", limit=200, session=session)
+
+        assert isinstance(new_communities, list)
+        assert "whitelist_status" in new_communities[3].get("data")
+        assert len(new_communities) == 200
+
+        # --------------------------------------------------------------- #
+
+        popular_communities = await get_communities(
+            _type="popular", limit=200, session=session
+        )
+
+        assert isinstance(popular_communities, list)
+        assert "display_name" in popular_communities[3].get("data")
+        assert len(new_communities) == 200
 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -116,46 +205,3 @@ async def test_get_posts():
 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-@pytest.mark.asyncio
-async def test_search():
-    async with aiohttp.ClientSession() as session:
-        # --------------------------------------------------------------- #
-
-        search_posts: list[dict] = await search(
-            _type="posts",
-            query="covid-19",
-            limit=5,
-            session=session,
-        )
-
-        assert isinstance(search_posts, list)
-        assert len(search_posts) == 5
-        assert (
-            "covid-19" in search_posts[0].get("data").get("selftext").lower()
-            or search_posts[0].get("data").get("title").lower()
-        )
-
-        # --------------------------------------------------------------- #
-
-        search_communities: list[dict] = await search(
-            _type="communities", query="ask", limit=13, session=session
-        )
-
-        assert isinstance(search_communities, list)
-        assert len(search_communities) == 13
-        assert "ask" in search_communities[0].get("data").get("display_name").lower()
-
-        # --------------------------------------------------------------- #
-
-        search_users: list[dict] = await search(
-            _type="users",
-            query="john",
-            limit=22,
-            session=session,
-        )
-
-        assert isinstance(search_users, list)
-        assert len(search_users) == 22
-        assert "john" in search_users[1].get("data").get("name").lower()
