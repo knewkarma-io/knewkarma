@@ -99,9 +99,10 @@ def create_parser() -> argparse.ArgumentParser:
 
     community_parser = subparsers.add_parser(
         "community",
-        help="community operations",
+        help="community (subreddit) operations",
         description=Markdown(
-            operations_description.format("Community"), style="argparse.text"
+            operations_description.format("Community (Subreddit)"),
+            style="argparse.text",
         ),
         epilog=Markdown(community_examples),
         formatter_class=RichHelpFormatter,
@@ -147,9 +148,10 @@ def create_parser() -> argparse.ArgumentParser:
 
     communities_parser = subparsers.add_parser(
         "communities",
-        help="communities operations",
+        help="communities (subreddits) operations",
         description=Markdown(
-            operations_description.format("Communities"), style="argparse.text"
+            operations_description.format("Communities (Subreddits)"),
+            style="argparse.text",
         ),
         epilog=Markdown(communities_examples),
         formatter_class=RichHelpFormatter,
@@ -201,11 +203,6 @@ def create_parser() -> argparse.ArgumentParser:
         "--front-page",
         help="get posts from the reddit front-page",
         action="store_true",
-    )
-    posts_parser.add_argument(
-        "-s",
-        "--search",
-        help="get posts that match a specified search query",
     )
     posts_parser.add_argument(
         "-l",

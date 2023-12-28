@@ -121,7 +121,7 @@ def convert_comments(comments: list[dict]) -> list[Comment]:
     :return: A list of Comment objects, each containing converted data about a comment.
     :rtype: list[Comment]
     """
-    if "link_title" in comments:
+    if "link_title" in comments[0].get("data"):
         comments_list: list = []
         for comment in comments:
             comment_data: dict = comment.get("data")
