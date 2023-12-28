@@ -11,7 +11,7 @@ from conftest import (
     TEST_COMMUNITY_ID,
     TEST_COMMUNITY_CREATED_TIMESTAMP,
 )
-from knewkarma.api import get_profile, get_posts
+from knewkarma._api import get_profile, get_posts, search
 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -20,22 +20,22 @@ from knewkarma.api import get_profile, get_posts
 @pytest.mark.asyncio
 async def test_get_profile():
     async with aiohttp.ClientSession() as session:
-        # ------------------------------------------------------------- #
+        # --------------------------------------------------------------- #
 
         user_profile: dict = await get_profile(
-            profile_type="user",
-            profile_source=TEST_USERNAME,
+            _type="user",
+            _from=TEST_USERNAME,
             session=session,
         )
 
         assert user_profile.get("id") == TEST_USER_ID
         assert user_profile.get("created") == TEST_USER_CREATED_TIMESTAMP
 
-        # ------------------------------------------------------------- #
+        # --------------------------------------------------------------- #
 
         community_profile: dict = await get_profile(
-            profile_type="community",
-            profile_source=TEST_COMMUNITY,
+            _type="community",
+            _from=TEST_COMMUNITY,
             session=session,
         )
 
@@ -49,11 +49,11 @@ async def test_get_profile():
 @pytest.mark.asyncio
 async def test_get_posts():
     async with aiohttp.ClientSession() as session:
-        # ------------------------------------------------------------- #
+        # --------------------------------------------------------------- #
 
         user_posts: list = await get_posts(
-            posts_type="user_posts",
-            posts_source=TEST_USERNAME,
+            _type="user_posts",
+            _from=TEST_USERNAME,
             sort="top",
             timeframe="year",
             limit=100,
@@ -64,11 +64,11 @@ async def test_get_posts():
         assert len(user_posts) == 100
         assert user_posts[0].get("data").get("author") == TEST_USERNAME
 
-        # ------------------------------------------------------------- #
+        # --------------------------------------------------------------- #
 
         community_posts: list = await get_posts(
-            posts_type="community",
-            posts_source=TEST_COMMUNITY,
+            _type="community",
+            _from=TEST_COMMUNITY,
             sort="top",
             timeframe="week",
             limit=200,
@@ -79,11 +79,11 @@ async def test_get_posts():
         assert len(community_posts) == 200
         assert community_posts[0].get("data").get("subreddit") == TEST_COMMUNITY
 
-        # ------------------------------------------------------------- #
+        # --------------------------------------------------------------- #
 
         listing_posts: list = await get_posts(
-            posts_type="listing",
-            posts_source="best",
+            _type="listing",
+            _from="best",
             sort="hot",
             timeframe="month",
             limit=10,
@@ -94,34 +94,17 @@ async def test_get_posts():
         assert len(listing_posts) == 10
         assert listing_posts[0].get("data").get("subreddit") == "best"
 
-        # ------------------------------------------------------------- #
+        # --------------------------------------------------------------- #
 
-        search_posts: list = await get_posts(
-            posts_type="search",
-            posts_source="covid-19",
-            sort="controversial",
-            limit=5,
-            session=session,
-        )
-
-        assert isinstance(search_posts, list)
-        assert len(search_posts) == 5
-        assert (
-            "covid-19" in search_posts[0].get("data").get("selftext").lower()
-            or search_posts[0].get("data").get("title").lower()
-        )
-
-        # ------------------------------------------------------------- #
-
-        new_posts: list = await get_posts(posts_type="new", limit=120, session=session)
+        new_posts: list = await get_posts(_type="new", limit=120, session=session)
 
         assert isinstance(new_posts, list)
         assert len(new_posts) == 120
 
-        # ------------------------------------------------------------- #
+        # --------------------------------------------------------------- #
 
         front_page_posts: list = await get_posts(
-            posts_type="front_page",
+            _type="front_page",
             sort="top",
             timeframe="hour",
             limit=3,
@@ -133,3 +116,46 @@ async def test_get_posts():
 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
+@pytest.mark.asyncio
+async def test_search():
+    async with aiohttp.ClientSession() as session:
+        # --------------------------------------------------------------- #
+
+        search_posts: list[dict] = await search(
+            _type="posts",
+            query="covid-19",
+            limit=5,
+            session=session,
+        )
+
+        assert isinstance(search_posts, list)
+        assert len(search_posts) == 5
+        assert (
+            "covid-19" in search_posts[0].get("data").get("selftext").lower()
+            or search_posts[0].get("data").get("title").lower()
+        )
+
+        # --------------------------------------------------------------- #
+
+        search_communities: list[dict] = await search(
+            _type="communities", query="ask", limit=13, session=session
+        )
+
+        assert isinstance(search_communities, list)
+        assert len(search_communities) == 13
+        assert "ask" in search_communities[0].get("data").get("display_name").lower()
+
+        # --------------------------------------------------------------- #
+
+        search_users: list[dict] = await search(
+            _type="users",
+            query="john",
+            limit=22,
+            session=session,
+        )
+
+        assert isinstance(search_users, list)
+        assert len(search_users) == 22
+        assert "john" in search_users[1].get("data").get("name").lower()

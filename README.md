@@ -15,7 +15,8 @@ A **Reddit** Data Analysis Toolkit.
 - [x] **<ins>It can also get posts from various sources, such as</ins>**:
     * **New**: Allows getting new posts
     * **Reddit Front-Page**: Allows getting posts from the Reddit Front-Page
-    * **Searching**: Allows getting posts that match the user-provided query from all over Reddit
+    * **Searching**: Allows searching *Users*, *Posts*, and *Communities* that match the user-provided query from all
+      over Reddit
     * **Listing**: Allows getting posts from a user-specified Reddit Listing
 - [x] **<ins>Bonus Features</ins>**
     * **Fully Async (both in the CLI and GUI)**
@@ -131,9 +132,6 @@ async def async_posts():
         # Fetch posts from a specified listing ('best')
         listing_posts = await posts.listing(listings_name="best", limit=50, sort="best", timeframe="month",
                                             session=session)
-
-        # Fetch posts that match the specified search query 'covid-19'
-        search_results = await posts.search(query="covid-19", limit=300, session=session)
 
         print(new_posts)
         print(front_page_posts)

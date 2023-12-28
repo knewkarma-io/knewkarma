@@ -9,11 +9,12 @@ from dataclasses import dataclass
 class User:
     name: str
     id: str
+    icon_img: str
     is_verified: bool
     has_verified_email: bool
-    is_blocked: bool
-    is_gold: bool
     is_mod: bool
+    is_gold: bool
+    is_blocked: bool
     is_employee: bool
     hidden_from_bots: bool
     accepts_followers: bool
@@ -21,7 +22,7 @@ class User:
     link_karma: int
     awardee_karma: int
     total_karma: int
-    created_at: str
+    joined_at: str
     community: dict
     raw_data: dict
 
@@ -80,9 +81,6 @@ class Post:
     community: str
     community_id: str
     community_type: str
-    upvotes: int
-    upvote_ratio: float
-    downvotes: int
     gilded: int
     is_nsfw: bool
     is_shareable: bool
@@ -94,7 +92,10 @@ class Post:
     permalink: str
     is_locked: bool
     is_archived: bool
-    created_at: str
+    upvotes: int
+    upvote_ratio: float
+    downvotes: int
+    posted_at: str
     raw_data: dict
 
 
@@ -116,12 +117,24 @@ class Comment:
     is_stickied: bool
     is_locked: bool
     is_archived: bool
-    created_at: str
+    commented_at: str
     community: str
     community_type: str
     post_id: str
     post_title: str
     author_is_premium: bool
+    raw_data: dict
+
+
+# -------------------------------------------------------------------- #
+
+
+@dataclass
+class WikiPage:
+    revision_id: str
+    revision_date: str
+    content_markdown: str
+    revised_by: User
     raw_data: dict
 
 
