@@ -1,9 +1,21 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-from .base import RedditCommunity, RedditPosts, RedditUser
+from .base import (
+    RedditCommunity,
+    RedditCommunities,
+    RedditPosts,
+    RedditUser,
+    RedditSearch,
+)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-__all__ = ["RedditCommunity", "RedditPosts", "RedditUser"]
+__all__ = [
+    "RedditCommunity",
+    "RedditCommunities",
+    "RedditPosts",
+    "RedditUser",
+    "RedditSearch",
+]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

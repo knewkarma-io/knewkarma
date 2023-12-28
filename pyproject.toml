@@ -5,14 +5,14 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "knewkarma"
 version = "4.0.0.0"
-description = "A Reddit Data Analysis Toolkit."
+description = "Reddit Data Analysis Toolkit."
 authors = ["Richard Mwewa <rly0nheart@duck.com>"]
 readme = "README.md"
 license = "MIT License"
 homepage = "https://pypi.org/project/knewkarma"
 documentation = "https://github.com/bellingcat/knewkarma/wiki"
 repository = "https://github.com/bellingcat/knewkarma"
-keywords = ["reddit-crawler", "reddit-scraping", "reddit", "reddit-api", "reddit-data"]
+keywords = ["reddit-crawler", "reddit-scraping", "reddit", "reddit-api", "reddit-data-analysis"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Visual Basic",

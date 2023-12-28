@@ -8,7 +8,7 @@ from typing import Union, List, Dict
 import pandas as pd
 
 from ._parser import create_parser
-from .data import Comment, Post, Community, User, PreviewCommunity
+from .data import Comment, Post, Community, User, PreviewCommunity, WikiPage
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -16,48 +16,72 @@ from .data import Comment, Post, Community, User, PreviewCommunity
 
 def dataframe(
     data: Union[
-        User,
         Community,
         Dict,
-        List[Union[Post, Comment, Community, PreviewCommunity]],
+        User,
+        WikiPage,
+        List[Union[Comment, Community, Post, PreviewCommunity, User]],
     ],
     to_dir: str,
-    save_json: Union[bool, str] = False,
-    save_csv: Union[bool, str] = False,
-) -> pd.DataFrame:
+    save_csv: str = None,
+    save_json: str = None,
+):
     """
-    Creates a pandas DataFrame from various types of data and optionally save it to JSON or CSV.
+    Converts and prints provided data into a pandas DataFrame and optionally saves it as JSON or CSV file.
 
-    :param data: Data to be converted into a DataFrame. This can be a User, Community, dictionary,
-                 or a list of Post, Comment, Community, or PreviewCommunity objects.
-    :param to_dir: Directory path where the JSON/CSV file will be saved.
-    :param save_json: If provided, the DataFrame will be saved as a JSON file. This can be a boolean or a string.
-                      If it's a string, it will be used as the base name for the file.
-    :param save_csv: If provided, the DataFrame will be saved as a CSV file. This can be a boolean or a string.
-                     If it's a string, it will be used as the base name for the file.
-    :return: A pandas DataFrame created from the provided data.
+    :param data: Data to be converted. Can be a single object (Community, User, WikiPage),
+                 a dictionary, or a list of objects (Comment, Community, Post, PreviewCommunity, User).
+    :type data: Union[Community, Dict, User, WikiPage, List[Union[Comment, Community, Post, PreviewCommunity, User]]]
+    :param save_csv: Optional. If provided, saves the DataFrame as a CSV file. Can be a boolean
+                     (True for default naming) or a string (specific file name).
+    :type save_csv: str
+    :param save_json: Optional. If provided, saves the DataFrame as a JSON file. Can be a boolean
+                      (True for default naming) or a string (specific file name).
+    :type save_json: str
+    :param to_dir: Directory path where the JSON/CSV file, will be stored (if saved).
+    :type to_dir: str
+    :return: A pandas DataFrame constructed from the provided data. Excludes any 'raw_data'
+             column from the dataframe.
+    :rtype: pd.DataFrame
+
+    Note
+    ----
+        This function internally converts User, Community, and WikiPage objects into a
+        list of dictionaries before DataFrame creation.
+        For lists containing Comment, Community, Post, PreviewCommunity and User objects,
+        each object is converted to its dictionary representation.
     """
-    # Convert single User or Community objects to a list of dictionaries
-    if isinstance(data, (User, Community)):
+    from rich import print
+
+    # Convert single User, Community, or WikiPage objects to a list of dictionaries
+    if isinstance(data, (User, Community, WikiPage)):
+        # Transform each attribute of the object into a dictionary entry
         data = [{"key": key, "value": value} for key, value in data.__dict__.items()]
-    # Convert a list of User or Community objects
-    elif isinstance(data, list) and all(
-        isinstance(item, (User, Community)) for item in data
-    ):
-        data = [
-            {"key": key, "value": value}
-            for item in data
-            for key, value in item.__dict__.items()
-        ]
-    # For other types of data, directly use it for DataFrame creation
-    elif not isinstance(data, Dict):
-        data = data
 
+    # Convert a list of objects (Comment, Community, Post, PreviewCommunity, User) to a list of dictionaries
+    elif isinstance(data, list) and all(
+        isinstance(item, (Comment, Community, Post, PreviewCommunity, User))
+        for item in data
+    ):
+        # Each object in the list is converted to its dictionary representation
+        data = [item.__dict__ for item in data]
+
+    # If data is already a dictionary or a list, use it directly for DataFrame creation
+    elif isinstance(data, (Dict, List)):
+        # No transformation needed; the data is ready for DataFrame creation
+        pass
+
+    # Set pandas display option to show all rows
     pd.set_option("display.max_rows", None)
+
+    # Create a DataFrame from the processed data
     df = pd.DataFrame(data)
+
+    # Save the DataFrame to CSV or JSON if specified
     save_dataframe(df=df, save_csv=save_csv, save_json=save_json, to_dir=to_dir)
 
-    return df.loc[:, df.columns != "raw_data"]  # Exclude 'raw_data' column if it exists
+    # Print the DataFrame, excluding the 'raw_data' column if it exists
+    print(df.loc[:, df.columns != "raw_data"])
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

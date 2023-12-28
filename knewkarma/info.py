@@ -13,7 +13,7 @@ version: str = "4.0.0.0"
 
 description: str = f"""
 # Knew Karma CLI {version}
-> A **Reddit** Data Analysis Toolkit."""
+> **Reddit** Data Analysis Toolkit."""
 epilog: str = f"""
 # Copyright © 2023-2024 [{author}]({about_author})
 ```
@@ -79,8 +79,39 @@ knewkarma community MachineLearning --profile
 ```
 knewkarma community MachineLearning --posts
 ```
-"""
 
+## Get community's wiki pages
+```
+knewkarma community MachineLearning --wiki-pages
+```
+
+## Get community's specified wiki page data
+```
+knewkarma community MachineLearning --wiki-page config/description
+```
+"""
+communities_examples: str = """
+# Examples
+## Get all communities
+```
+knewkarma communities --all
+```
+
+## Get default communities
+```
+knewkarma communities --default
+```
+
+## Get new communities
+```
+knewkarma communities --new
+```
+
+## Get popular communities
+```
+knewkarma communities --popular
+```
+"""
 posts_examples: str = """
 # Examples
 ## Get new posts
@@ -104,6 +135,23 @@ knewkarma posts --listing best
 ```
 """
 
+search_examples: str = """
+# Examples
+## Search users
+```
+knewkarma search john --users
+```
+
+## Search communities
+```
+knewkarma search ask --communities
+```
+
+## Search posts
+```
+knewkarma search covid-19 --posts
+```
+"""
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 # Construct path to the program's directory

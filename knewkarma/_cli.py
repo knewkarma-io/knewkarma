@@ -6,13 +6,13 @@ import os
 from datetime import datetime
 
 import aiohttp
-import rich
 
 from . import RedditUser, RedditCommunity, RedditPosts
-from ._meta import PROGRAM_DIRECTORY
+from ._api import get_updates
 from ._parser import create_parser, version
-from ._utils import dataframe, log, pathfinder
-from .api import get_updates
+from ._utils import log, pathfinder, dataframe
+from .base import RedditSearch, RedditCommunities
+from .info import PROGRAM_DIRECTORY
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -29,13 +29,15 @@ async def execute_functions(arguments: argparse.Namespace, function_mapping: dic
     """
 
     async with aiohttp.ClientSession() as request_session:
-        await get_updates(session=request_session)
+        if arguments.updates:
+            await get_updates(session=request_session)
 
         mode_action = function_mapping.get(arguments.mode)
-        is_executed: bool = False
         file_dir: str = ""
         for action, function in mode_action:
+            arg_is_available: bool = False
             if getattr(arguments, action, False):
+                arg_is_available = True
                 # ------------------------------------------------------------ #
 
                 if arguments.csv or arguments.json:
@@ -47,28 +49,21 @@ async def execute_functions(arguments: argparse.Namespace, function_mapping: dic
                         ]
                     )
 
-                # --------------------------------------------------------------- #
+                # ----------------------------------------------------------- #
 
-                call_function = await function(session=request_session)
-                if call_function:
-                    rich.print(
-                        dataframe(
-                            data=call_function,
-                            save_csv=arguments.csv,
-                            save_json=arguments.json,
-                            to_dir=file_dir,
-                        )
+                function_data = await function(session=request_session)
+                if function_data:
+                    dataframe(
+                        data=function_data,
+                        save_csv=arguments.csv,
+                        save_json=arguments.json,
+                        to_dir=file_dir,
                     )
-
-                is_executed = True
-
                 break
 
-                # ------------------------------------------------------------- #
-
-        if not is_executed:
+        if not arg_is_available:
             log.warning(
-                f"knewkarma {arguments.mode}: missing one or more expected argument(s)."
+                f"knewkarma {arguments.mode}: missing one or more expected argument(s)"
             )
 
 
@@ -79,27 +74,31 @@ def stage_and_start():
     """
     Main entrypoint for the Knew Karma command-line interface.
     """
-    # -------------------------------------------------------------------- #
+    # ------------------------------------------------------------------------- #
 
     parser = create_parser()
     arguments: argparse = parser.parse_args()
 
     start_time: datetime = datetime.now()
 
-    # -------------------------------------------------------------------- #
+    # ------------------------------------------------------------------------ #
 
     limit: int = arguments.limit
     sort = arguments.sort
     timeframe = arguments.timeframe
+
+    search_query = arguments.query if hasattr(arguments, "query") else None
 
     # ------------------------------------------------------------------------ #
 
     user = RedditUser(
         username=arguments.username if hasattr(arguments, "username") else None,
     )
+    search = RedditSearch()
     community = RedditCommunity(
         community=arguments.community if hasattr(arguments, "community") else None,
     )
+    communities = RedditCommunities()
     posts = RedditPosts()
 
     # ------------------------------------------------------------------------ #
@@ -144,6 +143,28 @@ def stage_and_start():
                     limit=limit, sort=sort, timeframe=timeframe, session=session
                 ),
             ),
+            ("wiki_pages", lambda session: community.wiki_pages(session=session)),
+            (
+                "wiki_page",
+                lambda session: community.wiki_page(
+                    page=arguments.wiki_page
+                    if hasattr(arguments, "wiki_page")
+                    else None,
+                    session=session,
+                ),
+            ),
+        ],
+        "communities": [
+            ("all", lambda session: communities.all(limit=limit, session=session)),
+            (
+                "default",
+                lambda session: communities.default(limit=limit, session=session),
+            ),
+            ("new", lambda session: communities.new(limit=limit, session=session)),
+            (
+                "popular",
+                lambda session: communities.popular(limit=limit, session=session),
+            ),
         ],
         "posts": [
             ("new", lambda session: posts.new(limit=limit, sort=sort, session=session)),
@@ -154,19 +175,33 @@ def stage_and_start():
                 ),
             ),
             (
-                "search",
-                lambda session: posts.search(
-                    query=arguments.search,
+                "listing",
+                lambda session: posts.listing(
+                    listings_name=arguments.listing,
                     limit=limit,
                     sort=sort,
                     timeframe=timeframe,
                     session=session,
                 ),
             ),
+        ],
+        "search": [
             (
-                "listing",
-                lambda session: posts.listing(
-                    listings_name=arguments.listing,
+                "users",
+                lambda session: search.users(
+                    query=search_query, limit=limit, session=session
+                ),
+            ),
+            (
+                "communities",
+                lambda session: search.communities(
+                    query=search_query, limit=limit, session=session
+                ),
+            ),
+            (
+                "posts",
+                lambda session: search.posts(
+                    query=search_query,
                     limit=limit,
                     sort=sort,
                     timeframe=timeframe,
