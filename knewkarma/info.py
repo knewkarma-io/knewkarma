@@ -124,11 +124,6 @@ knewkarma posts --new
 knewkarma posts --front-page
 ```
 
-## Search posts
-```
-knewkarma posts --search "covid-19"
-```
-
 ## Get posts from specified listing
 ```
 knewkarma posts --listing best

@@ -198,7 +198,7 @@ def setup_logging(debug_mode: bool) -> logging.getLogger:
         format="%(message)s",
         handlers=[
             RichHandler(
-                markup=True, log_time_format="[%I:%M:%S %p]", show_level=debug_mode
+                markup=True, log_time_format="[%I:%M:%S%p]", show_level=debug_mode
             )
         ],
     )
