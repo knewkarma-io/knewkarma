@@ -247,18 +247,24 @@ def create_parser() -> argparse.ArgumentParser:
     )
     user_parser.add_argument("username", help="username")
     user_parser.add_argument(
-        "-c",
-        "--comments",
-        help="get a user's comments",
-        action="store_true",
-    )
-    user_parser.add_argument(
         "-p",
         "--profile",
         help="get a user's profile",
         action="store_true",
     )
+    user_parser.add_argument(
+        "-c",
+        "--comments",
+        help="get a user's comments",
+        action="store_true",
+    )
 
+    user_parser.add_argument(
+        "-o",
+        "--overview",
+        help="get a user's most recent comment activity",
+        action="store_true",
+    )
     user_parser.add_argument(
         "-pp",
         "--posts",
