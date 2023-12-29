@@ -13,8 +13,9 @@ Knew Karma offers a variety of features for accessing and analyzing Reddit data,
 ### User Data
 
 - **Profile** — Retrieves user profile information.
-- **Posts** — Retrieves posts created by a user.
-- **Comments** — Collects comments from users.
+- **Posts** — Retrieves user posts.
+- **Comments** — Retrieves user comments.
+- **Overview** — Retrieves user's most recent comment activity.
 - **Top n Communities** — Identifies top communities based on user activity.
 - **Moderated Communities** — Lists communities moderated by the user.
 
