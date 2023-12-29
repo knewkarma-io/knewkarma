@@ -24,13 +24,14 @@ Partial Class MainWindow
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainWindow))
-        Dim TreeNode1 As TreeNode = New TreeNode("Subreddit")
-        Dim TreeNode2 As TreeNode = New TreeNode("User")
-        Dim TreeNode3 As TreeNode = New TreeNode("Front Page")
-        Dim TreeNode4 As TreeNode = New TreeNode("Listings")
-        Dim TreeNode5 As TreeNode = New TreeNode("Search")
-        Dim TreeNode6 As TreeNode = New TreeNode("Posts", New TreeNode() {TreeNode3, TreeNode4, TreeNode5})
-        Dim TreeNode7 As TreeNode = New TreeNode("Username", New TreeNode() {TreeNode1, TreeNode2, TreeNode6})
+        Dim TreeNode1 As TreeNode = New TreeNode("User")
+        Dim TreeNode2 As TreeNode = New TreeNode("Community")
+        Dim TreeNode3 As TreeNode = New TreeNode("Search")
+        Dim TreeNode4 As TreeNode = New TreeNode("New")
+        Dim TreeNode5 As TreeNode = New TreeNode("Front Page")
+        Dim TreeNode6 As TreeNode = New TreeNode("Listings")
+        Dim TreeNode7 As TreeNode = New TreeNode("Posts", New TreeNode() {TreeNode4, TreeNode5, TreeNode6})
+        Dim TreeNode8 As TreeNode = New TreeNode("Username", New TreeNode() {TreeNode1, TreeNode2, TreeNode3, TreeNode7})
         TextBoxQuery = New TextBox()
         ButtonSearch = New Button()
         ContextMenuStripRightClick = New ContextMenuStrip(components)
@@ -44,15 +45,15 @@ Partial Class MainWindow
         ToCSVToolStripMenuItem = New ToolStripMenuItem()
         ExitToolStripMenuItem = New ToolStripMenuItem()
         TextBoxUsername = New TextBox()
-        TextBoxSubreddit = New TextBox()
+        TextBoxCommunity = New TextBox()
         RadioButtonUserComments = New RadioButton()
         RadioButtonUserPosts = New RadioButton()
         RadioButtonUserProfile = New RadioButton()
-        RadioButtonSubredditProfile = New RadioButton()
-        RadioButtonSubredditPosts = New RadioButton()
+        RadioButtonCommunityProfile = New RadioButton()
+        RadioButtonCommunityPosts = New RadioButton()
         ComboBoxUserDataListing = New ComboBox()
         ComboBoxSearchResultListing = New ComboBox()
-        ComboBoxSubredditPostsListing = New ComboBox()
+        ComboBoxCommunityPostsListing = New ComboBox()
         ComboBoxFrontPageDataListing = New ComboBox()
         RadioButtonBest = New RadioButton()
         RadioButtonPopular = New RadioButton()
@@ -68,12 +69,12 @@ Partial Class MainWindow
         LabelFrontPageDataListing = New Label()
         NumericUpDownFrontPageDataLimit = New NumericUpDown()
         ButtonFetchFrontPageData = New Button()
-        GroupBoxSubredditDataFiltering = New GroupBox()
-        LabelSubredditPostsLimit = New Label()
-        LabelSubredditPostsListing = New Label()
-        NumericUpDownSubredditPostsLimit = New NumericUpDown()
-        ButtonFetchSubredditData = New Button()
-        GroupBoxSubredditData = New GroupBox()
+        GroupBoxCommunityDataFiltering = New GroupBox()
+        LabelCommunityPostsLimit = New Label()
+        LabelCommunityPostsListing = New Label()
+        NumericUpDownCommunityPostsLimit = New NumericUpDown()
+        ButtonFetchCommunityData = New Button()
+        GroupBoxCommunityData = New GroupBox()
         GroupBoxUserDataFiltering = New GroupBox()
         LabelUserDataLimit = New Label()
         LabelUserPostsListing = New Label()
@@ -84,8 +85,8 @@ Partial Class MainWindow
         PanelUserData = New Panel()
         PanelUserDataHeader = New Panel()
         Label1 = New Label()
-        PanelSubredditData = New Panel()
-        PanelSubredditDataHeader = New Panel()
+        PanelCommunityData = New Panel()
+        PanelCommunityDataHeader = New Panel()
         Label2 = New Label()
         PanelFrontPageData = New Panel()
         PanelFrontPageHeader = New Panel()
@@ -100,6 +101,10 @@ Partial Class MainWindow
         NumericUpDownPostListingsLimit = New NumericUpDown()
         GroupBoxPostListings = New GroupBox()
         PanelSearchPosts = New Panel()
+        GroupBox1 = New GroupBox()
+        RadioButtonSearchCommunities = New RadioButton()
+        RadioButtonSearchUsers = New RadioButton()
+        RadioButtonSearchPosts = New RadioButton()
         Panel1 = New Panel()
         Label4 = New Label()
         NotifyIcon1 = New NotifyIcon(components)
@@ -108,16 +113,16 @@ Partial Class MainWindow
         CType(NumericUpDownSearchResultLimit, ComponentModel.ISupportInitialize).BeginInit()
         GroupBoxFrontPageDataFiltering.SuspendLayout()
         CType(NumericUpDownFrontPageDataLimit, ComponentModel.ISupportInitialize).BeginInit()
-        GroupBoxSubredditDataFiltering.SuspendLayout()
-        CType(NumericUpDownSubredditPostsLimit, ComponentModel.ISupportInitialize).BeginInit()
-        GroupBoxSubredditData.SuspendLayout()
+        GroupBoxCommunityDataFiltering.SuspendLayout()
+        CType(NumericUpDownCommunityPostsLimit, ComponentModel.ISupportInitialize).BeginInit()
+        GroupBoxCommunityData.SuspendLayout()
         GroupBoxUserDataFiltering.SuspendLayout()
         CType(NumericUpDownUserDataLimit, ComponentModel.ISupportInitialize).BeginInit()
         GroupBoxUserData.SuspendLayout()
         PanelUserData.SuspendLayout()
         PanelUserDataHeader.SuspendLayout()
-        PanelSubredditData.SuspendLayout()
-        PanelSubredditDataHeader.SuspendLayout()
+        PanelCommunityData.SuspendLayout()
+        PanelCommunityDataHeader.SuspendLayout()
         PanelFrontPageData.SuspendLayout()
         PanelFrontPageHeader.SuspendLayout()
         PanelPostListings.SuspendLayout()
@@ -126,6 +131,7 @@ Partial Class MainWindow
         CType(NumericUpDownPostListingsLimit, ComponentModel.ISupportInitialize).BeginInit()
         GroupBoxPostListings.SuspendLayout()
         PanelSearchPosts.SuspendLayout()
+        GroupBox1.SuspendLayout()
         Panel1.SuspendLayout()
         SuspendLayout()
         ' 
@@ -134,7 +140,7 @@ Partial Class MainWindow
         TextBoxQuery.BackColor = SystemColors.Window
         TextBoxQuery.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         TextBoxQuery.ForeColor = SystemColors.WindowText
-        TextBoxQuery.Location = New Point(3, 103)
+        TextBoxQuery.Location = New Point(3, 163)
         TextBoxQuery.Name = "TextBoxQuery"
         TextBoxQuery.PlaceholderText = "Search query (e.g., osint)"
         TextBoxQuery.Size = New Size(131, 23)
@@ -145,7 +151,7 @@ Partial Class MainWindow
         ButtonSearch.FlatStyle = FlatStyle.Popup
         ButtonSearch.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonSearch.ForeColor = Color.Black
-        ButtonSearch.Location = New Point(140, 103)
+        ButtonSearch.Location = New Point(140, 163)
         ButtonSearch.Name = "ButtonSearch"
         ButtonSearch.Size = New Size(79, 24)
         ButtonSearch.TabIndex = 6
@@ -255,14 +261,14 @@ Partial Class MainWindow
         TextBoxUsername.Size = New Size(131, 23)
         TextBoxUsername.TabIndex = 1
         ' 
-        ' TextBoxSubreddit
+        ' TextBoxCommunity
         ' 
-        TextBoxSubreddit.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
-        TextBoxSubreddit.Location = New Point(3, 163)
-        TextBoxSubreddit.Name = "TextBoxSubreddit"
-        TextBoxSubreddit.PlaceholderText = "Subreddit (e.g., Ask)"
-        TextBoxSubreddit.Size = New Size(131, 23)
-        TextBoxSubreddit.TabIndex = 5
+        TextBoxCommunity.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
+        TextBoxCommunity.Location = New Point(3, 163)
+        TextBoxCommunity.Name = "TextBoxCommunity"
+        TextBoxCommunity.PlaceholderText = "Community (e.g., Ask)"
+        TextBoxCommunity.Size = New Size(131, 23)
+        TextBoxCommunity.TabIndex = 5
         ' 
         ' RadioButtonUserComments
         ' 
@@ -299,29 +305,29 @@ Partial Class MainWindow
         RadioButtonUserProfile.Text = "Profile"
         RadioButtonUserProfile.UseVisualStyleBackColor = True
         ' 
-        ' RadioButtonSubredditProfile
+        ' RadioButtonCommunityProfile
         ' 
-        RadioButtonSubredditProfile.AutoSize = True
-        RadioButtonSubredditProfile.Checked = True
-        RadioButtonSubredditProfile.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        RadioButtonSubredditProfile.Location = New Point(6, 23)
-        RadioButtonSubredditProfile.Name = "RadioButtonSubredditProfile"
-        RadioButtonSubredditProfile.Size = New Size(56, 19)
-        RadioButtonSubredditProfile.TabIndex = 5
-        RadioButtonSubredditProfile.TabStop = True
-        RadioButtonSubredditProfile.Text = "Profile"
-        RadioButtonSubredditProfile.UseVisualStyleBackColor = True
+        RadioButtonCommunityProfile.AutoSize = True
+        RadioButtonCommunityProfile.Checked = True
+        RadioButtonCommunityProfile.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
+        RadioButtonCommunityProfile.Location = New Point(6, 23)
+        RadioButtonCommunityProfile.Name = "RadioButtonCommunityProfile"
+        RadioButtonCommunityProfile.Size = New Size(56, 19)
+        RadioButtonCommunityProfile.TabIndex = 5
+        RadioButtonCommunityProfile.TabStop = True
+        RadioButtonCommunityProfile.Text = "Profile"
+        RadioButtonCommunityProfile.UseVisualStyleBackColor = True
         ' 
-        ' RadioButtonSubredditPosts
+        ' RadioButtonCommunityPosts
         ' 
-        RadioButtonSubredditPosts.AutoSize = True
-        RadioButtonSubredditPosts.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        RadioButtonSubredditPosts.Location = New Point(71, 23)
-        RadioButtonSubredditPosts.Name = "RadioButtonSubredditPosts"
-        RadioButtonSubredditPosts.Size = New Size(51, 19)
-        RadioButtonSubredditPosts.TabIndex = 6
-        RadioButtonSubredditPosts.Text = "Posts"
-        RadioButtonSubredditPosts.UseVisualStyleBackColor = True
+        RadioButtonCommunityPosts.AutoSize = True
+        RadioButtonCommunityPosts.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
+        RadioButtonCommunityPosts.Location = New Point(71, 23)
+        RadioButtonCommunityPosts.Name = "RadioButtonCommunityPosts"
+        RadioButtonCommunityPosts.Size = New Size(51, 19)
+        RadioButtonCommunityPosts.TabIndex = 6
+        RadioButtonCommunityPosts.Text = "Posts"
+        RadioButtonCommunityPosts.UseVisualStyleBackColor = True
         ' 
         ' ComboBoxUserDataListing
         ' 
@@ -358,23 +364,23 @@ Partial Class MainWindow
         ComboBoxSearchResultListing.Sorted = True
         ComboBoxSearchResultListing.TabIndex = 11
         ' 
-        ' ComboBoxSubredditPostsListing
+        ' ComboBoxCommunityPostsListing
         ' 
-        ComboBoxSubredditPostsListing.AutoCompleteCustomSource.AddRange(New String() {"Controversial", "Hot", "Best", "New", "Rising"})
-        ComboBoxSubredditPostsListing.AutoCompleteSource = AutoCompleteSource.CustomSource
-        ComboBoxSubredditPostsListing.BackColor = SystemColors.Window
-        ComboBoxSubredditPostsListing.DropDownStyle = ComboBoxStyle.DropDownList
-        ComboBoxSubredditPostsListing.Enabled = False
-        ComboBoxSubredditPostsListing.FlatStyle = FlatStyle.Popup
-        ComboBoxSubredditPostsListing.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
-        ComboBoxSubredditPostsListing.ForeColor = SystemColors.WindowText
-        ComboBoxSubredditPostsListing.FormattingEnabled = True
-        ComboBoxSubredditPostsListing.Items.AddRange(New Object() {"all", "best", "controversial", "hot", "new", "rising", "top"})
-        ComboBoxSubredditPostsListing.Location = New Point(6, 40)
-        ComboBoxSubredditPostsListing.Name = "ComboBoxSubredditPostsListing"
-        ComboBoxSubredditPostsListing.Size = New Size(116, 23)
-        ComboBoxSubredditPostsListing.Sorted = True
-        ComboBoxSubredditPostsListing.TabIndex = 11
+        ComboBoxCommunityPostsListing.AutoCompleteCustomSource.AddRange(New String() {"Controversial", "Hot", "Best", "New", "Rising"})
+        ComboBoxCommunityPostsListing.AutoCompleteSource = AutoCompleteSource.CustomSource
+        ComboBoxCommunityPostsListing.BackColor = SystemColors.Window
+        ComboBoxCommunityPostsListing.DropDownStyle = ComboBoxStyle.DropDownList
+        ComboBoxCommunityPostsListing.Enabled = False
+        ComboBoxCommunityPostsListing.FlatStyle = FlatStyle.Popup
+        ComboBoxCommunityPostsListing.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
+        ComboBoxCommunityPostsListing.ForeColor = SystemColors.WindowText
+        ComboBoxCommunityPostsListing.FormattingEnabled = True
+        ComboBoxCommunityPostsListing.Items.AddRange(New Object() {"all", "best", "controversial", "hot", "new", "rising", "top"})
+        ComboBoxCommunityPostsListing.Location = New Point(6, 40)
+        ComboBoxCommunityPostsListing.Name = "ComboBoxCommunityPostsListing"
+        ComboBoxCommunityPostsListing.Size = New Size(116, 23)
+        ComboBoxCommunityPostsListing.Sorted = True
+        ComboBoxCommunityPostsListing.TabIndex = 11
         ' 
         ' ComboBoxFrontPageDataListing
         ' 
@@ -463,12 +469,12 @@ Partial Class MainWindow
         GroupBoxSearchResultsFiltering.Controls.Add(NumericUpDownSearchResultLimit)
         GroupBoxSearchResultsFiltering.Controls.Add(ComboBoxSearchResultListing)
         GroupBoxSearchResultsFiltering.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
-        GroupBoxSearchResultsFiltering.Location = New Point(3, 23)
+        GroupBoxSearchResultsFiltering.Location = New Point(3, 81)
         GroupBoxSearchResultsFiltering.Name = "GroupBoxSearchResultsFiltering"
         GroupBoxSearchResultsFiltering.Size = New Size(215, 70)
         GroupBoxSearchResultsFiltering.TabIndex = 11
         GroupBoxSearchResultsFiltering.TabStop = False
-        GroupBoxSearchResultsFiltering.Text = "Set posts sort criterion and results limit"
+        GroupBoxSearchResultsFiltering.Text = "Set results sort criterion and limit"
         ' 
         ' LabelSearchResultsLimit
         ' 
@@ -495,7 +501,7 @@ Partial Class MainWindow
         NumericUpDownSearchResultLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownSearchResultLimit.Location = New Point(130, 41)
         NumericUpDownSearchResultLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        NumericUpDownSearchResultLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
+        NumericUpDownSearchResultLimit.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         NumericUpDownSearchResultLimit.Name = "NumericUpDownSearchResultLimit"
         NumericUpDownSearchResultLimit.ReadOnly = True
         NumericUpDownSearchResultLimit.Size = New Size(79, 22)
@@ -541,7 +547,7 @@ Partial Class MainWindow
         NumericUpDownFrontPageDataLimit.Font = New Font("Segoe UI Variable Text Semibold", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownFrontPageDataLimit.Location = New Point(130, 41)
         NumericUpDownFrontPageDataLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        NumericUpDownFrontPageDataLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
+        NumericUpDownFrontPageDataLimit.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         NumericUpDownFrontPageDataLimit.Name = "NumericUpDownFrontPageDataLimit"
         NumericUpDownFrontPageDataLimit.ReadOnly = True
         NumericUpDownFrontPageDataLimit.Size = New Size(79, 22)
@@ -560,80 +566,80 @@ Partial Class MainWindow
         ButtonFetchFrontPageData.Text = "&Fetch"
         ButtonFetchFrontPageData.UseVisualStyleBackColor = True
         ' 
-        ' GroupBoxSubredditDataFiltering
+        ' GroupBoxCommunityDataFiltering
         ' 
-        GroupBoxSubredditDataFiltering.Controls.Add(LabelSubredditPostsLimit)
-        GroupBoxSubredditDataFiltering.Controls.Add(LabelSubredditPostsListing)
-        GroupBoxSubredditDataFiltering.Controls.Add(NumericUpDownSubredditPostsLimit)
-        GroupBoxSubredditDataFiltering.Controls.Add(ComboBoxSubredditPostsListing)
-        GroupBoxSubredditDataFiltering.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
-        GroupBoxSubredditDataFiltering.Location = New Point(3, 81)
-        GroupBoxSubredditDataFiltering.Name = "GroupBoxSubredditDataFiltering"
-        GroupBoxSubredditDataFiltering.Size = New Size(215, 70)
-        GroupBoxSubredditDataFiltering.TabIndex = 11
-        GroupBoxSubredditDataFiltering.TabStop = False
-        GroupBoxSubredditDataFiltering.Text = "Set posts sort criterion and output limit"
+        GroupBoxCommunityDataFiltering.Controls.Add(LabelCommunityPostsLimit)
+        GroupBoxCommunityDataFiltering.Controls.Add(LabelCommunityPostsListing)
+        GroupBoxCommunityDataFiltering.Controls.Add(NumericUpDownCommunityPostsLimit)
+        GroupBoxCommunityDataFiltering.Controls.Add(ComboBoxCommunityPostsListing)
+        GroupBoxCommunityDataFiltering.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
+        GroupBoxCommunityDataFiltering.Location = New Point(3, 81)
+        GroupBoxCommunityDataFiltering.Name = "GroupBoxCommunityDataFiltering"
+        GroupBoxCommunityDataFiltering.Size = New Size(215, 70)
+        GroupBoxCommunityDataFiltering.TabIndex = 11
+        GroupBoxCommunityDataFiltering.TabStop = False
+        GroupBoxCommunityDataFiltering.Text = "Set posts sort criterion and output limit"
         ' 
-        ' LabelSubredditPostsLimit
+        ' LabelCommunityPostsLimit
         ' 
-        LabelSubredditPostsLimit.AutoSize = True
-        LabelSubredditPostsLimit.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        LabelSubredditPostsLimit.Location = New Point(126, 23)
-        LabelSubredditPostsLimit.Name = "LabelSubredditPostsLimit"
-        LabelSubredditPostsLimit.Size = New Size(75, 15)
-        LabelSubredditPostsLimit.TabIndex = 19
-        LabelSubredditPostsLimit.Text = "Limit posts to:"
+        LabelCommunityPostsLimit.AutoSize = True
+        LabelCommunityPostsLimit.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
+        LabelCommunityPostsLimit.Location = New Point(126, 23)
+        LabelCommunityPostsLimit.Name = "LabelCommunityPostsLimit"
+        LabelCommunityPostsLimit.Size = New Size(75, 15)
+        LabelCommunityPostsLimit.TabIndex = 19
+        LabelCommunityPostsLimit.Text = "Limit posts to:"
         ' 
-        ' LabelSubredditPostsListing
+        ' LabelCommunityPostsListing
         ' 
-        LabelSubredditPostsListing.AutoSize = True
-        LabelSubredditPostsListing.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        LabelSubredditPostsListing.Location = New Point(4, 22)
-        LabelSubredditPostsListing.Name = "LabelSubredditPostsListing"
-        LabelSubredditPostsListing.Size = New Size(72, 15)
-        LabelSubredditPostsListing.TabIndex = 18
-        LabelSubredditPostsListing.Text = "Sort posts by:"
+        LabelCommunityPostsListing.AutoSize = True
+        LabelCommunityPostsListing.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
+        LabelCommunityPostsListing.Location = New Point(4, 22)
+        LabelCommunityPostsListing.Name = "LabelCommunityPostsListing"
+        LabelCommunityPostsListing.Size = New Size(72, 15)
+        LabelCommunityPostsListing.TabIndex = 18
+        LabelCommunityPostsListing.Text = "Sort posts by:"
         ' 
-        ' NumericUpDownSubredditPostsLimit
+        ' NumericUpDownCommunityPostsLimit
         ' 
-        NumericUpDownSubredditPostsLimit.Enabled = False
-        NumericUpDownSubredditPostsLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
-        NumericUpDownSubredditPostsLimit.Location = New Point(130, 41)
-        NumericUpDownSubredditPostsLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        NumericUpDownSubredditPostsLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
-        NumericUpDownSubredditPostsLimit.Name = "NumericUpDownSubredditPostsLimit"
-        NumericUpDownSubredditPostsLimit.ReadOnly = True
-        NumericUpDownSubredditPostsLimit.Size = New Size(79, 22)
-        NumericUpDownSubredditPostsLimit.TabIndex = 17
-        NumericUpDownSubredditPostsLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
+        NumericUpDownCommunityPostsLimit.Enabled = False
+        NumericUpDownCommunityPostsLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
+        NumericUpDownCommunityPostsLimit.Location = New Point(130, 41)
+        NumericUpDownCommunityPostsLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
+        NumericUpDownCommunityPostsLimit.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        NumericUpDownCommunityPostsLimit.Name = "NumericUpDownCommunityPostsLimit"
+        NumericUpDownCommunityPostsLimit.ReadOnly = True
+        NumericUpDownCommunityPostsLimit.Size = New Size(79, 22)
+        NumericUpDownCommunityPostsLimit.TabIndex = 17
+        NumericUpDownCommunityPostsLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
         ' 
-        ' ButtonFetchSubredditData
+        ' ButtonFetchCommunityData
         ' 
-        ButtonFetchSubredditData.FlatAppearance.BorderSize = 0
-        ButtonFetchSubredditData.FlatStyle = FlatStyle.Popup
-        ButtonFetchSubredditData.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
-        ButtonFetchSubredditData.ForeColor = Color.Black
-        ButtonFetchSubredditData.Location = New Point(140, 163)
-        ButtonFetchSubredditData.Name = "ButtonFetchSubredditData"
-        ButtonFetchSubredditData.Size = New Size(79, 24)
-        ButtonFetchSubredditData.TabIndex = 6
-        ButtonFetchSubredditData.Text = "&Fetch"
-        ButtonFetchSubredditData.UseVisualStyleBackColor = True
+        ButtonFetchCommunityData.FlatAppearance.BorderSize = 0
+        ButtonFetchCommunityData.FlatStyle = FlatStyle.Popup
+        ButtonFetchCommunityData.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
+        ButtonFetchCommunityData.ForeColor = Color.Black
+        ButtonFetchCommunityData.Location = New Point(140, 163)
+        ButtonFetchCommunityData.Name = "ButtonFetchCommunityData"
+        ButtonFetchCommunityData.Size = New Size(79, 24)
+        ButtonFetchCommunityData.TabIndex = 6
+        ButtonFetchCommunityData.Text = "&Fetch"
+        ButtonFetchCommunityData.UseVisualStyleBackColor = True
         ' 
-        ' GroupBoxSubredditData
+        ' GroupBoxCommunityData
         ' 
-        GroupBoxSubredditData.BackColor = Color.Transparent
-        GroupBoxSubredditData.ContextMenuStrip = ContextMenuStripRightClick
-        GroupBoxSubredditData.Controls.Add(RadioButtonSubredditProfile)
-        GroupBoxSubredditData.Controls.Add(RadioButtonSubredditPosts)
-        GroupBoxSubredditData.FlatStyle = FlatStyle.Flat
-        GroupBoxSubredditData.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
-        GroupBoxSubredditData.Location = New Point(3, 26)
-        GroupBoxSubredditData.Name = "GroupBoxSubredditData"
-        GroupBoxSubredditData.Size = New Size(215, 49)
-        GroupBoxSubredditData.TabIndex = 9
-        GroupBoxSubredditData.TabStop = False
-        GroupBoxSubredditData.Text = "Select subreddit data to fetch"
+        GroupBoxCommunityData.BackColor = Color.Transparent
+        GroupBoxCommunityData.ContextMenuStrip = ContextMenuStripRightClick
+        GroupBoxCommunityData.Controls.Add(RadioButtonCommunityProfile)
+        GroupBoxCommunityData.Controls.Add(RadioButtonCommunityPosts)
+        GroupBoxCommunityData.FlatStyle = FlatStyle.Flat
+        GroupBoxCommunityData.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
+        GroupBoxCommunityData.Location = New Point(3, 26)
+        GroupBoxCommunityData.Name = "GroupBoxCommunityData"
+        GroupBoxCommunityData.Size = New Size(215, 49)
+        GroupBoxCommunityData.TabIndex = 9
+        GroupBoxCommunityData.TabStop = False
+        GroupBoxCommunityData.Text = "Select subreddit data to fetch"
         ' 
         ' GroupBoxUserDataFiltering
         ' 
@@ -675,7 +681,7 @@ Partial Class MainWindow
         NumericUpDownUserDataLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownUserDataLimit.Location = New Point(130, 41)
         NumericUpDownUserDataLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        NumericUpDownUserDataLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
+        NumericUpDownUserDataLimit.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         NumericUpDownUserDataLimit.Name = "NumericUpDownUserDataLimit"
         NumericUpDownUserDataLimit.ReadOnly = True
         NumericUpDownUserDataLimit.Size = New Size(79, 22)
@@ -715,21 +721,23 @@ Partial Class MainWindow
         TreeView1.HotTracking = True
         TreeView1.Location = New Point(12, 12)
         TreeView1.Name = "TreeView1"
-        TreeNode1.Name = "childSubreddit"
-        TreeNode1.Text = "Subreddit"
-        TreeNode2.Name = "childUser"
-        TreeNode2.Text = "User"
-        TreeNode3.Name = "subchildFrontPage"
-        TreeNode3.Text = "Front Page"
-        TreeNode4.Name = "subchildListings"
-        TreeNode4.Text = "Listings"
-        TreeNode5.Name = "subchildSearch"
-        TreeNode5.Text = "Search"
-        TreeNode6.Name = "childPosts"
-        TreeNode6.Text = "Posts"
-        TreeNode7.Name = "MainRoot"
-        TreeNode7.Text = "Username"
-        TreeView1.Nodes.AddRange(New TreeNode() {TreeNode7})
+        TreeNode1.Name = "childUser"
+        TreeNode1.Text = "User"
+        TreeNode2.Name = "childCommunity"
+        TreeNode2.Text = "Community"
+        TreeNode3.Name = "subchildSearch"
+        TreeNode3.Text = "Search"
+        TreeNode4.Name = "subchildNew"
+        TreeNode4.Text = "New"
+        TreeNode5.Name = "subchildFrontPage"
+        TreeNode5.Text = "Front Page"
+        TreeNode6.Name = "subchildListings"
+        TreeNode6.Text = "Listings"
+        TreeNode7.Name = "childPosts"
+        TreeNode7.Text = "Posts"
+        TreeNode8.Name = "MainRoot"
+        TreeNode8.Text = "Username"
+        TreeView1.Nodes.AddRange(New TreeNode() {TreeNode8})
         TreeView1.ShowNodeToolTips = True
         TreeView1.Size = New Size(129, 186)
         TreeView1.TabIndex = 17
@@ -770,30 +778,30 @@ Partial Class MainWindow
         Label1.TabIndex = 29
         Label1.Text = "Fetch a User's data"
         ' 
-        ' PanelSubredditData
+        ' PanelCommunityData
         ' 
-        PanelSubredditData.BackColor = Color.Transparent
-        PanelSubredditData.Controls.Add(ButtonFetchSubredditData)
-        PanelSubredditData.Controls.Add(PanelSubredditDataHeader)
-        PanelSubredditData.Controls.Add(TextBoxSubreddit)
-        PanelSubredditData.Controls.Add(GroupBoxSubredditDataFiltering)
-        PanelSubredditData.Controls.Add(GroupBoxSubredditData)
-        PanelSubredditData.Location = New Point(147, 12)
-        PanelSubredditData.Name = "PanelSubredditData"
-        PanelSubredditData.Size = New Size(221, 188)
-        PanelSubredditData.TabIndex = 21
-        PanelSubredditData.Visible = False
+        PanelCommunityData.BackColor = Color.Transparent
+        PanelCommunityData.Controls.Add(ButtonFetchCommunityData)
+        PanelCommunityData.Controls.Add(PanelCommunityDataHeader)
+        PanelCommunityData.Controls.Add(TextBoxCommunity)
+        PanelCommunityData.Controls.Add(GroupBoxCommunityDataFiltering)
+        PanelCommunityData.Controls.Add(GroupBoxCommunityData)
+        PanelCommunityData.Location = New Point(714, 23)
+        PanelCommunityData.Name = "PanelCommunityData"
+        PanelCommunityData.Size = New Size(221, 188)
+        PanelCommunityData.TabIndex = 21
+        PanelCommunityData.Visible = False
         ' 
-        ' PanelSubredditDataHeader
+        ' PanelCommunityDataHeader
         ' 
-        PanelSubredditDataHeader.BackColor = Color.Transparent
-        PanelSubredditDataHeader.BorderStyle = BorderStyle.FixedSingle
-        PanelSubredditDataHeader.Controls.Add(Label2)
-        PanelSubredditDataHeader.Enabled = False
-        PanelSubredditDataHeader.Location = New Point(3, 0)
-        PanelSubredditDataHeader.Name = "PanelSubredditDataHeader"
-        PanelSubredditDataHeader.Size = New Size(215, 20)
-        PanelSubredditDataHeader.TabIndex = 30
+        PanelCommunityDataHeader.BackColor = Color.Transparent
+        PanelCommunityDataHeader.BorderStyle = BorderStyle.FixedSingle
+        PanelCommunityDataHeader.Controls.Add(Label2)
+        PanelCommunityDataHeader.Enabled = False
+        PanelCommunityDataHeader.Location = New Point(3, 0)
+        PanelCommunityDataHeader.Name = "PanelCommunityDataHeader"
+        PanelCommunityDataHeader.Size = New Size(215, 20)
+        PanelCommunityDataHeader.TabIndex = 30
         ' 
         ' Label2
         ' 
@@ -803,9 +811,9 @@ Partial Class MainWindow
         Label2.ForeColor = Color.Black
         Label2.Location = New Point(34, 0)
         Label2.Name = "Label2"
-        Label2.Size = New Size(138, 16)
+        Label2.Size = New Size(150, 16)
         Label2.TabIndex = 29
-        Label2.Text = "Fetch a Subreddit's data"
+        Label2.Text = "Fetch a Community's data"
         ' 
         ' PanelFrontPageData
         ' 
@@ -927,7 +935,7 @@ Partial Class MainWindow
         NumericUpDownPostListingsLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
         NumericUpDownPostListingsLimit.Location = New Point(130, 41)
         NumericUpDownPostListingsLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        NumericUpDownPostListingsLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
+        NumericUpDownPostListingsLimit.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         NumericUpDownPostListingsLimit.Name = "NumericUpDownPostListingsLimit"
         NumericUpDownPostListingsLimit.ReadOnly = True
         NumericUpDownPostListingsLimit.Size = New Size(79, 22)
@@ -953,6 +961,7 @@ Partial Class MainWindow
         ' 
         ' PanelSearchPosts
         ' 
+        PanelSearchPosts.Controls.Add(GroupBox1)
         PanelSearchPosts.Controls.Add(ButtonSearch)
         PanelSearchPosts.Controls.Add(Panel1)
         PanelSearchPosts.Controls.Add(TextBoxQuery)
@@ -962,6 +971,57 @@ Partial Class MainWindow
         PanelSearchPosts.Size = New Size(221, 188)
         PanelSearchPosts.TabIndex = 27
         PanelSearchPosts.Visible = False
+        ' 
+        ' GroupBox1
+        ' 
+        GroupBox1.BackColor = Color.Transparent
+        GroupBox1.ContextMenuStrip = ContextMenuStripRightClick
+        GroupBox1.Controls.Add(RadioButtonSearchCommunities)
+        GroupBox1.Controls.Add(RadioButtonSearchUsers)
+        GroupBox1.Controls.Add(RadioButtonSearchPosts)
+        GroupBox1.FlatStyle = FlatStyle.Flat
+        GroupBox1.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
+        GroupBox1.Location = New Point(3, 26)
+        GroupBox1.Name = "GroupBox1"
+        GroupBox1.Size = New Size(215, 49)
+        GroupBox1.TabIndex = 32
+        GroupBox1.TabStop = False
+        GroupBox1.Text = "Select an entity to search for"
+        ' 
+        ' RadioButtonSearchCommunities
+        ' 
+        RadioButtonSearchCommunities.AutoSize = True
+        RadioButtonSearchCommunities.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
+        RadioButtonSearchCommunities.Location = New Point(126, 23)
+        RadioButtonSearchCommunities.Name = "RadioButtonSearchCommunities"
+        RadioButtonSearchCommunities.Size = New Size(89, 19)
+        RadioButtonSearchCommunities.TabIndex = 7
+        RadioButtonSearchCommunities.Text = "Communities"
+        RadioButtonSearchCommunities.UseVisualStyleBackColor = True
+        ' 
+        ' RadioButtonSearchUsers
+        ' 
+        RadioButtonSearchUsers.AutoSize = True
+        RadioButtonSearchUsers.Checked = True
+        RadioButtonSearchUsers.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
+        RadioButtonSearchUsers.Location = New Point(6, 23)
+        RadioButtonSearchUsers.Name = "RadioButtonSearchUsers"
+        RadioButtonSearchUsers.Size = New Size(53, 19)
+        RadioButtonSearchUsers.TabIndex = 5
+        RadioButtonSearchUsers.TabStop = True
+        RadioButtonSearchUsers.Text = "Users"
+        RadioButtonSearchUsers.UseVisualStyleBackColor = True
+        ' 
+        ' RadioButtonSearchPosts
+        ' 
+        RadioButtonSearchPosts.AutoSize = True
+        RadioButtonSearchPosts.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
+        RadioButtonSearchPosts.Location = New Point(71, 23)
+        RadioButtonSearchPosts.Name = "RadioButtonSearchPosts"
+        RadioButtonSearchPosts.Size = New Size(51, 19)
+        RadioButtonSearchPosts.TabIndex = 6
+        RadioButtonSearchPosts.Text = "Posts"
+        RadioButtonSearchPosts.UseVisualStyleBackColor = True
         ' 
         ' Panel1
         ' 
@@ -1002,9 +1062,9 @@ Partial Class MainWindow
         AutoScaleDimensions = New SizeF(7F, 16F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.White
-        ClientSize = New Size(377, 211)
+        ClientSize = New Size(1033, 721)
         ContextMenuStrip = ContextMenuStripRightClick
-        Controls.Add(PanelSubredditData)
+        Controls.Add(PanelCommunityData)
         Controls.Add(PanelSearchPosts)
         Controls.Add(PanelPostListings)
         Controls.Add(PanelFrontPageData)
@@ -1026,11 +1086,11 @@ Partial Class MainWindow
         GroupBoxFrontPageDataFiltering.ResumeLayout(False)
         GroupBoxFrontPageDataFiltering.PerformLayout()
         CType(NumericUpDownFrontPageDataLimit, ComponentModel.ISupportInitialize).EndInit()
-        GroupBoxSubredditDataFiltering.ResumeLayout(False)
-        GroupBoxSubredditDataFiltering.PerformLayout()
-        CType(NumericUpDownSubredditPostsLimit, ComponentModel.ISupportInitialize).EndInit()
-        GroupBoxSubredditData.ResumeLayout(False)
-        GroupBoxSubredditData.PerformLayout()
+        GroupBoxCommunityDataFiltering.ResumeLayout(False)
+        GroupBoxCommunityDataFiltering.PerformLayout()
+        CType(NumericUpDownCommunityPostsLimit, ComponentModel.ISupportInitialize).EndInit()
+        GroupBoxCommunityData.ResumeLayout(False)
+        GroupBoxCommunityData.PerformLayout()
         GroupBoxUserDataFiltering.ResumeLayout(False)
         GroupBoxUserDataFiltering.PerformLayout()
         CType(NumericUpDownUserDataLimit, ComponentModel.ISupportInitialize).EndInit()
@@ -1040,10 +1100,10 @@ Partial Class MainWindow
         PanelUserData.PerformLayout()
         PanelUserDataHeader.ResumeLayout(False)
         PanelUserDataHeader.PerformLayout()
-        PanelSubredditData.ResumeLayout(False)
-        PanelSubredditData.PerformLayout()
-        PanelSubredditDataHeader.ResumeLayout(False)
-        PanelSubredditDataHeader.PerformLayout()
+        PanelCommunityData.ResumeLayout(False)
+        PanelCommunityData.PerformLayout()
+        PanelCommunityDataHeader.ResumeLayout(False)
+        PanelCommunityDataHeader.PerformLayout()
         PanelFrontPageData.ResumeLayout(False)
         PanelFrontPageHeader.ResumeLayout(False)
         PanelFrontPageHeader.PerformLayout()
@@ -1057,6 +1117,8 @@ Partial Class MainWindow
         GroupBoxPostListings.PerformLayout()
         PanelSearchPosts.ResumeLayout(False)
         PanelSearchPosts.PerformLayout()
+        GroupBox1.ResumeLayout(False)
+        GroupBox1.PerformLayout()
         Panel1.ResumeLayout(False)
         Panel1.PerformLayout()
         ResumeLayout(False)
@@ -1075,15 +1137,15 @@ Partial Class MainWindow
     Friend WithEvents SaveFoundPostsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents TextBoxUsername As TextBox
     Friend WithEvents ButtonFetchUserData As Button
-    Friend WithEvents TextBoxSubreddit As TextBox
-    Friend WithEvents ButtonFetchSubredditData As Button
+    Friend WithEvents TextBoxCommunity As TextBox
+    Friend WithEvents ButtonFetchCommunityData As Button
     Friend WithEvents RadioButtonUserPosts As RadioButton
     Friend WithEvents RadioButtonUserProfile As RadioButton
     Friend WithEvents RadioButtonUserComments As RadioButton
     Friend WithEvents GroupBoxUserData As GroupBox
-    Friend WithEvents GroupBoxSubredditData As GroupBox
-    Friend WithEvents RadioButtonSubredditProfile As RadioButton
-    Friend WithEvents RadioButtonSubredditPosts As RadioButton
+    Friend WithEvents GroupBoxCommunityData As GroupBox
+    Friend WithEvents RadioButtonCommunityProfile As RadioButton
+    Friend WithEvents RadioButtonCommunityPosts As RadioButton
     Friend WithEvents GroupBoxUserDataFiltering As GroupBox
     Friend WithEvents ComboBoxUserDataListing As ComboBox
     Friend WithEvents NumericUpDownUserDataLimit As NumericUpDown
@@ -1094,11 +1156,11 @@ Partial Class MainWindow
     Friend WithEvents LabelSearchResultsListing As Label
     Friend WithEvents NumericUpDownSearchResultLimit As NumericUpDown
     Friend WithEvents ComboBoxSearchResultListing As ComboBox
-    Friend WithEvents GroupBoxSubredditDataFiltering As GroupBox
-    Friend WithEvents LabelSubredditPostsLimit As Label
-    Friend WithEvents LabelSubredditPostsListing As Label
-    Friend WithEvents NumericUpDownSubredditPostsLimit As NumericUpDown
-    Friend WithEvents ComboBoxSubredditPostsListing As ComboBox
+    Friend WithEvents GroupBoxCommunityDataFiltering As GroupBox
+    Friend WithEvents LabelCommunityPostsLimit As Label
+    Friend WithEvents LabelCommunityPostsListing As Label
+    Friend WithEvents NumericUpDownCommunityPostsLimit As NumericUpDown
+    Friend WithEvents ComboBoxCommunityPostsListing As ComboBox
     Friend WithEvents NumericUpDown2 As NumericUpDown
     Friend WithEvents ButtonFetchFrontPageData As Button
     Friend WithEvents PictureBox1 As PictureBox
@@ -1109,7 +1171,7 @@ Partial Class MainWindow
     Friend WithEvents ComboBoxFrontPageDataListing As ComboBox
     Friend WithEvents TreeView1 As TreeView
     Friend WithEvents PanelUserData As Panel
-    Friend WithEvents PanelSubredditData As Panel
+    Friend WithEvents PanelCommunityData As Panel
     Friend WithEvents PanelFrontPageData As Panel
     Friend WithEvents PanelPostListings As Panel
     Friend WithEvents GroupBoxPostListings As GroupBox
@@ -1128,7 +1190,7 @@ Partial Class MainWindow
     Friend WithEvents DarkModeDisableToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents PanelUserDataHeader As Panel
     Friend WithEvents Label1 As Label
-    Friend WithEvents PanelSubredditDataHeader As Panel
+    Friend WithEvents PanelCommunityDataHeader As Panel
     Friend WithEvents Label2 As Label
     Friend WithEvents PanelPostListingsDataHeader As Panel
     Friend WithEvents Label3 As Label
@@ -1138,4 +1200,8 @@ Partial Class MainWindow
     Friend WithEvents Label5 As Label
     Friend WithEvents NotifyIcon1 As NotifyIcon
     Friend WithEvents ButtonFetchListingPosts As Button
+    Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents RadioButtonSearchCommunities As RadioButton
+    Friend WithEvents RadioButtonSearchUsers As RadioButton
+    Friend WithEvents RadioButtonSearchPosts As RadioButton
 End Class

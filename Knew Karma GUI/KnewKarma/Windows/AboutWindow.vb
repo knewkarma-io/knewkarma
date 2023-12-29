@@ -22,8 +22,8 @@
         'Version.Text = $"Version {My.Application.Info.Version}"
         Copyright.Text = My.Application.Info.Copyright
 
-        Dim ApiHandler As New ApiHandler()
-        Await ApiHandler.AsyncGetUpdates()
+        ''Dim ApiHandler As New ApiHandler()
+        ' Await ApiHandler.AsyncGetUpdates()
     End Sub
 
     ''' <summary>
