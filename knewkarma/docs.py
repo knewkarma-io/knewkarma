@@ -5,21 +5,27 @@ from typing import Literal
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-author: str = "Richard Mwewa"
-about_author: str = "https://rly0nheart.github.io"
-version: str = "4.0.0.0"
+_MAJOR: str = "4"
+_MINOR: str = "0"
+_PATCH: str = "0"
+VERSION: str = f"{_MAJOR}.{_MINOR}"
+
+# ------------------------------------------------------------------------- #
+
+AUTHOR: str = "Richard Mwewa"
+ABOUT_AUTHOR: str = "https://rly0nheart.github.io"
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-description: str = f"""
-# Knew Karma CLI {version}
+DESCRIPTION: str = f"""
+# Knew Karma CLI {VERSION}
 > **Reddit** Data Analysis Toolkit.
 """
 
 # ------------------------------------------------------------------------ #
 
-epilog: str = f"""
-# Copyright © 2024 [{author}]({about_author}). All rights reserved.
+COPYRIGHT: str = f"""
+# Copyright © 2024 [{AUTHOR}]({ABOUT_AUTHOR}). All rights reserved.
 ```
 MIT License
 
@@ -45,11 +51,11 @@ SOFTWARE.
 
 # ------------------------------------------------------------------------ #
 
-operations_description: str = "# **{}** Operations"
+OPERATIONS_TEXT: str = "# **{}** Operations"
 
 # ------------------------------------------------------------------------ #
 
-user_examples: str = """
+USER_EXAMPLES: str = """
 # Examples
 ## Get user profile
 ```
@@ -84,7 +90,7 @@ knewkarma --limit 500 user TheRealKSi --top-communities 10
 
 # ------------------------------------------------------------------------ #
 
-community_examples: str = """
+COMMUNITY_EXAMPLES: str = """
 # Examples
 ## Get community profile
 ```
@@ -115,7 +121,7 @@ knewkarma community MachineLearning --rules
 
 # ------------------------------------------------------------------------ #
 
-communities_examples: str = """
+COMMUNITIES_EXAMPLES: str = """
 # Examples
 ## Get all communities
 ```
@@ -140,7 +146,7 @@ knewkarma communities --popular
 
 # ------------------------------------------------------------------------ #
 
-posts_examples: str = """
+POSTS_EXAMPLES: str = """
 # Examples
 ## Get new posts
 ```
@@ -160,7 +166,7 @@ knewkarma posts --listing best
 
 # ------------------------------------------------------------------------ #
 
-search_examples: str = """
+SEARCH_EXAMPLES: str = """
 # Examples
 ## Search users
 ```
@@ -179,9 +185,6 @@ knewkarma search covid-19 --posts
 """
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-# Construct path to the program's directory
-PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma-data"))
-
 DATA_SORT_CRITERION = Literal[
     "controversial",
     "new",
@@ -192,5 +195,8 @@ DATA_SORT_CRITERION = Literal[
 ]
 POSTS_LISTINGS = Literal["best", "controversial", "popular", "rising"]
 DATA_TIMEFRAME = Literal["hour", "day", "week", "month", "year"]
+
+# Construct path to the program's directory
+PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma-data"))
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

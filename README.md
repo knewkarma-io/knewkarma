@@ -91,6 +91,13 @@ async def async_comments(limit):
         print(comments)
 
 
+# Get user's most recent comment activity
+async def async_overview(limit):
+    async with aiohttp.ClientSession() as session:
+        comments = await user.overview(limit=limit, session=session)
+        print(comments)
+
+
 # Get user's top n communities based on n post frequency
 async def async_top_communities(top_n, limit):
     async with aiohttp.ClientSession() as session:
@@ -108,9 +115,9 @@ async def async_moderated_communities():
 asyncio.run(async_profile())
 asyncio.run(async_posts(limit=5))
 asyncio.run(async_comments(limit=100))
+asyncio.run(async_overview(limit=50))
 asyncio.run(async_top_communities(top_n=10, limit=100))
 asyncio.run(async_moderated_communities())
-
 ```
 
 ### Community (Subreddit) Data

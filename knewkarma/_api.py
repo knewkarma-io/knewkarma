@@ -1,11 +1,22 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
 from sys import version as python_version
 from typing import Union, Literal
 
 import aiohttp
+import rich
+from rich.markdown import Markdown
 
 from ._utils import log
-from .info import version, about_author, DATA_SORT_CRITERION, DATA_TIMEFRAME
+from .docs import (
+    _MAJOR,
+    _MINOR,
+    _PATCH,
+    VERSION,
+    ABOUT_AUTHOR,
+    DATA_SORT_CRITERION,
+    DATA_TIMEFRAME,
+)
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -37,8 +48,8 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
         async with session.get(
             endpoint,
             headers={
-                "User-Agent": f"Knew-Karma/{version} "
-                f"(Python {python_version}; +{about_author})"
+                "User-Agent": f"Knew-Karma/{VERSION} "
+                f"(Python {python_version}; +{ABOUT_AUTHOR})"
             },
         ) as response:
             if response.status == 200:
@@ -102,9 +113,6 @@ async def get_updates(session: aiohttp.ClientSession):
     :param session: aiohttp session to use for the request.
     :type session: aiohttp.ClientSession
     """
-    import rich
-    from rich.markdown import Markdown
-
     # Make a GET request to PyPI to get the project's latest release.
     response: dict = await get_data(endpoint=GITHUB_RELEASE_ENDPOINT, session=session)
     release: dict = process_response(response_data=response, valid_key="tag_name")
@@ -116,46 +124,24 @@ async def get_updates(session: aiohttp.ClientSession):
 
         # Splitting the version strings into components
         remote_parts: list = remote_version.split(".")
-        local_parts: list = version.split(".")
 
-        update_message: str = ""
+        update_message: str = f"%s update ({remote_version}) available"
 
         # ------------------------------------------------------------------------- #
 
         # Check for differences in version parts
-        if remote_parts[0] != local_parts[0]:
-            update_message = (
-                f"[bold][red]MAJOR[/][/] update ({remote_version}) available:"
-                f" Introduces significant and important changes."
-            )
+        if remote_parts[0] != _MAJOR:
+            update_message = update_message % "MAJOR"
 
         # ------------------------------------------------------------------------- #
 
-        elif remote_parts[1] != local_parts[1]:
-            update_message = (
-                f"[bold][blue]MINOR[/][/] update ({remote_version}) available:"
-                f" Includes small feature changes/improvements."
-            )
+        elif remote_parts[1] != _MINOR:
+            update_message = update_message % "MINOR"
 
         # ------------------------------------------------------------------------- #
 
-        elif remote_parts[2] != local_parts[2]:
-            update_message = (
-                f"[bold][green]PATCH[/][/] update ({remote_version}) available:"
-                f" Generally for bug fixes and small tweaks."
-            )
-
-        # ------------------------------------------------------------------------- #
-
-        elif (
-            len(remote_parts) > 3
-            and len(local_parts) > 3
-            and remote_parts[3] != local_parts[3]
-        ):
-            update_message = (
-                f"[bold][cyan]BUILD[/][/] update ({remote_version}) available."
-                f" Might be for specific builds or special versions."
-            )
+        elif remote_parts[2] != _PATCH:
+            update_message = update_message % "PATCH"
 
         # ------------------------------------------------------------------------- #
 

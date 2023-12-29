@@ -6,19 +6,19 @@ from typing import get_args
 from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
-from .info import (
-    community_examples,
-    description,
-    epilog,
-    posts_examples,
-    user_examples,
-    operations_description,
-    version,
-    POSTS_LISTINGS,
+from .docs import (
+    VERSION,
     DATA_TIMEFRAME,
     DATA_SORT_CRITERION,
-    search_examples,
-    communities_examples,
+    OPERATIONS_TEXT,
+    DESCRIPTION,
+    COPYRIGHT,
+    COMMUNITY_EXAMPLES,
+    COMMUNITIES_EXAMPLES,
+    POSTS_EXAMPLES,
+    POSTS_LISTINGS,
+    SEARCH_EXAMPLES,
+    USER_EXAMPLES,
 )
 
 
@@ -35,8 +35,8 @@ def create_parser() -> argparse.ArgumentParser:
     # -------------------------------------------------------------------- #
 
     parser = argparse.ArgumentParser(
-        description=Markdown(description, style="argparse.text"),
-        epilog=Markdown(epilog, style="argparse.text"),
+        description=Markdown(DESCRIPTION, style="argparse.text"),
+        epilog=Markdown(COPYRIGHT, style="argparse.text"),
         formatter_class=RichHelpFormatter,
     )
     subparsers = parser.add_subparsers(dest="mode", help="operation mode")
@@ -91,7 +91,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-v",
         "--version",
-        version=f"Knew Karma {version}",
+        version=f"Knew Karma {VERSION}",
         action="version",
     )
 
@@ -101,10 +101,10 @@ def create_parser() -> argparse.ArgumentParser:
         "community",
         help="community (subreddit) operations",
         description=Markdown(
-            operations_description.format("Community (Subreddit)"),
+            OPERATIONS_TEXT.format("Community (Subreddit)"),
             style="argparse.text",
         ),
-        epilog=Markdown(community_examples),
+        epilog=Markdown(COMMUNITY_EXAMPLES),
         formatter_class=RichHelpFormatter,
     )
     community_parser.add_argument(
@@ -150,10 +150,10 @@ def create_parser() -> argparse.ArgumentParser:
         "communities",
         help="communities (subreddits) operations",
         description=Markdown(
-            operations_description.format("Communities (Subreddits)"),
+            OPERATIONS_TEXT.format("Communities (Subreddits)"),
             style="argparse.text",
         ),
-        epilog=Markdown(communities_examples),
+        epilog=Markdown(COMMUNITIES_EXAMPLES),
         formatter_class=RichHelpFormatter,
     )
     communities_parser.add_argument(
@@ -186,10 +186,8 @@ def create_parser() -> argparse.ArgumentParser:
     posts_parser = subparsers.add_parser(
         "posts",
         help="posts operations",
-        description=Markdown(
-            operations_description.format("Posts"), style="argparse.text"
-        ),
-        epilog=Markdown(posts_examples),
+        description=Markdown(OPERATIONS_TEXT.format("Posts"), style="argparse.text"),
+        epilog=Markdown(POSTS_EXAMPLES),
         formatter_class=RichHelpFormatter,
     )
     posts_parser.add_argument(
@@ -217,10 +215,8 @@ def create_parser() -> argparse.ArgumentParser:
     search_parser = subparsers.add_parser(
         "search",
         help="search operations",
-        description=Markdown(
-            operations_description.format("Search"), style="argparse.text"
-        ),
-        epilog=Markdown(search_examples),
+        description=Markdown(OPERATIONS_TEXT.format("Search"), style="argparse.text"),
+        epilog=Markdown(SEARCH_EXAMPLES),
         formatter_class=RichHelpFormatter,
     )
     search_parser.add_argument("query", help="search query")
@@ -239,10 +235,8 @@ def create_parser() -> argparse.ArgumentParser:
     user_parser = subparsers.add_parser(
         "user",
         help="user operations",
-        description=Markdown(
-            operations_description.format("User"), style="argparse.text"
-        ),
-        epilog=Markdown(user_examples),
+        description=Markdown(OPERATIONS_TEXT.format("User"), style="argparse.text"),
+        epilog=Markdown(USER_EXAMPLES),
         formatter_class=RichHelpFormatter,
     )
     user_parser.add_argument("username", help="username")

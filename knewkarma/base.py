@@ -22,7 +22,7 @@ from ._converters import (
     convert_users,
 )
 from .data import Comment, Community, PreviewCommunity, User, Post, WikiPage
-from .info import DATA_TIMEFRAME, DATA_SORT_CRITERION, POSTS_LISTINGS
+from .docs import DATA_TIMEFRAME, DATA_SORT_CRITERION, POSTS_LISTINGS
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
