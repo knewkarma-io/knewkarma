@@ -1,6 +1,7 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 import os
+from datetime import date
 from typing import Literal
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -25,7 +26,7 @@ DESCRIPTION: str = f"""
 # ------------------------------------------------------------------------ #
 
 COPYRIGHT: str = f"""
-# Copyright © 2024 [{AUTHOR}]({ABOUT_AUTHOR}). All rights reserved.
+# Copyright © {date.today().year} [{AUTHOR}]({ABOUT_AUTHOR}). All rights reserved.
 ```
 MIT License
 
