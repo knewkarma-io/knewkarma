@@ -273,6 +273,7 @@ async def get_posts(
         "listing",
         "community",
         "user_posts",
+        "user_overview",
         "user_comments",
     ],
     _from: str = None,
@@ -304,6 +305,7 @@ async def get_posts(
         "listing": f"{COMMUNITY_DATA_ENDPOINT}/{_from}.json?",
         "community": f"{COMMUNITY_DATA_ENDPOINT}/{_from}.json",
         "user_posts": f"{USER_DATA_ENDPOINT}/{_from}/submitted.json",
+        "user_overview": f"{USER_DATA_ENDPOINT}/{_from}/overview.json",
         "user_comments": f"{USER_DATA_ENDPOINT}/{_from}/comments.json",
     }
 

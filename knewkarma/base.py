@@ -135,6 +135,31 @@ class RedditUser:
 
     # ------------------------------------------------------------------------------- #
 
+    async def overview(
+        self, limit: int, session: aiohttp.ClientSession
+    ) -> list[Comment]:
+        """
+        Returns a user's most recent comments.
+
+        :param limit: Maximum number of comments to return.
+        :type limit: int
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession
+        :return: A list of Comment objects, each containing data about a recent comment.
+        :rtype: list[Comment]
+        """
+        raw_comments: list = await get_posts(
+            _from=self._username,
+            _type="user_overview",
+            limit=limit,
+            session=session,
+        )
+        user_overview: list[Comment] = convert_comments(raw_comments)
+
+        return user_overview
+
+    # ------------------------------------------------------------------------------- #
+
     async def moderated_communities(
         self, session: aiohttp.ClientSession
     ) -> list[PreviewCommunity]:

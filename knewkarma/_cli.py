@@ -118,6 +118,7 @@ def stage_and_start():
                     limit=limit, sort=sort, timeframe=timeframe, session=session
                 ),
             ),
+            ("overview", lambda session: user.overview(limit=limit, session=session)),
             (
                 "moderated_communities",
                 lambda session: user.moderated_communities(session=session),

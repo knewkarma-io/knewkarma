@@ -107,8 +107,11 @@ class Comment:
     body: str
     id: str
     author: str
+    author_is_premium: bool
     upvotes: int
     downvotes: int
+    community: str
+    community_type: str
     is_nsfw: bool
     is_edited: bool
     score: float
@@ -118,11 +121,8 @@ class Comment:
     is_locked: bool
     is_archived: bool
     commented_at: str
-    community: str
-    community_type: str
     post_id: str
     post_title: str
-    author_is_premium: bool
     raw_data: dict
 
 

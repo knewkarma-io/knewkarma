@@ -3,7 +3,7 @@
 import logging
 import os
 from datetime import datetime
-from typing import Union, List, Dict
+from typing import Union
 
 import pandas as pd
 
@@ -17,10 +17,11 @@ from .data import Comment, Post, Community, User, PreviewCommunity, WikiPage
 def dataframe(
     data: Union[
         Community,
-        Dict,
         User,
         WikiPage,
-        List[Union[Comment, Community, Post, PreviewCommunity, User]],
+        dict,
+        list,
+        list[Union[Comment, Community, Post, PreviewCommunity, User]],
     ],
     to_dir: str,
     save_csv: str = None,
@@ -67,7 +68,7 @@ def dataframe(
         data = [item.__dict__ for item in data]
 
     # If data is already a dictionary or a list, use it directly for DataFrame creation
-    elif isinstance(data, (Dict, List)):
+    elif isinstance(data, (dict, list)):
         # No transformation needed; the data is ready for DataFrame creation
         pass
 

@@ -13,7 +13,11 @@ version: str = "4.0.0.0"
 
 description: str = f"""
 # Knew Karma CLI {version}
-> **Reddit** Data Analysis Toolkit."""
+> **Reddit** Data Analysis Toolkit.
+"""
+
+# ------------------------------------------------------------------------ #
+
 epilog: str = f"""
 # Copyright © 2024 [{author}]({about_author}). All rights reserved.
 ```
@@ -39,7 +43,12 @@ SOFTWARE.
 ```
 """
 
+# ------------------------------------------------------------------------ #
+
 operations_description: str = "# **{}** Operations"
+
+# ------------------------------------------------------------------------ #
+
 user_examples: str = """
 # Examples
 ## Get user profile
@@ -57,6 +66,11 @@ knewkarma user  AutoModerator --comments
 knewkarma user  AutoModerator --posts
 ```
 
+## Get user's most recent comment activity
+```
+knewkarma user AutoModerator --overview
+```
+
 ## Get communities moderated by user
 ```
 knewkarma user TheRealKSi --moderated-communities
@@ -67,6 +81,8 @@ knewkarma user TheRealKSi --moderated-communities
 knewkarma --limit 500 user TheRealKSi --top-communities 10
 ```
 """
+
+# ------------------------------------------------------------------------ #
 
 community_examples: str = """
 # Examples
@@ -89,7 +105,16 @@ knewkarma community MachineLearning --wiki-pages
 ```
 knewkarma community MachineLearning --wiki-page config/description
 ```
+
+## Get community rules
+```
+knewkarma community MachineLearning --rules
+```
+
 """
+
+# ------------------------------------------------------------------------ #
+
 communities_examples: str = """
 # Examples
 ## Get all communities
@@ -112,6 +137,9 @@ knewkarma communities --new
 knewkarma communities --popular
 ```
 """
+
+# ------------------------------------------------------------------------ #
+
 posts_examples: str = """
 # Examples
 ## Get new posts
@@ -129,6 +157,8 @@ knewkarma posts --front-page
 knewkarma posts --listing best
 ```
 """
+
+# ------------------------------------------------------------------------ #
 
 search_examples: str = """
 # Examples
