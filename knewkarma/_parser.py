@@ -52,7 +52,7 @@ def create_parser() -> argparse.ArgumentParser:
         type=int,
         default=100,
         metavar="NUMBER",
-        help="([bold][green]bulk[/][/]) data output limit (default: %(default)s)",
+        help="[[bold][green]bulk[/][/]] data output limit (default: %(default)s)",
     )
     parser.add_argument(
         "-j",
@@ -72,7 +72,7 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default="all",
         choices=list(get_args(DATA_TIMEFRAME)),
-        help="timeframe to get ([bold][green]bulk[/][/]) data from (default: %(default)s)",
+        help="timeframe to get [[bold][green]bulk[/][/]] data from (default: %(default)s)",
     )
     parser.add_argument(
         "-s",
@@ -80,12 +80,12 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default="all",
         choices=list(get_args(DATA_SORT_CRITERION)),
-        help="([bold][green]bulk[/][/]) sort criterion (default: %(default)s)",
+        help="[[bold][green]bulk[/][/]] sort criterion (default: %(default)s)",
     )
     parser.add_argument(
         "-d",
         "--debug",
-        help="([bold][blue]dev[/][/]) run knew karma in debug mode",
+        help="[[bold][yellow]dev[/][/]] run knew karma in debug mode",
         action="store_true",
     )
     parser.add_argument(
