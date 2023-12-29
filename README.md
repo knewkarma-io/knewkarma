@@ -37,7 +37,6 @@ Knew Karma offers a variety of features for accessing and analyzing Reddit data,
 
 - **New** — Retrieves new posts.
 - **Reddit Front-Page** — Retrieves front-page posts.
-- **Search** — Searches for posts based on queries.
 - **Listing** — Retrieves posts from specified Reddit listings.
 
 ### Search/Discovery
