@@ -37,7 +37,6 @@ class Community:
     description: str
     submit_text: str
     icon: str
-    # icon_img: str
     community_type: str
     subscribers: int
     current_active_users: int
@@ -56,15 +55,8 @@ class Community:
 class PreviewCommunity:
     name: str
     icon: str
-    # id: str
-    # description: str
-    # submit_text: str
-    # icon_img: str
     community_type: str
     subscribers: int
-    # current_active_users: int
-    # is_nsfw: bool
-    # language: str
     whitelist_status: str
     url: str
     created_at: str
