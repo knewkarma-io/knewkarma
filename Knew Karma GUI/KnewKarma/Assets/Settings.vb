@@ -202,27 +202,13 @@ Public Class SettingsManager
         MainWindow.TreeView1.ForeColor = color("PrimaryTextColor")
         MainWindow.TreeView1.LineColor = color("SecondaryTextColor")
 
-        ''' <summary>
-        ''' Apply colors to tab pages
-        ''' </summary>
-        Dim tabpages As New List(Of TabPage) From {
-            UserProfileWindow.TabPage1,
-            UserProfileWindow.TabPage2
-        }
-        For Each tabpage In tabpages
-            tabpage.BackColor = color("InputFieldBackgroundColor")
-            tabpage.ForeColor = color("PrimaryTextColor")
-        Next
 
         ''' <summary>
         ''' Apply colors to Forms
         ''' </summary>
         Dim forms As New List(Of Form) From {
             MainWindow,
-            AboutWindow,
-            CommentsWindow,
-            SubredditProfileWindow,
-            PostsWindow
+            AboutWindow
             }
         For Each form In forms
             form.BackColor = color("MainBackgroundColor")
@@ -235,7 +221,7 @@ Public Class SettingsManager
         Dim buttons As New List(Of Button) From {
             MainWindow.ButtonFetchFrontPageData,
             MainWindow.ButtonFetchListingPosts,
-            MainWindow.ButtonFetchSubredditData,
+            MainWindow.ButtonFetchCommunityData,
             MainWindow.ButtonFetchUserData,
             MainWindow.ButtonSearch,
             AboutWindow.ButtonViewLicense,
@@ -259,8 +245,8 @@ Public Class SettingsManager
             MainWindow.LabelSearchResultsListing,
             MainWindow.LabelUserPostsListing,
             MainWindow.LabelUserDataLimit,
-            MainWindow.LabelSubredditPostsListing,
-            MainWindow.LabelSubredditPostsLimit,
+            MainWindow.LabelCommunityPostsListing,
+            MainWindow.LabelCommunityPostsLimit,
             AboutWindow.LabelProgramFirstName,
             MainWindow.Label1,
             MainWindow.Label2,
@@ -284,8 +270,8 @@ Public Class SettingsManager
             MainWindow.RadioButtonUserProfile,
             MainWindow.RadioButtonUserPosts,
             MainWindow.RadioButtonUserComments,
-            MainWindow.RadioButtonSubredditProfile,
-            MainWindow.RadioButtonSubredditPosts
+            MainWindow.RadioButtonCommunityProfile,
+            MainWindow.RadioButtonCommunityPosts
             }
         ' MainWindow.RadioButtonPostProfile,
         ' MainWindow.RadioButtonPostComments,
@@ -300,7 +286,7 @@ Public Class SettingsManager
         Dim textBoxes As New List(Of TextBox) From {
             MainWindow.TextBoxUsername,
             MainWindow.TextBoxQuery,
-            MainWindow.TextBoxSubreddit
+            MainWindow.TextBoxCommunity
             }
 
         For Each textBox In textBoxes
@@ -314,7 +300,7 @@ Public Class SettingsManager
         Dim numericUpDowns As New List(Of NumericUpDown) From {
             MainWindow.NumericUpDownPostListingsLimit,
             MainWindow.NumericUpDownFrontPageDataLimit,
-            MainWindow.NumericUpDownSubredditPostsLimit,
+            MainWindow.NumericUpDownCommunityPostsLimit,
             MainWindow.NumericUpDownUserDataLimit,
             MainWindow.NumericUpDownSearchResultLimit
             }
@@ -329,7 +315,7 @@ Public Class SettingsManager
         Dim comboBoxes As New List(Of ComboBox) From {
             MainWindow.ComboBoxPostListingsListing,
             MainWindow.ComboBoxFrontPageDataListing,
-            MainWindow.ComboBoxSubredditPostsListing,
+            MainWindow.ComboBoxCommunityPostsListing,
             MainWindow.ComboBoxUserDataListing,
             MainWindow.ComboBoxSearchResultListing
             }
@@ -344,12 +330,12 @@ Public Class SettingsManager
         Dim GroupBoxes As New List(Of GroupBox) From {
             MainWindow.GroupBoxPostListings,
             MainWindow.GroupBoxFrontPageDataFiltering,
-            MainWindow.GroupBoxSubredditDataFiltering,
+            MainWindow.GroupBoxCommunityDataFiltering,
             MainWindow.GroupBoxUserDataFiltering,
             MainWindow.GroupBoxSearchResultsFiltering,
             MainWindow.GroupBoxPostListingsFiltering,
             MainWindow.GroupBoxUserData,
-            MainWindow.GroupBoxSubredditData
+            MainWindow.GroupBoxCommunityData
             }
         ' MainWindow.GroupBoxPostDataFiltering,
         ' MainWindow.GroupBoxPostData,
@@ -376,31 +362,6 @@ Public Class SettingsManager
             menuItem.BackColor = color("MainBackgroundColor")
             menuItem.ForeColor = color("PrimaryTextColor")
         Next
-
-        ''' <summary>
-        ''' Apply colors to data grid view cells
-        ''' </summary>
-        Dim cellStyles As New List(Of DataGridViewCellStyle) From {
-            SubredditProfileWindow.DataGridViewProfile.AlternatingRowsDefaultCellStyle,
-            SubredditProfileWindow.DataGridViewProfile.DefaultCellStyle,
-            UserProfileWindow.DataGridViewUserProfile.AlternatingRowsDefaultCellStyle,
-            UserProfileWindow.DataGridViewUserProfile.DefaultCellStyle,
-            UserProfileWindow.DataGridViewUserSubreddit.AlternatingRowsDefaultCellStyle,
-            UserProfileWindow.DataGridViewUserSubreddit.DefaultCellStyle,
-            PostsWindow.DataGridViewPosts.AlternatingRowsDefaultCellStyle,
-            PostsWindow.DataGridViewPosts.RowHeadersDefaultCellStyle,
-            PostsWindow.DataGridViewPosts.ColumnHeadersDefaultCellStyle,
-            PostsWindow.DataGridViewPosts.DefaultCellStyle,
-            CommentsWindow.DataGridViewComments.AlternatingRowsDefaultCellStyle,
-            CommentsWindow.DataGridViewComments.RowHeadersDefaultCellStyle,
-            CommentsWindow.DataGridViewComments.ColumnHeadersDefaultCellStyle,
-            CommentsWindow.DataGridViewComments.DefaultCellStyle
-            }
-        For Each cellStyle In cellStyles
-            cellStyle.BackColor = color("InputFieldBackgroundColor")
-            cellStyle.ForeColor = color("PrimaryTextColor")
-        Next
-
 
         ''' <summary>
         ''' Apply mouse enter/mouse leave colors to ToolStripMenuItem and ContextMenuStrip controls

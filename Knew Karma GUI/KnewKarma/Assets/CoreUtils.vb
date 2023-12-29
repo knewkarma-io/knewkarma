@@ -29,18 +29,18 @@ Public Class CoreUtils
             form.ComboBoxUserDataListing.Enabled = True
         End If
 
-        ' Handling Subreddit Radio Buttons
+        ' Handling Community Radio Buttons
         ' Similar to the user radio buttons above, check the state of subreddit radio buttons
         ' and enable/disable the corresponding controls to ensure a coherent set of options is available to the user.
 
-        If form.RadioButtonSubredditProfile.Checked Then
-            ' If the Subreddit Profile radio button is checked, disable the subreddit data limit and posts listing controls
-            form.NumericUpDownSubredditPostsLimit.Enabled = False
-            form.ComboBoxSubredditPostsListing.Enabled = False
-        ElseIf form.RadioButtonSubredditPosts.Checked Then
-            ' If the Subreddit Posts radio button is checked, enable the subreddit data limit and posts listing controls
-            form.NumericUpDownSubredditPostsLimit.Enabled = True
-            form.ComboBoxSubredditPostsListing.Enabled = True
+        If form.RadioButtonCommunityProfile.Checked Then
+            ' If the Community Profile radio button is checked, disable the subreddit data limit and posts listing controls
+            form.NumericUpDownCommunityPostsLimit.Enabled = False
+            form.ComboBoxCommunityPostsListing.Enabled = False
+        ElseIf form.RadioButtonCommunityPosts.Checked Then
+            ' If the Community Posts radio button is checked, enable the subreddit data limit and posts listing controls
+            form.NumericUpDownCommunityPostsLimit.Enabled = True
+            form.ComboBoxCommunityPostsListing.Enabled = True
         End If
     End Sub
 

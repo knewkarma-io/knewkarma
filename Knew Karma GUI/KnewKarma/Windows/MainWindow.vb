@@ -25,7 +25,7 @@ Public Class MainWindow
         ComboBoxFrontPageDataListing.SelectedIndex = 0
         ComboBoxUserDataListing.SelectedIndex = 0
         ComboBoxSearchResultListing.SelectedIndex = 0
-        ComboBoxSubredditPostsListing.SelectedIndex = 0
+        ComboBoxCommunityPostsListing.SelectedIndex = 0
         ComboBoxPostListingsListing.SelectedIndex = 0
     End Sub
 
@@ -90,9 +90,7 @@ Public Class MainWindow
         If query IsNot Nothing Then
             Await DataGridViewer.LoadSearchResultsAsync(
                 query:=query,
-                form:=PostsWindow,
-                sortCriterion:=ComboBoxSearchResultListing.Text,
-                postsLimit:=NumericUpDownSearchResultLimit.Value
+                limit:=NumericUpDownSearchResultLimit.Value
             )
         End If
     End Sub
@@ -113,9 +111,7 @@ Public Class MainWindow
             If query IsNot Nothing Then
                 Await DataGridViewer.LoadSearchResultsAsync(
                 query:=query,
-                form:=PostsWindow,
-                sortCriterion:=ComboBoxSearchResultListing.Text,
-                postsLimit:=NumericUpDownSearchResultLimit.Value
+                limit:=NumericUpDownSearchResultLimit.Value
             )
             End If
         End If
@@ -173,48 +169,48 @@ Public Class MainWindow
     End Sub
 
     ''' <summary>
-    ''' Handles the Click event for the ButtonFetchSubredditData control. 
+    ''' Handles the Click event for the ButtonFetchCommunityData control. 
     ''' </summary>
     ''' <param name="sender">The source of the event.</param>
     ''' <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-    Private Async Sub ButtonFetchSubredditData_Click(
+    Private Async Sub ButtonFetchCommunityData_Click(
                                                     sender As Object,
                                                     e As EventArgs
-                                                ) Handles ButtonFetchSubredditData.Click
-        Dim subreddit As String = CheckInput(txtBox:=TextBoxSubreddit)
+                                                ) Handles ButtonFetchCommunityData.Click
+        Dim subreddit As String = CheckInput(txtBox:=TextBoxCommunity)
         If subreddit IsNot Nothing Then
-            Await DataGridViewer.LoadSubredditDataAsync(subreddit:=subreddit)
+            Await DataGridViewer.LoadCommunityDataAsync(subreddit:=subreddit)
         End If
     End Sub
 
     ''' <summary>
-    ''' Handles the KeyDown event for the TextBoxSubreddit. 
+    ''' Handles the KeyDown event for the TextBoxCommunity. 
     ''' Processes Reddit posts when the Enter key is pressed.
     ''' </summary>
     ''' <param name="sender">The source of the event.</param>
     ''' <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-    Private Async Sub TextBoxSubreddit_KeyDown(
+    Private Async Sub TextBoxCommunity_KeyDown(
                                               sender As Object,
                                               e As KeyEventArgs
-                                          ) Handles TextBoxSubreddit.KeyDown
+                                          ) Handles TextBoxCommunity.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
-            Dim subreddit As String = CheckInput(txtBox:=TextBoxSubreddit)
+            Dim subreddit As String = CheckInput(txtBox:=TextBoxCommunity)
             If subreddit IsNot Nothing Then
-                Await DataGridViewer.LoadSubredditDataAsync(subreddit:=subreddit)
+                Await DataGridViewer.LoadCommunityDataAsync(subreddit:=subreddit)
             End If
         End If
     End Sub
 
-    Private Async Sub NumericUpDownSubredditDataLimit_KeyDown(
+    Private Async Sub NumericUpDownCommunityDataLimit_KeyDown(
                                                              sender As Object,
                                                              e As KeyEventArgs
-                                                         ) Handles NumericUpDownSubredditPostsLimit.KeyDown
+                                                         ) Handles NumericUpDownCommunityPostsLimit.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
-            Dim subreddit As String = CheckInput(txtBox:=TextBoxSubreddit)
+            Dim subreddit As String = CheckInput(txtBox:=TextBoxCommunity)
             If subreddit IsNot Nothing Then
-                Await DataGridViewer.LoadSubredditDataAsync(subreddit:=subreddit)
+                Await DataGridViewer.LoadCommunityDataAsync(subreddit:=subreddit)
             End If
         End If
     End Sub
@@ -340,8 +336,8 @@ Public Class MainWindow
         Select Case e.Node.Text
             Case "User"
                 PanelUserData.Visible = True
-            Case "Subreddit"
-                PanelSubredditData.Visible = True
+            Case "Community"
+                PanelCommunityData.Visible = True
             Case "Search"
                 PanelSearchPosts.Visible = True
             Case "Listings"
@@ -427,26 +423,26 @@ Public Class MainWindow
     End Sub
 
     ''' <summary>
-    ''' Handles the CheckedChanged event for the RadioButtonSubredditProfile control. 
+    ''' Handles the CheckedChanged event for the RadioButtonCommunityProfile control. 
     ''' </summary>
     ''' <param name="sender">The source of the event.</param>
     ''' <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-    Private Sub RadioButtonSubredditProfile_CheckedChanged(
+    Private Sub RadioButtonCommunityProfile_CheckedChanged(
                                                           sender As Object,
                                                           e As EventArgs
-                                                      ) Handles RadioButtonSubredditProfile.CheckedChanged
+                                                      ) Handles RadioButtonCommunityProfile.CheckedChanged
         CoreUtils.HandleRadioButtonChanges(form:=Me)
     End Sub
 
     ''' <summary>
-    ''' Handles the CheckedChanged event for the RadioButtonSubredditPosts control. 
+    ''' Handles the CheckedChanged event for the RadioButtonCommunityPosts control. 
     ''' </summary>
     ''' <param name="sender">The source of the event.</param>
     ''' <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-    Private Sub RadioButtonSubredditPosts_CheckedChanged(
+    Private Sub RadioButtonCommunityPosts_CheckedChanged(
                                                         sender As Object,
                                                         e As EventArgs
-                                                    ) Handles RadioButtonSubredditPosts.CheckedChanged
+                                                    ) Handles RadioButtonCommunityPosts.CheckedChanged
         CoreUtils.HandleRadioButtonChanges(form:=Me)
     End Sub
 
