@@ -74,7 +74,7 @@ def convert_posts(__posts: list[dict]) -> list[Post]:
     :return: A list of Post objects, each containing converted data about a post.
     :rtype: list[Post]
     """
-    if __posts:
+    if "upvote_ratio" in __posts[0].get("data"):
         posts_list: list = []
         for post in __posts:
             post_data = post.get("data")

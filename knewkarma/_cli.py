@@ -124,6 +124,26 @@ def stage_and_start():
                 lambda session: user.moderated_communities(session=session),
             ),
             (
+                "search_posts",
+                lambda session: user.search_posts(
+                    keyword=arguments.search_posts,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+            (
+                "search_comments",
+                lambda session: user.search_comments(
+                    keyword=arguments.search_comments,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+            (
                 "top_communities",
                 lambda session: user.top_communities(
                     top_n=arguments.top_communities
@@ -146,7 +166,7 @@ def stage_and_start():
             ),
             (
                 "search",
-                lambda session: community.search_posts(
+                lambda session: community.search(
                     keyword=arguments.search,
                     limit=limit,
                     sort=sort,
