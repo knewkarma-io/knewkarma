@@ -78,6 +78,16 @@ knewkarma user  AutoModerator --posts
 knewkarma user AutoModerator --overview
 ```
 
+## Get a user's posts that contain the specified keyword
+```
+knewkarma user AutoModerator --search-posts rules
+```
+
+## Get a user's comment that contain the specified keyword
+```
+knewkarma user AutoModerator --search-comments banned
+```
+
 ## Get communities moderated by user
 ```
 knewkarma user TheRealKSi --moderated-communities

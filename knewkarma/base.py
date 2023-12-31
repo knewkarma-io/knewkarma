@@ -160,6 +160,93 @@ class RedditUser:
 
     # ------------------------------------------------------------------------------- #
 
+    async def search_posts(
+        self,
+        session: aiohttp.ClientSession,
+        keyword: str,
+        limit: int,
+        sort: DATA_SORT_CRITERION = "all",
+        timeframe: DATA_TIMEFRAME = "all",
+    ) -> list[Post]:
+        """
+        Returns a user's posts that contain the specified keywords.
+
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession.
+        :param keyword: Keyword to search for in posts.
+        :type keyword: str
+        :param limit: Maximum number of posts to return.
+        :type limit: int
+        :param sort: Sort criterion for the posts.
+        :type sort: str
+        :param timeframe: Timeframe from which to get posts.
+        :type timeframe: str
+        :return: A list of Post objects, each containing data about a post.
+        :rtype: list[Post]
+        """
+        user_posts: list = await get_posts(
+            _type="user_posts",
+            _from=self._username,
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
+            session=session,
+        )
+        found_posts: list = []
+        pattern = re.compile(re.escape(keyword), re.IGNORECASE)
+        for post in user_posts:
+            post_data: dict = post.get("data")
+            if pattern.search(post_data.get("title")) or pattern.search(
+                post_data.get("selftext")
+            ):
+                found_posts.append(post)
+
+        return convert_posts(found_posts)
+
+    # ------------------------------------------------------------------------------- #
+
+    async def search_comments(
+        self,
+        session: aiohttp.ClientSession,
+        keyword: str,
+        limit: int,
+        sort: DATA_SORT_CRITERION = "all",
+        timeframe: DATA_TIMEFRAME = "all",
+    ) -> list[Comment]:
+        """
+        Returns a user's comments that contain the specified keyword.
+
+        :param session: Aiohttp session to use for the request.
+        :param keyword: Keyword to search for in comments.
+        :type keyword: str
+        :type session: aiohttp.ClientSession.
+        :param limit: Maximum number of comments to return.
+        :type limit: int
+        :param sort: Sort criterion for the comments.
+        :type sort: str
+        :param timeframe: Timeframe from which to get comments.
+        :type timeframe: str
+        :return: A list of Comment objects, each containing data about a comment.
+        :rtype: list[Comment]
+        """
+        user_comments: list = await get_posts(
+            _from=self._username,
+            _type="user_comments",
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
+            session=session,
+        )
+        found_comments: list = []
+        pattern = re.compile(re.escape(keyword), re.IGNORECASE)
+        for comment in user_comments:
+            if pattern.search(comment.get("data").get("body")):
+                found_comments.append(comment)
+
+        return convert_comments(found_comments)
+
+    # ------------------------------------------------------------------------------- #
+
     async def moderated_communities(
         self, session: aiohttp.ClientSession
     ) -> list[PreviewCommunity]:
@@ -433,7 +520,9 @@ class RedditCommunity:
 
         return community_posts
 
-    async def search_posts(
+    # ------------------------------------------------------------------------------- #
+
+    async def search(
         self,
         session: aiohttp.ClientSession,
         keyword: str,

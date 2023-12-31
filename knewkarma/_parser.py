@@ -267,6 +267,22 @@ def create_parser() -> argparse.ArgumentParser:
         help="get a user's posts",
     )
     user_parser.add_argument(
+        "-sp",
+        "--search-posts",
+        dest="search_posts",
+        metavar="KEYWORD",
+        help="get a user's posts that contain the specified keyword",
+        type=str,
+    )
+    user_parser.add_argument(
+        "-sc",
+        "--search-comments",
+        dest="search_comments",
+        metavar="KEYWORD",
+        help="get a user's comments that contain the specified keyword",
+        type=str,
+    )
+    user_parser.add_argument(
         "-mc",
         "--moderated-communities",
         dest="moderated_communities",
