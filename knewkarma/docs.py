@@ -103,6 +103,11 @@ knewkarma community MachineLearning --profile
 knewkarma community MachineLearning --posts
 ```
 
+## Search a community for posts that contain a specified keyword
+```
+knewkarma community MachineLearning --search "artificial intelligence"
+```
+
 ## Get community's wiki pages
 ```
 knewkarma community MachineLearning --wiki-pages
