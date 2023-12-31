@@ -74,7 +74,7 @@ def convert_posts(__posts: list[dict]) -> list[Post]:
     :return: A list of Post objects, each containing converted data about a post.
     :rtype: list[Post]
     """
-    if "upvote_ratio" in __posts[0].get("data"):
+    if len(__posts) != 0:
         posts_list: list = []
         for post in __posts:
             post_data = post.get("data")
@@ -121,7 +121,7 @@ def convert_comments(comments: list[dict]) -> list[Comment]:
     :return: A list of Comment objects, each containing converted data about a comment.
     :rtype: list[Comment]
     """
-    if "link_title" in comments[0].get("data"):
+    if len(comments) != 0:
         comments_list: list = []
         for comment in comments:
             comment_data: dict = comment.get("data")

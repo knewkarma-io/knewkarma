@@ -100,6 +100,20 @@ async def async_overview(limit):
         print(comments)
 
 
+# Get posts that contain the specified keyword
+async def async_search_posts(keyword, limit):
+    async with aiohttp.ClientSession() as session:
+        found_posts = await user.search_posts(keyword=keyword, limit=limit, session=session)
+        print(found_posts)
+
+
+# Get comments that contain the specified keyword
+async def async_search_comments(keyword, limit):
+    async with aiohttp.ClientSession() as session:
+        found_comments = await user.search_comments(keyword=keyword, limit=limit, session=session)
+        print(found_comments)
+
+
 # Get user's top n communities based on n post frequency
 async def async_top_communities(top_n, limit):
     async with aiohttp.ClientSession() as session:
@@ -118,6 +132,8 @@ asyncio.run(async_profile())
 asyncio.run(async_posts(limit=5))
 asyncio.run(async_comments(limit=100))
 asyncio.run(async_overview(limit=50))
+asyncio.run(async_search_posts(keyword="game", limit=100))
+asyncio.run(async_search_comments(keyword="lol", limit=100))
 asyncio.run(async_top_communities(top_n=10, limit=100))
 asyncio.run(async_moderated_communities())
 ```
@@ -149,6 +165,13 @@ async def async_posts(limit):
         print(posts)
 
 
+# Get posts that contain the specified keyword
+async def async_search(keyword, limit):
+    async with aiohttp.ClientSession() as session:
+        found_posts = await community.search(keyword=keyword, limit=limit, session=session)
+        print(found_posts)
+
+
 # Get a community's wiki pages
 async def async_wiki_pages():
     async with aiohttp.ClientSession() as session:
@@ -165,6 +188,7 @@ async def async_wiki_page(page):
 
 asyncio.run(async_profile())
 asyncio.run(async_posts(limit=200))
+asyncio.run(async_search(keyword="artificial intelligence", limit=100))
 asyncio.run(async_wiki_pages())
 asyncio.run(async_wiki_page(page="config/description"))
 ````

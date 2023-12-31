@@ -175,7 +175,7 @@ class RedditUser:
         :type session: aiohttp.ClientSession.
         :param keyword: Keyword to search for in posts.
         :type keyword: str
-        :param limit: Maximum number of posts to return.
+        :param limit: Maximum number of posts to search from.
         :type limit: int
         :param sort: Sort criterion for the posts.
         :type sort: str
@@ -220,7 +220,7 @@ class RedditUser:
         :param keyword: Keyword to search for in comments.
         :type keyword: str
         :type session: aiohttp.ClientSession.
-        :param limit: Maximum number of comments to return.
+        :param limit: Maximum number of comments to search from.
         :type limit: int
         :param sort: Sort criterion for the comments.
         :type sort: str
@@ -537,7 +537,7 @@ class RedditCommunity:
         :type session: aiohttp.ClientSession.
         :param keyword: Keyword to search for in posts.
         :type keyword: str
-        :param limit: Maximum number of posts to return.
+        :param limit: Maximum number of posts to search from.
         :type limit: int
         :param sort: Sort criterion for the posts.
         :type sort: str
