@@ -121,7 +121,7 @@ def create_parser() -> argparse.ArgumentParser:
         "-s",
         "--search",
         metavar="KEYWORD",
-        help="get a community for posts that contain the specified keyword",
+        help="get a community's posts that contain the specified keyword",
         type=str,
     )
     community_parser.add_argument(
