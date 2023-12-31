@@ -1,14 +1,8 @@
-﻿Imports System.Reflection
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel
-Imports Newtonsoft.Json
-Imports Newtonsoft.Json.Linq
+﻿Imports Newtonsoft.Json.Linq
 
 Public Class DataGridViewer
 
 
-    ''' <summary>
-    ''' Privately shared instance of ApiHandler to be used by methods in this class for interacting with the GitHub API.
-    ''' </summary>
     Private Shared ReadOnly apiHandler As New ApiHandler()
 
     ''' <summary>
@@ -94,39 +88,33 @@ Public Class DataGridViewer
             PostsList.Add(Post("data"))
         Next
 
-        PopulateDataGridViewFromJson(dataGridView:=PostsWindow.DataGridPosts, jsonData:=PostsList)
-        PostsWindow.Text = $"Posts — {listing} - {sort} {limit} posts"
-        PostsWindow.Show()
+        PopulateDataGridViewFromJson(dataGridView:=DataWindow.DataGrid, jsonData:=PostsList)
+        DataWindow.Text = $"Posts — {listing} - {sort} {limit} posts"
+        DataWindow.Show()
 
         ' Prompt to save data if the conditions are met.
         CoreUtils.PromptSaveData(data:=RawPosts, title:=$"{listing} posts")
     End Function
 
 
-    ''' <summary>
-    ''' Asynchronously gets the user profile data and updates the DataGridView in the FormUserProfile form with it.
-    ''' </summary>
-    ''' <param name="username">The username to get the data for.</param>
-    Private Shared Async Function AsyncLoadUserProfile(username As String) As Task
-        Dim ProfileData As JObject = Await apiHandler.AsyncGetProfile(type:="user", from:=username)
-        PopulateDataGridViewFromJson(dataGridView:=ProfileWindow.DataGridProfile, jsonData:=ProfileData)
-        ProfileWindow.Text = $"User — {username}"
-        ProfileWindow.Show()
-        ' Get the user subreddit data from the user's profile data.
-        ' LoadUserCommunity(UserCommunityData:=ProfileData)
+
+    Private Shared Async Function AsyncLoadProfile(profileType As String, profileSource As String) As Task
+        Dim ProfileData As JObject = Await apiHandler.AsyncGetProfile(type:=profileType.ToLowerInvariant, from:=profileSource)
+
+        PopulateDataGridViewFromJson(dataGridView:=DataWindow.DataGrid, jsonData:=ProfileData)
+
+        DataWindow.Size = New Size(360, 462)
+        DataWindow.MaximizeBox = False
+        DataWindow.FormBorderStyle = FormBorderStyle.FixedSingle
+        DataWindow.Text = $"{profileType} — {profileSource}"
+        DataWindow.Show()
 
         ' Prompt to save data if the conditions are met.
-        CoreUtils.PromptSaveData(data:=ProfileData, $"User ({username}) profile")
+        CoreUtils.PromptSaveData(data:=ProfileData, $"{profileType} ({profileSource}) profile")
 
     End Function
 
 
-    ''' <summary>
-    ''' Asynchronously loads the posts of a specific user and updates the DataGridView in the Posts.form.
-    ''' </summary>
-    ''' <param name="username">The Reddit username for which to fetch post data.</param>
-    ''' <param name="form">The Posts.object that contains the DataGridView to be updated.</param>
-    ''' <returns>A Task representing the asynchronous operation.</returns>
     Private Shared Async Function AsyncLoadUserPosts(
                                                     username As String,
                                                     sortCriterion As String,
@@ -151,21 +139,16 @@ Public Class DataGridViewer
                 PostsList.Add(Post("data"))
             Next
 
-            PopulateDataGridViewFromJson(dataGridView:=PostsWindow.DataGridPosts, jsonData:=PostsList)
-            PostsWindow.Text = $"User — {username} - {sort} {limit} posts"
-            PostsWindow.Show()
+            PopulateDataGridViewFromJson(dataGridView:=DataWindow.DataGrid, jsonData:=PostsList)
+
+            DataWindow.Text = $"User — {username} - {sort} {limit} posts"
+            DataWindow.Show()
 
             CoreUtils.PromptSaveData(data:=RawPosts, title:=$"User ({username}) posts")
         End If
     End Function
 
 
-    ''' <summary>
-    ''' Asynchronously loads the comments of a specific user and updates the DataGridView in the Comments.form.
-    ''' </summary>
-    ''' <param name="username">The Reddit username for which to fetch comments' data.</param>
-    ''' <param name="form">The Comments.object that contains the DataGridView to be updated.</param>
-    ''' <returns>A Task representing the asynchronous operation.</returns>
     Private Shared Async Function AsyncLoadUserComments(
                                                        username As String,
                                                        sortCriterion As String,
@@ -187,23 +170,21 @@ Public Class DataGridViewer
                 CommentsList.Add(Comment("data"))
             Next
 
-            PopulateDataGridViewFromJson(dataGridView:=PostsWindow.DataGridPosts, jsonData:=CommentsList)
-            PostsWindow.Text = $"User — {username} - {sortCriterion} {commentsLimit} comments"
-            PostsWindow.Show()
+            PopulateDataGridViewFromJson(dataGridView:=DataWindow.DataGrid, jsonData:=CommentsList)
+
+            DataWindow.Size = New Size(466, 366)
+            DataWindow.Text = $"User — {username} - {sortCriterion} {commentsLimit} comments"
+            DataWindow.Show()
 
             ' Prompt to save data if the conditions are met.
             CoreUtils.PromptSaveData(data:=RawComments, title:=$"User ({username}) comments")
         End If
     End Function
 
-    ''' <summary>
-    ''' Asynchronously load a user's data and update either the FormProfile, Posts.or FormUserComments forms 
-    ''' depending on which Radio Button is checked.
-    ''' </summary>
-    ''' <param name="username">The username to fetch data for.</param>
+
     Public Shared Async Function AsyncLoadUserData(username As String) As Task
         If MainWindow.RadioButtonUserProfile.Checked Then
-            Await AsyncLoadUserProfile(username:=username)
+            Await AsyncLoadProfile(profileType:="User", profileSource:=username)
         ElseIf MainWindow.RadioButtonUserPosts.Checked Then
             Await AsyncLoadUserPosts(
                 username:=username,
@@ -219,37 +200,16 @@ Public Class DataGridViewer
         End If
     End Function
 
-    ''' <summary>
-    ''' Asynchronously load a subreddit's profile data and updates the Profile form.
-    ''' </summary>
-    ''' <param name="username">The username to fetch data for.</param>
-    Public Shared Async Function CommunityProfile(subreddit As String) As Task
-        Dim ProfileData As JObject = Await apiHandler.AsyncGetProfile(type:="community", from:=subreddit)
-
-        PopulateDataGridViewFromJson(dataGridView:=ProfileWindow.DataGridProfile, jsonData:=ProfileData)
-        ProfileWindow.Text = $"Community — {subreddit}"
-        ProfileWindow.Show()
-
-        ' Prompt to save data if the conditions are met.
-        CoreUtils.PromptSaveData(data:=ProfileData, title:=$"Community ({subreddit}) profile")
-
-    End Function
 
 
-    ''' <summary>
-    ''' Asynchronously loads the posts of a specific subreddit and updates the DataGridView in the Posts.form.
-    ''' </summary>
-    ''' <param name="subreddit">The Community for which to fetch post data.</param>
-    ''' <param name="form">The Posts.object that contains the DataGridView to be updated.</param>
-    ''' <returns>A Task representing the asynchronous operation.</returns>
     Private Shared Async Function AsyncLoadCommunityPosts(
-                                                subreddit As String,
+                                                community As String,
                                                 sortCriterion As String,
                                                 postsLimit As Integer
                                             ) As Task
         Dim RawPosts As JArray = Await apiHandler.AsyncGetPosts(
             type:="community",
-            from:=subreddit,
+            from:=community,
             sort:=sortCriterion,
             limit:=postsLimit
         )
@@ -263,38 +223,29 @@ Public Class DataGridViewer
                 PostsList.Add(post("data"))
             Next
 
-            PopulateDataGridViewFromJson(dataGridView:=PostsWindow.DataGridPosts, jsonData:=PostsList)
-            PostsWindow.Text = $"Community — {sortCriterion} {postsLimit} posts from r/{subreddit}"
-            PostsWindow.Show()
+            PopulateDataGridViewFromJson(dataGridView:=DataWindow.DataGrid, jsonData:=PostsList)
+            DataWindow.Text = $"Community — {sortCriterion} {postsLimit} posts from r/{community}"
+            DataWindow.Show()
 
             ' Prompt to save data if the conditions are met.
-            CoreUtils.PromptSaveData(data:=RawPosts, title:=$"Community ({subreddit}) posts")
+            CoreUtils.PromptSaveData(data:=RawPosts, title:=$"Community ({community}) posts")
         End If
     End Function
 
-    ''' <summary>
-    ''' Asynchronously load a subreddit's data and update either the FormCommunityProfile or Posts.or forms 
-    ''' depending on which Radio Button is checked.
-    ''' </summary>
-    ''' <param name="subreddit">The username to fetch data for.</param>
-    Public Shared Async Function LoadCommunityDataAsync(subreddit As String) As Task
+
+    Public Shared Async Function LoadCommunityDataAsync(community As String) As Task
         If MainWindow.RadioButtonCommunityProfile.Checked Then
-            Await CommunityProfile(subreddit:=subreddit)
+            Await AsyncLoadProfile(profileType:="community", profileSource:=community)
         ElseIf MainWindow.RadioButtonCommunityPosts.Checked Then
             Await AsyncLoadCommunityPosts(
-                subreddit:=subreddit,
+                community:=community,
                 sortCriterion:=MainWindow.ComboBoxCommunityPostsListing.Text,
                 postsLimit:=MainWindow.NumericUpDownCommunityPostsLimit.Value
             )
         End If
     End Function
 
-    ''' <summary>
-    ''' Asynchronously loads the posts of a specific user and updates the DataGridView on the given form.
-    ''' </summary>
-    ''' <param name="username">The Reddit username for which to fetch post data.</param>
-    ''' <param name="form">The Posts.object that contains the DataGridView to be updated.</param>
-    ''' <returns>A Task representing the asynchronous operation.</returns>
+
     Public Shared Async Function LoadSearchResultsAsync(
                                                        query As String,
                                                       limit As Integer
@@ -316,21 +267,17 @@ Public Class DataGridViewer
                 ResultsList.Add(Result("data"))
             Next
 
-            PopulateDataGridViewFromJson(dataGridView:=PostsWindow.DataGridPosts, jsonData:=ResultsList)
-            PostsWindow.Text = $"Results — {query} - {limit} results"
-            PostsWindow.Show()
+            PopulateDataGridViewFromJson(dataGridView:=DataWindow.DataGrid, jsonData:=ResultsList)
+            DataWindow.Text = $"Results — {query} - {limit} results"
+            DataWindow.Show()
 
             CoreUtils.PromptSaveData(data:=Results, title:=$"{query} Search Results")
         End If
     End Function
 
-    ''' <summary>
-    ''' Asynchronously loads the posts from the Reddit front page and updates the DataGridView in the Posts.form.
-    ''' </summary>
-    ''' <param name="form">The Posts.object that contains the DataGridView to be updated.</param>
-    ''' <returns>A Task representing the asynchronous operation.</returns>
+
     Public Shared Async Function LoadFrontPagePostsAsync(
-                                                        form As PostsWindow,
+                                                        form As DataWindow,
                                                         sortCriterion As String,
                                                         postsLimit As Integer
                                                     ) As Task
@@ -350,9 +297,9 @@ Public Class DataGridViewer
                 PostsList.Add(Post("data"))
             Next
 
-            PopulateDataGridViewFromJson(dataGridView:=PostsWindow.DataGridPosts, jsonData:=PostsList)
-            PostsWindow.Text = $"Posts — Front-Page - {sortCriterion} {postsLimit} posts"
-            PostsWindow.Show()
+            PopulateDataGridViewFromJson(dataGridView:=DataWindow.DataGrid, jsonData:=PostsList)
+            DataWindow.Text = $"Posts — Front-Page - {sortCriterion} {postsLimit} posts"
+            DataWindow.Show()
 
             CoreUtils.PromptSaveData(data:=RawPosts, title:="Front-Page Posts")
         End If

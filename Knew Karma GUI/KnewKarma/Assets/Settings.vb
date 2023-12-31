@@ -263,6 +263,9 @@ Public Class SettingsManager
         ''' Apply colors to RadioButton controls
         ''' </summary>
         Dim radioButtons As New List(Of RadioButton) From {
+            MainWindow.RadioButtonSearchUsers,
+            MainWindow.RadioButtonSearchPosts,
+            MainWindow.RadioButtonSearchCommunities,
             MainWindow.RadioButtonBest,
             MainWindow.RadioButtonRising,
             MainWindow.RadioButtonPopular,
@@ -328,6 +331,7 @@ Public Class SettingsManager
         ''' Apply colors to GroupBox controls
         ''' </summary>
         Dim GroupBoxes As New List(Of GroupBox) From {
+            MainWindow.GroupBoxSearchData,
             MainWindow.GroupBoxPostListings,
             MainWindow.GroupBoxFrontPageDataFiltering,
             MainWindow.GroupBoxCommunityDataFiltering,
