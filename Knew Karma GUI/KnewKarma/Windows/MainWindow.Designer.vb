@@ -101,7 +101,7 @@ Partial Class MainWindow
         NumericUpDownPostListingsLimit = New NumericUpDown()
         GroupBoxPostListings = New GroupBox()
         PanelSearchPosts = New Panel()
-        GroupBox1 = New GroupBox()
+        GroupBoxSearchData = New GroupBox()
         RadioButtonSearchCommunities = New RadioButton()
         RadioButtonSearchUsers = New RadioButton()
         RadioButtonSearchPosts = New RadioButton()
@@ -131,7 +131,7 @@ Partial Class MainWindow
         CType(NumericUpDownPostListingsLimit, ComponentModel.ISupportInitialize).BeginInit()
         GroupBoxPostListings.SuspendLayout()
         PanelSearchPosts.SuspendLayout()
-        GroupBox1.SuspendLayout()
+        GroupBoxSearchData.SuspendLayout()
         Panel1.SuspendLayout()
         SuspendLayout()
         ' 
@@ -961,7 +961,7 @@ Partial Class MainWindow
         ' 
         ' PanelSearchPosts
         ' 
-        PanelSearchPosts.Controls.Add(GroupBox1)
+        PanelSearchPosts.Controls.Add(GroupBoxSearchData)
         PanelSearchPosts.Controls.Add(ButtonSearch)
         PanelSearchPosts.Controls.Add(Panel1)
         PanelSearchPosts.Controls.Add(TextBoxQuery)
@@ -972,27 +972,27 @@ Partial Class MainWindow
         PanelSearchPosts.TabIndex = 27
         PanelSearchPosts.Visible = False
         ' 
-        ' GroupBox1
+        ' GroupBoxSearchData
         ' 
-        GroupBox1.BackColor = Color.Transparent
-        GroupBox1.ContextMenuStrip = ContextMenuStripRightClick
-        GroupBox1.Controls.Add(RadioButtonSearchCommunities)
-        GroupBox1.Controls.Add(RadioButtonSearchUsers)
-        GroupBox1.Controls.Add(RadioButtonSearchPosts)
-        GroupBox1.FlatStyle = FlatStyle.Flat
-        GroupBox1.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
-        GroupBox1.Location = New Point(3, 26)
-        GroupBox1.Name = "GroupBox1"
-        GroupBox1.Size = New Size(215, 49)
-        GroupBox1.TabIndex = 32
-        GroupBox1.TabStop = False
-        GroupBox1.Text = "Select an entity to search for"
+        GroupBoxSearchData.BackColor = Color.Transparent
+        GroupBoxSearchData.ContextMenuStrip = ContextMenuStripRightClick
+        GroupBoxSearchData.Controls.Add(RadioButtonSearchCommunities)
+        GroupBoxSearchData.Controls.Add(RadioButtonSearchUsers)
+        GroupBoxSearchData.Controls.Add(RadioButtonSearchPosts)
+        GroupBoxSearchData.FlatStyle = FlatStyle.Flat
+        GroupBoxSearchData.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
+        GroupBoxSearchData.Location = New Point(3, 26)
+        GroupBoxSearchData.Name = "GroupBoxSearchData"
+        GroupBoxSearchData.Size = New Size(215, 49)
+        GroupBoxSearchData.TabIndex = 32
+        GroupBoxSearchData.TabStop = False
+        GroupBoxSearchData.Text = "Select an entity to search for"
         ' 
         ' RadioButtonSearchCommunities
         ' 
         RadioButtonSearchCommunities.AutoSize = True
         RadioButtonSearchCommunities.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        RadioButtonSearchCommunities.Location = New Point(126, 23)
+        RadioButtonSearchCommunities.Location = New Point(115, 23)
         RadioButtonSearchCommunities.Name = "RadioButtonSearchCommunities"
         RadioButtonSearchCommunities.Size = New Size(89, 19)
         RadioButtonSearchCommunities.TabIndex = 7
@@ -1016,7 +1016,7 @@ Partial Class MainWindow
         ' 
         RadioButtonSearchPosts.AutoSize = True
         RadioButtonSearchPosts.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        RadioButtonSearchPosts.Location = New Point(71, 23)
+        RadioButtonSearchPosts.Location = New Point(61, 23)
         RadioButtonSearchPosts.Name = "RadioButtonSearchPosts"
         RadioButtonSearchPosts.Size = New Size(51, 19)
         RadioButtonSearchPosts.TabIndex = 6
@@ -1117,8 +1117,8 @@ Partial Class MainWindow
         GroupBoxPostListings.PerformLayout()
         PanelSearchPosts.ResumeLayout(False)
         PanelSearchPosts.PerformLayout()
-        GroupBox1.ResumeLayout(False)
-        GroupBox1.PerformLayout()
+        GroupBoxSearchData.ResumeLayout(False)
+        GroupBoxSearchData.PerformLayout()
         Panel1.ResumeLayout(False)
         Panel1.PerformLayout()
         ResumeLayout(False)
@@ -1200,7 +1200,7 @@ Partial Class MainWindow
     Friend WithEvents Label5 As Label
     Friend WithEvents NotifyIcon1 As NotifyIcon
     Friend WithEvents ButtonFetchListingPosts As Button
-    Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents GroupBoxSearchData As GroupBox
     Friend WithEvents RadioButtonSearchCommunities As RadioButton
     Friend WithEvents RadioButtonSearchUsers As RadioButton
     Friend WithEvents RadioButtonSearchPosts As RadioButton

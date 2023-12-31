@@ -177,9 +177,9 @@ Public Class MainWindow
                                                     sender As Object,
                                                     e As EventArgs
                                                 ) Handles ButtonFetchCommunityData.Click
-        Dim subreddit As String = CheckInput(txtBox:=TextBoxCommunity)
-        If subreddit IsNot Nothing Then
-            Await DataGridViewer.LoadCommunityDataAsync(subreddit:=subreddit)
+        Dim community As String = CheckInput(txtBox:=TextBoxCommunity)
+        If community IsNot Nothing Then
+            Await DataGridViewer.LoadCommunityDataAsync(community:=community)
         End If
     End Sub
 
@@ -195,9 +195,9 @@ Public Class MainWindow
                                           ) Handles TextBoxCommunity.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
-            Dim subreddit As String = CheckInput(txtBox:=TextBoxCommunity)
-            If subreddit IsNot Nothing Then
-                Await DataGridViewer.LoadCommunityDataAsync(subreddit:=subreddit)
+            Dim community As String = CheckInput(txtBox:=TextBoxCommunity)
+            If community IsNot Nothing Then
+                Await DataGridViewer.LoadCommunityDataAsync(community:=community)
             End If
         End If
     End Sub
@@ -208,9 +208,9 @@ Public Class MainWindow
                                                          ) Handles NumericUpDownCommunityPostsLimit.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
-            Dim subreddit As String = CheckInput(txtBox:=TextBoxCommunity)
-            If subreddit IsNot Nothing Then
-                Await DataGridViewer.LoadCommunityDataAsync(subreddit:=subreddit)
+            Dim community As String = CheckInput(txtBox:=TextBoxCommunity)
+            If community IsNot Nothing Then
+                Await DataGridViewer.LoadCommunityDataAsync(community:=community)
             End If
         End If
     End Sub
@@ -265,7 +265,7 @@ Public Class MainWindow
                                                     e As EventArgs
                                                 ) Handles ButtonFetchFrontPageData.Click
         Await DataGridViewer.LoadFrontPagePostsAsync(
-            form:=PostsWindow,
+            form:=DataWindow,
             sortCriterion:=ComboBoxSearchResultListing.Text,
             postsLimit:=NumericUpDownSearchResultLimit.Value
         )
@@ -279,7 +279,7 @@ Public Class MainWindow
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
             Await DataGridViewer.LoadFrontPagePostsAsync(
-            form:=PostsWindow,
+            form:=DataWindow,
             sortCriterion:=ComboBoxSearchResultListing.Text,
             postsLimit:=NumericUpDownSearchResultLimit.Value
         )
