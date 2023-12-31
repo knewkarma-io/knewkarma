@@ -7,18 +7,18 @@ from rich.markdown import Markdown
 from rich_argparse import RichHelpFormatter
 
 from .docs import (
-    VERSION,
-    DATA_TIMEFRAME,
-    DATA_SORT_CRITERION,
-    OPERATIONS_TEXT,
-    DESCRIPTION,
     COPYRIGHT,
     COMMUNITY_EXAMPLES,
     COMMUNITIES_EXAMPLES,
+    DATA_TIMEFRAME,
+    DATA_SORT_CRITERION,
+    DESCRIPTION,
+    OPERATIONS_TEXT,
     POSTS_EXAMPLES,
-    POSTS_LISTINGS,
     SEARCH_EXAMPLES,
     USER_EXAMPLES,
+    POSTS_LISTINGS,
+    VERSION,
 )
 
 
