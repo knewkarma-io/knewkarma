@@ -144,6 +144,16 @@ def stage_and_start():
                     limit=limit, sort=sort, timeframe=timeframe, session=session
                 ),
             ),
+            (
+                "search",
+                lambda session: community.search_posts(
+                    keyword=arguments.search,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
             ("wiki_pages", lambda session: community.wiki_pages(session=session)),
             (
                 "wiki_page",

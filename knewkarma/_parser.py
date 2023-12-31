@@ -118,14 +118,15 @@ def create_parser() -> argparse.ArgumentParser:
         action="store_true",
     )
     community_parser.add_argument(
-        "-pp",
-        "--posts",
-        help="get a community's posts",
-        action="store_true",
+        "-s",
+        "--search",
+        metavar="KEYWORD",
+        help="get a community for posts that contain the specified keyword",
+        type=str,
     )
     community_parser.add_argument(
-        "-r",
-        "--rules",
+        "-pp",
+        "--posts",
         help="get a community's posts",
         action="store_true",
     )

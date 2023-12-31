@@ -1,5 +1,5 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
+import re
 from collections import Counter
 from typing import List
 
@@ -432,6 +432,49 @@ class RedditCommunity:
         community_posts: list[Post] = convert_posts(raw_posts)
 
         return community_posts
+
+    async def search_posts(
+        self,
+        session: aiohttp.ClientSession,
+        keyword: str,
+        limit: int,
+        sort: DATA_SORT_CRITERION = "all",
+        timeframe: DATA_TIMEFRAME = "all",
+    ) -> list[Post]:
+        """
+        Returns posts that contain a specified keyword from a community.
+
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession.
+        :param keyword: Keyword to search for in posts.
+        :type keyword: str
+        :param limit: Maximum number of posts to return.
+        :type limit: int
+        :param sort: Sort criterion for the posts.
+        :type sort: str
+        :param timeframe: Timeframe from which to get posts.
+        :type timeframe: str
+        :return: A list of Post objects, each containing data about a post.
+        :rtype: list[Post]
+        """
+        all_posts: list = await get_posts(
+            _type="community",
+            _from=self._community,
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
+            session=session,
+        )
+        found_posts: list = []
+        pattern = re.compile(re.escape(keyword), re.IGNORECASE)
+        for post in all_posts:
+            post_data: dict = post.get("data")
+            if pattern.search(post_data.get("title")) or pattern.search(
+                post_data.get("selftext")
+            ):
+                found_posts.append(post)
+
+        return convert_posts(found_posts)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
