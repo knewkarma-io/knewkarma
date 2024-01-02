@@ -276,18 +276,29 @@ Public Class DataGridViewer
     End Function
 
 
-    Public Shared Async Function LoadFrontPagePostsAsync(
+    Public Shared Async Function LoadFrontPageAndNewPostsAsync(
                                                         form As DataWindow,
                                                         sortCriterion As String,
                                                         postsLimit As Integer
                                                     ) As Task
-        Dim sort As String = MainWindow.ComboBoxFrontPageDataListing.Text
-        Dim limit As Integer = MainWindow.NumericUpDownFrontPageDataLimit.Value
+        Dim sort As String = MainWindow.ComboBoxFrontPageAndNewPostsListing.Text
+        Dim limit As Integer = MainWindow.NumericUpDownFrontPageAndNewPostsLimit.Value
 
-        Dim RawPosts As JArray = Await apiHandler.AsyncGetPosts(
-            type:="front_page_posts",
-            sort:=sortCriterion,
-            limit:=postsLimit)
+        Dim RawPosts As JArray = Nothing
+        If MainWindow.RadioButtonNewPosts.Checked Then
+            RawPosts = Await apiHandler.AsyncGetPosts(
+                type:="new",
+                sort:=sortCriterion,
+                limit:=postsLimit
+            )
+        ElseIf MainWindow.RadioButtonFrontPagePosts.Checked Then
+            RawPosts = Await apiHandler.AsyncGetPosts(
+                type:="front_page",
+                sort:=sortCriterion,
+                limit:=postsLimit
+            )
+        End If
+
         Dim isValid As Boolean = CoreUtils.IsValidData(data:=RawPosts)
 
         ' If the API data is valid, setup a DataGridView for the Posts.
@@ -298,10 +309,10 @@ Public Class DataGridViewer
             Next
 
             PopulateDataGridViewFromJson(dataGridView:=DataWindow.DataGrid, jsonData:=PostsList)
-            DataWindow.Text = $"Posts — Front-Page - {sortCriterion} {postsLimit} posts"
+            DataWindow.Text = $"Posts - {sortCriterion} {postsLimit} posts"
             DataWindow.Show()
 
-            CoreUtils.PromptSaveData(data:=RawPosts, title:="Front-Page Posts")
+            CoreUtils.PromptSaveData(data:=RawPosts, title:="Posts")
         End If
     End Function
 End Class

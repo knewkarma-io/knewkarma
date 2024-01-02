@@ -3,20 +3,30 @@ Imports System.Net.Http
 Imports Newtonsoft.Json.Linq
 Imports System.Runtime.InteropServices
 Imports System.Reflection
+Imports Microsoft.VisualBasic.Logging
+Imports System.Globalization
 
+''' <summary>
+''' Handles API requests and data processing for Reddit and GitHub.
+''' </summary>
 Public Class ApiHandler
 
-    Private BASE_REDDIT_ENDPOINT As String = "https://www.reddit.com"
-    Private USER_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/u"
-    Private USERS_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/users"
-    Private COMMUNITY_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/r"
-    Private COMMUNITIES_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/subreddits"
-    Private GITHUB_RELEASE_ENDPOINT As String = "https://api.github.com/repos/bellingcat/knewkarma/releases/latest"
+    Private ReadOnly BASE_REDDIT_ENDPOINT As String = "https://www.reddit.com"
+    Private ReadOnly USER_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/u"
+    Private ReadOnly USERS_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/users"
+    Private ReadOnly COMMUNITY_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/r"
+    Private ReadOnly COMMUNITIES_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/subreddits"
+    Private ReadOnly GITHUB_RELEASE_ENDPOINT As String = "https://api.github.com/repos/bellingcat/knewkarma/releases/latest"
 
     Private ReadOnly appVersion As String = $"{My.Application.Info.Version.Major}.{My.Application.Info.Version.Minor}"
     Private ReadOnly dotNetVersion As String = RuntimeInformation.FrameworkDescription
 
 
+    ''' <summary>
+    ''' Asynchronously fetches data from a specified API endpoint.
+    ''' </summary>
+    ''' <param name="endpoint">The API endpoint URL.</param>
+    ''' <returns>JToken containing the API response, or Nothing in case of failure.</returns>
     Public Async Function AsyncGetData(endpoint As String) As Task(Of JToken)
         Try
             Using httpClient As New HttpClient()
@@ -44,6 +54,13 @@ Public Class ApiHandler
         End Try
     End Function
 
+
+    ''' <summary>
+    ''' Asynchronously fetches data from an API endpoint and handles pagination.
+    ''' </summary>
+    ''' <param name="endpoint">The API endpoint URL.</param>
+    ''' <param name="limit">Maximum number of items to fetch.</param>
+    ''' <returns>JArray containing paginated response data.</returns>
     Private Async Function FetchAndPaginateAsync(endpoint As String, limit As Integer) As Task(Of JArray)
         Dim allItems As New JArray()
         Dim lastItemId As String = String.Empty
@@ -70,6 +87,12 @@ Public Class ApiHandler
     End Function
 
 
+    ''' <summary>
+    ''' Processes the API response, ensuring valid data is returned.
+    ''' </summary>
+    ''' <param name="data">The JToken response from the API.</param>
+    ''' <param name="validKey">A key to validate in the response object.</param>
+    ''' <returns>Processed JToken with valid data, or a default JToken in case of invalid data.</returns>
     Private Shared Function ProcessApiResponse(data As JToken, validKey As String) As JToken
         If data Is Nothing Then
             Return New JObject()
@@ -98,6 +121,48 @@ Public Class ApiHandler
     End Function
 
 
+    ''' <summary>
+    ''' Asynchronously fetches the program's update information from GitHub and compares it with the current version.
+    ''' Assumes version format: major.minor.patch.prefix
+    ''' </summary>
+    ''' <returns>Task representing the asynchronous operation.</returns>
+    Public Async Function AsyncGetUpdates() As Task
+        Dim response As JObject = Await AsyncGetData(endpoint:="https://api.github.com/repos/bellingcat/knewkarma/releases/latest")
+        If response IsNot Nothing AndAlso response.ContainsKey("tag_name") Then
+            Dim remoteVersion As String = response("tag_name").ToString()
+
+            ' Splitting the version strings into components
+            Dim remoteParts As List(Of String) = remoteVersion.Split(".").ToList()
+
+            Dim updateMessage As String = "{0} update available: {1}"
+            Dim isUpdateAvailable As Boolean = False
+
+            ' Check for differences in version parts
+            If remoteParts(0) <> My.Application.Info.Version.Major.ToString(CultureInfo.InvariantCulture) Then
+                updateMessage = String.Format(CultureInfo.InvariantCulture, updateMessage, "MAJOR", remoteVersion)
+                isUpdateAvailable = True
+            ElseIf remoteParts(1) <> My.Application.Info.Version.Minor.ToString(CultureInfo.InvariantCulture) Then
+                updateMessage = String.Format(CultureInfo.InvariantCulture, updateMessage, "MINOR", remoteVersion)
+                isUpdateAvailable = True
+            ElseIf remoteParts.Count > 2 AndAlso remoteParts(2) <> My.Application.Info.Version.Build.ToString(CultureInfo.InvariantCulture) Then
+                updateMessage = String.Format(CultureInfo.InvariantCulture, updateMessage, "PATCH", remoteVersion)
+                isUpdateAvailable = True
+            End If
+
+            If isUpdateAvailable Then
+                AboutWindow.VersionStatus.Text = updateMessage
+                AboutWindow.ButtonGetUpdates.Enabled = True
+            End If
+        End If
+    End Function
+
+
+    ''' <summary>
+    ''' Asynchronously retrieves a user or community profile from Reddit.
+    ''' </summary>
+    ''' <param name="type">The type of profile to fetch (e.g., 'user', 'community').</param>
+    ''' <param name="from">Identifier for the user or community.</param>
+    ''' <returns>Task representing the asynchronous operation, returning a JObject with profile data.</returns>
     Public Async Function AsyncGetProfile(type As String, from As String) As Task(Of JObject)
         Dim endpointMap As New Dictionary(Of String, String) From {
         {"user", $"{USER_DATA_ENDPOINT}/{from}/about.json"},
@@ -110,13 +175,20 @@ Public Class ApiHandler
             Dim processedResponse As JObject = CType(ProcessApiResponse(response, "data"), JObject)
             Return processedResponse("data")
         Else
-            ' Log an error for invalid profile type
-            ' LogError($"Invalid profile type: {profileType}")
             Return New JObject()
         End If
     End Function
 
-    ' Async function to get posts with pagination
+
+    ''' <summary>
+    ''' Asynchronously retrieves a collection of posts from Reddit based on specified criteria.
+    ''' </summary>
+    ''' <param name="limit">The maximum number of posts to retrieve.</param>
+    ''' <param name="type">The type of posts to retrieve, such as 'new', 'front_page', 'listing', 'community', 'user_posts', etc.</param>
+    ''' <param name="from">An optional parameter specifying the source of the posts (e.g., specific user or community).</param>
+    ''' <param name="sort">An optional parameter to define the sorting method of the posts (e.g., 'hot', 'new', 'top'). Default is 'all'.</param>
+    ''' <param name="timeframe">An optional parameter specifying the timeframe for the posts (e.g., 'day', 'week', 'month'). Default is 'all'.</param>
+    ''' <returns>Task representing the asynchronous operation, returning a JArray of posts.</returns>
     Public Async Function AsyncGetPosts(
         ByVal limit As Integer,
         ByVal type As String,
@@ -152,7 +224,13 @@ Public Class ApiHandler
     End Function
 
 
-    ' Async function to perform a search
+    ''' <summary>
+    ''' Asynchronously performs a search on Reddit for users, communities, or posts based on a query.
+    ''' </summary>
+    ''' <param name="searchType">The type of search to perform ('users', 'communities', or 'posts').</param>
+    ''' <param name="query">The search query string.</param>
+    ''' <param name="limit">The maximum number of search results to retrieve.</param>
+    ''' <returns>Task representing the asynchronous operation, returning a JArray of search results.</returns>
     Public Async Function AsyncSearch(searchType As String, query As String, limit As Integer) As Task(Of JArray)
         Dim sourceMap As New Dictionary(Of String, String) From {
         {"users", $"{USERS_DATA_ENDPOINT}/search.json?q={query}"},
@@ -171,7 +249,12 @@ Public Class ApiHandler
     End Function
 
 
-    ' Async function to get communities
+    ''' <summary>
+    ''' Asynchronously retrieves information about Reddit communities based on a specified type.
+    ''' </summary>
+    ''' <param name="communityType">The type of communities to retrieve (e.g., 'all', 'default', 'new', 'popular').</param>
+    ''' <param name="limit">The maximum number of communities to retrieve.</param>
+    ''' <returns>Task representing the asynchronous operation, returning a JArray of community information.</returns>
     Public Async Function AsyncGetCommunities(communityType As String, limit As Integer) As Task(Of JArray)
         Dim sourceMap As New Dictionary(Of String, String) From {
          {"all", $"{COMMUNITIES_DATA_ENDPOINT}.json"},
