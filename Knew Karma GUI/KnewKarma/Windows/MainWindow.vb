@@ -22,7 +22,7 @@ Public Class MainWindow
         settings.ToggleSettings(enabled:=settings.SaveToJson, saveTo:="json")
         settings.ToggleSettings(enabled:=settings.SaveToCsv, saveTo:="csv")
 
-        ComboBoxFrontPageDataListing.SelectedIndex = 0
+        ComboBoxFrontPageAndNewPostsListing.SelectedIndex = 0
         ComboBoxUserDataListing.SelectedIndex = 0
         ComboBoxSearchResultListing.SelectedIndex = 0
         ComboBoxCommunityPostsListing.SelectedIndex = 0
@@ -125,10 +125,10 @@ Public Class MainWindow
     ''' </summary>
     ''' <param name="sender">The sender of the event.</param>
     ''' <param name="e">The EventArgs instance containing the event data.</param>
-    Private Async Sub ButtonFetchUserData_Click(
+    Private Async Sub ButtonGetUserData_Click(
                                                sender As Object,
                                                e As EventArgs
-                                           ) Handles ButtonFetchUserData.Click
+                                           ) Handles ButtonGetUserData.Click
         Dim username As String = CheckInput(txtBox:=TextBoxUsername)
         If username IsNot Nothing Then
             Await DataGridViewer.AsyncLoadUserData(username:=username)
@@ -169,14 +169,14 @@ Public Class MainWindow
     End Sub
 
     ''' <summary>
-    ''' Handles the Click event for the ButtonFetchCommunityData control. 
+    ''' Handles the Click event for the ButtonGetCommunityData control. 
     ''' </summary>
     ''' <param name="sender">The source of the event.</param>
     ''' <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-    Private Async Sub ButtonFetchCommunityData_Click(
+    Private Async Sub ButtonGetCommunityData_Click(
                                                     sender As Object,
                                                     e As EventArgs
-                                                ) Handles ButtonFetchCommunityData.Click
+                                                ) Handles ButtonGetCommunityData.Click
         Dim community As String = CheckInput(txtBox:=TextBoxCommunity)
         If community IsNot Nothing Then
             Await DataGridViewer.LoadCommunityDataAsync(community:=community)
@@ -256,15 +256,15 @@ Public Class MainWindow
     End Sub
 
     ''' <summary>
-    ''' Handles the Click event for the ButtonFetchFrontPageData control. 
+    ''' Handles the Click event for the ButtonGetFrontPageData control. 
     ''' </summary>
     ''' <param name="sender">The source of the event.</param>
     ''' <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-    Private Async Sub ButtonFetchFrontPageData_Click(
+    Private Async Sub ButtonGetFrontPageAndNewPosts_Click(
                                                     sender As Object,
                                                     e As EventArgs
-                                                ) Handles ButtonFetchFrontPageData.Click
-        Await DataGridViewer.LoadFrontPagePostsAsync(
+                                                ) Handles ButtonGetFrontPageAndNewPosts.Click
+        Await DataGridViewer.LoadFrontPageAndNewPostsAsync(
             form:=DataWindow,
             sortCriterion:=ComboBoxSearchResultListing.Text,
             postsLimit:=NumericUpDownSearchResultLimit.Value
@@ -275,10 +275,10 @@ Public Class MainWindow
     Private Async Sub NumericUpDownFrontPageDataLimit_KeyDown(
                                                              sender As Object,
                                                              e As KeyEventArgs
-                                                         ) Handles NumericUpDownFrontPageDataLimit.KeyDown
+                                                         ) Handles NumericUpDownFrontPageAndNewPostsLimit.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
-            Await DataGridViewer.LoadFrontPagePostsAsync(
+            Await DataGridViewer.LoadFrontPageAndNewPostsAsync(
             form:=DataWindow,
             sortCriterion:=ComboBoxSearchResultListing.Text,
             postsLimit:=NumericUpDownSearchResultLimit.Value
@@ -287,11 +287,11 @@ Public Class MainWindow
     End Sub
 
     ''' <summary>
-    ''' Handles the Click event for the ButtonFetchPostListingsData control. 
+    ''' Handles the Click event for the ButtonGetPostListingsData control. 
     ''' </summary>
     ''' <param name="sender">The source of the event.</param>
     ''' <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-    Private Async Sub ButtonFetchPostListingsData_Click(sender As Object, e As EventArgs)
+    Private Async Sub ButtonGetPostListingsData_Click(sender As Object, e As EventArgs)
         Await DataGridViewer.AsyncLoadListingsPosts(
             sort:=ComboBoxPostListingsListing.Text,
             limit:=NumericUpDownPostListingsLimit.Value
@@ -339,14 +339,15 @@ Public Class MainWindow
             Case "Community"
                 PanelCommunityData.Visible = True
             Case "Search"
-                PanelSearchPosts.Visible = True
+                PanelSearch.Visible = True
             Case "Listings"
                 PanelPostListings.Visible = True
-            Case "Front Page"
-                PanelFrontPageData.Visible = True
+            Case "Front-Page/New"
+                PanelFrontPageAndNew.Visible = True
             Case Else
-                Me.Width = 169 ' Set the Window's width to 169
-                Me.Text = ""
+                PanelHome.Visible = True
+                'Me.Width = 169 ' Set the Window's width to 169
+                'Me.Text = ""
         End Select
     End Sub
 
@@ -460,14 +461,14 @@ Public Class MainWindow
     End Sub
 
     ''' <summary>
-    ''' Handles the Click event for the ButtonFetchPostListings control. 
+    ''' Handles the Click event for the ButtonGetPostListings control. 
     ''' </summary>
     ''' <param name="sender">The source of the event.</param>
     ''' <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-    Private Async Sub ButtonFetchListingPosts_Click(
+    Private Async Sub ButtonGetListingPosts_Click(
                                                    sender As Object,
                                                    e As EventArgs
-                                               ) Handles ButtonFetchListingPosts.Click
+                                               ) Handles ButtonGetListingPosts.Click
         Await DataGridViewer.AsyncLoadListingsPosts(
             sort:=ComboBoxPostListingsListing.Text,
             limit:=NumericUpDownPostListingsLimit.Value

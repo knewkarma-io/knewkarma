@@ -219,15 +219,15 @@ Public Class SettingsManager
         ''' Apply colors to buttons
         ''' </summary>
         Dim buttons As New List(Of Button) From {
-            MainWindow.ButtonFetchFrontPageData,
-            MainWindow.ButtonFetchListingPosts,
-            MainWindow.ButtonFetchCommunityData,
-            MainWindow.ButtonFetchUserData,
+            MainWindow.ButtonGetFrontPageAndNewPosts,
+            MainWindow.ButtonGetListingPosts,
+            MainWindow.ButtonGetCommunityData,
+            MainWindow.ButtonGetUserData,
             MainWindow.ButtonSearch,
             AboutWindow.ButtonViewLicense,
             AboutWindow.ButtonGetUpdates
         }
-        ' MainWindow.ButtonFetchPostData,
+        ' MainWindow.ButtonGetPostData,
         For Each button In buttons
             button.BackColor = color("InputFieldBackgroundColor")
             button.ForeColor = color("PrimaryTextColor")
@@ -248,11 +248,14 @@ Public Class SettingsManager
             MainWindow.LabelCommunityPostsListing,
             MainWindow.LabelCommunityPostsLimit,
             AboutWindow.LabelProgramFirstName,
+            MainWindow.LabelProgramFirstName,
+            AboutWindow.Description,
             MainWindow.Label1,
             MainWindow.Label2,
             MainWindow.Label3,
             MainWindow.Label4,
-            MainWindow.Label5
+            MainWindow.Label5,
+            MainWindow.Label6
             }
         AboutWindow.LabelProgramLastName.ForeColor = color("SecondaryTextColor")
         For Each label In labels
@@ -265,6 +268,8 @@ Public Class SettingsManager
         Dim radioButtons As New List(Of RadioButton) From {
             MainWindow.RadioButtonSearchUsers,
             MainWindow.RadioButtonSearchPosts,
+            MainWindow.RadioButtonNewPosts,
+            MainWindow.RadioButtonFrontPagePosts,
             MainWindow.RadioButtonSearchCommunities,
             MainWindow.RadioButtonBest,
             MainWindow.RadioButtonRising,
@@ -302,7 +307,7 @@ Public Class SettingsManager
         ''' </summary>
         Dim numericUpDowns As New List(Of NumericUpDown) From {
             MainWindow.NumericUpDownPostListingsLimit,
-            MainWindow.NumericUpDownFrontPageDataLimit,
+            MainWindow.NumericUpDownFrontPageAndNewPostsLimit,
             MainWindow.NumericUpDownCommunityPostsLimit,
             MainWindow.NumericUpDownUserDataLimit,
             MainWindow.NumericUpDownSearchResultLimit
@@ -317,7 +322,7 @@ Public Class SettingsManager
         ''' </summary>
         Dim comboBoxes As New List(Of ComboBox) From {
             MainWindow.ComboBoxPostListingsListing,
-            MainWindow.ComboBoxFrontPageDataListing,
+            MainWindow.ComboBoxFrontPageAndNewPostsListing,
             MainWindow.ComboBoxCommunityPostsListing,
             MainWindow.ComboBoxUserDataListing,
             MainWindow.ComboBoxSearchResultListing
@@ -333,7 +338,8 @@ Public Class SettingsManager
         Dim GroupBoxes As New List(Of GroupBox) From {
             MainWindow.GroupBoxSearchData,
             MainWindow.GroupBoxPostListings,
-            MainWindow.GroupBoxFrontPageDataFiltering,
+            MainWindow.GroupBoxFrontPageAndNewPostsFiltering,
+            MainWindow.GroupBoxFrontPageAndNewPosts,
             MainWindow.GroupBoxCommunityDataFiltering,
             MainWindow.GroupBoxUserDataFiltering,
             MainWindow.GroupBoxSearchResultsFiltering,

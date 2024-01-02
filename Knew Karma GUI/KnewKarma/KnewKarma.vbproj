@@ -7,9 +7,9 @@
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>WindowsForms</MyType>
     <Company>Richard Mwewa</Company>
-    <Description>A Reddit Data Analysis Toolkit.</Description>
-    <Copyright>© 2023 Richard Mwewa. All rights reserved.</Copyright>
-    <PackageProjectUrl>https://github.com/bellingcat/knewkarma</PackageProjectUrl>
+    <Description>Knew Karma is a Reddit Data Analysis Toolkit designed to provide an extensive range of functionalities for exploring and analysing Reddit data. It includes both Command-Line Interface (CLI) and Graphical User Interface (GUI) options, making it adaptable for various user preferences.</Description>
+    <Copyright>© 2024 Richard Mwewa. All rights reserved.</Copyright>
+    <PackageProjectUrl>https://pypi.org/project/knewkarma</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/bellingcat/knewkarma</RepositoryUrl>
     <AssemblyVersion>4.0.0</AssemblyVersion>
@@ -25,7 +25,7 @@
     <NeutralLanguage>en</NeutralLanguage>
     <Product>Knew Karma</Product>
     <AssemblyName>Knew Karma</AssemblyName>
-    <Title>A Reddit Data Analysis Toolkit.</Title>
+    <Title>Reddit Data Analysis Toolkit.</Title>
     <PackageIcon>icon.png</PackageIcon>
     <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
   </PropertyGroup>
