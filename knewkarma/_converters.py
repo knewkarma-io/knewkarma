@@ -2,7 +2,7 @@
 
 from typing import Union
 
-from ._utils import unix_timestamp_to_utc
+from ._coreutils import unix_timestamp_to_utc
 from .data import User, Post, PreviewCommunity, Community, Comment, WikiPage
 
 
