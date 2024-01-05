@@ -9,8 +9,8 @@ import aiohttp
 
 from . import RedditUser, RedditCommunity, RedditPosts
 from ._api import get_updates
+from ._coreutils import log, pathfinder, dataframe
 from ._parser import create_parser, VERSION
-from ._utils import log, pathfinder, dataframe
 from .base import RedditSearch, RedditCommunities
 from .docs import PROGRAM_DIRECTORY
 

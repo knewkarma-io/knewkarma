@@ -7,7 +7,7 @@ import aiohttp
 import rich
 from rich.markdown import Markdown
 
-from ._utils import log
+from ._coreutils import log
 from .docs import (
     _MAJOR,
     _MINOR,
