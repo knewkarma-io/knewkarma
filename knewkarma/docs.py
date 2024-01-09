@@ -4,12 +4,16 @@ import os
 from datetime import date
 from typing import Literal
 
+
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-_MAJOR: str = "4"
-_MINOR: str = "0"
-_PATCH: str = "0"
-VERSION: str = f"{_MAJOR}.{_MINOR}"
+
+class Version:
+    _major: str = "4"
+    _minor: str = "0"
+    _patch: str = "0"
+    version: str = f"{_major}.{_minor}"
+
 
 # ------------------------------------------------------------------------- #
 
@@ -19,7 +23,7 @@ ABOUT_AUTHOR: str = "https://rly0nheart.github.io"
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 DESCRIPTION: str = f"""
-# Knew Karma CLI {VERSION}
+# Knew Karma CLI {Version.version}
 > **Reddit** Data Analysis Toolkit.
 """
 

@@ -10,7 +10,7 @@ import aiohttp
 from . import RedditUser, RedditCommunity, RedditPosts
 from ._api import get_updates
 from ._coreutils import log, pathfinder, dataframe
-from ._parser import create_parser, VERSION
+from ._parser import create_parser, Version
 from .base import RedditSearch, RedditCommunities
 from .docs import PROGRAM_DIRECTORY
 
@@ -255,7 +255,7 @@ def stage_and_start():
             start_time: datetime = datetime.now()
 
             log.info(
-                f"[bold]Knew Karma CLI[/] {VERSION} started at "
+                f"[bold]Knew Karma CLI[/] {Version.version} started at "
                 f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}..."
             )
             asyncio.run(
