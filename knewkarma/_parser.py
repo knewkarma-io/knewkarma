@@ -18,7 +18,7 @@ from .docs import (
     SEARCH_EXAMPLES,
     USER_EXAMPLES,
     POSTS_LISTINGS,
-    VERSION,
+    Version,
 )
 
 
@@ -91,7 +91,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-v",
         "--version",
-        version=f"Knew Karma {VERSION}",
+        version=f"Knew Karma CLI/GUI {Version.version}",
         action="version",
     )
 
