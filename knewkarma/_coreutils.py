@@ -16,12 +16,12 @@ from .data import Comment, Post, Community, User, PreviewCommunity, WikiPage
 
 def dataframe(
     data: Union[
-        Community,
-        User,
-        WikiPage,
         dict,
         list,
         list[Union[Comment, Community, Post, PreviewCommunity, User]],
+        User,
+        WikiPage,
+        Community,
     ],
     to_dir: str,
     save_csv: str = None,
@@ -54,6 +54,26 @@ def dataframe(
     """
     from rich import print
 
+    def save_dataframe():
+        """
+        Saves a pandas DataFrame to JSON and/or CSV files.
+        """
+        if save_csv:
+            csv_filename = f"{save_csv.upper()}-{filename_timestamp()}.csv"
+            csv_filepath = os.path.join(to_dir, "csv", csv_filename)
+            df.to_csv(csv_filepath, index=False)
+            log.info(
+                f"{os.path.getsize(csv_filepath)} bytes written to [link file://{csv_filepath}]{csv_filepath}"
+            )
+
+        if save_json:
+            json_filename = f"{save_json.upper()}-{filename_timestamp()}.json"
+            json_filepath = os.path.join(to_dir, "json", json_filename)
+            df.to_json(json_filepath, orient="records", lines=True, indent=4)
+            log.info(
+                f"{os.path.getsize(json_filepath)} bytes written to [link file://{json_filepath}]{json_filepath}"
+            )
+
     # Convert single User, Community, or WikiPage objects to a list of dictionaries
     if isinstance(data, (User, Community, WikiPage)):
         # Transform each attribute of the object into a dictionary entry
@@ -79,48 +99,10 @@ def dataframe(
     df = pd.DataFrame(data)
 
     # Save the DataFrame to CSV or JSON if specified
-    save_dataframe(df=df, save_csv=save_csv, save_json=save_json, to_dir=to_dir)
+    save_dataframe()
 
     # Print the DataFrame, excluding the 'raw_data' column if it exists
     print(df.loc[:, df.columns != "raw_data"])
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-def save_dataframe(
-    df: pd.DataFrame,
-    save_csv: str,
-    save_json: str,
-    to_dir: str,
-):
-    """
-    Saves a pandas DataFrame to JSON and/or CSV files.
-
-    :param df: The DataFrame to be saved.
-    :type df: pandas.DataFrame
-    :param save_csv: The base name for the CSV file. If provided, saves the DataFrame to a CSV file.
-    :type save_csv: str
-    :param save_json: The base name for the JSON file. If provided, saves the DataFrame to a JSON file.
-    :type save_json: str
-    :param to_dir: The directory where the files will be saved.
-    :type to_dir: str
-    """
-    if save_csv:
-        csv_filename = f"{save_csv.upper()}-{filename_timestamp()}.csv"
-        csv_filepath = os.path.join(to_dir, "csv", csv_filename)
-        df.to_csv(csv_filepath, index=False)
-        log.info(
-            f"{os.path.getsize(csv_filepath)} bytes written to [link file://{csv_filepath}]{csv_filepath}"
-        )
-
-    if save_json:
-        json_filename = f"{save_json.upper()}-{filename_timestamp()}.json"
-        json_filepath = os.path.join(to_dir, "json", json_filename)
-        df.to_json(json_filepath, orient="records", lines=True, indent=4)
-        log.info(
-            f"{os.path.getsize(json_filepath)} bytes written to [link file://{json_filepath}]{json_filepath}"
-        )
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
