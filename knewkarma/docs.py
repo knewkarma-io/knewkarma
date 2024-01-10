@@ -9,10 +9,10 @@ from typing import Literal
 
 
 class Version:
-    _major: str = "4"
-    _minor: str = "0"
-    _patch: str = "0"
-    version: str = f"{_major}.{_minor}"
+    major: str = "4"
+    minor: str = "0"
+    patch: str = "0"
+    version: str = f"{major}.{minor}"
 
 
 # ------------------------------------------------------------------------- #

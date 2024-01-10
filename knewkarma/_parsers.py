@@ -3,15 +3,15 @@
 from typing import Union
 
 from ._coreutils import unix_timestamp_to_utc
-from .data import User, Post, PreviewCommunity, Community, Comment, WikiPage
+from .data import User, Post, Comment, Community, PreviewCommunity, WikiPage
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def convert_users(__data: Union[list[dict], dict]) -> Union[list[User], User]:
+def parse_users(__data: Union[list[dict], dict]) -> Union[list[User], User]:
     """
-    Converts raw user data into User objects.
+    Parses raw user data into User objects.
 
     :param __data: User data in the form of a list of dictionaries or a single dictionary.
     :type __data: Union[list[dict], dict]
@@ -67,9 +67,9 @@ def convert_users(__data: Union[list[dict], dict]) -> Union[list[User], User]:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def convert_posts(__posts: list[dict]) -> list[Post]:
+def parse_posts(__posts: list[dict]) -> list[Post]:
     """
-    Converts raw posts into a list of Post objects.
+    Parses raw posts into a list of Post objects.
     :param __posts: A list of post dictionaries to convert.
     :return: A list of Post objects, each containing converted data about a post.
     :rtype: list[Post]
@@ -113,9 +113,9 @@ def convert_posts(__posts: list[dict]) -> list[Post]:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def convert_comments(comments: list[dict]) -> list[Comment]:
+def parse_comments(comments: list[dict]) -> list[Comment]:
     """
-    Converts raw comments data into a list of Comment objects.
+    Parses raw comments data into a list of Comment objects.
     :param comments: A list of comment dictionaries to convert.
     :type comments: list[dict]
     :return: A list of Comment objects, each containing converted data about a comment.
@@ -158,11 +158,11 @@ def convert_comments(comments: list[dict]) -> list[Comment]:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def convert_communities(
+def parse_communities(
     __data: Union[list, dict], is_preview: bool = False
 ) -> Union[list[Union[Community, PreviewCommunity]], Community]:
     """
-    Converts raw community data into Community objects.
+    Parses raw community data into Community objects.
 
     :param __data: Community data in the form of a list or a single dictionary.
     :type __data: Union[list, dict]
@@ -234,9 +234,9 @@ def convert_communities(
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def convert_community_wiki_page(wiki_page: dict) -> WikiPage:
+def parse_community_wiki_page(wiki_page: dict) -> WikiPage:
     """
-    Converts raw community wiki page data into a WikiPage object.
+    Parses raw community wiki page data into a WikiPage object.
 
     :param wiki_page: Raw wiki page data to be converted.
     :type wiki_page: dict
