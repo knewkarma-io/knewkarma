@@ -8,7 +8,7 @@ making it adaptable for various user preferences.
 
 ## Knew Karma CLI/GUI
 
-Knew Karma offers a variety of features for accessing and analyzing Reddit data, including:
+Knew Karma offers a variety of features for accessing and analysing Reddit data, including:
 
 ### User Data
 
