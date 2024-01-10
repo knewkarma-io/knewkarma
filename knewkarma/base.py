@@ -14,12 +14,12 @@ from ._api import (
     BASE_REDDIT_ENDPOINT,
     COMMUNITY_DATA_ENDPOINT,
 )
-from ._converters import (
-    convert_comments,
-    convert_communities,
-    convert_community_wiki_page,
-    convert_posts,
-    convert_users,
+from ._parsers import (
+    parse_comments,
+    parse_communities,
+    parse_community_wiki_page,
+    parse_posts,
+    parse_users,
 )
 from .data import Comment, Community, PreviewCommunity, User, Post, WikiPage
 from .docs import DATA_TIMEFRAME, DATA_SORT_CRITERION, POSTS_LISTINGS
@@ -59,7 +59,7 @@ class RedditUser:
         raw_user: dict = await get_profile(
             _from=self._username, _type="user", session=session
         )
-        user_profile: User = convert_users(raw_user)
+        user_profile: User = parse_users(raw_user)
 
         return user_profile
 
@@ -94,7 +94,7 @@ class RedditUser:
             timeframe=timeframe,
             session=session,
         )
-        user_posts: list[Post] = convert_posts(raw_posts)
+        user_posts: list[Post] = parse_posts(raw_posts)
 
         return user_posts
 
@@ -129,7 +129,7 @@ class RedditUser:
             timeframe=timeframe,
             session=session,
         )
-        user_comments: list[Comment] = convert_comments(raw_comments)
+        user_comments: list[Comment] = parse_comments(raw_comments)
 
         return user_comments
 
@@ -154,7 +154,7 @@ class RedditUser:
             limit=limit,
             session=session,
         )
-        user_overview: list[Comment] = convert_comments(raw_comments)
+        user_overview: list[Comment] = parse_comments(raw_comments)
 
         return user_overview
 
@@ -201,7 +201,7 @@ class RedditUser:
             ):
                 found_posts.append(post)
 
-        return convert_posts(found_posts)
+        return parse_posts(found_posts)
 
     # ------------------------------------------------------------------------------- #
 
@@ -243,7 +243,7 @@ class RedditUser:
             if pattern.search(comment.get("data").get("body")):
                 found_comments.append(comment)
 
-        return convert_comments(found_comments)
+        return parse_comments(found_comments)
 
     # ------------------------------------------------------------------------------- #
 
@@ -262,7 +262,7 @@ class RedditUser:
             endpoint=f"{BASE_REDDIT_ENDPOINT}/user/{self._username}/moderated_subreddits.json",
             session=session,
         )
-        preview_communities: list[PreviewCommunity] = convert_communities(
+        preview_communities: list[PreviewCommunity] = parse_communities(
             raw_preview_communities.get("data"), is_preview=True
         )
 
@@ -345,7 +345,7 @@ class RedditSearch:
         search_users: list = await search(
             query=query, _type="users", limit=limit, session=session
         )
-        users_results: list[User] = convert_users(search_users)
+        users_results: list[User] = parse_users(search_users)
 
         return users_results
 
@@ -368,7 +368,7 @@ class RedditSearch:
         search_communities: list = await search(
             query=query, _type="communities", limit=limit, session=session
         )
-        communities_results: list[Community] = convert_communities(search_communities)
+        communities_results: list[Community] = parse_communities(search_communities)
 
         return communities_results
 
@@ -406,7 +406,7 @@ class RedditSearch:
             timeframe=timeframe,
             session=session,
         )
-        posts_results: list[Post] = convert_posts(search_posts)
+        posts_results: list[Post] = parse_posts(search_posts)
 
         return posts_results
 
@@ -444,7 +444,7 @@ class RedditCommunity:
             _from=self._community,
             session=session,
         )
-        community_profile: Community = convert_communities(raw_community)
+        community_profile: Community = parse_communities(raw_community)
 
         return community_profile
 
@@ -481,7 +481,7 @@ class RedditCommunity:
             endpoint=f"{COMMUNITY_DATA_ENDPOINT}/{self._community}/wiki/{page}.json",
             session=session,
         )
-        wiki_page: WikiPage = convert_community_wiki_page(wiki_page=raw_page)
+        wiki_page: WikiPage = parse_community_wiki_page(wiki_page=raw_page)
 
         return wiki_page
 
@@ -516,7 +516,7 @@ class RedditCommunity:
             timeframe=timeframe,
             session=session,
         )
-        community_posts: list[Post] = convert_posts(raw_posts)
+        community_posts: list[Post] = parse_posts(raw_posts)
 
         return community_posts
 
@@ -563,7 +563,7 @@ class RedditCommunity:
             ):
                 found_posts.append(post)
 
-        return convert_posts(found_posts)
+        return parse_posts(found_posts)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -593,7 +593,7 @@ class RedditCommunities:
         raw_communities: list = await get_communities(
             _type="all", limit=limit, session=session
         )
-        all_communities: list[Community] = convert_communities(raw_communities)
+        all_communities: list[Community] = parse_communities(raw_communities)
 
         return all_communities
 
@@ -614,7 +614,7 @@ class RedditCommunities:
         raw_communities: list = await get_communities(
             _type="default", limit=limit, session=session
         )
-        default_communities: list[Community] = convert_communities(raw_communities)
+        default_communities: list[Community] = parse_communities(raw_communities)
 
         return default_communities
 
@@ -635,7 +635,7 @@ class RedditCommunities:
         raw_communities: list = await get_communities(
             _type="new", limit=limit, session=session
         )
-        new_communities: list[Community] = convert_communities(raw_communities)
+        new_communities: list[Community] = parse_communities(raw_communities)
 
         return new_communities
 
@@ -656,7 +656,7 @@ class RedditCommunities:
         raw_communities: list = await get_communities(
             _type="popular", limit=limit, session=session
         )
-        popular_communities: list[Community] = convert_communities(raw_communities)
+        popular_communities: list[Community] = parse_communities(raw_communities)
 
         return popular_communities
 
@@ -702,7 +702,7 @@ class RedditPosts:
             session=session,
         )
         if listing_posts:
-            return convert_posts(listing_posts)
+            return parse_posts(listing_posts)
 
     # ------------------------------------------------------------------------------- #
 
@@ -730,7 +730,7 @@ class RedditPosts:
             sort=sort,
             session=session,
         )
-        new_posts: list[Post] = convert_posts(raw_posts)
+        new_posts: list[Post] = parse_posts(raw_posts)
 
         return new_posts
 
@@ -762,7 +762,7 @@ class RedditPosts:
             timeframe=timeframe,
             session=session,
         )
-        front_page_posts: list[Post] = convert_posts(raw_posts)
+        front_page_posts: list[Post] = parse_posts(raw_posts)
 
         return front_page_posts
 

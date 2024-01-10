@@ -7,12 +7,9 @@ import aiohttp
 import rich
 from rich.markdown import Markdown
 
-from ._coreutils import log
+from ._coreutils import console
 from .docs import (
-    _MAJOR,
-    _MINOR,
-    _PATCH,
-    VERSION,
+    Version,
     ABOUT_AUTHOR,
     DATA_SORT_CRITERION,
     DATA_TIMEFRAME,
@@ -48,7 +45,7 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
         async with session.get(
             endpoint,
             headers={
-                "User-Agent": f"Knew-Karma/{VERSION} "
+                "User-Agent": f"Knew-Karma/{Version.version} "
                 f"(Python {python_version}; +{ABOUT_AUTHOR})"
             },
         ) as response:
@@ -56,14 +53,14 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
                 return await response.json()
             else:
                 error_message = await response.json()
-                log.error(f"An API error occurred: {error_message}")
+                console.log(f"An API error occurred: {error_message}")
                 return {}
 
     except aiohttp.ClientConnectionError as error:
-        log.error(f"An HTTP error occurred: [red]{error}[/]")
+        console.log(f"An HTTP error occurred: [red]{error}[/]")
         return {}
     except Exception as error:
-        log.critical(f"An unknown error occurred: [red]{error}[/]")
+        console.log(f"An unknown error occurred: [red]{error}[/]")
         return {}
 
 
@@ -96,7 +93,7 @@ def process_response(
     elif isinstance(response_data, list):
         return response_data if response_data else []
     else:
-        log.critical(
+        console.log(
             f"Unknown data type ({response_data}: {type(response_data)}), expected a list or dict."
         )
 
@@ -130,23 +127,23 @@ async def get_updates(session: aiohttp.ClientSession):
         # ------------------------------------------------------------------------- #
 
         # Check for differences in version parts
-        if remote_parts[0] != _MAJOR:
+        if remote_parts[0] != Version.major:
             update_message = update_message % "MAJOR"
 
         # ------------------------------------------------------------------------- #
 
-        elif remote_parts[1] != _MINOR:
+        elif remote_parts[1] != Version.minor:
             update_message = update_message % "MINOR"
 
         # ------------------------------------------------------------------------- #
 
-        elif remote_parts[2] != _PATCH:
+        elif remote_parts[2] != Version.patch:
             update_message = update_message % "PATCH"
 
         # ------------------------------------------------------------------------- #
 
         if update_message:
-            log.info(update_message)
+            console.log(update_message)
             rich.print(markdown_release_notes)
 
 

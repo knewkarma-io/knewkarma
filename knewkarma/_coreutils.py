@@ -1,13 +1,12 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-import logging
 import os
 from datetime import datetime
 from typing import Union
 
 import pandas as pd
+from rich.console import Console
 
-from ._parser import create_parser
 from .data import Comment, Post, Community, User, PreviewCommunity, WikiPage
 
 
@@ -62,7 +61,7 @@ def dataframe(
             csv_filename = f"{save_csv.upper()}-{filename_timestamp()}.csv"
             csv_filepath = os.path.join(to_dir, "csv", csv_filename)
             df.to_csv(csv_filepath, index=False)
-            log.info(
+            console.log(
                 f"{os.path.getsize(csv_filepath)} bytes written to [link file://{csv_filepath}]{csv_filepath}"
             )
 
@@ -70,7 +69,7 @@ def dataframe(
             json_filename = f"{save_json.upper()}-{filename_timestamp()}.json"
             json_filepath = os.path.join(to_dir, "json", json_filename)
             df.to_json(json_filepath, orient="records", lines=True, indent=4)
-            log.info(
+            console.log(
                 f"{os.path.getsize(json_filepath)} bytes written to [link file://{json_filepath}]{json_filepath}"
             )
 
@@ -164,35 +163,6 @@ def unix_timestamp_to_utc(timestamp: int) -> str:
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-
-def setup_logging(debug_mode: bool) -> logging.getLogger:
-    """
-    Configure and return a logging object with the specified log level.
-
-    :param debug_mode: A boolean value indicating whether log level should be set to DEBUG.
-    :type debug_mode: bool
-    :return: A logging object configured with the specified log level.
-    :rtype: logging.getLogger
-    """
-    from rich.logging import RichHandler
-
-    logging.basicConfig(
-        level="DEBUG" if debug_mode else "INFO",
-        format="%(message)s",
-        handlers=[
-            RichHandler(
-                markup=True,
-                log_time_format="%I:%M:%S%p",
-                show_level=debug_mode,
-                show_time=debug_mode,
-            )
-        ],
-    )
-    return logging.getLogger("Knew Karma CLI")
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-log: logging.getLogger = setup_logging(debug_mode=create_parser().parse_args().debug)
+console = Console(color_system="auto", log_time_format="[%I:%M:%S%p]")
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
