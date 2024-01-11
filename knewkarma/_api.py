@@ -151,31 +151,31 @@ async def get_updates(session: aiohttp.ClientSession):
 
 
 async def get_profile(
-    _from: str,
-    _type: Literal["user", "community"],
+    profile_source: str,
+    profile_type: Literal["user", "community"],
     session: aiohttp.ClientSession,
 ) -> dict:
     """
     Asynchronously fetches a profile from the specified source.
 
-    :param _from: Source to get profile data from.
-    :type _from: str
-    :param _type: The type of profile that is to be fetched.
-    :type _type: str
+    :param profile_source: Source to get profile data from.
+    :type profile_source: str
+    :param profile_type: The type of profile that is to be fetched.
+    :type profile_type: str
     :param session: aiohttp session to use for the request.
     :return: A dictionary object containing profile data from the specified source.
     :rtype: dict
     """
     # Use a dictionary for direct mapping
-    source_map: dict = {
-        "user": f"{USER_DATA_ENDPOINT}/{_from}/about.json",
-        "community": f"{COMMUNITY_DATA_ENDPOINT}/{_from}/about.json",
+    profile_mapping: dict = {
+        "user": f"{USER_DATA_ENDPOINT}/{profile_source}/about.json",
+        "community": f"{COMMUNITY_DATA_ENDPOINT}/{profile_source}/about.json",
     }
 
     # ------------------------------------------------------------------------- #
 
     # Get the endpoint directly from the dictionary
-    endpoint: str = source_map.get(_type, "")
+    endpoint: str = profile_mapping.get(profile_type, "")
 
     # ------------------------------------------------------------------------- #
 
@@ -250,7 +250,7 @@ async def __fetch_and_paginate(
 async def get_posts(
     session: aiohttp.ClientSession,
     limit: int,
-    _type: Literal[
+    posts_type: Literal[
         "new",
         "front_page",
         "listing",
@@ -259,7 +259,7 @@ async def get_posts(
         "user_overview",
         "user_comments",
     ],
-    _from: str = None,
+    posts_source: str = None,
     timeframe: DATA_TIMEFRAME = "all",
     sort: DATA_SORT_CRITERION = "all",
 ) -> list[dict]:
@@ -270,10 +270,10 @@ async def get_posts(
     :type session: aiohttp.ClientSession
     :param limit: Maximum number of posts to get.
     :type limit: int
-    :param _type: Type of posts to be fetched.
-    :type _type: str
-    :param _from: Source from where posts will be fetched.
-    :type _from: str
+    :param posts_type: Type of posts to be fetched.
+    :type posts_type: str
+    :param posts_source: Source from where posts will be fetched.
+    :type posts_source: str
     :param sort: Posts' sort criterion.
     :type sort: str
     :param timeframe: Timeframe from which to get posts.
@@ -285,17 +285,17 @@ async def get_posts(
     source_map = {
         "new": f"{BASE_REDDIT_ENDPOINT}/new.json",
         "front_page": f"{BASE_REDDIT_ENDPOINT}/.json",
-        "listing": f"{COMMUNITY_DATA_ENDPOINT}/{_from}.json?",
-        "community": f"{COMMUNITY_DATA_ENDPOINT}/{_from}.json",
-        "user_posts": f"{USER_DATA_ENDPOINT}/{_from}/submitted.json",
-        "user_overview": f"{USER_DATA_ENDPOINT}/{_from}/overview.json",
-        "user_comments": f"{USER_DATA_ENDPOINT}/{_from}/comments.json",
+        "listing": f"{COMMUNITY_DATA_ENDPOINT}/{posts_source}.json?",
+        "community": f"{COMMUNITY_DATA_ENDPOINT}/{posts_source}.json",
+        "user_posts": f"{USER_DATA_ENDPOINT}/{posts_source}/submitted.json",
+        "user_overview": f"{USER_DATA_ENDPOINT}/{posts_source}/overview.json",
+        "user_comments": f"{USER_DATA_ENDPOINT}/{posts_source}/comments.json",
     }
 
     # ------------------------------------------------------------------------- #
 
-    endpoint = source_map.get(_type, "")
-    if _type == "new_posts":
+    endpoint = source_map.get(posts_type, "")
+    if posts_type == "new_posts":
         endpoint += f"?limit={limit}&sort={sort}"
     else:
         endpoint += f"?limit={limit}&sort={sort}&t={timeframe}"
@@ -318,9 +318,9 @@ async def get_posts(
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def search(
+async def get_searches(
     session: aiohttp.ClientSession,
-    _type: Literal["users", "communities", "posts"],
+    search_type: Literal["users", "communities", "posts"],
     query: str,
     limit: int,
     sort: DATA_SORT_CRITERION = "all",
@@ -331,8 +331,8 @@ async def search(
 
     :param session: Aiohttp session to use for the request.
     :type session: aiohttp.ClientSession
-    :param _type: Type of results to get.
-    :type _type: str
+    :param search_type: Type of results to get.
+    :type search_type: str
     :param query: Search query.
     :type query: str
     :param limit: Maximum number of results to get.
@@ -342,7 +342,7 @@ async def search(
     :param timeframe: Timeframe from which to get posts.
     :type timeframe: str
     """
-    source_map: dict = {
+    search_mapping: dict = {
         "users": f"{USERS_DATA_ENDPOINT}/search.json",
         "communities": f"{COMMUNITIES_DATA_ENDPOINT}/search.json",
         "posts": f"{BASE_REDDIT_ENDPOINT}/search.json",
@@ -350,8 +350,8 @@ async def search(
 
     # ------------------------------------------------------------------------- #
 
-    endpoint = source_map.get(_type, "")
-    if _type == "posts":
+    endpoint = search_mapping.get(search_type, "")
+    if search_type == "posts":
         endpoint += f"?q={query}&limit={limit}&sort={sort}&t={timeframe}"
     else:
         endpoint += f"?q={query}&limit={limit}"
@@ -375,28 +375,28 @@ async def search(
 
 
 async def get_communities(
-    _type: Literal["all", "default", "new", "popular"],
+    communities_type: Literal["all", "default", "new", "popular"],
     limit: int,
     session: aiohttp.ClientSession,
 ) -> list[dict]:
     """
     Asynchronously gets the specified type of communities.
 
-    :param _type: Type of communities to get.
-    :type _type: str
+    :param communities_type: Type of communities to get.
+    :type communities_type: str
     :param limit: Maximum number of communities to return.
     :type limit: int
     :param session: Aiohttp session to use for the request.
     :type session: aiohttp.ClientSession
     """
-    source_map: dict = {
+    communities_mapping: dict = {
         "all": f"{COMMUNITIES_DATA_ENDPOINT}.json",
         "default": f"{COMMUNITIES_DATA_ENDPOINT}/default.json",
         "new": f"{COMMUNITIES_DATA_ENDPOINT}/new.json",
         "popular": f"{COMMUNITIES_DATA_ENDPOINT}/popular.json",
     }
 
-    endpoint = source_map.get(_type, "")
+    endpoint = communities_mapping.get(communities_type, "")
     endpoint += f"?limit={limit}"
 
     # ------------------------------------------------------------------------- #

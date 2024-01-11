@@ -11,7 +11,7 @@ from conftest import (
     TEST_COMMUNITY_ID,
     TEST_COMMUNITY_CREATED_TIMESTAMP,
 )
-from knewkarma._api import get_profile, search, get_communities, get_posts
+from knewkarma._api import get_profile, get_searches, get_communities, get_posts
 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -22,8 +22,8 @@ async def test_search():
     async with aiohttp.ClientSession() as session:
         # --------------------------------------------------------------- #
 
-        search_posts: list[dict] = await search(
-            _type="posts",
+        search_posts: list[dict] = await get_searches(
+            search_type="posts",
             query="covid-19",
             limit=5,
             session=session,
@@ -38,8 +38,8 @@ async def test_search():
 
         # --------------------------------------------------------------- #
 
-        search_communities: list[dict] = await search(
-            _type="communities", query="ask", limit=13, session=session
+        search_communities: list[dict] = await get_searches(
+            search_type="communities", query="ask", limit=13, session=session
         )
 
         assert isinstance(search_communities, list)
@@ -48,8 +48,8 @@ async def test_search():
 
         # --------------------------------------------------------------- #
 
-        search_users: list[dict] = await search(
-            _type="users",
+        search_users: list[dict] = await get_searches(
+            search_type="users",
             query="john",
             limit=22,
             session=session,
@@ -69,8 +69,8 @@ async def test_get_profile():
         # --------------------------------------------------------------- #
 
         user_profile: dict = await get_profile(
-            _type="user",
-            _from=TEST_USERNAME,
+            profile_type="user",
+            profile_source=TEST_USERNAME,
             session=session,
         )
 
@@ -80,8 +80,8 @@ async def test_get_profile():
         # --------------------------------------------------------------- #
 
         community_profile: dict = await get_profile(
-            _type="community",
-            _from=TEST_COMMUNITY,
+            profile_type="community",
+            profile_source=TEST_COMMUNITY,
             session=session,
         )
 
@@ -97,7 +97,9 @@ async def test_get_communities():
     async with aiohttp.ClientSession() as session:
         # --------------------------------------------------------------- #
 
-        all_communities = await get_communities(_type="all", limit=100, session=session)
+        all_communities = await get_communities(
+            communities_type="all", limit=100, session=session
+        )
 
         assert isinstance(all_communities, list)
         assert "subreddit_type" in all_communities[0].get("data")
@@ -106,7 +108,7 @@ async def test_get_communities():
         # --------------------------------------------------------------- #
 
         default_communities = await get_communities(
-            _type="default", limit=150, session=session
+            communities_type="default", limit=150, session=session
         )
 
         assert isinstance(default_communities, list)
@@ -115,7 +117,9 @@ async def test_get_communities():
 
         # --------------------------------------------------------------- #
 
-        new_communities = await get_communities(_type="new", limit=200, session=session)
+        new_communities = await get_communities(
+            communities_type="new", limit=200, session=session
+        )
 
         assert isinstance(new_communities, list)
         assert "whitelist_status" in new_communities[3].get("data")
@@ -124,7 +128,7 @@ async def test_get_communities():
         # --------------------------------------------------------------- #
 
         popular_communities = await get_communities(
-            _type="popular", limit=200, session=session
+            communities_type="popular", limit=200, session=session
         )
 
         assert isinstance(popular_communities, list)
@@ -141,8 +145,8 @@ async def test_get_posts():
         # --------------------------------------------------------------- #
 
         user_posts: list = await get_posts(
-            _type="user_posts",
-            _from=TEST_USERNAME,
+            posts_type="user_posts",
+            posts_source=TEST_USERNAME,
             sort="top",
             timeframe="year",
             limit=100,
@@ -156,8 +160,8 @@ async def test_get_posts():
         # --------------------------------------------------------------- #
 
         community_posts: list = await get_posts(
-            _type="community",
-            _from=TEST_COMMUNITY,
+            posts_type="community",
+            posts_source=TEST_COMMUNITY,
             sort="top",
             timeframe="week",
             limit=200,
@@ -171,8 +175,8 @@ async def test_get_posts():
         # --------------------------------------------------------------- #
 
         listing_posts: list = await get_posts(
-            _type="listing",
-            _from="best",
+            posts_type="listing",
+            posts_source="best",
             sort="hot",
             timeframe="month",
             limit=10,
@@ -185,7 +189,7 @@ async def test_get_posts():
 
         # --------------------------------------------------------------- #
 
-        new_posts: list = await get_posts(_type="new", limit=120, session=session)
+        new_posts: list = await get_posts(posts_type="new", limit=120, session=session)
 
         assert isinstance(new_posts, list)
         assert len(new_posts) == 120
@@ -193,7 +197,7 @@ async def test_get_posts():
         # --------------------------------------------------------------- #
 
         front_page_posts: list = await get_posts(
-            _type="front_page",
+            posts_type="front_page",
             sort="top",
             timeframe="hour",
             limit=3,

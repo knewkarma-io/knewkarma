@@ -34,7 +34,7 @@ from .docs import (
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def create_parser() -> argparse.ArgumentParser:
+def create_arg_parser() -> argparse.ArgumentParser:
     """
     Creates and configures an argument parser for the command line arguments.
 
@@ -307,9 +307,9 @@ def create_parser() -> argparse.ArgumentParser:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def execute_functions(args: argparse.Namespace, function_mapping: dict):
+async def call_arg_functions(args: argparse.Namespace, function_mapping: dict):
     """
-    Executes command-line arguments' functions based on user-input.
+    Calls command-line arguments' functions based on user-input.
 
     :param args: Argparse namespace object  containing parsed command-line arguments.
     :type args: argparse.Namespace
@@ -363,14 +363,14 @@ def stage_and_start():
     """
     Main entrypoint for the Knew Karma command-line interface.
     """
-    # ------------------------------------------------------------------------- #
+    # ------------------------------------------------------------------------------- #
 
-    parser = create_parser()
+    parser = create_arg_parser()
     args: argparse = parser.parse_args()
 
     start_time: datetime = datetime.now()
 
-    # ------------------------------------------------------------------------ #
+    # ------------------------------------------------------------------------------- #
 
     limit: int = args.limit
     sort = args.sort
@@ -378,7 +378,7 @@ def stage_and_start():
 
     search_query = args.query if hasattr(args, "query") else None
 
-    # ------------------------------------------------------------------------ #
+    # ------------------------------------------------------------------------------- #
 
     user = RedditUser(
         username=args.username if hasattr(args, "username") else None,
@@ -390,7 +390,7 @@ def stage_and_start():
     communities = RedditCommunities()
     posts = RedditPosts()
 
-    # ------------------------------------------------------------------------ #
+    # ------------------------------------------------------------------------------- #
 
     function_mapping: dict = {
         "user": [
@@ -529,7 +529,7 @@ def stage_and_start():
         ],
     }
 
-    # ------------------------------------------------------------------------ #
+    # ------------------------------------------------------------------------------- #
 
     if args.mode:
         print(
@@ -545,7 +545,9 @@ def stage_and_start():
                 f"[bold]Knew Karma CLI[/] {Version.version} started at "
                 f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}..."
             )
-            asyncio.run(execute_functions(args=args, function_mapping=function_mapping))
+            asyncio.run(
+                call_arg_functions(args=args, function_mapping=function_mapping)
+            )
         except KeyboardInterrupt:
             console.log(f"User interruption detected ([yellow]Ctrl+C[/])")
         finally:

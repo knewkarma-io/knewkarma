@@ -1,4 +1,5 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
 import re
 from collections import Counter
 from typing import List
@@ -10,7 +11,7 @@ from ._api import (
     get_data,
     get_posts,
     get_profile,
-    search,
+    get_searches,
     BASE_REDDIT_ENDPOINT,
     COMMUNITY_DATA_ENDPOINT,
 )
@@ -21,7 +22,7 @@ from ._parsers import (
     parse_posts,
     parse_users,
 )
-from .data import Comment, Community, PreviewCommunity, User, Post, WikiPage
+from .data import Comment, Community, User, Post, WikiPage, PreviewCommunity
 from .docs import DATA_TIMEFRAME, DATA_SORT_CRITERION, POSTS_LISTINGS
 
 
@@ -57,7 +58,7 @@ class RedditUser:
         :rtype: User
         """
         raw_user: dict = await get_profile(
-            _from=self._username, _type="user", session=session
+            profile_source=self._username, profile_type="user", session=session
         )
         user_profile: User = parse_users(raw_user)
 
@@ -87,8 +88,8 @@ class RedditUser:
         :rtype: list[Post]
         """
         raw_posts: list = await get_posts(
-            _from=self._username,
-            _type="user_posts",
+            posts_source=self._username,
+            posts_type="user_posts",
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -122,8 +123,8 @@ class RedditUser:
         :rtype: list[Comment]
         """
         raw_comments: list = await get_posts(
-            _from=self._username,
-            _type="user_comments",
+            posts_source=self._username,
+            posts_type="user_comments",
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -149,8 +150,8 @@ class RedditUser:
         :rtype: list[Comment]
         """
         raw_comments: list = await get_posts(
-            _from=self._username,
-            _type="user_overview",
+            posts_source=self._username,
+            posts_type="user_overview",
             limit=limit,
             session=session,
         )
@@ -185,8 +186,8 @@ class RedditUser:
         :rtype: list[Post]
         """
         user_posts: list = await get_posts(
-            _type="user_posts",
-            _from=self._username,
+            posts_type="user_posts",
+            posts_source=self._username,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -230,8 +231,8 @@ class RedditUser:
         :rtype: list[Comment]
         """
         user_comments: list = await get_posts(
-            _from=self._username,
-            _type="user_comments",
+            posts_source=self._username,
+            posts_type="user_comments",
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -295,8 +296,8 @@ class RedditUser:
         :rtype: dict
         """
         posts = await get_posts(
-            _type="user_posts",
-            _from=self._username,
+            posts_type="user_posts",
+            posts_source=self._username,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -342,8 +343,8 @@ class RedditSearch:
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         """
-        search_users: list = await search(
-            query=query, _type="users", limit=limit, session=session
+        search_users: list = await get_searches(
+            query=query, search_type="users", limit=limit, session=session
         )
         users_results: list[User] = parse_users(search_users)
 
@@ -365,8 +366,8 @@ class RedditSearch:
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         """
-        search_communities: list = await search(
-            query=query, _type="communities", limit=limit, session=session
+        search_communities: list = await get_searches(
+            query=query, search_type="communities", limit=limit, session=session
         )
         communities_results: list[Community] = parse_communities(search_communities)
 
@@ -398,9 +399,9 @@ class RedditSearch:
         :return: A list of Post objects, each containing data about a post.
         :rtype: list[Post]
         """
-        search_posts: list = await search(
+        search_posts: list = await get_searches(
             query=query,
-            _type="posts",
+            search_type="posts",
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -440,13 +441,15 @@ class RedditCommunity:
         :rtype: Community
         """
         raw_community: dict = await get_profile(
-            _type="community",
-            _from=self._community,
+            profile_type="community",
+            profile_source=self._community,
             session=session,
         )
         community_profile: Community = parse_communities(raw_community)
 
         return community_profile
+
+    # ------------------------------------------------------------------------------- #
 
     async def wiki_pages(self, session: aiohttp.ClientSession) -> list[str]:
         """
@@ -509,8 +512,8 @@ class RedditCommunity:
         :rtype: list[Post]
         """
         raw_posts: list = await get_posts(
-            _type="community",
-            _from=self._community,
+            posts_type="community",
+            posts_source=self._community,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -547,8 +550,8 @@ class RedditCommunity:
         :rtype: list[Post]
         """
         all_posts: list = await get_posts(
-            _type="community",
-            _from=self._community,
+            posts_type="community",
+            posts_source=self._community,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -591,7 +594,7 @@ class RedditCommunities:
             *in morphius' voice* "the only limitation you have at this point is the matrix's rate limit."
         """
         raw_communities: list = await get_communities(
-            _type="all", limit=limit, session=session
+            communities_type="all", limit=limit, session=session
         )
         all_communities: list[Community] = parse_communities(raw_communities)
 
@@ -612,7 +615,7 @@ class RedditCommunities:
         :rtype: list[Community]
         """
         raw_communities: list = await get_communities(
-            _type="default", limit=limit, session=session
+            communities_type="default", limit=limit, session=session
         )
         default_communities: list[Community] = parse_communities(raw_communities)
 
@@ -633,7 +636,7 @@ class RedditCommunities:
         :rtype: list[Community]
         """
         raw_communities: list = await get_communities(
-            _type="new", limit=limit, session=session
+            communities_type="new", limit=limit, session=session
         )
         new_communities: list[Community] = parse_communities(raw_communities)
 
@@ -654,7 +657,7 @@ class RedditCommunities:
         :rtype: list[Community]
         """
         raw_communities: list = await get_communities(
-            _type="popular", limit=limit, session=session
+            communities_type="popular", limit=limit, session=session
         )
         popular_communities: list[Community] = parse_communities(raw_communities)
 
@@ -694,8 +697,8 @@ class RedditPosts:
         :rtype: list[Post]
         """
         listing_posts: list = await get_posts(
-            _type="listing",
-            _from=listings_name,
+            posts_type="listing",
+            posts_source=listings_name,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -725,7 +728,7 @@ class RedditPosts:
         :rtype: list[Post]
         """
         raw_posts: list = await get_posts(
-            _type="new",
+            posts_type="new",
             limit=limit,
             sort=sort,
             session=session,
@@ -733,6 +736,8 @@ class RedditPosts:
         new_posts: list[Post] = parse_posts(raw_posts)
 
         return new_posts
+
+    # ------------------------------------------------------------------------------- #
 
     @staticmethod
     async def front_page(
@@ -756,7 +761,7 @@ class RedditPosts:
         :rtype: list[Post]
         """
         raw_posts: list = await get_posts(
-            _type="front_page",
+            posts_type="front_page",
             limit=limit,
             sort=sort,
             timeframe=timeframe,
