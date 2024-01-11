@@ -131,12 +131,6 @@ knewkarma community MachineLearning --wiki-pages
 ```
 knewkarma community MachineLearning --wiki-page config/description
 ```
-
-## Get community rules
-```
-knewkarma community MachineLearning --rules
-```
-
 """
 
 # ------------------------------------------------------------------------ #
