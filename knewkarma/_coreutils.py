@@ -51,7 +51,6 @@ def dataframe(
         For lists containing Comment, Community, Post, PreviewCommunity and User objects,
         each object is converted to its dictionary representation.
     """
-    from rich import print
 
     def save_dataframe():
         """
@@ -101,7 +100,7 @@ def dataframe(
     save_dataframe()
 
     # Print the DataFrame, excluding the 'raw_data' column if it exists
-    print(df.loc[:, df.columns != "raw_data"])
+    console.print(df.loc[:, df.columns != "raw_data"])
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

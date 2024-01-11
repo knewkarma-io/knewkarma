@@ -18,7 +18,7 @@ Knew Karma offers a variety of features for accessing and analysing Reddit data,
 - **Overview** — Retrieves user's most recent comment activity.
 - **Search Posts** — Returns a user's posts that contain the specified keyword.
 - **Search Comments** — Returns a user's comments that contain the specified keyword.
-- **Top n Communities** — Identifies top communities based on user activity.
+- **Top *n* Communities** — Identifies top communities based on user activity.
 - **Moderated Communities** — Lists communities moderated by the user.
 
 ### Community (Subreddit) Data
@@ -127,15 +127,14 @@ async def async_moderated_communities():
         moderated_communities = await user.moderated_communities(session=session)
         print(moderated_communities)
 
-
-asyncio.run(async_profile())
-asyncio.run(async_posts(limit=5))
-asyncio.run(async_comments(limit=100))
-asyncio.run(async_overview(limit=50))
-asyncio.run(async_search_posts(keyword="game", limit=100))
-asyncio.run(async_search_comments(keyword="lol", limit=100))
-asyncio.run(async_top_communities(top_n=10, limit=100))
-asyncio.run(async_moderated_communities())
+# asyncio.run(async_profile())
+# asyncio.run(async_posts(limit=5))
+# asyncio.run(async_comments(limit=100))
+# asyncio.run(async_overview(limit=50))
+# asyncio.run(async_search_posts(keyword="game", limit=100))
+# asyncio.run(async_search_comments(keyword="lol", limit=100))
+# asyncio.run(async_top_communities(top_n=10, limit=100))
+# asyncio.run(async_moderated_communities())
 ```
 
 ### Community (Subreddit) Data
@@ -185,12 +184,11 @@ async def async_wiki_page(page):
         wiki_page = await community.wiki_page(page=page, session=session)
         print(wiki_page)
 
-
-asyncio.run(async_profile())
-asyncio.run(async_posts(limit=200))
-asyncio.run(async_search(keyword="artificial intelligence", limit=100))
-asyncio.run(async_wiki_pages())
-asyncio.run(async_wiki_page(page="config/description"))
+# asyncio.run(async_profile())
+# asyncio.run(async_posts(limit=200))
+# asyncio.run(async_search(keyword="artificial intelligence", limit=100))
+# asyncio.run(async_wiki_pages())
+# asyncio.run(async_wiki_page(page="config/description"))
 ````
 
 ### Communities (Subreddits) Data
@@ -231,11 +229,10 @@ async def async_popular(limit):
         popular_communities = await communities.default(limit=limit, session=session)
         print(popular_communities)
 
-
-asyncio.run(async_all(limit=500))
-asyncio.run(async_default(limit=200))
-asyncio.run(async_new(limit=100))
-asyncio.run(async_popular(limit=150))
+# asyncio.run(async_all(limit=500))
+# asyncio.run(async_default(limit=200))
+# asyncio.run(async_new(limit=100))
+# asyncio.run(async_popular(limit=150))
 ````
 
 ### Posts Data
@@ -270,13 +267,11 @@ async def async_listing(listing, limit, timeframe):
                                             session=session)
         print(listing_posts)
 
-
-asyncio.run(async_new(limit=100))
-
 # timeframes: ["hour", "day", "month", "year"]. Leave parameter unspecified to get from all timeframes.
 # sorting: ["controversial", "new", "top", "best", "hot", "rising"]. Leave parameter unspecified to get from all sort criteria.
-asyncio.run(async_front_page(limit=150, sort="top", timeframe="hour"))
-asyncio.run(async_listing(listing="best", limit=200, timeframe="month"))
+# asyncio.run(async_new(limit=100))
+# asyncio.run(async_front_page(limit=150, sort="top", timeframe="hour"))
+# asyncio.run(async_listing(listing="best", limit=200, timeframe="month"))
 ```
 
 ### Search/Discovery
@@ -311,10 +306,9 @@ async def async_search_posts(query, limit):
         posts = await search.posts(query=query, limit=limit, session=session)
         print(posts)
 
-
-asyncio.run(async_search_users(query="john", limit=150))
-asyncio.run(async_search_communities(query="ask", limit=200))
-asyncio.run(async_search_posts(query="cooking", limit=250))
+# asyncio.run(async_search_users(query="john", limit=150))
+# asyncio.run(async_search_communities(query="ask", limit=200))
+# asyncio.run(async_search_posts(query="cooking", limit=250))
 ```
 
 </details>
