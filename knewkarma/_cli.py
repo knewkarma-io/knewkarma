@@ -50,10 +50,20 @@ def create_arg_parser() -> argparse.ArgumentParser:
     )
     subparsers = main_parser.add_subparsers(dest="mode", help="operation mode")
     main_parser.add_argument(
-        "-u",
-        "--updates",
-        help="check for updates on run",
-        action="store_true",
+        "-t",
+        "--timeframe",
+        type=str,
+        default="all",
+        choices=list(get_args(DATA_TIMEFRAME)),
+        help="timeframe to get [[bold][green]bulk[/][/]] data from (default: %(default)s)",
+    )
+    main_parser.add_argument(
+        "-s",
+        "--sort",
+        type=str,
+        default="all",
+        choices=list(get_args(DATA_SORT_CRITERION)),
+        help="[[bold][green]bulk[/][/]] sort criterion (default: %(default)s)",
     )
     main_parser.add_argument(
         "-l",
@@ -76,20 +86,10 @@ def create_arg_parser() -> argparse.ArgumentParser:
         help="write output to a csv file",
     )
     main_parser.add_argument(
-        "-t",
-        "--timeframe",
-        type=str,
-        default="all",
-        choices=list(get_args(DATA_TIMEFRAME)),
-        help="timeframe to get [[bold][green]bulk[/][/]] data from (default: %(default)s)",
-    )
-    main_parser.add_argument(
-        "-s",
-        "--sort",
-        type=str,
-        default="all",
-        choices=list(get_args(DATA_SORT_CRITERION)),
-        help="[[bold][green]bulk[/][/]] sort criterion (default: %(default)s)",
+        "-u",
+        "--updates",
+        help="check for updates on run",
+        action="store_true",
     )
     main_parser.add_argument(
         "-v",
