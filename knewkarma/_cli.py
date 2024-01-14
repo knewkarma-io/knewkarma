@@ -74,16 +74,11 @@ def create_arg_parser() -> argparse.ArgumentParser:
         help="[[bold][green]bulk[/][/]] data output limit (default: %(default)s)",
     )
     main_parser.add_argument(
-        "-j",
-        "--json",
-        metavar="FILENAME",
-        help="write output to a json file",
-    )
-    main_parser.add_argument(
-        "-c",
-        "--csv",
-        metavar="FILENAME",
-        help="write output to a csv file",
+        "-e",
+        "--export",
+        type=str,
+        metavar="FILETYPES",
+        help="a comma-separated list of file types to export the output to (supported: [green]csv,html,json,xml[/])",
     )
     main_parser.add_argument(
         "-u",
@@ -322,19 +317,24 @@ async def call_arg_functions(args: argparse.Namespace, function_mapping: dict):
             await get_updates(session=request_session)
 
         mode_action = function_mapping.get(args.mode)
-        file_dir: str = ""
+        directory: str = ""
         for action, function in mode_action:
             arg_is_available: bool = False
             if getattr(args, action, False):
                 arg_is_available = True
                 # ------------------------------------------------------------ #
 
-                if args.csv or args.json:
-                    file_dir = os.path.join(PROGRAM_DIRECTORY, args.mode, action)
+                if args.export:
+                    # Create path to main directory in which target data files will be exported
+                    directory = os.path.join(PROGRAM_DIRECTORY, args.mode, action)
+
+                    # Create file directories for supported data file types
                     pathfinder(
                         directories=[
-                            os.path.join(file_dir, "csv"),
-                            os.path.join(file_dir, "json"),
+                            os.path.join(directory, "csv"),
+                            os.path.join(directory, "html"),
+                            os.path.join(directory, "json"),
+                            os.path.join(directory, "xml"),
                         ]
                     )
 
@@ -344,9 +344,8 @@ async def call_arg_functions(args: argparse.Namespace, function_mapping: dict):
                 if function_data:
                     dataframe(
                         data=function_data,
-                        save_csv=args.csv,
-                        save_json=args.json,
-                        to_dir=file_dir,
+                        export_to=args.export.split(","),
+                        export_dir=directory,
                     )
                 break
 
