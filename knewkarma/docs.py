@@ -24,7 +24,7 @@ ABOUT_AUTHOR: str = "https://rly0nheart.github.io"
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 DESCRIPTION: str = f"""
-# Knew Karma CLI {Version.release}
+# Knew Karma (CLI) {Version.release}
 > **Reddit** Data Analysis Toolkit.
 """
 
