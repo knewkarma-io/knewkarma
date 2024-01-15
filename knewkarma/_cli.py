@@ -28,6 +28,7 @@ from .docs import (
     POSTS_LISTINGS,
     SEARCH_EXAMPLES,
     USER_EXAMPLES,
+    LICENSE,
 )
 
 
@@ -45,7 +46,7 @@ def create_arg_parser() -> argparse.ArgumentParser:
 
     main_parser = argparse.ArgumentParser(
         description=Markdown(DESCRIPTION, style="argparse.text"),
-        epilog=Markdown(COPYRIGHT, style="argparse.text"),
+        epilog=Markdown(LICENSE, style="argparse.text"),
         formatter_class=RichHelpFormatter,
     )
     subparsers = main_parser.add_subparsers(dest="mode", help="operation mode")
@@ -89,7 +90,7 @@ def create_arg_parser() -> argparse.ArgumentParser:
     main_parser.add_argument(
         "-v",
         "--version",
-        version=f"Knew Karma CLI/GUI {Version.version}",
+        version=Markdown(f"Knew Karma {Version.release} {COPYRIGHT}"),
         action="version",
     )
 
@@ -344,7 +345,7 @@ async def call_arg_functions(args: argparse.Namespace, function_mapping: dict):
                 if function_data:
                     dataframe(
                         data=function_data,
-                        export_to=args.export.split(","),
+                        export_to=args.export.split(",") if args.export else None,
                         export_dir=directory,
                     )
                 break
@@ -541,7 +542,7 @@ def stage_and_start():
             start_time: datetime = datetime.now()
 
             console.log(
-                f"[bold]Knew Karma CLI[/] {Version.version} started at "
+                f"[bold]Knew Karma[/] (CLI) {Version.release} started at "
                 f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}..."
             )
             asyncio.run(
