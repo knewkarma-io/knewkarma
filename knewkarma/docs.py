@@ -12,7 +12,8 @@ class Version:
     major: str = "4"
     minor: str = "0"
     patch: str = "0"
-    version: str = f"{major}.{minor}"
+    full: str = f"{major}.{minor}.{patch}"
+    release: str = f"{major}.{minor}"
 
 
 # ------------------------------------------------------------------------- #
@@ -23,14 +24,17 @@ ABOUT_AUTHOR: str = "https://rly0nheart.github.io"
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 DESCRIPTION: str = f"""
-# Knew Karma CLI {Version.version}
+# Knew Karma CLI {Version.release}
 > **Reddit** Data Analysis Toolkit.
 """
 
 # ------------------------------------------------------------------------ #
 
-COPYRIGHT: str = f"""
-# Copyright © {date.today().year} [{AUTHOR}]({ABOUT_AUTHOR}). All rights reserved.
+COPYRIGHT: str = (
+    f"Copyright © {date.today().year} [{AUTHOR}]({ABOUT_AUTHOR}). All rights reserved."
+)
+LICENSE: str = f"""
+# {COPYRIGHT}
 ```
 MIT License
 

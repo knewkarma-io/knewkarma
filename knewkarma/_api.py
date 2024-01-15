@@ -45,7 +45,7 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
         async with session.get(
             endpoint,
             headers={
-                "User-Agent": f"Knew-Karma/{Version.version} "
+                "User-Agent": f"Knew-Karma/{Version.full} "
                 f"(Python {python_version}; +{ABOUT_AUTHOR})"
             },
         ) as response:

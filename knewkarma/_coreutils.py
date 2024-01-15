@@ -129,9 +129,13 @@ def dataframe(
     df = pd.DataFrame(data)
 
     # Export the data frane to files
-    export_dataframe(
-        df=df, filename=filename_timestamp(), directory=export_dir, formats=export_to
-    )
+    if export_to:
+        export_dataframe(
+            df=df,
+            filename=filename_timestamp(),
+            directory=export_dir,
+            formats=export_to,
+        )
 
     # Print the DataFrame, excluding the 'raw_data' column if it exists
     console.print(df.loc[:, df.columns != "raw_data"])
