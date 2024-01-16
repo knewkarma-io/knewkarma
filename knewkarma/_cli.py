@@ -326,9 +326,9 @@ async def call_arg_functions(args: argparse.Namespace, function_mapping: dict):
         mode_action = function_mapping.get(args.mode)
         directory: str = ""
         for action, function in mode_action:
-            arg_is_available: bool = False
+            arg_is_present: bool = False
             if getattr(args, action, False):
-                arg_is_available = True
+                arg_is_present = True
                 # ------------------------------------------------------------ #
 
                 if args.export:
@@ -368,7 +368,7 @@ async def call_arg_functions(args: argparse.Namespace, function_mapping: dict):
 
                 break
 
-        if not arg_is_available:
+        if not arg_is_present:
             console.log(
                 f"knewkarma {args.mode}: missing one or more expected argument(s)"
             )
