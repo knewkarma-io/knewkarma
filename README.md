@@ -4,8 +4,8 @@
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/_rly0nheart)
 
 **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
-functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, an *
-*Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical User
+functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, an
+**Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical User
 Interface (GUI)** for Windows machines, making it adaptable for various user preferences.
 
 ## Feature Overview
