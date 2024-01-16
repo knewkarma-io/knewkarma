@@ -120,9 +120,9 @@ def create_dataframe(
     pd.set_option("display.max_rows", None)
 
     # Create a DataFrame from the processed data
-    df = pd.DataFrame(data)
+    dataframe = pd.DataFrame(data)
 
-    return df
+    return dataframe
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
