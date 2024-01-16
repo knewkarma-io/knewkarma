@@ -12,7 +12,13 @@ from rich_argparse import RichHelpFormatter
 
 from . import RedditUser, RedditCommunity, RedditPosts
 from ._api import get_updates
-from ._coreutils import console, pathfinder, dataframe
+from ._coreutils import (
+    console,
+    pathfinder,
+    export_dataframe,
+    filename_timestamp,
+    create_dataframe,
+)
 from .base import RedditSearch, RedditCommunities
 from .docs import (
     PROGRAM_DIRECTORY,
@@ -343,11 +349,23 @@ async def call_arg_functions(args: argparse.Namespace, function_mapping: dict):
 
                 function_data = await function(session=request_session)
                 if function_data:
-                    dataframe(
-                        data=function_data,
-                        export_to=args.export.split(",") if args.export else None,
-                        export_dir=directory,
-                    )
+                    dataframe = create_dataframe(data=function_data)
+
+                    # Print the DataFrame, excluding the 'raw_data' column if it exists
+                    console.print(dataframe.loc[:, dataframe.columns != "raw_data"])
+
+                    # ------------------------------------------------------- #
+
+                    if args.export:
+                        export_dataframe(
+                            dataframe=dataframe,
+                            filename=filename_timestamp(),
+                            directory=directory,
+                            formats=args.export.split(","),
+                        )
+
+                    # -------------------------------------------------------- #
+
                 break
 
         if not arg_is_available:
