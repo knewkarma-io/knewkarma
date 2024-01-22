@@ -31,7 +31,7 @@ DESCRIPTION: str = f"""
 # ------------------------------------------------------------------------ #
 
 COPYRIGHT: str = (
-    f"Copyright © {date.today().year} [{AUTHOR}]({ABOUT_AUTHOR}). All rights reserved."
+    f"© {date.today().year} [{AUTHOR}]({ABOUT_AUTHOR}). All rights reserved."
 )
 LICENSE: str = f"""
 # {COPYRIGHT}
@@ -70,37 +70,37 @@ USER_EXAMPLES: str = """
 ```
 knewkarma user  AutoModerator --profile
 ```
-
+***
 ## Get user comments
 ```
 knewkarma user  AutoModerator --comments
 ```
-
+***
 ## Get user comments
 ```
 knewkarma user  AutoModerator --posts
 ```
-
+***
 ## Get user's most recent comment activity
 ```
 knewkarma user AutoModerator --overview
 ```
-
+***
 ## Get a user's posts that contain the specified keyword
 ```
 knewkarma user AutoModerator --search-posts rules
 ```
-
+***
 ## Get a user's comment that contain the specified keyword
 ```
 knewkarma user AutoModerator --search-comments banned
 ```
-
+***
 ## Get communities moderated by user
 ```
 knewkarma user TheRealKSi --moderated-communities
 ```
-
+***
 ## Get user's top n communities based on community frequency in n posts
 ```
 knewkarma --limit 500 user TheRealKSi --top-communities 10
@@ -115,22 +115,22 @@ COMMUNITY_EXAMPLES: str = """
 ```
 knewkarma community MachineLearning --profile
 ```
-
+***
 ## Get community posts
 ```
 knewkarma community MachineLearning --posts
 ```
-
+***
 ## Search a community for posts that contain a specified keyword
 ```
 knewkarma community MachineLearning --search "artificial intelligence"
 ```
-
+***
 ## Get community's wiki pages
 ```
 knewkarma community MachineLearning --wiki-pages
 ```
-
+***
 ## Get community's specified wiki page data
 ```
 knewkarma community MachineLearning --wiki-page config/description
@@ -145,17 +145,17 @@ COMMUNITIES_EXAMPLES: str = """
 ```
 knewkarma communities --all
 ```
-
+***
 ## Get default communities
 ```
 knewkarma communities --default
 ```
-
+***
 ## Get new communities
 ```
 knewkarma communities --new
 ```
-
+***
 ## Get popular communities
 ```
 knewkarma communities --popular
@@ -170,12 +170,12 @@ POSTS_EXAMPLES: str = """
 ```
 knewkarma posts --new
 ```
-
+***
 ## Get posts from Reddit Front-Page
 ```
 knewkarma posts --front-page
 ```
-
+***
 ## Get posts from specified listing
 ```
 knewkarma posts --listing best
@@ -190,12 +190,12 @@ SEARCH_EXAMPLES: str = """
 ```
 knewkarma search john --users
 ```
-
+***
 ## Search communities
 ```
 knewkarma search ask --communities
 ```
-
+***
 ## Search posts
 ```
 knewkarma search covid-19 --posts
