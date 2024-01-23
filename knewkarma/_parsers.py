@@ -2,7 +2,7 @@
 
 from typing import Union
 
-from ._coreutils import unix_timestamp_to_utc
+from ._coreutils import time_since
 from .data import User, Post, Comment, Community, PreviewCommunity, WikiPage
 
 
@@ -45,7 +45,7 @@ def parse_users(__data: Union[list[dict], dict]) -> Union[list[User], User]:
             awardee_karma=user.get("awardee_karma"),
             total_karma=user.get("total_karma"),
             community=user.get("subreddit"),
-            joined_at=unix_timestamp_to_utc(timestamp=user.get("created")),
+            created=time_since(timestamp=user.get("created")),
             raw_data=user,
         )
 
@@ -102,7 +102,7 @@ def parse_posts(__posts: list[dict]) -> list[Post]:
                     permalink=post_data.get("permalink"),
                     is_locked=post_data.get("locked"),
                     is_archived=post_data.get("archived"),
-                    posted_at=unix_timestamp_to_utc(timestamp=post_data.get("created")),
+                    created=time_since(timestamp=post_data.get("created")),
                     raw_data=post_data,
                 )
             )
@@ -141,9 +141,7 @@ def parse_comments(comments: list[dict]) -> list[Comment]:
                     is_stickied=comment_data.get("stickied"),
                     is_locked=comment_data.get("locked"),
                     is_archived=comment_data.get("archived"),
-                    commented_at=unix_timestamp_to_utc(
-                        timestamp=comment_data.get("created")
-                    ),
+                    created=time_since(timestamp=comment_data.get("created")),
                     community=comment_data.get("subreddit_name_prefixed"),
                     community_type=comment_data.get("subreddit_type"),
                     post_id=comment_data.get("link_id"),
@@ -193,7 +191,7 @@ def parse_communities(
                 subscribers=community.get("subscribers"),
                 whitelist_status=community.get("whitelist_status"),
                 url=community.get("url"),
-                created_at=unix_timestamp_to_utc(timestamp=community.get("created")),
+                created=time_since(timestamp=community.get("created")),
                 raw_data=community,
             )
         else:
@@ -210,7 +208,7 @@ def parse_communities(
                 language=community.get("lang"),
                 whitelist_status=community.get("whitelist_status"),
                 url=community.get("url"),
-                created_at=unix_timestamp_to_utc(timestamp=community.get("created")),
+                created=time_since(timestamp=community.get("created")),
                 raw_data=community,
             )
 
@@ -249,9 +247,7 @@ def parse_community_wiki_page(wiki_page: dict) -> WikiPage:
 
         return WikiPage(
             revision_id=page_data.get("revision_id"),
-            revision_date=unix_timestamp_to_utc(
-                timestamp=page_data.get("revision_date")
-            ),
+            revision_date=time_since(timestamp=page_data.get("revision_date")),
             content_markdown=page_data.get("content_md"),
             revised_by=User(
                 name=user.get("name"),
@@ -270,7 +266,7 @@ def parse_community_wiki_page(wiki_page: dict) -> WikiPage:
                 awardee_karma=user.get("awardee_karma"),
                 total_karma=user.get("total_karma"),
                 community=user.get("subreddit"),
-                joined_at=unix_timestamp_to_utc(timestamp=user.get("created")),
+                created=time_since(timestamp=user.get("created")),
                 raw_data=user,
             ),
             raw_data=page_data,
