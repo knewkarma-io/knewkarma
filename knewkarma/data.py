@@ -22,7 +22,7 @@ class User:
     link_karma: int
     awardee_karma: int
     total_karma: int
-    joined_at: str
+    created: str
     community: dict
     raw_data: dict
 
@@ -44,7 +44,7 @@ class Community:
     language: str
     whitelist_status: str
     url: str
-    created_at: str
+    created: str
     raw_data: dict
 
 
@@ -59,7 +59,7 @@ class PreviewCommunity:
     subscribers: int
     whitelist_status: str
     url: str
-    created_at: str
+    created: str
     raw_data: dict
 
 
@@ -87,7 +87,7 @@ class Post:
     upvotes: int
     upvote_ratio: float
     downvotes: int
-    posted_at: str
+    created: str
     raw_data: dict
 
 
@@ -112,7 +112,7 @@ class Comment:
     is_stickied: bool
     is_locked: bool
     is_archived: bool
-    commented_at: str
+    created: str
     post_id: str
     post_title: str
     raw_data: dict

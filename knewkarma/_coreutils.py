@@ -1,6 +1,7 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 import os
+import time
 from datetime import datetime
 from typing import Union, Literal
 
@@ -27,19 +28,46 @@ def pathfinder(directories: list[str]):
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def unix_timestamp_to_utc(timestamp: int) -> str:
+def time_since(timestamp: int):
     """
-    Converts a UNIX timestamp to a formatted datetime.utc string./home/rly0nheart/PycharmProjects/knewkarma/knewkarma/_cli.py
+    Convert a Unix timestamp into a human-readable time difference.
 
-    :param timestamp: The UNIX timestamp to be converted.
+    :param timestamp: A Unix timestamp.
     :type timestamp: int
-    :return: A formatted datetime.utc string in the format "dd MMMM yyyy, hh:mm:ssAM/PM"
+    :return: A string representing the time difference from now, formatted as '6h' for hours, '6d' for days, '6m' for months, or '6y' for years.
     :rtype: str
     """
-    utc_from_timestamp: datetime = datetime.utcfromtimestamp(timestamp)
-    datetime_string: str = utc_from_timestamp.strftime("%d %B %Y, %I:%M:%S%p")
+    # Convert the current time to a Unix timestamp
+    now = int(time.time())
 
-    return datetime_string
+    # Calculate the difference in seconds
+    diff = now - timestamp
+
+    # Define the time thresholds in seconds
+    minute = 60
+    hour = 60 * minute
+    day = 24 * hour
+    month = 30 * day
+    year = 12 * month
+
+    # Determine the time unit and value
+    if diff < hour:
+        count = diff // minute
+        label = "m"  # minutes
+    elif diff < day:
+        count = diff // hour
+        label = "h"  # hours
+    elif diff < month:
+        count = diff // day
+        label = "d"  # days
+    elif diff < year:
+        count = diff // month
+        label = "m"  # months
+    else:
+        count = diff // year
+        label = "y"  # years
+
+    return f"{count}{label} ago"
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
