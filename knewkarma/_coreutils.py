@@ -35,7 +35,8 @@ def time_since(timestamp: int):
     :param timestamp: A Unix timestamp.
     :type timestamp: int
     :return: A string representing the time difference from now,
-        formatted as '6hrs' for hours, '6d' for days, '6mo' for months, or '6yrs' for years.
+        formatted as '6sec' for seconds, '6min' for minutes, '6hr' for hours, '6d' for days,
+        '6wk' for weeks, '6mo' for months, or '6yr' for years.
     :rtype: str
     """
     # Convert the current time to a Unix timestamp
@@ -48,25 +49,32 @@ def time_since(timestamp: int):
     minute = 60
     hour = 60 * minute
     day = 24 * hour
+    week = 7 * day
     month = 30 * day
     year = 12 * month
 
     # Determine the time unit and value
-    if diff < hour:
+    if diff < minute:
+        count = diff
+        label = "sec"  # seconds
+    elif diff < hour:
         count = diff // minute
         label = "min"  # minutes
     elif diff < day:
         count = diff // hour
-        label = "hrs"  # hours
-    elif diff < month:
+        label = "h"  # hours
+    elif diff < week:
         count = diff // day
         label = "d"  # days
+    elif diff < month:
+        count = diff // week
+        label = "w"  # weeks
     elif diff < year:
         count = diff // month
         label = "mo"  # months
     else:
         count = diff // year
-        label = "yrs"  # years
+        label = "y"  # years
 
     return "just now" if count == 0 else f"{int(count)}{label} ago"
 

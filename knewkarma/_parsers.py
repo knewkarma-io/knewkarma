@@ -76,40 +76,39 @@ def parse_posts(data: Union[dict, list]) -> Union[Post, list[Post]]:
     :rtype: Union[dict, list]
     """
 
-    def parse_post(post_data: dict) -> Post:
-        if "upvote_ratio" in data:
-            return Post(
-                title=post_data.get("title"),
-                thumbnail=post_data.get("thumbnail"),
-                id=post_data.get("id"),
-                body=post_data.get("selftext"),
-                author=post_data.get("author"),
-                community=post_data.get("subreddit"),
-                community_id=post_data.get("subreddit_id"),
-                community_type=post_data.get("subreddit_type"),
-                upvotes=post_data.get("ups"),
-                upvote_ratio=post_data.get("upvote_ratio"),
-                downvotes=post_data.get("downs"),
-                gilded=post_data.get("gilded"),
-                is_nsfw=post_data.get("over_18"),
-                is_shareable=post_data.get("is_reddit_media_domain"),
-                is_edited=post_data.get("edited"),
-                comments=post_data.get("num_comments"),
-                hide_from_bots=post_data.get("is_robot_indexable"),
-                score=post_data.get("score"),
-                domain=post_data.get("domain"),
-                permalink=post_data.get("permalink"),
-                is_locked=post_data.get("locked"),
-                is_archived=post_data.get("archived"),
-                created=time_since(timestamp=post_data.get("created")),
-                raw_data=data,
-            )
+    def build_post(post_data: dict) -> Post:
+        return Post(
+            title=post_data.get("title"),
+            thumbnail=post_data.get("thumbnail"),
+            id=post_data.get("id"),
+            body=post_data.get("selftext"),
+            author=post_data.get("author"),
+            community=post_data.get("subreddit"),
+            community_id=post_data.get("subreddit_id"),
+            community_type=post_data.get("subreddit_type"),
+            upvotes=post_data.get("ups"),
+            upvote_ratio=post_data.get("upvote_ratio"),
+            downvotes=post_data.get("downs"),
+            gilded=post_data.get("gilded"),
+            is_nsfw=post_data.get("over_18"),
+            is_shareable=post_data.get("is_reddit_media_domain"),
+            is_edited=post_data.get("edited"),
+            comments=post_data.get("num_comments"),
+            hide_from_bots=post_data.get("is_robot_indexable"),
+            score=post_data.get("score"),
+            domain=post_data.get("domain"),
+            permalink=post_data.get("permalink"),
+            is_locked=post_data.get("locked"),
+            is_archived=post_data.get("archived"),
+            created=time_since(timestamp=post_data.get("created")),
+            raw_data=data,
+        )
 
     if isinstance(data, dict):
-        return parse_post(post_data=data)
+        return build_post(post_data=data)
 
     elif isinstance(data, list):
-        return [parse_post(post.get("data")) for post in data if post.get("data")]
+        return [build_post(post.get("data")) for post in data if post.get("data")]
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
