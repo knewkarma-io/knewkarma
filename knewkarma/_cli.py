@@ -19,7 +19,7 @@ from ._coreutils import (
     filename_timestamp,
     create_dataframe,
 )
-from .base import RedditSearch, RedditCommunities
+from .base import RedditSearch, RedditCommunities, RedditPost
 from .docs import (
     PROGRAM_DIRECTORY,
     DESCRIPTION,
@@ -30,6 +30,7 @@ from .docs import (
     OPERATIONS_TEXT,
     COMMUNITY_EXAMPLES,
     COMMUNITIES_EXAMPLES,
+    POST_EXAMPLES,
     POSTS_EXAMPLES,
     POSTS_LISTINGS,
     SEARCH_EXAMPLES,
@@ -185,6 +186,25 @@ def create_arg_parser() -> argparse.ArgumentParser:
         "--popular",
         help="get popular communities",
         action="store_true",
+    )
+
+    # ------------------------------------------------------------------------------- #
+
+    post_parser = subparsers.add_parser(
+        "post",
+        help="post operations",
+        description=Markdown(OPERATIONS_TEXT.format("Post"), style="argparse.text"),
+        epilog=Markdown(POST_EXAMPLES),
+        formatter_class=RichHelpFormatter,
+    )
+
+    post_parser.add_argument("id", help="post id", type=str)
+    post_parser.add_argument("community", help="post source community", type=str)
+    post_parser.add_argument(
+        "-p", "--profile", help="get post 'profile' data", action="store_true"
+    )
+    post_parser.add_argument(
+        "-c", "--comments", help="get post comments", action="store_true"
     )
 
     # ------------------------------------------------------------------------------- #
@@ -406,6 +426,10 @@ def stage_and_start():
         community=args.community if hasattr(args, "community") else None,
     )
     communities = RedditCommunities()
+    post = RedditPost(
+        id=args.id if hasattr(args, "id") else None,
+        community=args.community if hasattr(args, "community") else None,
+    )
     posts = RedditPosts()
 
     # ------------------------------------------------------------------------------- #
@@ -500,6 +524,17 @@ def stage_and_start():
             (
                 "popular",
                 lambda session: communities.popular(limit=limit, session=session),
+            ),
+        ],
+        "post": [
+            ("profile", lambda session: post.profile(session=session)),
+            (
+                "comments",
+                lambda session: post.comments(
+                    limit=limit,
+                    sort=sort,
+                    session=session,
+                ),
             ),
         ],
         "posts": [

@@ -3,6 +3,7 @@
 from .base import (
     RedditCommunity,
     RedditCommunities,
+    RedditPost,
     RedditPosts,
     RedditUser,
     RedditSearch,
@@ -13,6 +14,7 @@ from .base import (
 __all__ = [
     "RedditCommunity",
     "RedditCommunities",
+    "RedditPost",
     "RedditPosts",
     "RedditUser",
     "RedditSearch",

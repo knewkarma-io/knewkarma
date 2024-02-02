@@ -164,6 +164,21 @@ knewkarma communities --popular
 
 # ------------------------------------------------------------------------ #
 
+POST_EXAMPLES: str = """
+# Examples
+## Get a post's 'profile'
+```
+knewkarma post 12csg48 OSINT --profile
+```
+***
+## Get a post's comments
+```
+knewkarma post 12csg48 OSINT --comments
+```
+"""
+
+# ------------------------------------------------------------------------ #
+
 POSTS_EXAMPLES: str = """
 # Examples
 ## Get new posts

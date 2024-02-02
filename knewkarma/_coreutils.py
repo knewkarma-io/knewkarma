@@ -34,7 +34,8 @@ def time_since(timestamp: int):
 
     :param timestamp: A Unix timestamp.
     :type timestamp: int
-    :return: A string representing the time difference from now, formatted as '6h' for hours, '6d' for days, '6m' for months, or '6y' for years.
+    :return: A string representing the time difference from now,
+        formatted as '6hrs' for hours, '6d' for days, '6mo' for months, or '6yrs' for years.
     :rtype: str
     """
     # Convert the current time to a Unix timestamp
@@ -53,21 +54,21 @@ def time_since(timestamp: int):
     # Determine the time unit and value
     if diff < hour:
         count = diff // minute
-        label = "m"  # minutes
+        label = "min"  # minutes
     elif diff < day:
         count = diff // hour
-        label = "h"  # hours
+        label = "hrs"  # hours
     elif diff < month:
         count = diff // day
         label = "d"  # days
     elif diff < year:
         count = diff // month
-        label = "m"  # months
+        label = "mo"  # months
     else:
         count = diff // year
-        label = "y"  # years
+        label = "yrs"  # years
 
-    return f"{count}{label} ago"
+    return "just now" if count == 0 else f"{int(count)}{label} ago"
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -106,6 +107,7 @@ def create_dataframe(
         User,
         WikiPage,
         Community,
+        Post,
     ],
 ):
     """
@@ -127,7 +129,7 @@ def create_dataframe(
     """
 
     # Convert single User, Community, or WikiPage objects to a list of dictionaries
-    if isinstance(data, (User, Community, WikiPage)):
+    if isinstance(data, (User, Community, WikiPage, Post)):
         # Transform each attribute of the object into a dictionary entry
         data = [{"key": key, "value": value} for key, value in data.__dict__.items()]
 

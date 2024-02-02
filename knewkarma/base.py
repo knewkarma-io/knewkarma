@@ -667,6 +667,42 @@ class RedditCommunities:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
+class RedditPost:
+    """Represents a Reddit post and provides method(s) for getting data from the specified post."""
+
+    def __init__(self, id: str, community: str):
+        self._id = id
+        self._community = community
+
+    async def profile(self, session: aiohttp.ClientSession) -> Post:
+        post_data: dict = await get_data(
+            endpoint=f"{BASE_REDDIT_ENDPOINT}/r/{self._community}/comments/{self._id}.json",
+            session=session,
+        )
+
+        raw_post: dict = (
+            post_data[0].get("data", {}).get("children", [])[0].get("data", {})
+        )
+        if raw_post:
+            return parse_posts(data=raw_post)
+
+    async def comments(
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: DATA_SORT_CRITERION = "all",
+    ) -> list[Comment]:
+        post_data: dict = await get_data(
+            endpoint=f"{BASE_REDDIT_ENDPOINT}/r/{self._community}/comments/{self._id}.json?sort={sort}&limit={limit}",
+            session=session,
+        )
+
+        raw_comments: list = post_data[1].get("data", {}).get("children", [])
+
+        if raw_comments:
+            return parse_comments(comments=raw_comments)
+
+
 class RedditPosts:
     """Represents Reddit posts and provides methods for getting posts from various sources."""
 
@@ -767,7 +803,7 @@ class RedditPosts:
             timeframe=timeframe,
             session=session,
         )
-        front_page_posts: list[Post] = parse_posts(raw_posts)
+        front_page_posts: list = parse_posts(raw_posts)
 
         return front_page_posts
 

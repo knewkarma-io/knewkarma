@@ -67,47 +67,49 @@ def parse_users(__data: Union[list[dict], dict]) -> Union[list[User], User]:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def parse_posts(__posts: list[dict]) -> list[Post]:
+def parse_posts(data: Union[dict, list]) -> Union[Post, list[Post]]:
     """
-    Parses raw posts into a list of Post objects.
-    :param __posts: A list of post dictionaries to convert.
-    :return: A list of Post objects, each containing converted data about a post.
-    :rtype: list[Post]
+    Parses raw post data into a Post object.
+
+    :param data: Raw post data to parse.
+    :type data: Union[dict, list]
+    :rtype: Union[dict, list]
     """
-    if len(__posts) != 0:
-        posts_list: list = []
-        for post in __posts:
-            post_data = post.get("data")
-            posts_list.append(
-                Post(
-                    title=post_data.get("title"),
-                    thumbnail=post_data.get("thumbnail"),
-                    id=post_data.get("id"),
-                    body=post_data.get("selftext"),
-                    author=post_data.get("author"),
-                    community=post_data.get("subreddit"),
-                    community_id=post_data.get("subreddit_id"),
-                    community_type=post_data.get("subreddit_type"),
-                    upvotes=post_data.get("ups"),
-                    upvote_ratio=post_data.get("upvote_ratio"),
-                    downvotes=post_data.get("downs"),
-                    gilded=post_data.get("gilded"),
-                    is_nsfw=post_data.get("over_18"),
-                    is_shareable=post_data.get("is_reddit_media_domain"),
-                    is_edited=post_data.get("edited"),
-                    comments=post_data.get("num_comments"),
-                    hide_from_bots=post_data.get("is_robot_indexable"),
-                    score=post_data.get("score"),
-                    domain=post_data.get("domain"),
-                    permalink=post_data.get("permalink"),
-                    is_locked=post_data.get("locked"),
-                    is_archived=post_data.get("archived"),
-                    created=time_since(timestamp=post_data.get("created")),
-                    raw_data=post_data,
-                )
+
+    def parse_post(post_data: dict) -> Post:
+        if "upvote_ratio" in data:
+            return Post(
+                title=post_data.get("title"),
+                thumbnail=post_data.get("thumbnail"),
+                id=post_data.get("id"),
+                body=post_data.get("selftext"),
+                author=post_data.get("author"),
+                community=post_data.get("subreddit"),
+                community_id=post_data.get("subreddit_id"),
+                community_type=post_data.get("subreddit_type"),
+                upvotes=post_data.get("ups"),
+                upvote_ratio=post_data.get("upvote_ratio"),
+                downvotes=post_data.get("downs"),
+                gilded=post_data.get("gilded"),
+                is_nsfw=post_data.get("over_18"),
+                is_shareable=post_data.get("is_reddit_media_domain"),
+                is_edited=post_data.get("edited"),
+                comments=post_data.get("num_comments"),
+                hide_from_bots=post_data.get("is_robot_indexable"),
+                score=post_data.get("score"),
+                domain=post_data.get("domain"),
+                permalink=post_data.get("permalink"),
+                is_locked=post_data.get("locked"),
+                is_archived=post_data.get("archived"),
+                created=time_since(timestamp=post_data.get("created")),
+                raw_data=data,
             )
 
-        return posts_list
+    if isinstance(data, dict):
+        return parse_post(post_data=data)
+
+    elif isinstance(data, list):
+        return [parse_post(post.get("data")) for post in data if post.get("data")]
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -145,7 +147,7 @@ def parse_comments(comments: list[dict]) -> list[Comment]:
                     community=comment_data.get("subreddit_name_prefixed"),
                     community_type=comment_data.get("subreddit_type"),
                     post_id=comment_data.get("link_id"),
-                    post_title=comment_data.get("link_title"),
+                    post_title=comment_data.get("link_title", "NaN"),
                     raw_data=comment_data,
                 )
             )
