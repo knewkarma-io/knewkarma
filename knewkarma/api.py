@@ -282,7 +282,7 @@ async def get_posts(
         all_posts.extend(process_response(response_data=posts_list))
 
         # We use the id of the last post in the list to paginate to the next posts
-        last_post_id: str = all_posts[-1].get("data").get("id")
+        last_post_id: str = all_posts[-1].get("data").get("name")
 
         # ---------------------------------------------------------- #
 
