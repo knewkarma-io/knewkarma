@@ -7,7 +7,7 @@ from typing import Literal
 
 author: str = "Richard Mwewa"
 about_author: str = "https://rly0nheart.github.io"
-version: str = "3.5.0.0"
+version: str = "3.5.1.0"
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
