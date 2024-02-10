@@ -46,7 +46,6 @@ def parse_users(__data: Union[list[dict], dict]) -> Union[list[User], User]:
             total_karma=user.get("total_karma"),
             community=user.get("subreddit"),
             created=time_since(timestamp=user.get("created")),
-            raw_data=user,
         )
 
     # ------------------------------------------------------------------------------- #
@@ -101,7 +100,6 @@ def parse_posts(data: Union[dict, list]) -> Union[Post, list[Post]]:
             is_locked=post_data.get("locked"),
             is_archived=post_data.get("archived"),
             created=time_since(timestamp=post_data.get("created")),
-            raw_data=data,
         )
 
     if isinstance(data, dict):
@@ -147,7 +145,6 @@ def parse_comments(comments: list[dict]) -> list[Comment]:
                     community_type=comment_data.get("subreddit_type"),
                     post_id=comment_data.get("link_id"),
                     post_title=comment_data.get("link_title", "NaN"),
-                    raw_data=comment_data,
                 )
             )
 
@@ -193,7 +190,6 @@ def parse_communities(
                 whitelist_status=community.get("whitelist_status"),
                 url=community.get("url"),
                 created=time_since(timestamp=community.get("created")),
-                raw_data=community,
             )
         else:
             community_obj = Community(
@@ -210,7 +206,6 @@ def parse_communities(
                 whitelist_status=community.get("whitelist_status"),
                 url=community.get("url"),
                 created=time_since(timestamp=community.get("created")),
-                raw_data=community,
             )
 
         return community_obj
@@ -268,9 +263,7 @@ def parse_community_wiki_page(wiki_page: dict) -> WikiPage:
                 total_karma=user.get("total_karma"),
                 community=user.get("subreddit"),
                 created=time_since(timestamp=user.get("created")),
-                raw_data=user,
             ),
-            raw_data=page_data,
         )
 
 

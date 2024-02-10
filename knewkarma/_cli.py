@@ -372,7 +372,7 @@ async def call_arg_functions(args: argparse.Namespace, function_mapping: dict):
                     dataframe = create_dataframe(data=function_data)
 
                     # Print the DataFrame, excluding the 'raw_data' column if it exists
-                    console.print(dataframe.loc[:, dataframe.columns != "raw_data"])
+                    console.print(dataframe)
 
                     # ------------------------------------------------------- #
 
