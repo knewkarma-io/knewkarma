@@ -239,7 +239,7 @@ async def __fetch_and_paginate(
         all_items.extend(processed_data)
 
         if len(data_list) > 0:
-            last_item_id = data_list[-1].get("data").get("id")
+            last_item_id = data_list[-1].get("data").get("name")
 
         if needed_count <= 0:
             break
@@ -296,9 +296,9 @@ async def get_posts(
 
     endpoint = source_map.get(posts_type, "")
     if posts_type == "new_posts":
-        endpoint += f"?limit={limit}&sort={sort}"
+        endpoint += f"?limit={limit}&sort={sort}&raw_json=1"
     else:
-        endpoint += f"?limit={limit}&sort={sort}&t={timeframe}"
+        endpoint += f"?limit={limit}&sort={sort}&t={timeframe}&raw_json=1"
 
     # ------------------------------------------------------------------------- #
 
