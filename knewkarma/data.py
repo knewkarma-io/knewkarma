@@ -24,7 +24,6 @@ class User:
     total_karma: int
     created: str
     community: dict
-    raw_data: dict
 
 
 # -------------------------------------------------------------------- #
@@ -45,7 +44,6 @@ class Community:
     whitelist_status: str
     url: str
     created: str
-    raw_data: dict
 
 
 # -------------------------------------------------------------------- #
@@ -60,7 +58,6 @@ class PreviewCommunity:
     whitelist_status: str
     url: str
     created: str
-    raw_data: dict
 
 
 @dataclass
@@ -88,7 +85,6 @@ class Post:
     upvote_ratio: float
     downvotes: int
     created: str
-    raw_data: dict
 
 
 # -------------------------------------------------------------------- #
@@ -115,7 +111,6 @@ class Comment:
     created: str
     post_id: str
     post_title: str
-    raw_data: dict
 
 
 # -------------------------------------------------------------------- #
@@ -127,7 +122,6 @@ class WikiPage:
     revision_date: str
     content_markdown: str
     revised_by: User
-    raw_data: dict
 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
