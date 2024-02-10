@@ -219,7 +219,7 @@ async def __fetch_and_paginate(
 
     while len(all_items) < limit:
         if paginate and last_item_id:
-            endpoint = f"{data_endpoint}&after={last_item_id}"
+            endpoint = f"{data_endpoint}&count={len(all_items)}&after={last_item_id}"
         else:
             endpoint = data_endpoint
 
