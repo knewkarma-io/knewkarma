@@ -201,54 +201,43 @@ async def _paginate(
     Asynchronously fetches and processes data in a paginated manner from a specified endpoint until the specified limit
     of items is reached or there are no more items to fetch. It uses a specified processing function
     to handle the data from each request.
-
-
-    :param session: The aiohttp ClientSession to be used for making HTTP requests.
-    :param endpoint: The initial URL endpoint from which to start fetching data.
-    :param process_func: A callable that processes the data from each request. It should accept a list of items
-                         and optionally return a list of processed items.
-    :param limit: The maximum number of items to process and return.
-    :return: A list of processed items.
     """
     all_items = []
     last_item_id = ""  # Initially empty, updated with each request to paginate
 
-    while len(all_items) < limit:
-        # Construct the paginated endpoint for the current request
-        paginated_endpoint = (
-            f"{endpoint}&after={last_item_id}&count={len(all_items)}"
-            if last_item_id
-            else endpoint
-        )
+    console = Console()
+    with Progress(console=console) as progress:
+        task_id = progress.add_task("[cyan]Starting...", total=limit)
 
-        # Fetch data from the endpoint using the get_data function
-        response = await get_data(session=session, endpoint=paginated_endpoint)
-        items = response.get("data", {}).get("children", [])
-
-        if not items:
-            break  # Exit the loop if no items were returned in the response
-
-        # Process the fetched items. Ensure process_func respects the limit.
-        processed_items = process_func(response_data=items)
-
-        # Ensure not to exceed the limit when appending processed items
-        items_to_limit = limit - len(all_items)
-        all_items.extend(processed_items[:items_to_limit])
-
-        # Update last_item_id for pagination; stop if no more data ('after' is None or empty)
-        last_item_id = response.get("data").get("after")
-
-        if len(all_items) < limit:
-            delay = randint(1, 20)
-            console.log(
-                f"{len(all_items)}/{limit} {collection_name} fetched so far, "
-                f"resuming in {delay} {'seconds' if delay > 1 else 'second'}..."
+        while len(all_items) < limit:
+            paginated_endpoint = (
+                f"{endpoint}&after={last_item_id}&count={len(all_items)}"
+                if last_item_id
+                else endpoint
             )
-            # Apply a delay to respect Reddit's rate limiting, if necessary
-            await asyncio.sleep(delay)
 
-        if not last_item_id:
-            break
+            response = await get_data(session=session, endpoint=paginated_endpoint)
+            items = response.get("data", {}).get("children", [])
+
+            if not items:
+                progress.update(task_id, description="[red]No more items to fetch.")
+                break
+
+            processed_items = await process_func(response_data=items)
+            items_to_limit = limit - len(all_items)
+            all_items.extend(processed_items[:items_to_limit])
+
+            last_item_id = response.get("data").get("after")
+            progress.update(task_id, advance=len(processed_items), description=f"[green]{len(all_items)}/{limit} {collection_name} fetched...")
+
+            if len(all_items) < limit and last_item_id:
+                delay = randint(1, 20)
+                progress.update(task_id, description=f"[yellow]Waiting {delay}s before next fetch...")
+                await asyncio.sleep(delay)
+
+            if not last_item_id:
+                progress.update(task_id, description="[green]Fetch complete.")
+                break
 
     return all_items
 
