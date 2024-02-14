@@ -6,7 +6,6 @@ from sys import version as python_version
 from typing import Union, Literal
 
 import aiohttp
-import rich
 from rich.markdown import Markdown
 from rich.progress import Progress
 
@@ -147,7 +146,7 @@ async def get_updates(session: aiohttp.ClientSession):
 
         if update_message:
             console.log(update_message)
-            rich.print(markdown_release_notes)
+            console.print(markdown_release_notes)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
