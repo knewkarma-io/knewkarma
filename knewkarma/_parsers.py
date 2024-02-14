@@ -77,7 +77,9 @@ def parse_posts(data: Union[dict, list]) -> Union[list[dict], dict]:
             if post.get("edited")
             else False,
             "comments": post.get("num_comments"),
-            "created": time_since(timestamp=post.get("created")),
+            "created": time_since(timestamp=post.get("created"))
+            if post.get("created")
+            else "NaN",
         }
 
     if isinstance(data, dict):
@@ -115,7 +117,9 @@ def parse_comments(comments: list[dict]) -> list[dict]:
                     "is_stickied": comment_data.get("stickied"),
                     "is_locked": comment_data.get("locked"),
                     "is_archived": comment_data.get("archived"),
-                    "created": time_since(timestamp=comment_data.get("created")),
+                    "created": time_since(timestamp=comment.get("created"))
+                    if comment.get("created")
+                    else "NaN",
                 }
             )
 
@@ -134,8 +138,9 @@ def parse_communities(
         if is_preview:
             community_obj = {
                 "name": community.get("display_name"),
-                "icon": community.get("community_icon").split("?")[0],
-                "community_type": community.get("subreddit_type"),
+                "id": community.get("id"),
+                "type": community.get("subreddit_type"),
+                "icon": community.get("community_icon", "").split("?")[0],
                 "subscribers": community.get("subscribers"),
                 "whitelist_status": community.get("whitelist_status"),
                 "url": community.get("url"),
@@ -147,15 +152,17 @@ def parse_communities(
                 "id": community.get("id"),
                 "description": community.get("public_description"),
                 "submit_text": community.get("submit_text"),
-                "icon": community.get("community_icon").split("?")[0],
-                "community_type": community.get("subreddit_type"),
+                "icon": community.get("community_icon", "").split("?")[0],
+                "type": community.get("subreddit_type"),
                 "subscribers": community.get("subscribers"),
                 "current_active_users": community.get("accounts_active"),
                 "is_nsfw": community.get("over18"),
                 "language": community.get("lang"),
                 "whitelist_status": community.get("whitelist_status"),
                 "url": community.get("url"),
-                "created": time_since(timestamp=community.get("created")),
+                "created": time_since(timestamp=community.get("created"))
+                if community.get("created")
+                else "NaN",
             }
 
         return community_obj
@@ -163,7 +170,9 @@ def parse_communities(
     # ------------------------------------------------------------------------------- #
 
     if isinstance(data, list) and len(data) != 0:
-        community_data = [build_community(community=community) for community in data]
+        community_data = [
+            build_community(community=community.get("data")) for community in data
+        ]
 
     elif isinstance(data, dict) and "subreddit_type" in data:
         community_data = build_community(community=data)
