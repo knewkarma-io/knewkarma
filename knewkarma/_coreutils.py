@@ -7,6 +7,7 @@ from typing import Union, Literal
 
 import pandas as pd
 from rich.console import Console
+from rich.tree import Tree
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -141,6 +142,17 @@ def create_dataframe(
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
+def show_exported_files(tree: Tree, directory: str, base_path: str = ""):
+    for item in sorted(os.listdir(directory)):
+        path = os.path.join(directory, item)
+        if os.path.isdir(path):
+            branch = tree.add(f":open_file_folder: {item}", guide_style="blue")
+            show_exported_files(branch, path, os.path.join(base_path, item))
+        else:
+            filepath: str = os.path.join(directory, path, item, path)
+            tree.add(f":page_facing_up: [italic][link file://{filepath}]{item}[/]")
+
+
 def export_dataframe(
     dataframe: pd.DataFrame,
     filename: str,
@@ -170,7 +182,6 @@ def export_dataframe(
         ),
         "json": lambda: dataframe.to_json(
             os.path.join(directory, "json", f"{filename}.json"),
-            encoding="utf-8",
             orient="records",
             lines=True,
             force_ascii=False,
