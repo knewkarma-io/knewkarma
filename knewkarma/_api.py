@@ -206,7 +206,7 @@ async def _paginate(
     last_item_id = None
 
     with Progress(console=console, transient=True) as progress:
-        task_id = progress.add_task("", total=limit)
+        task_id = progress.add_task("---", total=limit)
 
         while len(all_items) < limit:
             # --------------------------------------------------------------------- #
