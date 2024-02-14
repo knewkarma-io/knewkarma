@@ -82,6 +82,13 @@ def create_arg_parser() -> argparse.ArgumentParser:
         help="[[bold][green]bulk[/][/]] data output limit (default: %(default)s)",
     )
     main_parser.add_argument(
+        "-sleep",
+        type=int,
+        default=20,
+        metavar="SECONDS",
+        help="[[bold][green]bulk data[/][/]] sleep delay (seconds) after each request (default: %(default)s)",
+    )
+    main_parser.add_argument(
         "-e",
         "--export",
         type=str,
@@ -596,7 +603,7 @@ def stage_and_start():
 
             console.log(
                 f"[bold]Knew Karma[/] (CLI) {Version.release} started at "
-                f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}..."
+                f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}"
             )
             asyncio.run(
                 call_arg_functions(args=args, function_mapping=function_mapping)
@@ -604,7 +611,8 @@ def stage_and_start():
         except KeyboardInterrupt:
             console.log(f"User interruption detected ([yellow]Ctrl+C[/])")
         finally:
-            console.log(f"Stopped in {datetime.now() - start_time} seconds.")
+            elapsed_time = datetime.now() - start_time
+            console.log(f"Done! {elapsed_time.total_seconds():.2f} seconds elapsed.")
     else:
         parser.print_usage()
 

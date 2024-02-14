@@ -8,8 +8,6 @@ from typing import Union, Literal
 import pandas as pd
 from rich.console import Console
 
-from .data import Comment, Post, Community, User, PreviewCommunity, WikiPage
-
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
@@ -56,27 +54,27 @@ def time_since(timestamp: int):
     # Determine the time unit and value
     if diff < minute:
         count = diff
-        label = "sec"  # seconds
+        label = "seconds" if int(count) > 1 else "second"  # seconds
     elif diff < hour:
         count = diff // minute
-        label = "min"  # minutes
+        label = "minutes" if int(count) > 1 else "minute"  # minutes
     elif diff < day:
         count = diff // hour
-        label = "h"  # hours
+        label = "hours" if int(count) > 1 else "hour"  # hours
     elif diff < week:
         count = diff // day
-        label = "d"  # days
+        label = "days" if int(count) > 1 else "day"
     elif diff < month:
         count = diff // week
-        label = "w"  # weeks
+        label = "weeks" if int(count) > 1 else "week"
     elif diff < year:
         count = diff // month
-        label = "mo"  # months
+        label = "months" if int(count) > 1 else "month"
     else:
         count = diff // year
-        label = "y"  # years
+        label = "years" if int(count) > 1 else "year"
 
-    return "just now" if count == 0 else f"{int(count)}{label} ago"
+    return "just now" if int(count) == 0 else f"{int(count)} {label} ago"
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -108,51 +106,28 @@ def filename_timestamp() -> str:
 
 
 def create_dataframe(
-    data: Union[
-        dict,
-        list,
-        list[Union[Comment, Community, Post, PreviewCommunity, User]],
-        User,
-        WikiPage,
-        Community,
-        Post,
-    ],
+    data: Union[dict, list[dict], list[tuple]],
 ):
     """
     Converts provided data into a pandas DataFrame.
 
-    :param data: Data to be converted. Can be a single object (Community, User, WikiPage),
-                 a dictionary, or a list of objects (Comment, Community, Post, PreviewCommunity, User).
-    :type data: Union[Community, Dict, User, WikiPage, List[Union[Comment, Community, Post, PreviewCommunity, User]]]
+    :param data: Data to be converted.
+    :type data: Union[dict, list[dict], list[str]]
     :return: A pandas DataFrame constructed from the provided data. Excludes any 'raw_data'
              column from the dataframe.
     :rtype: pd.DataFrame
-
-    Note
-    ----
-        This function internally converts User, Community, and WikiPage objects into a
-        list of dictionaries before DataFrame creation.
-        For lists containing Comment, Community, Post, PreviewCommunity and User objects,
-        each object is converted to its dictionary representation.
     """
 
-    # Convert single User, Community, or WikiPage objects to a list of dictionaries
-    if isinstance(data, (User, Community, WikiPage, Post)):
+    if isinstance(data, dict):
         # Transform each attribute of the object into a dictionary entry
-        data = [{"key": key, "value": value} for key, value in data.__dict__.items()]
+        data = [{"key": key, "value": value} for key, value in data.items()]
 
     # Convert a list of objects (Comment, Community, Post, PreviewCommunity, User) to a list of dictionaries
     elif isinstance(data, list) and all(
-        isinstance(item, (Comment, Community, Post, PreviewCommunity, User))
-        for item in data
+        isinstance(item, (dict, tuple)) for item in data
     ):
         # Each object in the list is converted to its dictionary representation
-        data = [item.__dict__ for item in data]
-
-    # If data is already a dictionary or a list, use it directly for DataFrame creation
-    elif isinstance(data, (dict, list)):
-        # No transformation needed; the data is ready for DataFrame creation
-        pass
+        data = [item for item in data]
 
     # Set pandas display option to show all rows
     pd.set_option("display.max_rows", None)

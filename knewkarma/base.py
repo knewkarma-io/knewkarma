@@ -2,7 +2,6 @@
 
 import re
 from collections import Counter
-from typing import List
 
 import aiohttp
 
@@ -22,7 +21,6 @@ from ._parsers import (
     parse_posts,
     parse_users,
 )
-from .data import Comment, Community, User, Post, WikiPage, PreviewCommunity
 from .docs import DATA_TIMEFRAME, DATA_SORT_CRITERION, POSTS_LISTINGS
 
 
@@ -48,19 +46,19 @@ class RedditUser:
 
     # ------------------------------------------------------------------------------- #
 
-    async def profile(self, session: aiohttp.ClientSession) -> User:
+    async def profile(self, session: aiohttp.ClientSession) -> dict:
         """
         Returns a user's profile data.
 
         :param session: aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
-        :return: A User object containing user profile data.
-        :rtype: User
+        :return: A dictionary containing user profile data.
+        :rtype: dict
         """
         raw_user: dict = await get_profile(
             profile_source=self._username, profile_type="user", session=session
         )
-        user_profile: User = parse_users(raw_user)
+        user_profile: dict = parse_users(raw_user)
 
         return user_profile
 
@@ -72,7 +70,7 @@ class RedditUser:
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
         timeframe: DATA_TIMEFRAME = "all",
-    ) -> list[Post]:
+    ) -> list[dict]:
         """
         Returns a user's posts.
 
@@ -84,8 +82,8 @@ class RedditUser:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: str
-        :return: A list of Post objects, each containing data about a post.
-        :rtype: list[Post]
+        :return: A list of dictionaries, each containing data about a post.
+        :rtype: list[dict]
         """
         raw_posts: list = await get_posts(
             posts_source=self._username,
@@ -95,7 +93,7 @@ class RedditUser:
             timeframe=timeframe,
             session=session,
         )
-        user_posts: list[Post] = parse_posts(raw_posts)
+        user_posts: list[dict] = parse_posts(raw_posts)
 
         return user_posts
 
@@ -107,7 +105,7 @@ class RedditUser:
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
         timeframe: DATA_TIMEFRAME = "all",
-    ) -> list[Comment]:
+    ) -> list[dict]:
         """
         Returns a user's comments.
 
@@ -117,10 +115,10 @@ class RedditUser:
         :type limit: int
         :param sort: Sort criterion for the comments.
         :type sort: str
-        :param timeframe: Timeframe from which to get comments.
+        :param timeframe: Timeframe from which tyo get comments.
         :type timeframe: str
-        :return: A list of Comment objects, each containing data about a comment.
-        :rtype: list[Comment]
+        :return: A list of dictionaries, each containing data about a comment.
+        :rtype: list[dict]
         """
         raw_comments: list = await get_posts(
             posts_source=self._username,
@@ -130,15 +128,13 @@ class RedditUser:
             timeframe=timeframe,
             session=session,
         )
-        user_comments: list[Comment] = parse_comments(raw_comments)
+        user_comments: list[dict] = parse_comments(raw_comments)
 
         return user_comments
 
     # ------------------------------------------------------------------------------- #
 
-    async def overview(
-        self, limit: int, session: aiohttp.ClientSession
-    ) -> list[Comment]:
+    async def overview(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
         """
         Returns a user's most recent comments.
 
@@ -146,8 +142,8 @@ class RedditUser:
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
-        :return: A list of Comment objects, each containing data about a recent comment.
-        :rtype: list[Comment]
+        :return: A list of dictionaries, each containing data about a recent comment.
+        :rtype: list[dict]
         """
         raw_comments: list = await get_posts(
             posts_source=self._username,
@@ -155,7 +151,7 @@ class RedditUser:
             limit=limit,
             session=session,
         )
-        user_overview: list[Comment] = parse_comments(raw_comments)
+        user_overview: list[dict] = parse_comments(raw_comments)
 
         return user_overview
 
@@ -168,7 +164,7 @@ class RedditUser:
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
         timeframe: DATA_TIMEFRAME = "all",
-    ) -> list[Post]:
+    ) -> list[dict]:
         """
         Returns a user's posts that contain the specified keywords.
 
@@ -182,8 +178,8 @@ class RedditUser:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: str
-        :return: A list of Post objects, each containing data about a post.
-        :rtype: list[Post]
+        :return: A list of dictionaries, each containing data about a post.
+        :rtype: list[dict]
         """
         user_posts: list = await get_posts(
             posts_type="user_posts",
@@ -213,7 +209,7 @@ class RedditUser:
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
         timeframe: DATA_TIMEFRAME = "all",
-    ) -> list[Comment]:
+    ) -> list[dict]:
         """
         Returns a user's comments that contain the specified keyword.
 
@@ -227,8 +223,8 @@ class RedditUser:
         :type sort: str
         :param timeframe: Timeframe from which to get comments.
         :type timeframe: str
-        :return: A list of Comment objects, each containing data about a comment.
-        :rtype: list[Comment]
+        :return: A list of dictionaries, each containing data about a comment.
+        :rtype: list[dict]
         """
         user_comments: list = await get_posts(
             posts_source=self._username,
@@ -248,22 +244,20 @@ class RedditUser:
 
     # ------------------------------------------------------------------------------- #
 
-    async def moderated_communities(
-        self, session: aiohttp.ClientSession
-    ) -> list[PreviewCommunity]:
+    async def moderated_communities(self, session: aiohttp.ClientSession) -> list[dict]:
         """
         Returns communities moderated by the user.
 
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
-        :return: A list of PreviewCommunity objects, each containing preview data of a Community.
-        :rtype: list[PreviewCommunity]
+        :return: A list of dictionaries, each containing preview data of a Community.
+        :rtype: list[dict]
         """
         raw_preview_communities: dict = await get_data(
             endpoint=f"{BASE_REDDIT_ENDPOINT}/user/{self._username}/moderated_subreddits.json",
             session=session,
         )
-        preview_communities: list[PreviewCommunity] = parse_communities(
+        preview_communities: list[dict] = parse_communities(
             raw_preview_communities.get("data"), is_preview=True
         )
 
@@ -278,7 +272,7 @@ class RedditUser:
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
         timeframe: DATA_TIMEFRAME = "all",
-    ) -> dict:
+    ) -> list[tuple]:
         """
         Returns a user's top n communities based on community frequency in n posts.
 
@@ -311,14 +305,9 @@ class RedditUser:
             # Count the occurrences of each community
             community_counts = Counter(communities)
 
-            # Get the top N communities
-            most_active_communities = {
-                f"top {top_n}": community_counts.most_common(top_n)
-            }
+            return community_counts.most_common(top_n)
 
-            return most_active_communities
-
-        return {}
+        return []
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -332,7 +321,7 @@ class RedditSearch:
     @staticmethod
     async def users(
         query: str, limit: int, session: aiohttp.ClientSession
-    ) -> list[User]:
+    ) -> list[dict]:
         """
         Search users.
 
@@ -346,7 +335,7 @@ class RedditSearch:
         search_users: list = await get_searches(
             query=query, search_type="users", limit=limit, session=session
         )
-        users_results: list[User] = parse_users(search_users)
+        users_results: list[dict] = parse_users(search_users)
 
         return users_results
 
@@ -355,7 +344,7 @@ class RedditSearch:
     @staticmethod
     async def communities(
         query: str, limit: int, session: aiohttp.ClientSession
-    ) -> list[Community]:
+    ) -> list[dict]:
         """
         Search communities.
 
@@ -369,7 +358,7 @@ class RedditSearch:
         search_communities: list = await get_searches(
             query=query, search_type="communities", limit=limit, session=session
         )
-        communities_results: list[Community] = parse_communities(search_communities)
+        communities_results: list[dict] = parse_communities(search_communities)
 
         return communities_results
 
@@ -382,7 +371,7 @@ class RedditSearch:
         session: aiohttp.ClientSession,
         sort: DATA_SORT_CRITERION = "all",
         timeframe: DATA_TIMEFRAME = "all",
-    ) -> List[Post]:
+    ) -> list[dict]:
         """
         Returns posts.
 
@@ -396,8 +385,8 @@ class RedditSearch:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: str
-        :return: A list of Post objects, each containing data about a post.
-        :rtype: list[Post]
+        :return: A list of dictionaries, each containing data about a post.
+        :rtype: list[dict]
         """
         search_posts: list = await get_searches(
             query=query,
@@ -407,7 +396,7 @@ class RedditSearch:
             timeframe=timeframe,
             session=session,
         )
-        posts_results: list[Post] = parse_posts(search_posts)
+        posts_results: list[dict] = parse_posts(search_posts)
 
         return posts_results
 
@@ -431,13 +420,13 @@ class RedditCommunity:
 
     # ------------------------------------------------------------------------------- #
 
-    async def profile(self, session: aiohttp.ClientSession) -> Community:
+    async def profile(self, session: aiohttp.ClientSession) -> dict:
         """
         Returns a community's profile data.
 
         :param session: aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
-        :return: A community object containing community profile data.
+        :return: A dictionary containing community profile data.
         :rtype: Community
         """
         raw_community: dict = await get_profile(
@@ -445,7 +434,7 @@ class RedditCommunity:
             profile_source=self._community,
             session=session,
         )
-        community_profile: Community = parse_communities(raw_community)
+        community_profile: dict = parse_communities(raw_community)
 
         return community_profile
 
@@ -469,7 +458,7 @@ class RedditCommunity:
 
     # ------------------------------------------------------------------------------- #
 
-    async def wiki_page(self, page: str, session: aiohttp.ClientSession) -> WikiPage:
+    async def wiki_page(self, page: str, session: aiohttp.ClientSession) -> dict:
         """
         Return a community's specified wiki page data.
 
@@ -484,7 +473,7 @@ class RedditCommunity:
             endpoint=f"{COMMUNITY_DATA_ENDPOINT}/{self._community}/wiki/{page}.json",
             session=session,
         )
-        wiki_page: WikiPage = parse_community_wiki_page(wiki_page=raw_page)
+        wiki_page: dict = parse_community_wiki_page(wiki_page=raw_page)
 
         return wiki_page
 
@@ -496,7 +485,7 @@ class RedditCommunity:
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
         timeframe: DATA_TIMEFRAME = "all",
-    ) -> List[Post]:
+    ) -> list[dict]:
         """
         Returns a community's posts.
 
@@ -508,18 +497,18 @@ class RedditCommunity:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: str
-        :return: A list of Post objects, each containing data about a post.
-        :rtype: list[Post]
+        :return: A list of dictionaries, each containing data about a post.
+        :rtype: list[dict]
         """
         raw_posts: list = await get_posts(
-            posts_type="community",
+            posts_type="community_posts",
             posts_source=self._community,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
             session=session,
         )
-        community_posts: list[Post] = parse_posts(raw_posts)
+        community_posts: list[dict] = parse_posts(raw_posts)
 
         return community_posts
 
@@ -532,7 +521,7 @@ class RedditCommunity:
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
         timeframe: DATA_TIMEFRAME = "all",
-    ) -> list[Post]:
+    ) -> list[dict]:
         """
         Returns posts that contain a specified keyword from a community.
 
@@ -546,11 +535,11 @@ class RedditCommunity:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: str
-        :return: A list of Post objects, each containing data about a post.
-        :rtype: list[Post]
+        :return: A list of dictionaries, each containing data about a post.
+        :rtype: list[dict]
         """
         all_posts: list = await get_posts(
-            posts_type="community",
+            posts_type="community_posts",
             posts_source=self._community,
             limit=limit,
             sort=sort,
@@ -578,7 +567,7 @@ class RedditCommunities:
     # ------------------------------------------------------------------------------- #
 
     @staticmethod
-    async def all(limit: int, session: aiohttp.ClientSession) -> list[Community]:
+    async def all(limit: int, session: aiohttp.ClientSession) -> list[dict]:
         """
         Return all communities.
 
@@ -586,24 +575,24 @@ class RedditCommunities:
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
-        :return: A list of community objects, each containing data about a community.
-        :rtype: list[Community]
+        :return: A list of dictionaries, each containing data about a community.
+        :rtype: list[dict]
 
         Note
         ----
-            *in morphius' voice* "the only limitation you have at this point is the matrix's rate limit."
+            *in Morphius' voice* "the only limitation you have at this point is the matrix's rate limit."
         """
         raw_communities: list = await get_communities(
             communities_type="all", limit=limit, session=session
         )
-        all_communities: list[Community] = parse_communities(raw_communities)
+        all_communities: list[dict] = parse_communities(raw_communities)
 
         return all_communities
 
     # ------------------------------------------------------------------------------- #
 
     @staticmethod
-    async def default(limit: int, session: aiohttp.ClientSession) -> list[Community]:
+    async def default(limit: int, session: aiohttp.ClientSession) -> list[dict]:
         """
         Return default communities.
 
@@ -611,20 +600,20 @@ class RedditCommunities:
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
-        :return: A list of community objects, each containing data about a community.
-        :rtype: list[Community]
+        :return: A list of dictionaries, each containing data about a community.
+        :rtype: list[dict]
         """
         raw_communities: list = await get_communities(
             communities_type="default", limit=limit, session=session
         )
-        default_communities: list[Community] = parse_communities(raw_communities)
+        default_communities: list[dict] = parse_communities(raw_communities)
 
         return default_communities
 
     # ------------------------------------------------------------------------------- #
 
     @staticmethod
-    async def new(limit: int, session: aiohttp.ClientSession) -> list[Community]:
+    async def new(limit: int, session: aiohttp.ClientSession) -> list[dict]:
         """
         Return new communities.
 
@@ -632,20 +621,20 @@ class RedditCommunities:
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
-        :return: A list of community objects, each containing data about a community.
-        :rtype: list[Community]
+        :return: A list of dictionaries, each containing data about a community.
+        :rtype: list[dict]
         """
         raw_communities: list = await get_communities(
             communities_type="new", limit=limit, session=session
         )
-        new_communities: list[Community] = parse_communities(raw_communities)
+        new_communities: list[dict] = parse_communities(raw_communities)
 
         return new_communities
 
     # ------------------------------------------------------------------------------- #
 
     @staticmethod
-    async def popular(limit: int, session: aiohttp.ClientSession) -> list[Community]:
+    async def popular(limit: int, session: aiohttp.ClientSession) -> list[dict]:
         """
         Return popular communities.
 
@@ -653,13 +642,13 @@ class RedditCommunities:
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
-        :return: A list of community objects, each containing data about a community.
-        :rtype: list[Community]
+        :return: A list of dictionaries, each containing data about a community.
+        :rtype: list[dict]
         """
         raw_communities: list = await get_communities(
             communities_type="popular", limit=limit, session=session
         )
-        popular_communities: list[Community] = parse_communities(raw_communities)
+        popular_communities: list[dict] = parse_communities(raw_communities)
 
         return popular_communities
 
@@ -674,7 +663,7 @@ class RedditPost:
         self._id = id
         self._community = community
 
-    async def profile(self, session: aiohttp.ClientSession) -> Post:
+    async def profile(self, session: aiohttp.ClientSession) -> dict:
         post_data: dict = await get_data(
             endpoint=f"{BASE_REDDIT_ENDPOINT}/r/{self._community}/comments/{self._id}.json",
             session=session,
@@ -691,7 +680,7 @@ class RedditPost:
         session: aiohttp.ClientSession,
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
-    ) -> list[Comment]:
+    ) -> list[dict]:
         post_data: dict = await get_data(
             endpoint=f"{BASE_REDDIT_ENDPOINT}/r/{self._community}/comments/{self._id}.json?sort={sort}&limit={limit}",
             session=session,
@@ -715,7 +704,7 @@ class RedditPosts:
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
         timeframe: DATA_TIMEFRAME = "all",
-    ) -> List[Post]:
+    ) -> list[dict]:
         """
         Returns posts from a specified listing.
 
@@ -729,11 +718,11 @@ class RedditPosts:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: str
-        :return: A list of Post objects, each containing data about a post.
-        :rtype: list[Post]
+        :return: A list of dictionaries, each containing data about a post.
+        :rtype: list[dict]
         """
         listing_posts: list = await get_posts(
-            posts_type="listing",
+            posts_type="listing_posts",
             posts_source=listings_name,
             limit=limit,
             sort=sort,
@@ -750,7 +739,7 @@ class RedditPosts:
         session: aiohttp.ClientSession,
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
-    ) -> List[Post]:
+    ) -> list[dict]:
         """
         Returns new posts.
 
@@ -760,16 +749,16 @@ class RedditPosts:
         :type limit: int
         :param sort: Sort criterion for the posts.
         :type sort: str
-        :return: A list of Post objects, each containing data about a post.
-        :rtype: list[Post]
+        :return: A list of dictionaries, each containing data about a post.
+        :rtype: list[dict]
         """
         raw_posts: list = await get_posts(
-            posts_type="new",
+            posts_type="new_posts",
             limit=limit,
             sort=sort,
             session=session,
         )
-        new_posts: list[Post] = parse_posts(raw_posts)
+        new_posts: list[dict] = parse_posts(raw_posts)
 
         return new_posts
 
@@ -781,7 +770,7 @@ class RedditPosts:
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
         timeframe: DATA_TIMEFRAME = "all",
-    ) -> List[Post]:
+    ) -> list[dict]:
         """
         Returns posts from the Reddit front-page.
 
@@ -793,11 +782,11 @@ class RedditPosts:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: str
-        :return: A list of Post objects, each containing data about a post.
-        :rtype: list[Post]
+        :return: A list of dictionaries, each containing data about a post.
+        :rtype: list[dict]
         """
         raw_posts: list = await get_posts(
-            posts_type="front_page",
+            posts_type="front_page_posts",
             limit=limit,
             sort=sort,
             timeframe=timeframe,
