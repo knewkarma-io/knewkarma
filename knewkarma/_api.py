@@ -197,7 +197,7 @@ async def _paginate(
     process_func: callable,
     limit: int,
     collection_name: str = "items",
-):
+) -> list[dict]:
     """
     Asynchronously fetches and processes data in a paginated manner from a specified endpoint until the specified limit
     of items is reached or there are no more items to fetch. It uses a specified processing function
@@ -242,8 +242,6 @@ async def _paginate(
 
             if not last_item_id:
                 break
-
-    return all_items
 
 
 async def get_posts(
