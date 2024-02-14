@@ -8,6 +8,7 @@ from typing import get_args
 
 import aiohttp
 from rich.markdown import Markdown
+from rich.tree import Tree
 from rich_argparse import RichHelpFormatter
 
 from . import RedditUser, RedditCommunity, RedditPosts
@@ -18,6 +19,7 @@ from ._coreutils import (
     export_dataframe,
     filename_timestamp,
     create_dataframe,
+    show_exported_files,
 )
 from .base import RedditSearch, RedditCommunities, RedditPost
 from .docs import (
@@ -390,6 +392,14 @@ async def call_arg_functions(args: argparse.Namespace, function_mapping: dict):
                             directory=directory,
                             formats=args.export.split(","),
                         )
+
+                        # Show exported files
+                        tree = Tree(
+                            f":open_file_folder: [bold]{directory}[/]",
+                            guide_style="bold bright_blue",
+                        )
+                        show_exported_files(tree=tree, directory=directory)
+                        console.print(tree)
 
                     # -------------------------------------------------------- #
 
