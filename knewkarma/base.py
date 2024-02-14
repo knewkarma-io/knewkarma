@@ -585,7 +585,9 @@ class RedditCommunities:
         raw_communities: list = await get_communities(
             communities_type="all", limit=limit, session=session
         )
-        all_communities: list[dict] = parse_communities(raw_communities)
+        all_communities: list[dict] = parse_communities(
+            raw_communities, is_preview=True
+        )
 
         return all_communities
 
@@ -606,7 +608,9 @@ class RedditCommunities:
         raw_communities: list = await get_communities(
             communities_type="default", limit=limit, session=session
         )
-        default_communities: list[dict] = parse_communities(raw_communities)
+        default_communities: list[dict] = parse_communities(
+            raw_communities, is_preview=True
+        )
 
         return default_communities
 
@@ -627,7 +631,9 @@ class RedditCommunities:
         raw_communities: list = await get_communities(
             communities_type="new", limit=limit, session=session
         )
-        new_communities: list[dict] = parse_communities(raw_communities)
+        new_communities: list[dict] = parse_communities(
+            raw_communities, is_preview=True
+        )
 
         return new_communities
 
@@ -648,7 +654,9 @@ class RedditCommunities:
         raw_communities: list = await get_communities(
             communities_type="popular", limit=limit, session=session
         )
-        popular_communities: list[dict] = parse_communities(raw_communities)
+        popular_communities: list[dict] = parse_communities(
+            raw_communities, is_preview=True
+        )
 
         return popular_communities
 
