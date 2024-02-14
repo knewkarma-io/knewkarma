@@ -1,5 +1,7 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
+import asyncio
+from random import randint
 from sys import version as python_version
 from typing import Union, Literal
 
@@ -188,60 +190,64 @@ async def get_profile(
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def __fetch_and_paginate(
+async def _paginate(
     session: aiohttp.ClientSession,
-    data_endpoint: str,
+    endpoint: str,
     process_func: callable,
     limit: int,
-    **kwargs,
+    collection_name: str = "items",
 ):
     """
-    Fetches data in a paginated manner from a given endpoint and processes it using a specified function.
+    Asynchronously fetches and processes data in a paginated manner from a specified endpoint until the specified limit
+    of items is reached or there are no more items to fetch. It uses a specified processing function
+    to handle the data from each request.
 
-    :param session: aiohttp.ClientSession to use for the request.
-    :type session: aiohttp.ClientSession
-    :param data_endpoint: The data endpoint for the API request.
-    :type data_endpoint: str
-    :param process_func: Function to process each batch of data.
-    :type process_func: callable
-    :param limit: The maximum number of items to fetch.
-    :type limit: int
-    :param kwargs: Additional keyword arguments to pass to the processing function.
-    :type kwargs: Any
-    :return: A list of processed data items.
-    :rtype: list[dict]
+
+    :param session: The aiohttp ClientSession to be used for making HTTP requests.
+    :param endpoint: The initial URL endpoint from which to start fetching data.
+    :param process_func: A callable that processes the data from each request. It should accept a list of items
+                         and optionally return a list of processed items.
+    :param limit: The maximum number of items to process and return.
+    :return: A list of processed items.
     """
     all_items = []
-    last_item_id = ""
-    paginate = limit > 100
-
-    # ------------------------------------------------------------------------- #
+    last_item_id = ""  # Initially empty, updated with each request to paginate
 
     while len(all_items) < limit:
-        if paginate and last_item_id:
-            endpoint = f"{data_endpoint}&count={len(all_items)}&after={last_item_id}"
-        else:
-            endpoint = data_endpoint
+        # Construct the paginated endpoint for the current request
+        paginated_endpoint = (
+            f"{endpoint}&after={last_item_id}&count={len(all_items)}"
+            if last_item_id
+            else endpoint
+        )
 
-        # -------------------------------------------------------------------- #
+        # Fetch data from the endpoint using the get_data function
+        response = await get_data(session=session, endpoint=paginated_endpoint)
+        items = response.get("data", {}).get("children", [])
 
-        raw_data = await get_data(session=session, endpoint=endpoint)
-        data_list = raw_data.get("data", {}).get("children", [])
+        if not items:
+            break  # Exit the loop if no items were returned in the response
 
-        if not data_list:
-            break
+        # Process the fetched items. Ensure process_func respects the limit.
+        processed_items = process_func(response_data=items)
 
-        needed_count = limit - len(all_items)
-        processed_data = process_func(response_data=data_list[:needed_count], **kwargs)
+        # Ensure not to exceed the limit when appending processed items
+        items_to_limit = limit - len(all_items)
+        all_items.extend(processed_items[:items_to_limit])
 
-        # -------------------------------------------------------------------- #
+        # Update last_item_id for pagination; stop if no more data ('after' is None or empty)
+        last_item_id = response.get("data").get("after")
 
-        all_items.extend(processed_data)
+        if len(all_items) < limit:
+            delay = randint(1, 20)
+            console.log(
+                f"{len(all_items)}/{limit} {collection_name} fetched so far, "
+                f"resuming in {delay} {'seconds' if delay > 1 else 'second'}..."
+            )
+            # Apply a delay to respect Reddit's rate limiting, if necessary
+            await asyncio.sleep(delay)
 
-        if len(data_list) > 0:
-            last_item_id = data_list[-1].get("data").get("name")
-
-        if needed_count <= 0:
+        if not last_item_id:
             break
 
     return all_items
@@ -251,10 +257,10 @@ async def get_posts(
     session: aiohttp.ClientSession,
     limit: int,
     posts_type: Literal[
-        "new",
-        "front_page",
-        "listing",
-        "community",
+        "new_posts",
+        "front_page_posts",
+        "listing_posts",
+        "community_posts",
         "user_posts",
         "user_overview",
         "user_comments",
@@ -283,10 +289,10 @@ async def get_posts(
     :rtype: list[dict]
     """
     source_map = {
-        "new": f"{BASE_REDDIT_ENDPOINT}/new.json",
-        "front_page": f"{BASE_REDDIT_ENDPOINT}/.json",
-        "listing": f"{COMMUNITY_DATA_ENDPOINT}/{posts_source}.json?",
-        "community": f"{COMMUNITY_DATA_ENDPOINT}/{posts_source}.json",
+        "new_posts": f"{BASE_REDDIT_ENDPOINT}/new.json",
+        "front_page_posts": f"{BASE_REDDIT_ENDPOINT}/.json",
+        "listing_posts": f"{COMMUNITY_DATA_ENDPOINT}/{posts_source}.json?",
+        "community_posts": f"{COMMUNITY_DATA_ENDPOINT}/{posts_source}.json",
         "user_posts": f"{USER_DATA_ENDPOINT}/{posts_source}/submitted.json",
         "user_overview": f"{USER_DATA_ENDPOINT}/{posts_source}/overview.json",
         "user_comments": f"{USER_DATA_ENDPOINT}/{posts_source}/comments.json",
@@ -302,12 +308,12 @@ async def get_posts(
 
     # ------------------------------------------------------------------------- #
 
-    posts: list[dict] = await __fetch_and_paginate(
+    posts: list[dict] = await _paginate(
         session=session,
-        data_endpoint=endpoint,
+        endpoint=endpoint,
         process_func=process_response,
         limit=limit,
-        valid_key="data",
+        collection_name=posts_type,
     )
 
     # ------------------------------------------------------------------------- #
@@ -358,12 +364,12 @@ async def get_searches(
 
     # ------------------------------------------------------------------------- #
 
-    search_results: list[dict] = await __fetch_and_paginate(
+    search_results: list[dict] = await _paginate(
         session=session,
-        data_endpoint=endpoint,
+        endpoint=endpoint,
         process_func=process_response,
         limit=limit,
-        valid_key="data",
+        collection_name=search_type,
     )
 
     # ------------------------------------------------------------------------- #
@@ -401,12 +407,12 @@ async def get_communities(
 
     # ------------------------------------------------------------------------- #
 
-    communities: list[dict] = await __fetch_and_paginate(
+    communities: list[dict] = await _paginate(
         session=session,
-        data_endpoint=endpoint,
+        endpoint=endpoint,
         process_func=process_response,
         limit=limit,
-        valid_key="data",
+        collection_name="communities",
     )
 
     # ------------------------------------------------------------------------- #
