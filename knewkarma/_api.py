@@ -243,6 +243,8 @@ async def _paginate(
             if not last_item_id:
                 break
 
+    return all_items
+
 
 async def get_posts(
     session: aiohttp.ClientSession,
