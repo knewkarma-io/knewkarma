@@ -210,6 +210,8 @@ async def _paginate(
         task_id = progress.add_task("...", total=limit)
 
         while len(all_items) < limit:
+            # --------------------------------------------------------------------- #
+
             paginated_endpoint = (
                 f"{endpoint}&after={last_item_id}&count={len(all_items)}"
                 if last_item_id
@@ -222,11 +224,15 @@ async def _paginate(
             if not items:
                 break
 
+            # --------------------------------------------------------------------- #
+
             processed_items = process_func(response_data=items)
             items_to_limit = limit - len(all_items)
             all_items.extend(processed_items[:items_to_limit])
 
             last_item_id = response.get("data").get("after")
+
+            # --------------------------------------------------------------------- #
 
             if len(all_items) < limit and last_item_id:
                 delay = randint(1, 20)
@@ -242,6 +248,8 @@ async def _paginate(
 
             if not last_item_id:
                 break
+
+            # --------------------------------------------------------------------- #
 
     return all_items
 
