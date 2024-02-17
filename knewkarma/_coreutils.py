@@ -1,11 +1,12 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
+import asyncio
 import os
 import time
 from datetime import datetime
 from typing import Union, Literal
 
 import pandas as pd
+import rich
 from rich.console import Console
 from rich.tree import Tree
 
@@ -22,6 +23,26 @@ def pathfinder(directories: list[str]):
     """
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
+async def log_countdown(seconds: int, status):
+    """
+    Asynchronously counts down from a given number of seconds, updating the status message each second.
+
+    :param seconds: Number of seconds for the countdown.
+    :type seconds: int
+    :param status: The `rich.console.Status`
+        instance used to display and update the status message during the countdown.
+    :type status: rich.console.Status
+    """
+    for remaining in range(seconds, 0, -1):
+        status.update(
+            status=f"Resuming in [bold][cyan]{remaining}[/][/] {'seconds' if remaining > 1 else 'second'}[yellow]...[/]"
+        )
+        await asyncio.sleep(1)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

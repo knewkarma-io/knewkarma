@@ -1,18 +1,15 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-import asyncio
 from random import randint
 from sys import version as python_version
 from typing import Union, Literal
 
 import aiohttp
 from rich.markdown import Markdown
-from rich.progress import Progress
 
-from ._coreutils import console
+from ._coreutils import console, log_countdown
 from .docs import (
     Version,
-    ABOUT_AUTHOR,
     DATA_SORT_CRITERION,
     DATA_TIMEFRAME,
 )
@@ -47,8 +44,8 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
         async with session.get(
             endpoint,
             headers={
-                "User-Agent": f"Knew-Karma/{Version.full} "
-                f"(Python {python_version}; +{ABOUT_AUTHOR})"
+                "User-Agent": f"Knew-Karma/{Version.release} "
+                f"(Python {python_version}; +https://knewkarma-wiki.readthedocs.io)"
             },
         ) as response:
             if response.status == 200:
@@ -91,7 +88,7 @@ def process_response(
         if valid_key:
             return response_data if valid_key in response_data else {}
         else:
-            return response_data  # Explicitly return the dictionary if valid_key is not provided
+            return response_data
     elif isinstance(response_data, list):
         return response_data if response_data else []
     else:
@@ -205,9 +202,10 @@ async def _paginate(
     all_items = []
     last_item_id = None
 
-    with Progress(console=console, transient=True) as progress:
-        task_id = progress.add_task("---", total=limit)
-
+    with console.status(
+        status=f"Fetching [bold][cyan]{limit}[/][/] {collection_name}[yellow]...[/]",
+        spinner="dots2",
+    ) as status:
         while len(all_items) < limit:
             # --------------------------------------------------------------------- #
 
@@ -235,17 +233,15 @@ async def _paginate(
 
             if len(all_items) < limit and last_item_id:
                 delay = randint(1, 20)
-                progress.update(
-                    task_id,
-                    advance=len(processed_items),
-                    description=(
-                        f"[cyan]{len(all_items)}[/]/[cyan]{limit}[/] {collection_name} "
-                        f"fetched so far, resuming in [cyan]{delay}[/] {'seconds' if delay > 1 else 'second'}"
-                    ),
+                console.print(
+                    f"[green]✔[/] {len(all_items)}/{limit} {collection_name} fetched so far."
                 )
-                await asyncio.sleep(delay)
+                await log_countdown(seconds=delay, status=status)
 
-            if not last_item_id:
+            if len(all_items) == limit:
+                console.print(
+                    f"[green]✔[/] Successfully fetched {len(all_items)}/{limit} {collection_name}."
+                )
                 break
 
             # --------------------------------------------------------------------- #

@@ -435,6 +435,7 @@ def stage_and_start():
 
     # ------------------------------------------------------------------------------- #
 
+    username = args.username if hasattr(args, "username") else None
     user = RedditUser(
         username=args.username if hasattr(args, "username") else None,
     )
@@ -619,7 +620,7 @@ def stage_and_start():
                 call_arg_functions(args=args, function_mapping=function_mapping)
             )
         except KeyboardInterrupt:
-            console.log(f"User interruption detected ([yellow]Ctrl+C[/])")
+            console.log("User interruption detected ([yellow]Ctrl+C[/])")
         finally:
             elapsed_time = datetime.now() - start_time
             console.log(f"Done! {elapsed_time.total_seconds():.2f} seconds elapsed.")
