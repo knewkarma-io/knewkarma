@@ -1,18 +1,14 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-import asyncio
-from random import randint
 from sys import version as python_version
 from typing import Union, Literal
 
 import aiohttp
 from rich.markdown import Markdown
-from rich.progress import Progress
 
 from ._coreutils import console
 from .docs import (
     Version,
-    ABOUT_AUTHOR,
     DATA_SORT_CRITERION,
     DATA_TIMEFRAME,
 )
@@ -47,22 +43,22 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
         async with session.get(
             endpoint,
             headers={
-                "User-Agent": f"Knew-Karma/{Version.full} "
-                f"(Python {python_version}; +{ABOUT_AUTHOR})"
+                "User-Agent": f"Knew-Karma/{Version.release} "
+                f"(Python {python_version}; +https://knewkarma-wiki.readthedocs.io)"
             },
         ) as response:
             if response.status == 200:
                 return await response.json()
             else:
                 error_message = await response.json()
-                console.log(f"An API error occurred: {error_message}")
+                console.print(f"[red]✘[/] An API error occurred: {error_message}")
                 return {}
 
     except aiohttp.ClientConnectionError as error:
-        console.log(f"An HTTP error occurred: [red]{error}[/]")
+        console.print(f"[red]✘[/] An HTTP error occurred: {error}")
         return {}
     except Exception as error:
-        console.log(f"An unknown error occurred: [red]{error}[/]")
+        console.print(f"[red]✘[/] An unknown error occurred: {error}")
         return {}
 
 
@@ -91,7 +87,7 @@ def process_response(
         if valid_key:
             return response_data if valid_key in response_data else {}
         else:
-            return response_data  # Explicitly return the dictionary if valid_key is not provided
+            return response_data
     elif isinstance(response_data, list):
         return response_data if response_data else []
     else:
@@ -195,7 +191,6 @@ async def _paginate(
     endpoint: str,
     process_func: callable,
     limit: int,
-    collection_name: str = "items",
 ) -> list[dict]:
     """
     Asynchronously fetches and processes data in a paginated manner from a specified endpoint until the specified limit
@@ -205,50 +200,35 @@ async def _paginate(
     all_items = []
     last_item_id = None
 
-    with Progress(console=console, transient=True) as progress:
-        task_id = progress.add_task("---", total=limit)
+    while len(all_items) < limit:
+        # --------------------------------------------------------------------- #
 
-        while len(all_items) < limit:
-            # --------------------------------------------------------------------- #
+        paginated_endpoint = (
+            f"{endpoint}&after={last_item_id}&count={len(all_items)}"
+            if last_item_id
+            else endpoint
+        )
 
-            paginated_endpoint = (
-                f"{endpoint}&after={last_item_id}&count={len(all_items)}"
-                if last_item_id
-                else endpoint
-            )
+        response = await get_data(session=session, endpoint=paginated_endpoint)
+        items = response.get("data", {}).get("children", [])
 
-            response = await get_data(session=session, endpoint=paginated_endpoint)
-            items = response.get("data", {}).get("children", [])
+        if not items:
+            break
 
-            if not items:
-                break
+        # --------------------------------------------------------------------- #
 
-            # --------------------------------------------------------------------- #
+        processed_items = process_func(response_data=items)
+        items_to_limit = limit - len(all_items)
+        all_items.extend(processed_items[:items_to_limit])
 
-            processed_items = process_func(response_data=items)
-            items_to_limit = limit - len(all_items)
-            all_items.extend(processed_items[:items_to_limit])
+        last_item_id = response.get("data").get("after")
 
-            last_item_id = response.get("data").get("after")
+        # --------------------------------------------------------------------- #
 
-            # --------------------------------------------------------------------- #
+        if len(all_items) == limit:
+            break
 
-            if len(all_items) < limit and last_item_id:
-                delay = randint(1, 20)
-                progress.update(
-                    task_id,
-                    advance=len(processed_items),
-                    description=(
-                        f"[cyan]{len(all_items)}[/]/[cyan]{limit}[/] {collection_name} "
-                        f"fetched so far, resuming in [cyan]{delay}[/] {'seconds' if delay > 1 else 'second'}"
-                    ),
-                )
-                await asyncio.sleep(delay)
-
-            if not last_item_id:
-                break
-
-            # --------------------------------------------------------------------- #
+        # --------------------------------------------------------------------- #
 
     return all_items
 
@@ -313,7 +293,6 @@ async def get_posts(
         endpoint=endpoint,
         process_func=process_response,
         limit=limit,
-        collection_name=posts_type,
     )
 
     # ------------------------------------------------------------------------- #
@@ -369,7 +348,6 @@ async def get_searches(
         endpoint=endpoint,
         process_func=process_response,
         limit=limit,
-        collection_name=search_type,
     )
 
     # ------------------------------------------------------------------------- #
@@ -412,7 +390,6 @@ async def get_communities(
         endpoint=endpoint,
         process_func=process_response,
         limit=limit,
-        collection_name="communities",
     )
 
     # ------------------------------------------------------------------------- #
