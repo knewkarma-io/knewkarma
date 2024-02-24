@@ -1,5 +1,4 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
 import os
 import time
 from datetime import datetime
@@ -22,6 +21,26 @@ def pathfinder(directories: list[str]):
     """
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
+def timestamp_to_utc(timestamp: float) -> str:
+    """
+    Converts a unix-timestamp to a datetime.utc string.
+
+    :param timestamp: Unix timestamp to convert.
+    :type timestamp: float
+    :return: A datetime.utc string from the converted timestamp.
+    :rtype: str
+
+    Return format
+    -------------
+    dd MM YYYY, hh:mm:ss AM/PM
+    """
+    utc_object = datetime.utcfromtimestamp(timestamp)
+    return utc_object.strftime("%d %b %Y, %I:%M:%S %p")
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -209,6 +228,6 @@ def export_dataframe(
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-console = Console(color_system="auto", log_time_format="[%I:%M:%S%p]")
+console = Console(color_system="auto")
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
