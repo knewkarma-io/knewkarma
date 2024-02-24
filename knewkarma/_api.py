@@ -1,13 +1,12 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-from random import randint
 from sys import version as python_version
 from typing import Union, Literal
 
 import aiohttp
 from rich.markdown import Markdown
 
-from ._coreutils import console, log_countdown
+from ._coreutils import console
 from .docs import (
     Version,
     DATA_SORT_CRITERION,
@@ -52,14 +51,14 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
                 return await response.json()
             else:
                 error_message = await response.json()
-                console.log(f"An API error occurred: {error_message}")
+                console.print(f"[red]✘[/] An API error occurred: {error_message}")
                 return {}
 
     except aiohttp.ClientConnectionError as error:
-        console.log(f"An HTTP error occurred: [red]{error}[/]")
+        console.print(f"[red]✘[/] An HTTP error occurred: {error}")
         return {}
     except Exception as error:
-        console.log(f"An unknown error occurred: [red]{error}[/]")
+        console.print(f"[red]✘[/] An unknown error occurred: {error}")
         return {}
 
 
@@ -192,7 +191,6 @@ async def _paginate(
     endpoint: str,
     process_func: callable,
     limit: int,
-    collection_name: str = "items",
 ) -> list[dict]:
     """
     Asynchronously fetches and processes data in a paginated manner from a specified endpoint until the specified limit
@@ -202,49 +200,35 @@ async def _paginate(
     all_items = []
     last_item_id = None
 
-    with console.status(
-        status=f"Fetching [bold][cyan]{limit}[/][/] {collection_name}[yellow]...[/]",
-        spinner="dots2",
-    ) as status:
-        while len(all_items) < limit:
-            # --------------------------------------------------------------------- #
+    while len(all_items) < limit:
+        # --------------------------------------------------------------------- #
 
-            paginated_endpoint = (
-                f"{endpoint}&after={last_item_id}&count={len(all_items)}"
-                if last_item_id
-                else endpoint
-            )
+        paginated_endpoint = (
+            f"{endpoint}&after={last_item_id}&count={len(all_items)}"
+            if last_item_id
+            else endpoint
+        )
 
-            response = await get_data(session=session, endpoint=paginated_endpoint)
-            items = response.get("data", {}).get("children", [])
+        response = await get_data(session=session, endpoint=paginated_endpoint)
+        items = response.get("data", {}).get("children", [])
 
-            if not items:
-                break
+        if not items:
+            break
 
-            # --------------------------------------------------------------------- #
+        # --------------------------------------------------------------------- #
 
-            processed_items = process_func(response_data=items)
-            items_to_limit = limit - len(all_items)
-            all_items.extend(processed_items[:items_to_limit])
+        processed_items = process_func(response_data=items)
+        items_to_limit = limit - len(all_items)
+        all_items.extend(processed_items[:items_to_limit])
 
-            last_item_id = response.get("data").get("after")
+        last_item_id = response.get("data").get("after")
 
-            # --------------------------------------------------------------------- #
+        # --------------------------------------------------------------------- #
 
-            if len(all_items) < limit and last_item_id:
-                delay = randint(1, 20)
-                console.print(
-                    f"[green]✔[/] {len(all_items)}/{limit} {collection_name} fetched so far."
-                )
-                await log_countdown(seconds=delay, status=status)
+        if len(all_items) == limit:
+            break
 
-            if len(all_items) == limit:
-                console.print(
-                    f"[green]✔[/] Successfully fetched {len(all_items)}/{limit} {collection_name}."
-                )
-                break
-
-            # --------------------------------------------------------------------- #
+        # --------------------------------------------------------------------- #
 
     return all_items
 
@@ -309,7 +293,6 @@ async def get_posts(
         endpoint=endpoint,
         process_func=process_response,
         limit=limit,
-        collection_name=posts_type,
     )
 
     # ------------------------------------------------------------------------- #
@@ -365,7 +348,6 @@ async def get_searches(
         endpoint=endpoint,
         process_func=process_response,
         limit=limit,
-        collection_name=search_type,
     )
 
     # ------------------------------------------------------------------------- #
@@ -408,7 +390,6 @@ async def get_communities(
         endpoint=endpoint,
         process_func=process_response,
         limit=limit,
-        collection_name="communities",
     )
 
     # ------------------------------------------------------------------------- #

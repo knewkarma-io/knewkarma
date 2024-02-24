@@ -1,12 +1,10 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-import asyncio
 import os
 import time
 from datetime import datetime
 from typing import Union, Literal
 
 import pandas as pd
-import rich
 from rich.console import Console
 from rich.tree import Tree
 
@@ -28,21 +26,21 @@ def pathfinder(directories: list[str]):
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def log_countdown(seconds: int, status):
+def timestamp_to_utc(timestamp: float) -> str:
     """
-    Asynchronously counts down from a given number of seconds, updating the status message each second.
+    Converts a unix-timestamp to a datetime.utc string.
 
-    :param seconds: Number of seconds for the countdown.
-    :type seconds: int
-    :param status: The `rich.console.Status`
-        instance used to display and update the status message during the countdown.
-    :type status: rich.console.Status
+    :param timestamp: Unix timestamp to convert.
+    :type timestamp: float
+    :return: A datetime.utc string from the converted timestamp.
+    :rtype: str
+
+    Return format
+    -------------
+    dd MM YYYY, hh:mm:ss AM/PM
     """
-    for remaining in range(seconds, 0, -1):
-        status.update(
-            status=f"Resuming in [bold][cyan]{remaining}[/][/] {'seconds' if remaining > 1 else 'second'}[yellow]...[/]"
-        )
-        await asyncio.sleep(1)
+    utc_object = datetime.utcfromtimestamp(timestamp)
+    return utc_object.strftime("%d %b %Y, %I:%M:%S %p")
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -230,6 +228,6 @@ def export_dataframe(
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-console = Console(color_system="auto", log_time_format="[%I:%M:%S%p]")
+console = Console(color_system="auto")
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
