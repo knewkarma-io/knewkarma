@@ -338,7 +338,7 @@ def create_arg_parser() -> argparse.ArgumentParser:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-async def call_arg_functions(args: argparse.Namespace, function_mapping: dict):
+async def call_functions(args: argparse.Namespace, function_mapping: dict):
     """
     Calls command-line arguments' functions based on user-input.
 
@@ -435,7 +435,6 @@ def stage_and_start():
 
     # ------------------------------------------------------------------------------- #
 
-    username = args.username if hasattr(args, "username") else None
     user = RedditUser(
         username=args.username if hasattr(args, "username") else None,
     )
@@ -609,21 +608,25 @@ def stage_and_start():
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
         )
-        try:
-            start_time: datetime = datetime.now()
-
-            console.log(
-                f"[bold]Knew Karma[/] (CLI) {Version.release} started at "
-                f"{start_time.strftime('%a %b %d %Y, %I:%M:%S%p')}"
-            )
-            asyncio.run(
-                call_arg_functions(args=args, function_mapping=function_mapping)
-            )
-        except KeyboardInterrupt:
-            console.log("User interruption detected ([yellow]Ctrl+C[/])")
-        finally:
-            elapsed_time = datetime.now() - start_time
-            console.log(f"Done! {elapsed_time.total_seconds():.2f} seconds elapsed.")
+        with console.status(
+            status=f"[bold]Knew Karma[/] (CLI) [bold][cyan]{Version.release}[/][/] started at "
+            f"{start_time.strftime('%a %b [bold][cyan]%d[/][/] [bold][cyan]%Y[/][/], [bold][cyan]%I:%M:%S[/][/] %p')}",
+            spinner="dots2",
+        ):
+            try:
+                start_time: datetime = datetime.now()
+                asyncio.run(
+                    call_functions(args=args, function_mapping=function_mapping)
+                )
+            except KeyboardInterrupt:
+                console.print(
+                    "[yellow]✔[/] User interruption detected ([yellow]Ctrl+C[/])"
+                )
+            finally:
+                elapsed_time = datetime.now() - start_time
+                console.print(
+                    f"[green]✔[/] Done! {elapsed_time.total_seconds():.2f} seconds elapsed."
+                )
     else:
         parser.print_usage()
 

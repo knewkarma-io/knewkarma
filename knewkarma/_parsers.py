@@ -2,7 +2,7 @@
 
 from typing import Union
 
-from ._coreutils import time_since
+from ._coreutils import timestamp_to_utc
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -27,22 +27,19 @@ def parse_users(data: Union[list[dict], dict]) -> Union[list[dict], dict]:
             "awardee_karma": user.get("awardee_karma"),
             "total_karma": user.get("total_karma"),
             "community": user.get("subreddit"),
-            "created": time_since(timestamp=user.get("created"))
+            "created": timestamp_to_utc(timestamp=user.get("created"))
             if user.get("created")
             else "NaN",
         }
 
     # ------------------------------------------------------------------------------- #
 
+    converted_data = None
     if isinstance(data, list) and len(data) != 0:
         converted_data = [build_user(user.get("data")) for user in data]
 
     elif isinstance(data, dict) and "is_employee" in data:
         converted_data = build_user(data)
-    else:
-        raise ValueError(
-            f"Unexpected data type {type(data).__name__}. Expected {list} or {dict}"
-        )
 
     return converted_data
 
@@ -55,8 +52,8 @@ def parse_posts(data: Union[dict, list]) -> Union[list[dict], dict]:
         return {
             "author": post.get("author"),
             "title": post.get("title"),
-            "id": post.get("id"),
             "body": post.get("selftext"),
+            "id": post.get("id"),
             "community": post.get("subreddit"),
             "community_id": post.get("subreddit_id"),
             "community_type": post.get("subreddit_type"),
@@ -73,11 +70,11 @@ def parse_posts(data: Union[dict, list]) -> Union[list[dict], dict]:
             "is_archived": post.get("archived"),
             "domain": post.get("domain"),
             "score": post.get("score"),
-            "edited": time_since(timestamp=post.get("edited"))
+            "edited": timestamp_to_utc(timestamp=post.get("edited"))
             if post.get("edited")
             else False,
             "comments": post.get("num_comments"),
-            "created": time_since(timestamp=post.get("created"))
+            "created": timestamp_to_utc(timestamp=post.get("created"))
             if post.get("created")
             else "NaN",
         }
@@ -117,7 +114,7 @@ def parse_comments(comments: list[dict]) -> list[dict]:
                     "is_stickied": comment_data.get("stickied"),
                     "is_locked": comment_data.get("locked"),
                     "is_archived": comment_data.get("archived"),
-                    "created": time_since(timestamp=comment.get("created"))
+                    "created": timestamp_to_utc(timestamp=comment.get("created"))
                     if comment.get("created")
                     else "NaN",
                 }
@@ -144,7 +141,7 @@ def parse_communities(
                 "subscribers": community.get("subscribers"),
                 "whitelist_status": community.get("whitelist_status"),
                 "url": community.get("url"),
-                "created": time_since(timestamp=community.get("created")),
+                "created": timestamp_to_utc(timestamp=community.get("created")),
             }
         else:
             community_obj = {
@@ -160,7 +157,7 @@ def parse_communities(
                 "language": community.get("lang"),
                 "whitelist_status": community.get("whitelist_status"),
                 "url": community.get("url"),
-                "created": time_since(timestamp=community.get("created"))
+                "created": timestamp_to_utc(timestamp=community.get("created"))
                 if community.get("created")
                 else "NaN",
             }
@@ -169,6 +166,7 @@ def parse_communities(
 
     # ------------------------------------------------------------------------------- #
 
+    community_data = None
     if isinstance(data, list) and len(data) != 0:
         community_data = [
             build_community(community=community.get("data")) for community in data
@@ -176,10 +174,6 @@ def parse_communities(
 
     elif isinstance(data, dict) and "subreddit_type" in data:
         community_data = build_community(community=data)
-    else:
-        raise ValueError(
-            f"Unexpected data type {type(data).__name__}. Expected {list} or {dict}"
-        )
 
     return community_data
 
@@ -194,7 +188,7 @@ def parse_community_wiki_page(wiki_page: dict) -> dict:
 
         return {
             "revision_id": page_data.get("revision_id"),
-            "revision_date": time_since(timestamp=page_data.get("revision_date")),
+            "revision_date": timestamp_to_utc(timestamp=page_data.get("revision_date")),
             "content_markdown": page_data.get("content_md"),
             "revised_by": {
                 "name": user.get("name"),
@@ -213,7 +207,7 @@ def parse_community_wiki_page(wiki_page: dict) -> dict:
                 "awardee_karma": user.get("awardee_karma"),
                 "total_karma": user.get("total_karma"),
                 "community": user.get("subreddit"),
-                "created": time_since(timestamp=user.get("created")),
+                "created": timestamp_to_utc(timestamp=user.get("created")),
             },
         }
 
