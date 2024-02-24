@@ -1,400 +1,634 @@
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-from sys import version as python_version
-from typing import Union, Literal
+import argparse
+import asyncio
+import os
+from datetime import datetime
+from typing import get_args
 
 import aiohttp
 from rich.markdown import Markdown
+from rich.tree import Tree
+from rich_argparse import RichHelpFormatter
 
-from ._coreutils import console
+from . import RedditUser, RedditCommunity, RedditPosts
+from ._api import get_updates
+from ._coreutils import (
+    console,
+    pathfinder,
+    export_dataframe,
+    filename_timestamp,
+    create_dataframe,
+    show_exported_files,
+)
+from .base import RedditSearch, RedditCommunities, RedditPost
 from .docs import (
-    Version,
-    DATA_SORT_CRITERION,
+    PROGRAM_DIRECTORY,
+    DESCRIPTION,
+    COPYRIGHT,
     DATA_TIMEFRAME,
+    DATA_SORT_CRITERION,
+    Version,
+    OPERATIONS_TEXT,
+    COMMUNITY_EXAMPLES,
+    COMMUNITIES_EXAMPLES,
+    POST_EXAMPLES,
+    POSTS_EXAMPLES,
+    POSTS_LISTINGS,
+    SEARCH_EXAMPLES,
+    USER_EXAMPLES,
+    LICENSE,
 )
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-BASE_REDDIT_ENDPOINT: str = "https://www.reddit.com"
-USER_DATA_ENDPOINT: str = f"{BASE_REDDIT_ENDPOINT}/u"
-USERS_DATA_ENDPOINT: str = f"{BASE_REDDIT_ENDPOINT}/users"
-COMMUNITY_DATA_ENDPOINT: str = f"{BASE_REDDIT_ENDPOINT}/r"
-COMMUNITIES_DATA_ENDPOINT: str = f"{BASE_REDDIT_ENDPOINT}/subreddits"
-GITHUB_RELEASE_ENDPOINT: str = (
-    "https://api.github.com/repos/bellingcat/knewkarma/releases/latest"
-)
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict, list]:
+def create_arg_parser() -> argparse.ArgumentParser:
     """
-    Asynchronously fetches JSON data from a given API endpoint.
+    Creates and configures an argument parser for the command line arguments.
 
-    :param session: aiohttp session to use for the request.
-    :type session: aiohttp.ClientSession
-    :param endpoint: The API endpoint to fetch data from.
-    :type endpoint: str
-    :return: Returns JSON data as a dictionary or list. Returns an empty dict if fetching fails.
-    :rtype: Union[dict, list]
+    :return: A configured argparse.ArgumentParser object ready to parse the command line arguments.
+    :rtype: argparse.ArgumentParser
     """
-    try:
-        async with session.get(
-            endpoint,
-            headers={
-                "User-Agent": f"Knew-Karma/{Version.release} "
-                f"(Python {python_version}; +https://knewkarma-wiki.readthedocs.io)"
-            },
-        ) as response:
-            if response.status == 200:
-                return await response.json()
-            else:
-                error_message = await response.json()
-                console.print(f"[red]✘[/] An API error occurred: {error_message}")
-                return {}
+    # ------------------------------------------------------------------------------- #
 
-    except aiohttp.ClientConnectionError as error:
-        console.print(f"[red]✘[/] An HTTP error occurred: {error}")
-        return {}
-    except Exception as error:
-        console.print(f"[red]✘[/] An unknown error occurred: {error}")
-        return {}
+    main_parser = argparse.ArgumentParser(
+        description=Markdown(DESCRIPTION, style="argparse.text"),
+        epilog=Markdown(LICENSE, style="argparse.text"),
+        formatter_class=RichHelpFormatter,
+    )
+    subparsers = main_parser.add_subparsers(dest="mode", help="operation mode")
+    main_parser.add_argument(
+        "-t",
+        "--timeframe",
+        type=str,
+        default="all",
+        choices=list(get_args(DATA_TIMEFRAME)),
+        help="timeframe to get [[bold][green]bulk[/][/]] data from (default: %(default)s)",
+    )
+    main_parser.add_argument(
+        "-s",
+        "--sort",
+        type=str,
+        default="all",
+        choices=list(get_args(DATA_SORT_CRITERION)),
+        help="[[bold][green]bulk[/][/]] sort criterion (default: %(default)s)",
+    )
+    main_parser.add_argument(
+        "-l",
+        "--limit",
+        type=int,
+        default=100,
+        metavar="NUMBER",
+        help="[[bold][green]bulk[/][/]] data output limit (default: %(default)s)",
+    )
+    main_parser.add_argument(
+        "-sleep",
+        type=int,
+        default=20,
+        metavar="SECONDS",
+        help="[[bold][green]bulk data[/][/]] sleep delay (seconds) after each request (default: %(default)s)",
+    )
+    main_parser.add_argument(
+        "-e",
+        "--export",
+        type=str,
+        metavar="FILETYPES",
+        help="a comma-separated list of file types to export the output to (supported: [green]csv,html,json,xml[/])",
+    )
+    main_parser.add_argument(
+        "-u",
+        "--updates",
+        help="check for updates on run",
+        action="store_true",
+    )
+    main_parser.add_argument(
+        "-v",
+        "--version",
+        version=Markdown(f"Knew Karma {Version.release} {COPYRIGHT}"),
+        action="version",
+    )
+
+    # ------------------------------------------------------------------------------- #
+
+    community_parser = subparsers.add_parser(
+        "community",
+        help="community (subreddit) operations",
+        description=Markdown(
+            OPERATIONS_TEXT.format("Community (Subreddit)"),
+            style="argparse.text",
+        ),
+        epilog=Markdown(COMMUNITY_EXAMPLES),
+        formatter_class=RichHelpFormatter,
+    )
+    community_parser.add_argument(
+        "community",
+        help="community name",
+    )
+    community_parser.add_argument(
+        "-p",
+        "--profile",
+        help="get a community's profile",
+        action="store_true",
+    )
+    community_parser.add_argument(
+        "-s",
+        "--search",
+        metavar="KEYWORD",
+        help="get a community's posts that contain the specified keyword",
+        type=str,
+    )
+    community_parser.add_argument(
+        "-pp",
+        "--posts",
+        help="get a community's posts",
+        action="store_true",
+    )
+    community_parser.add_argument(
+        "-wp",
+        "--wiki-page",
+        dest="wiki_page",
+        help="get a community's specified wiki page data",
+        metavar="WIKI_PAGE",
+    )
+    community_parser.add_argument(
+        "-wps",
+        "--wiki-pages",
+        dest="wiki_pages",
+        help="get a community's wiki pages",
+        action="store_true",
+    )
+
+    # ------------------------------------------------------------------------------- #
+
+    communities_parser = subparsers.add_parser(
+        "communities",
+        help="communities (subreddits) operations",
+        description=Markdown(
+            OPERATIONS_TEXT.format("Communities (Subreddits)"),
+            style="argparse.text",
+        ),
+        epilog=Markdown(COMMUNITIES_EXAMPLES),
+        formatter_class=RichHelpFormatter,
+    )
+    communities_parser.add_argument(
+        "-a",
+        "--all",
+        help="get all communities",
+        action="store_true",
+    )
+    communities_parser.add_argument(
+        "-d",
+        "--default",
+        help="get default communities",
+        action="store_true",
+    )
+    communities_parser.add_argument(
+        "-n",
+        "--new",
+        help="get new communities",
+        action="store_true",
+    )
+    communities_parser.add_argument(
+        "-p",
+        "--popular",
+        help="get popular communities",
+        action="store_true",
+    )
+
+    # ------------------------------------------------------------------------------- #
+
+    post_parser = subparsers.add_parser(
+        "post",
+        help="post operations",
+        description=Markdown(OPERATIONS_TEXT.format("Post"), style="argparse.text"),
+        epilog=Markdown(POST_EXAMPLES),
+        formatter_class=RichHelpFormatter,
+    )
+
+    post_parser.add_argument("id", help="post id", type=str)
+    post_parser.add_argument("community", help="post source community", type=str)
+    post_parser.add_argument(
+        "-p", "--profile", help="get post 'profile' data", action="store_true"
+    )
+    post_parser.add_argument(
+        "-c", "--comments", help="get post comments", action="store_true"
+    )
+
+    # ------------------------------------------------------------------------------- #
+
+    posts_parser = subparsers.add_parser(
+        "posts",
+        help="posts operations",
+        description=Markdown(OPERATIONS_TEXT.format("Posts"), style="argparse.text"),
+        epilog=Markdown(POSTS_EXAMPLES),
+        formatter_class=RichHelpFormatter,
+    )
+    posts_parser.add_argument(
+        "-n",
+        "--new",
+        help="get new posts",
+        action="store_true",
+    )
+    posts_parser.add_argument(
+        "-f",
+        "--front-page",
+        help="get posts from the reddit front-page",
+        action="store_true",
+    )
+    posts_parser.add_argument(
+        "-l",
+        "--listing",
+        default="all",
+        help="get posts from a specified listing",
+        choices=list(get_args(POSTS_LISTINGS)),
+    )
+
+    # ------------------------------------------------------------------------------- #
+
+    search_parser = subparsers.add_parser(
+        "search",
+        help="search operations",
+        description=Markdown(OPERATIONS_TEXT.format("Search"), style="argparse.text"),
+        epilog=Markdown(SEARCH_EXAMPLES),
+        formatter_class=RichHelpFormatter,
+    )
+    search_parser.add_argument("query", help="search query")
+    search_parser.add_argument(
+        "-u", "--users", help="search users", action="store_true"
+    )
+    search_parser.add_argument(
+        "-p", "--posts", help="search posts", action="store_true"
+    )
+    search_parser.add_argument(
+        "-c", "--communities", help="search communities", action="store_true"
+    )
+
+    # ------------------------------------------------------------------------------- #
+
+    user_parser = subparsers.add_parser(
+        "user",
+        help="user operations",
+        description=Markdown(OPERATIONS_TEXT.format("User"), style="argparse.text"),
+        epilog=Markdown(USER_EXAMPLES),
+        formatter_class=RichHelpFormatter,
+    )
+    user_parser.add_argument("username", help="username")
+    user_parser.add_argument(
+        "-p",
+        "--profile",
+        help="get a user's profile",
+        action="store_true",
+    )
+    user_parser.add_argument(
+        "-c",
+        "--comments",
+        help="get a user's comments",
+        action="store_true",
+    )
+
+    user_parser.add_argument(
+        "-o",
+        "--overview",
+        help="get a user's most recent comment activity",
+        action="store_true",
+    )
+    user_parser.add_argument(
+        "-pp",
+        "--posts",
+        action="store_true",
+        help="get a user's posts",
+    )
+    user_parser.add_argument(
+        "-sp",
+        "--search-posts",
+        dest="search_posts",
+        metavar="KEYWORD",
+        help="get a user's posts that contain the specified keyword",
+        type=str,
+    )
+    user_parser.add_argument(
+        "-sc",
+        "--search-comments",
+        dest="search_comments",
+        metavar="KEYWORD",
+        help="get a user's comments that contain the specified keyword",
+        type=str,
+    )
+    user_parser.add_argument(
+        "-mc",
+        "--moderated-communities",
+        dest="moderated_communities",
+        help="get communities moderated by the user",
+        action="store_true",
+    )
+    user_parser.add_argument(
+        "-tc",
+        "--top-communities",
+        dest="top_communities",
+        metavar="TOP_N",
+        type=int,
+        help="get a user's top n communities based on community frequency in n posts",
+    )
+
+    return main_parser
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def process_response(
-    response_data: Union[dict, list], valid_key: str = None
-) -> Union[dict, list]:
+async def call_functions(args: argparse.Namespace, function_mapping: dict):
     """
-    Processes and validates the API response data.
+    Calls command-line arguments' functions based on user-input.
 
-    If it's a dictionary and a valid_key is provided,
-    checks for the presence of the key in the response dictionary.
-
-    If it's a list, it ensures the list is not empty.
-
-    :param response_data: The API response data to validate, which should be a dictionary or list.
-    :type response_data: Union[dict, list]
-    :param valid_key: The key to check for in the data if it's a dictionary.
-    :type valid_key: str
-    :return: The original data if valid, or an empty dictionary or list if invalid.
-    :rtype: Union[dict, list]
+    :param args: Argparse namespace object  containing parsed command-line arguments.
+    :type args: argparse.Namespace
+    :param function_mapping: Mapping of command-line commands to their respective functions
+    :type function_mapping: dict
     """
-    if isinstance(response_data, dict):
-        if valid_key:
-            return response_data if valid_key in response_data else {}
-        else:
-            return response_data
-    elif isinstance(response_data, list):
-        return response_data if response_data else []
-    else:
-        console.log(
-            f"Unknown data type ({response_data}: {type(response_data)}), expected a list or dict."
+
+    async with aiohttp.ClientSession() as request_session:
+        if args.updates:
+            await get_updates(session=request_session)
+
+        mode_action = function_mapping.get(args.mode)
+        directory: str = ""
+        for action, function in mode_action:
+            arg_is_present: bool = False
+            if getattr(args, action, False):
+                arg_is_present = True
+                # ------------------------------------------------------------ #
+
+                if args.export:
+                    # Create path to main directory in which target data files will be exported
+                    directory = os.path.join(PROGRAM_DIRECTORY, args.mode, action)
+
+                    # Create file directories for supported data file types
+                    pathfinder(
+                        directories=[
+                            os.path.join(directory, "csv"),
+                            os.path.join(directory, "html"),
+                            os.path.join(directory, "json"),
+                            os.path.join(directory, "xml"),
+                        ]
+                    )
+
+                # ----------------------------------------------------------- #
+
+                function_data = await function(session=request_session)
+                if function_data:
+                    dataframe = create_dataframe(data=function_data)
+
+                    # Print the DataFrame, excluding the 'raw_data' column if it exists
+                    console.print(dataframe)
+
+                    # ------------------------------------------------------- #
+
+                    if args.export:
+                        export_dataframe(
+                            dataframe=dataframe,
+                            filename=filename_timestamp(),
+                            directory=directory,
+                            formats=args.export.split(","),
+                        )
+
+                        # Show exported files
+                        tree = Tree(
+                            f":open_file_folder: [bold]{directory}[/]",
+                            guide_style="bold bright_blue",
+                        )
+                        show_exported_files(tree=tree, directory=directory)
+                        console.print(tree)
+
+                    # -------------------------------------------------------- #
+
+                break
+
+        if not arg_is_present:
+            console.log(
+                f"knewkarma {args.mode}: missing one or more expected argument(s)"
+            )
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
+def stage_and_start():
+    """
+    Main entrypoint for the Knew Karma command-line interface.
+    """
+    # ------------------------------------------------------------------------------- #
+
+    parser = create_arg_parser()
+    args: argparse = parser.parse_args()
+
+    start_time: datetime = datetime.now()
+
+    # ------------------------------------------------------------------------------- #
+
+    limit: int = args.limit
+    sort = args.sort
+    timeframe = args.timeframe
+
+    search_query = args.query if hasattr(args, "query") else None
+
+    # ------------------------------------------------------------------------------- #
+
+    user = RedditUser(
+        username=args.username if hasattr(args, "username") else None,
+    )
+    search = RedditSearch()
+    community = RedditCommunity(
+        community=args.community if hasattr(args, "community") else None,
+    )
+    communities = RedditCommunities()
+    post = RedditPost(
+        id=args.id if hasattr(args, "id") else None,
+        community=args.community if hasattr(args, "community") else None,
+    )
+    posts = RedditPosts()
+
+    # ------------------------------------------------------------------------------- #
+
+    function_mapping: dict = {
+        "user": [
+            ("profile", lambda session: user.profile(session=session)),
+            (
+                "posts",
+                lambda session: user.posts(
+                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                ),
+            ),
+            (
+                "comments",
+                lambda session: user.comments(
+                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                ),
+            ),
+            ("overview", lambda session: user.overview(limit=limit, session=session)),
+            (
+                "moderated_communities",
+                lambda session: user.moderated_communities(session=session),
+            ),
+            (
+                "search_posts",
+                lambda session: user.search_posts(
+                    keyword=args.search_posts,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+            (
+                "search_comments",
+                lambda session: user.search_comments(
+                    keyword=args.search_comments,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+            (
+                "top_communities",
+                lambda session: user.top_communities(
+                    top_n=args.top_communities
+                    if hasattr(args, "top_communities")
+                    else None,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+        ],
+        "community": [
+            ("profile", lambda session: community.profile(session=session)),
+            (
+                "posts",
+                lambda session: community.posts(
+                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                ),
+            ),
+            (
+                "search",
+                lambda session: community.search(
+                    keyword=args.search,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+            ("wiki_pages", lambda session: community.wiki_pages(session=session)),
+            (
+                "wiki_page",
+                lambda session: community.wiki_page(
+                    page=args.wiki_page if hasattr(args, "wiki_page") else None,
+                    session=session,
+                ),
+            ),
+        ],
+        "communities": [
+            ("all", lambda session: communities.all(limit=limit, session=session)),
+            (
+                "default",
+                lambda session: communities.default(limit=limit, session=session),
+            ),
+            ("new", lambda session: communities.new(limit=limit, session=session)),
+            (
+                "popular",
+                lambda session: communities.popular(limit=limit, session=session),
+            ),
+        ],
+        "post": [
+            ("profile", lambda session: post.profile(session=session)),
+            (
+                "comments",
+                lambda session: post.comments(
+                    limit=limit,
+                    sort=sort,
+                    session=session,
+                ),
+            ),
+        ],
+        "posts": [
+            ("new", lambda session: posts.new(limit=limit, sort=sort, session=session)),
+            (
+                "front_page",
+                lambda session: posts.front_page(
+                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                ),
+            ),
+            (
+                "listing",
+                lambda session: posts.listing(
+                    listings_name=args.listing,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+        ],
+        "search": [
+            (
+                "users",
+                lambda session: search.users(
+                    query=search_query, limit=limit, session=session
+                ),
+            ),
+            (
+                "communities",
+                lambda session: search.communities(
+                    query=search_query, limit=limit, session=session
+                ),
+            ),
+            (
+                "posts",
+                lambda session: search.posts(
+                    query=search_query,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+        ],
+    }
+
+    # ------------------------------------------------------------------------------- #
+
+    if args.mode:
+        print(
+            """
+┓┏┓         ┓┏┓         
+┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
+┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
         )
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-async def get_updates(session: aiohttp.ClientSession):
-    """
-    Asynchronously gets and compares the current program version with the remote version.
-
-    Assumes version format: major.minor.patch.prefix
-
-    :param session: aiohttp session to use for the request.
-    :type session: aiohttp.ClientSession
-    """
-    # Make a GET request to PyPI to get the project's latest release.
-    response: dict = await get_data(endpoint=GITHUB_RELEASE_ENDPOINT, session=session)
-    release: dict = process_response(response_data=response, valid_key="tag_name")
-
-    if release:
-        remote_version: str = release.get("tag_name")
-        markup_release_notes: str = release.get("body")
-        markdown_release_notes = Markdown(markup=markup_release_notes)
-
-        # Splitting the version strings into components
-        remote_parts: list = remote_version.split(".")
-
-        update_message: str = f"%s update ({remote_version}) available"
-
-        # ------------------------------------------------------------------------- #
-
-        # Check for differences in version parts
-        if remote_parts[0] != Version.major:
-            update_message = update_message % "MAJOR"
-
-        # ------------------------------------------------------------------------- #
-
-        elif remote_parts[1] != Version.minor:
-            update_message = update_message % "MINOR"
-
-        # ------------------------------------------------------------------------- #
-
-        elif remote_parts[2] != Version.patch:
-            update_message = update_message % "PATCH"
-
-        # ------------------------------------------------------------------------- #
-
-        if update_message:
-            console.log(update_message)
-            console.print(markdown_release_notes)
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-async def get_profile(
-    profile_source: str,
-    profile_type: Literal["user", "community"],
-    session: aiohttp.ClientSession,
-) -> dict:
-    """
-    Asynchronously fetches a profile from the specified source.
-
-    :param profile_source: Source to get profile data from.
-    :type profile_source: str
-    :param profile_type: The type of profile that is to be fetched.
-    :type profile_type: str
-    :param session: aiohttp session to use for the request.
-    :return: A dictionary object containing profile data from the specified source.
-    :rtype: dict
-    """
-    # Use a dictionary for direct mapping
-    profile_mapping: dict = {
-        "user": f"{USER_DATA_ENDPOINT}/{profile_source}/about.json",
-        "community": f"{COMMUNITY_DATA_ENDPOINT}/{profile_source}/about.json",
-    }
-
-    # ------------------------------------------------------------------------- #
-
-    # Get the endpoint directly from the dictionary
-    endpoint: str = profile_mapping.get(profile_type, "")
-
-    # ------------------------------------------------------------------------- #
-
-    profile_data = await get_data(endpoint=endpoint, session=session)
-    return process_response(
-        response_data=profile_data.get("data", {}), valid_key="created_utc"
-    )
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-async def _paginate(
-    session: aiohttp.ClientSession,
-    endpoint: str,
-    process_func: callable,
-    limit: int,
-) -> list[dict]:
-    """
-    Asynchronously fetches and processes data in a paginated manner from a specified endpoint until the specified limit
-    of items is reached or there are no more items to fetch. It uses a specified processing function
-    to handle the data from each request.
-    """
-    all_items = []
-    last_item_id = None
-
-    while len(all_items) < limit:
-        # --------------------------------------------------------------------- #
-
-        paginated_endpoint = (
-            f"{endpoint}&after={last_item_id}&count={len(all_items)}"
-            if last_item_id
-            else endpoint
-        )
-
-        response = await get_data(session=session, endpoint=paginated_endpoint)
-        items = response.get("data", {}).get("children", [])
-
-        if not items:
-            break
-
-        # --------------------------------------------------------------------- #
-
-        processed_items = process_func(response_data=items)
-        items_to_limit = limit - len(all_items)
-        all_items.extend(processed_items[:items_to_limit])
-
-        last_item_id = response.get("data").get("after")
-
-        # --------------------------------------------------------------------- #
-
-        if len(all_items) == limit:
-            break
-
-        # --------------------------------------------------------------------- #
-
-    return all_items
-
-
-async def get_posts(
-    session: aiohttp.ClientSession,
-    limit: int,
-    posts_type: Literal[
-        "new_posts",
-        "front_page_posts",
-        "listing_posts",
-        "community_posts",
-        "user_posts",
-        "user_overview",
-        "user_comments",
-    ],
-    posts_source: str = None,
-    timeframe: DATA_TIMEFRAME = "all",
-    sort: DATA_SORT_CRITERION = "all",
-) -> list[dict]:
-    """
-    Asynchronously gets a specified number of posts, with a specified sorting criterion, from the specified source.
-
-    :param session: aiohttp session to use for the request.
-    :type session: aiohttp.ClientSession
-    :param limit: Maximum number of posts to get.
-    :type limit: int
-    :param posts_type: Type of posts to be fetched.
-    :type posts_type: str
-    :param posts_source: Source from where posts will be fetched.
-    :type posts_source: str
-    :param sort: Posts' sort criterion.
-    :type sort: str
-    :param timeframe: Timeframe from which to get posts.
-    :type timeframe: str
-
-    :return: A list of dictionaries, each containing data of a post.
-    :rtype: list[dict]
-    """
-    source_map = {
-        "new_posts": f"{BASE_REDDIT_ENDPOINT}/new.json",
-        "front_page_posts": f"{BASE_REDDIT_ENDPOINT}/.json",
-        "listing_posts": f"{COMMUNITY_DATA_ENDPOINT}/{posts_source}.json?",
-        "community_posts": f"{COMMUNITY_DATA_ENDPOINT}/{posts_source}.json",
-        "user_posts": f"{USER_DATA_ENDPOINT}/{posts_source}/submitted.json",
-        "user_overview": f"{USER_DATA_ENDPOINT}/{posts_source}/overview.json",
-        "user_comments": f"{USER_DATA_ENDPOINT}/{posts_source}/comments.json",
-    }
-
-    # ------------------------------------------------------------------------- #
-
-    endpoint = source_map.get(posts_type, "")
-    if posts_type == "new_posts":
-        endpoint += f"?limit={limit}&sort={sort}&raw_json=1"
+        with console.status(
+            status=f"[bold]Knew Karma[/] (CLI) [bold][cyan]{Version.release}[/][/] started at "
+            f"{start_time.strftime('%a %b [bold][cyan]%d[/][/] [bold][cyan]%Y[/][/], [bold][cyan]%I:%M:%S[/][/] %p')}",
+            spinner="dots2",
+        ):
+            try:
+                start_time: datetime = datetime.now()
+                asyncio.run(
+                    call_functions(args=args, function_mapping=function_mapping)
+                )
+            except KeyboardInterrupt:
+                console.print(
+                    "[yellow]✔[/] User interruption detected ([yellow]Ctrl+C[/])"
+                )
+            finally:
+                elapsed_time = datetime.now() - start_time
+                console.print(
+                    f"[green]✔[/] Done! {elapsed_time.total_seconds():.2f} seconds elapsed."
+                )
     else:
-        endpoint += f"?limit={limit}&sort={sort}&t={timeframe}&raw_json=1"
-
-    # ------------------------------------------------------------------------- #
-
-    posts: list[dict] = await _paginate(
-        session=session,
-        endpoint=endpoint,
-        process_func=process_response,
-        limit=limit,
-    )
-
-    # ------------------------------------------------------------------------- #
-
-    return posts
+        parser.print_usage()
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-async def get_searches(
-    session: aiohttp.ClientSession,
-    search_type: Literal["users", "communities", "posts"],
-    query: str,
-    limit: int,
-    sort: DATA_SORT_CRITERION = "all",
-    timeframe: DATA_TIMEFRAME = "all",
-) -> list[dict]:
-    """
-    Asynchronously searches from a specified results type that match the specified query.
-
-    :param session: Aiohttp session to use for the request.
-    :type session: aiohttp.ClientSession
-    :param search_type: Type of results to get.
-    :type search_type: str
-    :param query: Search query.
-    :type query: str
-    :param limit: Maximum number of results to get.
-    :type limit: int
-    :param sort: Posts' sort criterion.
-    :type sort: str
-    :param timeframe: Timeframe from which to get posts.
-    :type timeframe: str
-    """
-    search_mapping: dict = {
-        "users": f"{USERS_DATA_ENDPOINT}/search.json",
-        "communities": f"{COMMUNITIES_DATA_ENDPOINT}/search.json",
-        "posts": f"{BASE_REDDIT_ENDPOINT}/search.json",
-    }
-
-    # ------------------------------------------------------------------------- #
-
-    endpoint = search_mapping.get(search_type, "")
-    if search_type == "posts":
-        endpoint += f"?q={query}&limit={limit}&sort={sort}&t={timeframe}"
-    else:
-        endpoint += f"?q={query}&limit={limit}"
-
-    # ------------------------------------------------------------------------- #
-
-    search_results: list[dict] = await _paginate(
-        session=session,
-        endpoint=endpoint,
-        process_func=process_response,
-        limit=limit,
-    )
-
-    # ------------------------------------------------------------------------- #
-
-    return search_results
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-async def get_communities(
-    communities_type: Literal["all", "default", "new", "popular"],
-    limit: int,
-    session: aiohttp.ClientSession,
-) -> list[dict]:
-    """
-    Asynchronously gets the specified type of communities.
-
-    :param communities_type: Type of communities to get.
-    :type communities_type: str
-    :param limit: Maximum number of communities to return.
-    :type limit: int
-    :param session: Aiohttp session to use for the request.
-    :type session: aiohttp.ClientSession
-    """
-    communities_mapping: dict = {
-        "all": f"{COMMUNITIES_DATA_ENDPOINT}.json",
-        "default": f"{COMMUNITIES_DATA_ENDPOINT}/default.json",
-        "new": f"{COMMUNITIES_DATA_ENDPOINT}/new.json",
-        "popular": f"{COMMUNITIES_DATA_ENDPOINT}/popular.json",
-    }
-
-    endpoint = communities_mapping.get(communities_type, "")
-    endpoint += f"?limit={limit}"
-
-    # ------------------------------------------------------------------------- #
-
-    communities: list[dict] = await _paginate(
-        session=session,
-        endpoint=endpoint,
-        process_func=process_response,
-        limit=limit,
-    )
-
-    # ------------------------------------------------------------------------- #
-
-    return communities
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
