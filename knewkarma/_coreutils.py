@@ -1,7 +1,10 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+import getpass
+import locale
 import os
+import platform
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Union, Literal
 
 import pandas as pd
@@ -10,6 +13,14 @@ from rich.tree import Tree
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+
+def systeminfo():
+    return {
+        "python": platform.python_version(),
+        "username": getpass.getuser(),
+        "system": f"{platform.node()} {platform.release()} ({platform.system()})",
+    }
 
 
 def pathfinder(directories: list[str]):
@@ -26,21 +37,25 @@ def pathfinder(directories: list[str]):
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def timestamp_to_utc(timestamp: float) -> str:
+def timestamp_to_locale(timestamp: float) -> str:
     """
-    Converts a unix-timestamp to a datetime.utc string.
+    Converts a unix timestamp to a localized datetime string based on the system's locale.
 
     :param timestamp: Unix timestamp to convert.
     :type timestamp: float
-    :return: A datetime.utc string from the converted timestamp.
+    :return: A localized datetime string from the converted timestamp.
     :rtype: str
-
-    Return format
-    -------------
-    dd MM YYYY, hh:mm:ss AM/PM
     """
-    utc_object = datetime.utcfromtimestamp(timestamp)
-    return utc_object.strftime("%d %b %Y, %I:%M:%S %p")
+    # Set the locale to the user's system default
+    locale.setlocale(locale.LC_TIME, "")
+
+    # Convert timestamp to a timezone-aware datetime object in UTC
+    utc_object = datetime.fromtimestamp(timestamp, timezone.utc)
+
+    local_object = utc_object.astimezone()
+
+    # Format the datetime object according to the locale's conventions
+    return local_object.strftime("%x, %X")
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -220,7 +235,7 @@ def export_dataframe(
             )
             file_mapping.get(file_format)()
             console.log(
-                f"{os.path.getsize(filepath)} bytes written to [link file://{filepath}]{filepath}"
+                f"[green]✔[/] {os.path.getsize(filepath)} bytes written to [link file://{filepath}]{filepath}"
             )
         else:
             console.log(f"Unsupported file format: {file_format}")
@@ -228,6 +243,6 @@ def export_dataframe(
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-console = Console(color_system="auto")
+console = Console(color_system="auto", log_time=False)
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

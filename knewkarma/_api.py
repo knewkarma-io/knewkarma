@@ -1,5 +1,7 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
+import asyncio
+from random import randint
 from sys import version as python_version
 from typing import Union, Literal
 
@@ -51,14 +53,15 @@ async def get_data(session: aiohttp.ClientSession, endpoint: str) -> Union[dict,
                 return await response.json()
             else:
                 error_message = await response.json()
-                console.print(f"[red]✘[/] An API error occurred: {error_message}")
+                print(response.headers)
+                console.log(f"[red]✘[/] An API error occurred: {error_message}")
                 return {}
 
     except aiohttp.ClientConnectionError as error:
-        console.print(f"[red]✘[/] An HTTP error occurred: {error}")
+        console.log(f"[red]✘[/] An HTTP error occurred: {error}")
         return {}
     except Exception as error:
-        console.print(f"[red]✘[/] An unknown error occurred: {error}")
+        console.log(f"[red]✘[/] An unknown error occurred: {error}")
         return {}
 
 
@@ -142,7 +145,7 @@ async def get_updates(session: aiohttp.ClientSession):
 
         if update_message:
             console.log(update_message)
-            console.print(markdown_release_notes)
+            console.log(markdown_release_notes)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -195,14 +198,11 @@ async def _paginate(
     """
     Asynchronously fetches and processes data in a paginated manner from a specified endpoint until the specified limit
     of items is reached or there are no more items to fetch. It uses a specified processing function
-    to handle the data from each request.
+    to handle the data from each request, ensuring no duplicates are returned.
     """
     all_items = []
     last_item_id = None
-
     while len(all_items) < limit:
-        # --------------------------------------------------------------------- #
-
         paginated_endpoint = (
             f"{endpoint}&after={last_item_id}&count={len(all_items)}"
             if last_item_id
@@ -230,7 +230,19 @@ async def _paginate(
 
         # --------------------------------------------------------------------- #
 
+        sleep_delay: int = randint(1, 10)
+        console.log(
+            f"[green]✔[/] Fetched {len(all_items)}/{limit} items so far. Resuming in {sleep_delay} seconds...",
+        )
+        await asyncio.sleep(sleep_delay)
+
+        # --------------------------------------------------------------------- #
+
+    console.log(f"[green]✔[/] Successfully fetched {len(all_items)}/{limit} items!")
     return all_items
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
 async def get_posts(

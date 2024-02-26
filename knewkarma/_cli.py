@@ -20,6 +20,7 @@ from ._coreutils import (
     filename_timestamp,
     create_dataframe,
     show_exported_files,
+    systeminfo,
 )
 from .base import RedditSearch, RedditCommunities, RedditPost
 from .docs import (
@@ -381,7 +382,7 @@ async def call_functions(args: argparse.Namespace, function_mapping: dict):
                     dataframe = create_dataframe(data=function_data)
 
                     # Print the DataFrame, excluding the 'raw_data' column if it exists
-                    console.print(dataframe)
+                    console.log(dataframe)
 
                     # ------------------------------------------------------- #
 
@@ -399,7 +400,7 @@ async def call_functions(args: argparse.Namespace, function_mapping: dict):
                             guide_style="bold bright_blue",
                         )
                         show_exported_files(tree=tree, directory=directory)
-                        console.print(tree)
+                        console.log(tree)
 
                     # -------------------------------------------------------- #
 
@@ -604,27 +605,33 @@ def stage_and_start():
     if args.mode:
         print(
             """
-┓┏┓         ┓┏┓         
+┓┏┓         ┓┏┓
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
         )
         with console.status(
-            status=f"[bold]Knew Karma[/] (CLI) [bold][cyan]{Version.release}[/][/] started at "
-            f"{start_time.strftime('%a %b [bold][cyan]%d[/][/] [bold][cyan]%Y[/][/], [bold][cyan]%I:%M:%S[/][/] %p')}",
+            status=f"Working: [bold]Knew Karma (CLI) [cyan]{Version.release}[/][/]",
             spinner="dots2",
         ):
+            # ------------------------------------- #
+            for key, value in systeminfo().items():
+                console.log(f"◉ [bold]{key}[/]: {value}")
+
+            print(f"{'='*40}")
+            # ------------------------------------- #
+
             try:
                 start_time: datetime = datetime.now()
                 asyncio.run(
                     call_functions(args=args, function_mapping=function_mapping)
                 )
             except KeyboardInterrupt:
-                console.print(
+                console.log(
                     "[yellow]✔[/] User interruption detected ([yellow]Ctrl+C[/])"
                 )
             finally:
                 elapsed_time = datetime.now() - start_time
-                console.print(
+                console.log(
                     f"[green]✔[/] Done! {elapsed_time.total_seconds():.2f} seconds elapsed."
                 )
     else:
