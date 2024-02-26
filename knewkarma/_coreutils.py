@@ -16,6 +16,7 @@ from rich.tree import Tree
 
 
 def systeminfo():
+    """Shows some basic system info"""
     return {
         "python": platform.python_version(),
         "username": getpass.getuser(),
@@ -37,7 +38,7 @@ def pathfinder(directories: list[str]):
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def timestamp_to_locale(timestamp: float) -> str:
+def _timestamp_to_locale(timestamp: float) -> str:
     """
     Converts a unix timestamp to a localized datetime string based on the system's locale.
 
@@ -61,15 +62,13 @@ def timestamp_to_locale(timestamp: float) -> str:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def time_since(timestamp: int):
+def _time_since(timestamp: int) -> str:
     """
     Convert a Unix timestamp into a human-readable time difference.
 
     :param timestamp: A Unix timestamp.
     :type timestamp: int
-    :return: A string representing the time difference from now,
-        formatted as '6sec' for seconds, '6min' for minutes, '6hr' for hours, '6d' for days,
-        '6wk' for weeks, '6mo' for months, or '6yr' for years.
+    :return: A string representing the time difference from now.
     :rtype: str
     """
     # Convert the current time to a Unix timestamp
@@ -110,6 +109,33 @@ def time_since(timestamp: int):
         label = "years" if int(count) > 1 else "year"
 
     return "just now" if int(count) == 0 else f"{int(count)} {label} ago"
+
+
+def timestamp_to_readable(
+    timestamp: float, time_format: Literal["concise", "locale"] = "locale"
+) -> str:
+    """
+    Converts a Unix timestamp into a more readable format based on the specified `time_format`.
+    The function supports converting the timestamp into either a localized datetime string or a concise
+    human-readable time difference (e.g., "3 hours ago").
+
+    :param timestamp: The Unix timestamp to be converted.
+    :type timestamp: float
+    :param time_format: Determines the format of the output time. Use "concise" for a human-readable
+                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
+    :type time_format: Literal["concise", "locale"]
+    :return: A string representing the formatted time. The format is determined by the `time_format` parameter.
+    :rtype: str
+    :raises ValueError: If `time_format` is not one of the expected values ("concise" or "locale").
+    """
+    if time_format == "concise":
+        return _time_since(timestamp=int(timestamp))
+    elif time_format == "locale":
+        return _timestamp_to_locale(timestamp=timestamp)
+    else:
+        raise ValueError(
+            f"Unknown time format {time_format}. Expected `concise` or `locale`."
+        )
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
