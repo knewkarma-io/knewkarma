@@ -21,7 +21,7 @@ from ._parsers import (
     parse_posts,
     parse_users,
 )
-from .docs import DATA_TIMEFRAME, DATA_SORT_CRITERION, POSTS_LISTINGS
+from .docs import DATA_TIMEFRAME, DATA_SORT_CRITERION, POSTS_LISTINGS, TIME_FORMAT
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -32,17 +32,18 @@ class RedditUser:
 
     # ------------------------------------------------------------------------------- #
 
-    def __init__(
-        self,
-        username: str,
-    ):
+    def __init__(self, username: str, time_format: TIME_FORMAT = "locale"):
         """
         Initialises a RedditUser instance for getting profile, posts and comments data from the specified user.
 
         :param username: Username of the user to get data from.
         :type username: str
+        :param time_format: Determines the format of the output. Use "concise" for a human-readable
+                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
+        :type time_format: Literal["concise", "locale"]
         """
         self._username = username
+        self._time_format = time_format
 
     # ------------------------------------------------------------------------------- #
 
@@ -58,7 +59,7 @@ class RedditUser:
         raw_user: dict = await get_profile(
             profile_source=self._username, profile_type="user", session=session
         )
-        user_profile: dict = parse_users(raw_user)
+        user_profile: dict = parse_users(raw_user, time_format=self._time_format)
 
         return user_profile
 
@@ -93,7 +94,7 @@ class RedditUser:
             timeframe=timeframe,
             session=session,
         )
-        user_posts: list[dict] = parse_posts(raw_posts)
+        user_posts: list[dict] = parse_posts(raw_posts, time_format=self._time_format)
 
         return user_posts
 
@@ -128,7 +129,9 @@ class RedditUser:
             timeframe=timeframe,
             session=session,
         )
-        user_comments: list[dict] = parse_comments(raw_comments)
+        user_comments: list[dict] = parse_comments(
+            raw_comments, time_format=self._time_format
+        )
 
         return user_comments
 
@@ -151,7 +154,9 @@ class RedditUser:
             limit=limit,
             session=session,
         )
-        user_overview: list[dict] = parse_comments(raw_comments)
+        user_overview: list[dict] = parse_comments(
+            raw_comments, time_format=self._time_format
+        )
 
         return user_overview
 
@@ -198,7 +203,7 @@ class RedditUser:
             ):
                 found_posts.append(post)
 
-        return parse_posts(found_posts)
+        return parse_posts(found_posts, time_format=self._time_format)
 
     # ------------------------------------------------------------------------------- #
 
@@ -240,7 +245,7 @@ class RedditUser:
             if pattern.search(comment.get("data").get("body")):
                 found_comments.append(comment)
 
-        return parse_comments(found_comments)
+        return parse_comments(found_comments, time_format=self._time_format)
 
     # ------------------------------------------------------------------------------- #
 
@@ -258,7 +263,9 @@ class RedditUser:
             session=session,
         )
         preview_communities: list[dict] = parse_communities(
-            raw_preview_communities.get("data"), is_preview=True
+            raw_preview_communities.get("data"),
+            is_preview=True,
+            time_format=self._time_format,
         )
 
         return preview_communities
@@ -317,10 +324,14 @@ class RedditSearch:
     """Represents Readit search functionality and provides methods for getting search results from different entities"""
 
     # ------------------------------------------------------------------------------- #
+    def __init__(self, time_format: TIME_FORMAT = "locale"):
+        self._time_format = time_format
 
-    @staticmethod
     async def users(
-        query: str, limit: int, session: aiohttp.ClientSession
+        self,
+        query: str,
+        limit: int,
+        session: aiohttp.ClientSession,
     ) -> list[dict]:
         """
         Search users.
@@ -335,15 +346,16 @@ class RedditSearch:
         search_users: list = await get_searches(
             query=query, search_type="users", limit=limit, session=session
         )
-        users_results: list[dict] = parse_users(search_users)
+        users_results: list[dict] = parse_users(
+            search_users, time_format=self._time_format
+        )
 
         return users_results
 
     # ------------------------------------------------------------------------------- #
 
-    @staticmethod
     async def communities(
-        query: str, limit: int, session: aiohttp.ClientSession
+        self, query: str, limit: int, session: aiohttp.ClientSession
     ) -> list[dict]:
         """
         Search communities.
@@ -358,14 +370,16 @@ class RedditSearch:
         search_communities: list = await get_searches(
             query=query, search_type="communities", limit=limit, session=session
         )
-        communities_results: list[dict] = parse_communities(search_communities)
+        communities_results: list[dict] = parse_communities(
+            search_communities, time_format=self._time_format
+        )
 
         return communities_results
 
     # ------------------------------------------------------------------------------- #
 
-    @staticmethod
     async def posts(
+        self,
         query: str,
         limit: int,
         session: aiohttp.ClientSession,
@@ -396,7 +410,9 @@ class RedditSearch:
             timeframe=timeframe,
             session=session,
         )
-        posts_results: list[dict] = parse_posts(search_posts)
+        posts_results: list[dict] = parse_posts(
+            search_posts, time_format=self._time_format
+        )
 
         return posts_results
 
@@ -406,17 +422,18 @@ class RedditCommunity:
 
     # ------------------------------------------------------------------------------- #
 
-    def __init__(
-        self,
-        community: str,
-    ):
+    def __init__(self, community: str, time_format: TIME_FORMAT = "locale"):
         """
         Initialises a RedditCommunity instance for getting profile and posts from the specified community.
 
         :param community: Name of the community to get data from.
         :type community: str
+        :param time_format: Determines the format of the output. Use "concise" for a human-readable
+                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
+        :type time_format: Literal["concise", "locale"]
         """
         self._community = community
+        self._time_format = time_format
 
     # ------------------------------------------------------------------------------- #
 
@@ -434,7 +451,9 @@ class RedditCommunity:
             profile_source=self._community,
             session=session,
         )
-        community_profile: dict = parse_communities(raw_community)
+        community_profile: dict = parse_communities(
+            raw_community, time_format=self._time_format
+        )
 
         return community_profile
 
@@ -473,7 +492,9 @@ class RedditCommunity:
             endpoint=f"{COMMUNITY_DATA_ENDPOINT}/{self._community}/wiki/{page}.json",
             session=session,
         )
-        wiki_page: dict = parse_community_wiki_page(wiki_page=raw_page)
+        wiki_page: dict = parse_community_wiki_page(
+            wiki_page=raw_page, time_format=self._time_format
+        )
 
         return wiki_page
 
@@ -508,7 +529,9 @@ class RedditCommunity:
             timeframe=timeframe,
             session=session,
         )
-        community_posts: list[dict] = parse_posts(raw_posts)
+        community_posts: list[dict] = parse_posts(
+            raw_posts, time_format=self._time_format
+        )
 
         return community_posts
 
@@ -555,7 +578,7 @@ class RedditCommunity:
             ):
                 found_posts.append(post)
 
-        return parse_posts(found_posts)
+        return parse_posts(found_posts, time_format=self._time_format)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -565,9 +588,10 @@ class RedditCommunities:
     """Represents Reddit communities and provides methods for getting related data."""
 
     # ------------------------------------------------------------------------------- #
+    def __init__(self, time_format: TIME_FORMAT = "locale"):
+        self._time_format = time_format
 
-    @staticmethod
-    async def all(limit: int, session: aiohttp.ClientSession) -> list[dict]:
+    async def all(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
         """
         Return all communities.
 
@@ -586,15 +610,14 @@ class RedditCommunities:
             communities_type="all", limit=limit, session=session
         )
         all_communities: list[dict] = parse_communities(
-            raw_communities, is_preview=True
+            raw_communities, is_preview=True, time_format=self._time_format
         )
 
         return all_communities
 
     # ------------------------------------------------------------------------------- #
 
-    @staticmethod
-    async def default(limit: int, session: aiohttp.ClientSession) -> list[dict]:
+    async def default(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
         """
         Return default communities.
 
@@ -609,15 +632,14 @@ class RedditCommunities:
             communities_type="default", limit=limit, session=session
         )
         default_communities: list[dict] = parse_communities(
-            raw_communities, is_preview=True
+            raw_communities, is_preview=True, time_format=self._time_format
         )
 
         return default_communities
 
     # ------------------------------------------------------------------------------- #
 
-    @staticmethod
-    async def new(limit: int, session: aiohttp.ClientSession) -> list[dict]:
+    async def new(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
         """
         Return new communities.
 
@@ -632,15 +654,14 @@ class RedditCommunities:
             communities_type="new", limit=limit, session=session
         )
         new_communities: list[dict] = parse_communities(
-            raw_communities, is_preview=True
+            raw_communities, is_preview=True, time_format=self._time_format
         )
 
         return new_communities
 
     # ------------------------------------------------------------------------------- #
 
-    @staticmethod
-    async def popular(limit: int, session: aiohttp.ClientSession) -> list[dict]:
+    async def popular(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
         """
         Return popular communities.
 
@@ -655,7 +676,7 @@ class RedditCommunities:
             communities_type="popular", limit=limit, session=session
         )
         popular_communities: list[dict] = parse_communities(
-            raw_communities, is_preview=True
+            raw_communities, is_preview=True, time_format=self._time_format
         )
 
         return popular_communities
@@ -667,9 +688,10 @@ class RedditCommunities:
 class RedditPost:
     """Represents a Reddit post and provides method(s) for getting data from the specified post."""
 
-    def __init__(self, id: str, community: str):
+    def __init__(self, id: str, community: str, time_format: TIME_FORMAT = "locale"):
         self._id = id
         self._community = community
+        self._time_format = time_format
 
     async def profile(self, session: aiohttp.ClientSession) -> dict:
         post_data: dict = await get_data(
@@ -681,7 +703,7 @@ class RedditPost:
             post_data[0].get("data", {}).get("children", [])[0].get("data", {})
         )
         if raw_post:
-            return parse_posts(data=raw_post)
+            return parse_posts(data=raw_post, time_format=self._time_format)
 
     async def comments(
         self,
@@ -697,7 +719,7 @@ class RedditPost:
         raw_comments: list = post_data[1].get("data", {}).get("children", [])
 
         if raw_comments:
-            return parse_comments(comments=raw_comments)
+            return parse_comments(comments=raw_comments, time_format=self._time_format)
 
 
 class RedditPosts:
@@ -705,8 +727,11 @@ class RedditPosts:
 
     # ------------------------------------------------------------------------------- #
 
-    @staticmethod
+    def __init__(self, time_format: TIME_FORMAT = "locale"):
+        self._time_format = time_format
+
     async def listing(
+        self,
         session: aiohttp.ClientSession,
         listings_name: POSTS_LISTINGS,
         limit: int,
@@ -738,12 +763,12 @@ class RedditPosts:
             session=session,
         )
         if listing_posts:
-            return parse_posts(listing_posts)
+            return parse_posts(listing_posts, time_format=self._time_format)
 
     # ------------------------------------------------------------------------------- #
 
-    @staticmethod
     async def new(
+        self,
         session: aiohttp.ClientSession,
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
@@ -766,14 +791,14 @@ class RedditPosts:
             sort=sort,
             session=session,
         )
-        new_posts: list[dict] = parse_posts(raw_posts)
+        new_posts: list[dict] = parse_posts(raw_posts, time_format=self._time_format)
 
         return new_posts
 
     # ------------------------------------------------------------------------------- #
 
-    @staticmethod
     async def front_page(
+        self,
         session: aiohttp.ClientSession,
         limit: int,
         sort: DATA_SORT_CRITERION = "all",
@@ -800,7 +825,7 @@ class RedditPosts:
             timeframe=timeframe,
             session=session,
         )
-        front_page_posts: list = parse_posts(raw_posts)
+        front_page_posts: list = parse_posts(raw_posts, time_format=self._time_format)
 
         return front_page_posts
 

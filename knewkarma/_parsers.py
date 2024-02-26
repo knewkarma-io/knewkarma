@@ -2,13 +2,16 @@
 
 from typing import Union
 
-from ._coreutils import timestamp_to_locale
+from ._coreutils import timestamp_to_readable
+from .docs import TIME_FORMAT
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def parse_users(data: Union[list[dict], dict]) -> Union[list[dict], dict]:
+def parse_users(
+    data: Union[list[dict], dict], time_format: TIME_FORMAT
+) -> Union[list[dict], dict]:
     def build_user(user: dict) -> dict:
         return {
             "name": user.get("name"),
@@ -27,7 +30,9 @@ def parse_users(data: Union[list[dict], dict]) -> Union[list[dict], dict]:
             "awardee_karma": user.get("awardee_karma"),
             "total_karma": user.get("total_karma"),
             "community": user.get("subreddit"),
-            "created": timestamp_to_locale(timestamp=user.get("created"))
+            "created": timestamp_to_readable(
+                timestamp=user.get("created"), time_format=time_format
+            )
             if user.get("created")
             else "NaN",
         }
@@ -47,7 +52,9 @@ def parse_users(data: Union[list[dict], dict]) -> Union[list[dict], dict]:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def parse_posts(data: Union[dict, list]) -> Union[list[dict], dict]:
+def parse_posts(
+    data: Union[dict, list], time_format: TIME_FORMAT
+) -> Union[list[dict], dict]:
     def build_post(post: dict) -> dict:
         return {
             "author": post.get("author"),
@@ -70,11 +77,15 @@ def parse_posts(data: Union[dict, list]) -> Union[list[dict], dict]:
             "is_archived": post.get("archived"),
             "domain": post.get("domain"),
             "score": post.get("score"),
-            "edited": timestamp_to_locale(timestamp=post.get("edited"))
+            "edited": timestamp_to_readable(
+                timestamp=post.get("edited"), time_format=time_format
+            )
             if post.get("edited")
             else False,
             "comments": post.get("num_comments"),
-            "created": timestamp_to_locale(timestamp=post.get("created"))
+            "created": timestamp_to_readable(
+                timestamp=post.get("created"), time_format=time_format
+            )
             if post.get("created")
             else "NaN",
         }
@@ -89,7 +100,7 @@ def parse_posts(data: Union[dict, list]) -> Union[list[dict], dict]:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def parse_comments(comments: list[dict]) -> list[dict]:
+def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]:
     if len(comments) != 0:
         comments_list: list = []
         for comment in comments:
@@ -114,7 +125,9 @@ def parse_comments(comments: list[dict]) -> list[dict]:
                     "is_stickied": comment_data.get("stickied"),
                     "is_locked": comment_data.get("locked"),
                     "is_archived": comment_data.get("archived"),
-                    "created": timestamp_to_locale(timestamp=comment.get("created"))
+                    "created": timestamp_to_readable(
+                        timestamp=comment.get("created"), time_format=time_format
+                    )
                     if comment.get("created")
                     else "NaN",
                 }
@@ -127,7 +140,7 @@ def parse_comments(comments: list[dict]) -> list[dict]:
 
 
 def parse_communities(
-    data: Union[list, dict], is_preview: bool = False
+    data: Union[list, dict], time_format, is_preview: bool = False
 ) -> Union[list[dict], dict]:
     def build_community(
         community: dict,
@@ -141,7 +154,9 @@ def parse_communities(
                 "subscribers": community.get("subscribers"),
                 "whitelist_status": community.get("whitelist_status"),
                 "url": community.get("url"),
-                "created": timestamp_to_locale(timestamp=community.get("created")),
+                "created": timestamp_to_readable(
+                    timestamp=community.get("created"), time_format=time_format
+                ),
             }
         else:
             community_obj = {
@@ -157,7 +172,9 @@ def parse_communities(
                 "language": community.get("lang"),
                 "whitelist_status": community.get("whitelist_status"),
                 "url": community.get("url"),
-                "created": timestamp_to_locale(timestamp=community.get("created"))
+                "created": timestamp_to_readable(
+                    timestamp=community.get("created"), time_format=time_format
+                )
                 if community.get("created")
                 else "NaN",
             }
@@ -181,14 +198,14 @@ def parse_communities(
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
-def parse_community_wiki_page(wiki_page: dict) -> dict:
+def parse_community_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
     if "revision_id" in wiki_page:
         page_data: dict = wiki_page.get("data")
         user: dict = page_data.get("revision_by").get("data")
 
         return {
             "revision_id": page_data.get("revision_id"),
-            "revision_date": timestamp_to_locale(
+            "revision_date": timestamp_to_readable(
                 timestamp=page_data.get("revision_date")
             ),
             "content_markdown": page_data.get("content_md"),
@@ -209,7 +226,9 @@ def parse_community_wiki_page(wiki_page: dict) -> dict:
                 "awardee_karma": user.get("awardee_karma"),
                 "total_karma": user.get("total_karma"),
                 "community": user.get("subreddit"),
-                "created": timestamp_to_locale(timestamp=user.get("created")),
+                "created": timestamp_to_readable(
+                    timestamp=user.get("created"), time_format=time_format
+                ),
             },
         }
 

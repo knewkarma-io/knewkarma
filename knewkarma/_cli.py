@@ -16,11 +16,11 @@ from ._api import get_updates
 from ._coreutils import (
     console,
     pathfinder,
+    systeminfo,
     export_dataframe,
     filename_timestamp,
     create_dataframe,
     show_exported_files,
-    systeminfo,
 )
 from .base import RedditSearch, RedditCommunities, RedditPost
 from .docs import (
@@ -85,11 +85,10 @@ def create_arg_parser() -> argparse.ArgumentParser:
         help="[[bold][green]bulk[/][/]] data output limit (default: %(default)s)",
     )
     main_parser.add_argument(
-        "-sleep",
-        type=int,
-        default=20,
-        metavar="SECONDS",
-        help="[[bold][green]bulk data[/][/]] sleep delay (seconds) after each request (default: %(default)s)",
+        "--time-format",
+        default="locale",
+        help="determines the format of the output time",
+        choices=["concise", "locale"],
     )
     main_parser.add_argument(
         "-e",
@@ -431,6 +430,7 @@ def stage_and_start():
     limit: int = args.limit
     sort = args.sort
     timeframe = args.timeframe
+    time_format = args.time_format
 
     search_query = args.query if hasattr(args, "query") else None
 
@@ -438,17 +438,20 @@ def stage_and_start():
 
     user = RedditUser(
         username=args.username if hasattr(args, "username") else None,
+        time_format=time_format,
     )
-    search = RedditSearch()
+    search = RedditSearch(time_format=time_format)
     community = RedditCommunity(
         community=args.community if hasattr(args, "community") else None,
+        time_format=time_format,
     )
-    communities = RedditCommunities()
+    communities = RedditCommunities(time_format=time_format)
     post = RedditPost(
         id=args.id if hasattr(args, "id") else None,
         community=args.community if hasattr(args, "community") else None,
+        time_format=time_format,
     )
-    posts = RedditPosts()
+    posts = RedditPosts(time_format=time_format)
 
     # ------------------------------------------------------------------------------- #
 

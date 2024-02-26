@@ -228,6 +228,7 @@ DATA_SORT_CRITERION = Literal[
 ]
 POSTS_LISTINGS = Literal["best", "controversial", "popular", "rising"]
 DATA_TIMEFRAME = Literal["hour", "day", "week", "month", "year"]
+TIME_FORMAT = Literal["concise", "locale"]
 
 # Construct path to the program's directory
 PROGRAM_DIRECTORY: str = os.path.expanduser(os.path.join("~", "knewkarma-data"))
