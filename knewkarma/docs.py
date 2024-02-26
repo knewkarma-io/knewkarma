@@ -11,7 +11,7 @@ from typing import Literal
 class Version:
     major: str = "4"
     minor: str = "0"
-    patch: str = "0rc1"
+    patch: str = "0rc2"
     full: str = f"{major}.{minor}.{patch}"
     release: str = f"{major}.{minor}"
 
