@@ -2,7 +2,7 @@
 
 from typing import Union
 
-from ._coreutils import timestamp_to_utc
+from ._coreutils import timestamp_to_locale
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -27,7 +27,7 @@ def parse_users(data: Union[list[dict], dict]) -> Union[list[dict], dict]:
             "awardee_karma": user.get("awardee_karma"),
             "total_karma": user.get("total_karma"),
             "community": user.get("subreddit"),
-            "created": timestamp_to_utc(timestamp=user.get("created"))
+            "created": timestamp_to_locale(timestamp=user.get("created"))
             if user.get("created")
             else "NaN",
         }
@@ -70,11 +70,11 @@ def parse_posts(data: Union[dict, list]) -> Union[list[dict], dict]:
             "is_archived": post.get("archived"),
             "domain": post.get("domain"),
             "score": post.get("score"),
-            "edited": timestamp_to_utc(timestamp=post.get("edited"))
+            "edited": timestamp_to_locale(timestamp=post.get("edited"))
             if post.get("edited")
             else False,
             "comments": post.get("num_comments"),
-            "created": timestamp_to_utc(timestamp=post.get("created"))
+            "created": timestamp_to_locale(timestamp=post.get("created"))
             if post.get("created")
             else "NaN",
         }
@@ -114,7 +114,7 @@ def parse_comments(comments: list[dict]) -> list[dict]:
                     "is_stickied": comment_data.get("stickied"),
                     "is_locked": comment_data.get("locked"),
                     "is_archived": comment_data.get("archived"),
-                    "created": timestamp_to_utc(timestamp=comment.get("created"))
+                    "created": timestamp_to_locale(timestamp=comment.get("created"))
                     if comment.get("created")
                     else "NaN",
                 }
@@ -141,7 +141,7 @@ def parse_communities(
                 "subscribers": community.get("subscribers"),
                 "whitelist_status": community.get("whitelist_status"),
                 "url": community.get("url"),
-                "created": timestamp_to_utc(timestamp=community.get("created")),
+                "created": timestamp_to_locale(timestamp=community.get("created")),
             }
         else:
             community_obj = {
@@ -157,7 +157,7 @@ def parse_communities(
                 "language": community.get("lang"),
                 "whitelist_status": community.get("whitelist_status"),
                 "url": community.get("url"),
-                "created": timestamp_to_utc(timestamp=community.get("created"))
+                "created": timestamp_to_locale(timestamp=community.get("created"))
                 if community.get("created")
                 else "NaN",
             }
@@ -188,7 +188,9 @@ def parse_community_wiki_page(wiki_page: dict) -> dict:
 
         return {
             "revision_id": page_data.get("revision_id"),
-            "revision_date": timestamp_to_utc(timestamp=page_data.get("revision_date")),
+            "revision_date": timestamp_to_locale(
+                timestamp=page_data.get("revision_date")
+            ),
             "content_markdown": page_data.get("content_md"),
             "revised_by": {
                 "name": user.get("name"),
@@ -207,7 +209,7 @@ def parse_community_wiki_page(wiki_page: dict) -> dict:
                 "awardee_karma": user.get("awardee_karma"),
                 "total_karma": user.get("total_karma"),
                 "community": user.get("subreddit"),
-                "created": timestamp_to_utc(timestamp=user.get("created")),
+                "created": timestamp_to_locale(timestamp=user.get("created")),
             },
         }
 
