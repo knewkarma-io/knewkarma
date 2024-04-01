@@ -4,9 +4,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "knewkarma"
-version = "4.0.0rc4"
-description = "Reddit Data Analysis Toolkit."
-authors = ["Richard Mwewa <rly0nheart@duck.com>"]
+version = "4.0.0"
+description = "A Reddit Data Analysis Toolkit"
+authors = ["Richard Mwewa <rly0nheart@gagpasta.com>"]
 readme = "README.md"
 license = "MIT License"
 homepage = "https://pypi.org/project/knewkarma"

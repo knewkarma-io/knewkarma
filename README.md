@@ -4,7 +4,7 @@
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/_rly0nheart)
 
 **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
-functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, an
+functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** snap package, an
 **Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical
 User
 Interface (GUI)** for Windows machines, making it adaptable for various user preferences.
@@ -22,23 +22,23 @@ Knew Karma offers a variety of features for accessing and analysing Reddit data,
     - *Overview* — Retrieves user's most recent comment activity.
     - *Search Posts* — Returns a user's posts that contain the specified keyword.
     - *Search Comments* — Returns a user's comments that contain the specified keyword.
-    - *Top *n* Communities* — Identifies top communities based on user activity.
-    - *Moderated Communities* — Lists communities moderated by the user.
+    - *Top *n* Communities* — Identifies top subreddits based on user activity.
+    - *Moderated Communities* — Lists subreddits moderated by the user.
 
 
 - **Community (Subreddit) Data**
-    - *Profile* — Retrieves community profile information.
-    - *Posts* — Retrieves posts from a specified community.
-    - *Search Posts* — Returns a community's posts that contain the specified keyword.
-    - *Wiki Pages* — Lists wiki pages in a community.
+    - *Profile* — Retrieves subreddit profile information.
+    - *Posts* — Retrieves posts from a specified subreddit.
+    - *Search Posts* — Returns a subreddit's posts that contain the specified keyword.
+    - *Wiki Pages* — Lists wiki pages in a subreddit.
     - *Wiki Page Data* — Retrieves content from specific wiki pages.
 
 
 - **Communities (Subreddits) Data**
-    - *All* — Retrieves all communities.
-    - *Default* — Retrieves default communities.
-    - *New* — Retrieves new communities.
-    - *Popular* — Retrieves popular communities.
+    - *All* — Retrieves all subreddits.
+    - *Default* — Retrieves default subreddits.
+    - *New* — Retrieves new subreddits.
+    - *Popular* — Retrieves popular subreddits.
 
 
 - **Posts Data**
@@ -49,7 +49,7 @@ Knew Karma offers a variety of features for accessing and analysing Reddit data,
 
 - **Search & Discovery**
     - *Users* — Searches for users.
-    - *Communities* — Searches for communities.
+    - *Communities* — Searches for subreddits.
     - *Posts* — Searches for posts.
 
 # Documentation

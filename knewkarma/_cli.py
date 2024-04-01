@@ -32,11 +32,11 @@ def create_parser() -> argparse.ArgumentParser:
     :rtype: argparse.ArgumentParser
     """
     main_parser = argparse.ArgumentParser(
-        description=Markdown(Docs.description, style="argparse.text"),
-        epilog=Markdown(Docs.license, style="argparse.text"),
+        description=Markdown(Docs.about, style="argparse.text"),
+        epilog=Markdown(Docs.description),
         formatter_class=RichHelpFormatter,
     )
-    subparsers = main_parser.add_subparsers(dest="mode", help="operation mode")
+    subparsers = main_parser.add_subparsers(dest="module", help="module")
     main_parser.add_argument(
         "-t",
         "--timeframe",
@@ -58,7 +58,6 @@ def create_parser() -> argparse.ArgumentParser:
         "--limit",
         type=int,
         default=100,
-        metavar="NUMBER",
         help="[[bold][green]bulk[/][/]] data output limit (default: %(default)s)",
     )
     main_parser.add_argument(
@@ -71,7 +70,6 @@ def create_parser() -> argparse.ArgumentParser:
         "-e",
         "--export",
         type=str,
-        metavar="FILETYPES",
         help="a comma-separated list of file types to export the output to (supported: [green]csv,html,json,xml[/])",
     )
     main_parser.add_argument(
@@ -89,9 +87,71 @@ def create_parser() -> argparse.ArgumentParser:
         action="version",
     )
 
+    post_parser = subparsers.add_parser(
+        "post",
+        help="post module",
+        description=Markdown("# Post", style="argparse.text"),
+        epilog=Markdown(Docs.examples["post"]),
+        formatter_class=RichHelpFormatter,
+    )
+
+    post_parser.add_argument("id", help="post id", type=str)
+    post_parser.add_argument("subreddit", help="post source subreddit", type=str)
+    post_parser.add_argument(
+        "-p", "--profile", help="get post 'profile' data", action="store_true"
+    )
+    post_parser.add_argument(
+        "-c", "--comments", help="get post comments", action="store_true"
+    )
+
+    posts_parser = subparsers.add_parser(
+        "posts",
+        help="posts module",
+        description=Markdown("# Posts", style="argparse.text"),
+        epilog=Markdown(Docs.examples["posts"]),
+        formatter_class=RichHelpFormatter,
+    )
+    posts_parser.add_argument(
+        "-n",
+        "--new",
+        help="get new posts",
+        action="store_true",
+    )
+    posts_parser.add_argument(
+        "-f",
+        "--front-page",
+        help="get posts from the reddit front-page",
+        action="store_true",
+    )
+    posts_parser.add_argument(
+        "-l",
+        "--listing",
+        default="all",
+        help="get posts from a specified listing",
+        choices=list(get_args(DATA_LISTING)),
+    )
+
+    search_parser = subparsers.add_parser(
+        "search",
+        help="search module",
+        description=Markdown("# Search", style="argparse.text"),
+        epilog=Markdown(Docs.examples["search"]),
+        formatter_class=RichHelpFormatter,
+    )
+    search_parser.add_argument("query", help="search query")
+    search_parser.add_argument(
+        "-u", "--users", help="search users", action="store_true"
+    )
+    search_parser.add_argument(
+        "-p", "--posts", help="search posts", action="store_true"
+    )
+    search_parser.add_argument(
+        "-c", "--subreddits", help="search subreddits", action="store_true"
+    )
+
     subreddit_parser = subparsers.add_parser(
         "subreddit",
-        help="subreddit operations",
+        help="subreddit module",
         description=Markdown(
             "# Subreddit",
             style="argparse.text",
@@ -139,7 +199,7 @@ def create_parser() -> argparse.ArgumentParser:
 
     subreddits_parser = subparsers.add_parser(
         "subreddits",
-        help="subreddits operations",
+        help="subreddits module",
         description=Markdown(
             "# Subreddits",
             style="argparse.text",
@@ -172,71 +232,9 @@ def create_parser() -> argparse.ArgumentParser:
         action="store_true",
     )
 
-    post_parser = subparsers.add_parser(
-        "post",
-        help="post operations",
-        description=Markdown("# Post", style="argparse.text"),
-        epilog=Markdown(Docs.examples["post"]),
-        formatter_class=RichHelpFormatter,
-    )
-
-    post_parser.add_argument("id", help="post id", type=str)
-    post_parser.add_argument("subreddit", help="post source subreddit", type=str)
-    post_parser.add_argument(
-        "-p", "--profile", help="get post 'profile' data", action="store_true"
-    )
-    post_parser.add_argument(
-        "-c", "--comments", help="get post comments", action="store_true"
-    )
-
-    posts_parser = subparsers.add_parser(
-        "posts",
-        help="posts operations",
-        description=Markdown("# Posts", style="argparse.text"),
-        epilog=Markdown(Docs.examples["posts"]),
-        formatter_class=RichHelpFormatter,
-    )
-    posts_parser.add_argument(
-        "-n",
-        "--new",
-        help="get new posts",
-        action="store_true",
-    )
-    posts_parser.add_argument(
-        "-f",
-        "--front-page",
-        help="get posts from the reddit front-page",
-        action="store_true",
-    )
-    posts_parser.add_argument(
-        "-l",
-        "--listing",
-        default="all",
-        help="get posts from a specified listing",
-        choices=list(get_args(DATA_LISTING)),
-    )
-
-    search_parser = subparsers.add_parser(
-        "search",
-        help="search operations",
-        description=Markdown("# Search", style="argparse.text"),
-        epilog=Markdown(Docs.examples["search"]),
-        formatter_class=RichHelpFormatter,
-    )
-    search_parser.add_argument("query", help="search query")
-    search_parser.add_argument(
-        "-u", "--users", help="search users", action="store_true"
-    )
-    search_parser.add_argument(
-        "-p", "--posts", help="search posts", action="store_true"
-    )
-    search_parser.add_argument(
-        "-c", "--subreddits", help="search subreddits", action="store_true"
-    )
-
     user_parser = subparsers.add_parser(
         "user",
-        help="user operations",
+        help="user module",
         description=Markdown("# User", style="argparse.text"),
         epilog=Markdown(Docs.examples["user"]),
         formatter_class=RichHelpFormatter,
@@ -316,7 +314,7 @@ async def call_functions(args: argparse.Namespace, function_mapping: dict):
         if args.updates:
             await Api().get_updates(session=request_session)
 
-        mode_action = function_mapping.get(args.mode)
+        mode_action = function_mapping.get(args.module)
         directory: str = ""
         for action, function in mode_action:
             arg_is_present: bool = False
@@ -328,7 +326,7 @@ async def call_functions(args: argparse.Namespace, function_mapping: dict):
                         os.path.join("~", "knewkarma-data")
                     )
                     # Create path to main directory in which target data files will be exported
-                    directory = os.path.join(output_dir, args.mode, action)
+                    directory = os.path.join(output_dir, args.module, action)
 
                     # Create file directories for supported data file types
                     pathfinder(
@@ -367,7 +365,7 @@ async def call_functions(args: argparse.Namespace, function_mapping: dict):
 
         if not arg_is_present:
             console.log(
-                f"knewkarma {args.mode}: missing one or more expected argument(s)"
+                f"knewkarma {args.module}: missing one or more expected argument(s)"
             )
 
 
@@ -552,7 +550,7 @@ def stage_and_start():
         ],
     }
 
-    if args.mode:
+    if args.module:
         print(
             """
 ┓┏┓         ┓┏┓

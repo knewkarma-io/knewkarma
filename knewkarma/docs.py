@@ -1,47 +1,26 @@
-from datetime import date
-
-from .version import Version
-
-
 class Docs:
     """
     Container for documentation-related data for Knew Karma.
 
     Attributes:
           copyright (str): Copyright notice for the current year, including the author's details.
-          license (str): The MIT license under which the Knew Karma software is distributed.
           description (str): A brief description of Knew Karma as a CLI tool for Reddit data analysis.
           examples (dict): Usage examples for different operations within Knew Karma.
     """
 
-    copyright: str = f"© Copyright 2023-{date.today().year} [Richard Mwewa](https://rly0nheart.github.io)"
+    author: str = "[Richard Mwewa](https://rly0nheart.github.io)"
+    copyright: str = (
+        "© Copyright 2023-{date.today().year} {author}. All Rights Reserved"
+    )
 
-    license: str = f"""# License
-MIT License
-
-{copyright}
-    
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of Knew Karma and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-    
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-    
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+    about: str = f"**Knew Karma**: *Reddit Data Analysis Toolkit.* — by {author}"
+    description: str = """
+**Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
+functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, an
+**Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical
+User
+Interface (GUI)** for Windows machines, making it adaptable for various user preferences.
 """
-    description: str = f"""
-# Knew Karma {Version.release}
-> **Reddit Data Analysis Toolkit.**"""
 
     examples: dict = {
         "user": """
