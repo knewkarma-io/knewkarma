@@ -13,33 +13,36 @@ description: |
   
   Knew Karma offers a variety of features for accessing and analysing Reddit data, including:
   
-  - User Data
+  - User
       - *Profile* — Retrieves user profile information.
       - *Posts* — Retrieves user posts.
       - *Comments* — Retrieves user comments.
       - *Overview* — Retrieves user's most recent comment activity.
       - *Search Posts* — Returns a user's posts that contain the specified keyword.
       - *Search Comments* — Returns a user's comments that contain the specified keyword.
-      - *Top *n* Communities* — Identifies top subreddits based on user activity.
-      - *Moderated Communities* — Lists subreddits moderated by the user.
+      - *Top *n* Subreddits* — Identifies top subreddits based on user activity.
+      - *Moderated Subreddits* — Lists subreddits moderated by the user.
   
   
-  - Community (Subreddit) Data
+  - Subreddit
       - *Profile* — Retrieves subreddit profile information.
       - *Posts* — Retrieves posts from a specified subreddit.
       - *Search Posts* — Returns a subreddit's posts that contain the specified keyword.
       - *Wiki Pages* — Lists wiki pages in a subreddit.
-      - *Wiki Page Data* — Retrieves content from specific wiki pages.
+      - *Wiki Page* — Retrieves content from specific wiki pages.
   
   
-  - Communities (Subreddits) Data
+  - Subreddits
       - *All* — Retrieves all subreddits.
       - *Default* — Retrieves default subreddits.
       - *New* — Retrieves new subreddits.
       - *Popular* — Retrieves popular subreddits.
   
-  
-  - Posts Data
+  - Post
+    - Data — Retrieves an individual post's data.
+    - Comments — Retrieves an individual post's comments.
+
+  - Posts
       - *New* — Retrieves new posts.
       - *Reddit Front-Page* — Retrieves front-page posts.
       - *Listing* — Retrieves posts from specified Reddit listings.
@@ -47,7 +50,7 @@ description: |
   
   - Search & Discovery
       - *Users* — Searches for users.
-      - *Communities* — Searches for subreddits.
+      - *Subreddits* — Searches for subreddits.
       - *Posts* — Searches for posts.
 
 version: 4.0.0
