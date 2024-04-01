@@ -23,9 +23,9 @@ Partial Class AboutWindow
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(AboutWindow))
+        Dim resources As ComponentModel.ComponentResourceManager = New ComponentModel.ComponentResourceManager(GetType(AboutWindow))
         LabelProgramFirstName = New Label()
-        VersionStatus = New Label()
+        Version = New Label()
         ToolTipMainAboutBox = New ToolTip(components)
         ButtonViewLicense = New Button()
         ButtonClose = New Button()
@@ -34,31 +34,29 @@ Partial Class AboutWindow
         Copyright = New LinkLabel()
         PictureBox1 = New PictureBox()
         ButtonGetUpdates = New Button()
-        Version = New Label()
-        Description = New Label()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' LabelProgramFirstName
         ' 
         LabelProgramFirstName.AutoSize = True
-        LabelProgramFirstName.Font = New Font("Segoe UI Variable Display", 18F, FontStyle.Bold Or FontStyle.Underline, GraphicsUnit.Point)
+        LabelProgramFirstName.Font = New Font("Segoe UI Variable Display Semib", 9.75F, FontStyle.Bold, GraphicsUnit.Point)
         LabelProgramFirstName.ForeColor = SystemColors.ControlText
-        LabelProgramFirstName.Location = New Point(203, 19)
+        LabelProgramFirstName.Location = New Point(138, 88)
         LabelProgramFirstName.Name = "LabelProgramFirstName"
-        LabelProgramFirstName.Size = New Size(76, 32)
+        LabelProgramFirstName.Size = New Size(40, 17)
         LabelProgramFirstName.TabIndex = 3
         LabelProgramFirstName.Text = "Knew"
         ' 
-        ' VersionStatus
+        ' Version
         ' 
-        VersionStatus.AutoSize = True
-        VersionStatus.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
-        VersionStatus.Location = New Point(205, 99)
-        VersionStatus.Name = "VersionStatus"
-        VersionStatus.Size = New Size(81, 16)
-        VersionStatus.TabIndex = 9
-        VersionStatus.Text = "Version Status"
+        Version.AutoSize = True
+        Version.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
+        Version.Location = New Point(119, 109)
+        Version.Name = "Version"
+        Version.Size = New Size(45, 16)
+        Version.TabIndex = 9
+        Version.Text = "Version"
         ' 
         ' ToolTipMainAboutBox
         ' 
@@ -74,7 +72,7 @@ Partial Class AboutWindow
         ButtonViewLicense.FlatStyle = FlatStyle.Popup
         ButtonViewLicense.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonViewLicense.ForeColor = Color.Black
-        ButtonViewLicense.Location = New Point(203, 210)
+        ButtonViewLicense.Location = New Point(12, 231)
         ButtonViewLicense.Name = "ButtonViewLicense"
         ButtonViewLicense.Size = New Size(83, 25)
         ButtonViewLicense.TabIndex = 10
@@ -87,7 +85,7 @@ Partial Class AboutWindow
         ButtonClose.FlatStyle = FlatStyle.Popup
         ButtonClose.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         ButtonClose.ForeColor = Color.White
-        ButtonClose.Location = New Point(396, 210)
+        ButtonClose.Location = New Point(298, 231)
         ButtonClose.Name = "ButtonClose"
         ButtonClose.Size = New Size(62, 25)
         ButtonClose.TabIndex = 12
@@ -98,7 +96,7 @@ Partial Class AboutWindow
         ' 
         LabelBuildPlatform.AutoSize = True
         LabelBuildPlatform.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        LabelBuildPlatform.Location = New Point(203, 124)
+        LabelBuildPlatform.Location = New Point(79, 143)
         LabelBuildPlatform.Name = "LabelBuildPlatform"
         LabelBuildPlatform.Size = New Size(74, 15)
         LabelBuildPlatform.TabIndex = 13
@@ -107,33 +105,31 @@ Partial Class AboutWindow
         ' LabelProgramLastName
         ' 
         LabelProgramLastName.AutoSize = True
-        LabelProgramLastName.BackColor = Color.Transparent
-        LabelProgramLastName.Font = New Font("Segoe UI Variable Display", 18F, FontStyle.Underline, GraphicsUnit.Point)
+        LabelProgramLastName.Font = New Font("Segoe UI Variable Display Semib", 9.75F, FontStyle.Bold, GraphicsUnit.Point)
         LabelProgramLastName.ForeColor = Color.FromArgb(CByte(255), CByte(87), CByte(0))
-        LabelProgramLastName.Location = New Point(272, 19)
+        LabelProgramLastName.Location = New Point(174, 88)
         LabelProgramLastName.Name = "LabelProgramLastName"
-        LabelProgramLastName.Size = New Size(81, 32)
+        LabelProgramLastName.Size = New Size(46, 17)
         LabelProgramLastName.TabIndex = 14
         LabelProgramLastName.Text = "Karma"
         ' 
         ' Copyright
         ' 
         Copyright.AutoSize = True
-        Copyright.Font = New Font("Segoe UI Variable Display", 6.75F, FontStyle.Regular, GraphicsUnit.Point)
-        Copyright.Location = New Point(12, 223)
+        Copyright.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
+        Copyright.Location = New Point(77, 180)
         Copyright.Name = "Copyright"
-        Copyright.Size = New Size(44, 12)
+        Copyright.Size = New Size(56, 15)
         Copyright.TabIndex = 15
         Copyright.TabStop = True
         Copyright.Text = "Copyright"
         ' 
         ' PictureBox1
         ' 
-        PictureBox1.BackColor = Color.Transparent
         PictureBox1.Image = CType(resources.GetObject("PictureBox1.Image"), Image)
-        PictureBox1.Location = New Point(12, 12)
+        PictureBox1.Location = New Point(138, 12)
         PictureBox1.Name = "PictureBox1"
-        PictureBox1.Size = New Size(164, 190)
+        PictureBox1.Size = New Size(82, 73)
         PictureBox1.SizeMode = PictureBoxSizeMode.Zoom
         PictureBox1.TabIndex = 16
         PictureBox1.TabStop = False
@@ -144,42 +140,20 @@ Partial Class AboutWindow
         ButtonGetUpdates.FlatStyle = FlatStyle.Popup
         ButtonGetUpdates.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonGetUpdates.ForeColor = Color.Black
-        ButtonGetUpdates.Location = New Point(292, 210)
+        ButtonGetUpdates.Location = New Point(101, 231)
         ButtonGetUpdates.Name = "ButtonGetUpdates"
         ButtonGetUpdates.Size = New Size(98, 25)
         ButtonGetUpdates.TabIndex = 17
         ButtonGetUpdates.Text = "Get Updates"
         ButtonGetUpdates.UseVisualStyleBackColor = True
         ' 
-        ' Version
-        ' 
-        Version.AutoSize = True
-        Version.Font = New Font("Segoe UI Variable Display Semil", 18F, FontStyle.Regular, GraphicsUnit.Point)
-        Version.Location = New Point(345, 19)
-        Version.Name = "Version"
-        Version.Size = New Size(88, 32)
-        Version.TabIndex = 18
-        Version.Text = "Version"
-        ' 
-        ' Description
-        ' 
-        Description.AutoSize = True
-        Description.Font = New Font("Segoe UI Variable Display Light", 12F, FontStyle.Regular, GraphicsUnit.Point)
-        Description.Location = New Point(205, 51)
-        Description.Name = "Description"
-        Description.Size = New Size(194, 21)
-        Description.TabIndex = 19
-        Description.Text = "Reddit Data Analysis Toolkit."
-        ' 
-        ' AboutWindow
+        ' About
         ' 
         AutoScaleDimensions = New SizeF(7F, 16F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.Gainsboro
         CancelButton = ButtonClose
-        ClientSize = New Size(471, 249)
-        Controls.Add(Description)
-        Controls.Add(Version)
+        ClientSize = New Size(371, 268)
         Controls.Add(ButtonGetUpdates)
         Controls.Add(PictureBox1)
         Controls.Add(Copyright)
@@ -187,7 +161,7 @@ Partial Class AboutWindow
         Controls.Add(LabelBuildPlatform)
         Controls.Add(ButtonClose)
         Controls.Add(ButtonViewLicense)
-        Controls.Add(VersionStatus)
+        Controls.Add(Version)
         Controls.Add(LabelProgramFirstName)
         DoubleBuffered = True
         Font = New Font("Segoe UI Variable Text", 9F, FontStyle.Regular, GraphicsUnit.Point)
@@ -195,8 +169,7 @@ Partial Class AboutWindow
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         MaximizeBox = False
         MinimizeBox = False
-        Name = "AboutWindow"
-        ShowIcon = False
+        Name = "About"
         ShowInTaskbar = False
         StartPosition = FormStartPosition.CenterScreen
         Text = "About"
@@ -207,7 +180,7 @@ Partial Class AboutWindow
     Friend WithEvents LabelProgramFirstName As Label
     Friend WithEvents LicenseRichTextBox As RichTextBox
     Friend WithEvents DataGridView1 As DataGridView
-    Friend WithEvents VersionStatus As Label
+    Friend WithEvents Version As Label
     Friend WithEvents LabelCopyright As Label
     Friend WithEvents ToolTipMainAboutBox As ToolTip
     Friend WithEvents ButtonViewLicense As Button
@@ -217,6 +190,4 @@ Partial Class AboutWindow
     Friend WithEvents Copyright As LinkLabel
     Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents ButtonGetUpdates As Button
-    Friend WithEvents Version As Label
-    Friend WithEvents Description As Label
 End Class

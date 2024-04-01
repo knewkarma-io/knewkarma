@@ -1,156 +1,82 @@
-﻿' Necessary imports
-Imports System.Net.Http
+﻿Imports System.Net.Http
 Imports Newtonsoft.Json.Linq
 Imports System.Runtime.InteropServices
-Imports System.Reflection
-Imports Microsoft.VisualBasic.Logging
-Imports System.Globalization
+
 
 ''' <summary>
-''' Handles API requests and data processing for Reddit and GitHub.
+''' Class for making API calls to Reddit and or GitHub.
 ''' </summary>
 Public Class ApiHandler
-
-    Private ReadOnly BASE_REDDIT_ENDPOINT As String = "https://www.reddit.com"
-    Private ReadOnly USER_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/u"
-    Private ReadOnly USERS_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/users"
-    Private ReadOnly COMMUNITY_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/r"
-    Private ReadOnly COMMUNITIES_DATA_ENDPOINT As String = $"{BASE_REDDIT_ENDPOINT}/subreddits"
-    Private ReadOnly GITHUB_RELEASE_ENDPOINT As String = "https://api.github.com/repos/bellingcat/knewkarma/releases/latest"
-
-    Private ReadOnly appVersion As String = $"{My.Application.Info.Version.Major}.{My.Application.Info.Version.Minor}"
-    Private ReadOnly dotNetVersion As String = RuntimeInformation.FrameworkDescription
-
+    ' Base Reddit endpoint
+    Private Const BASE_ENDPOINT As String = "https://www.reddit.com"
 
     ''' <summary>
-    ''' Asynchronously fetches data from a specified API endpoint.
+    ''' Represents the current program version in format {Major}.{Minor}.
+    ''' </summary>
+    Private ReadOnly appVersion As String = $"{My.Application.Info.Version.Major}.{My.Application.Info.Version.Minor}"
+
+    ''' <summary>
+    ''' Represents the .NET version program is running on.
+    ''' </summary>
+    Private ReadOnly dotNetVersion As String = RuntimeInformation.FrameworkDescription
+
+    ''' <summary>
+    ''' Makes an asynchronous GET request to a given endpoint.
     ''' </summary>
     ''' <param name="endpoint">The API endpoint URL.</param>
-    ''' <returns>JToken containing the API response, or Nothing in case of failure.</returns>
+    ''' <returns>JToken received from the API call.</returns>
     Public Async Function AsyncGetData(endpoint As String) As Task(Of JToken)
         Try
             Using httpClient As New HttpClient()
                 httpClient.DefaultRequestHeaders.Add(
-                "User-Agent",
-                $"Knew-Karma/{appVersion} (.NET {dotNetVersion}; +https:rly0nheart.github.io)"
-            )
+                    "User-Agent",
+                    $"Knew-Karma/{appVersion} ({dotNetVersion}; +https://rly0nheart.github.io)"
+                )
 
                 Dim response As HttpResponseMessage = Await httpClient.GetAsync(endpoint)
 
                 If response.IsSuccessStatusCode Then
                     Dim json As String = Await response.Content.ReadAsStringAsync()
-                    Return JToken.Parse(json)
+                    Return JObject.Parse(json)
                 Else
-                    MessageBox.Show($"Error: {response.StatusCode} - {response.ReasonPhrase}", "API Request Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    MessageBox.Show(
+                        response.ReasonPhrase,
+                        "An API Error occurred",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    )
                     Return Nothing
                 End If
             End Using
-        Catch ex As HttpRequestException
-            MessageBox.Show($"HTTP Request Error: {ex.Message}", "Network Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Return Nothing
         Catch ex As Exception
-            MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Return Nothing
+            MessageBox.Show(
+                ex.Message,
+                "An HTTP Error occurred",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            )
         End Try
+        Return Nothing
     End Function
 
-
     ''' <summary>
-    ''' Asynchronously fetches data from an API endpoint and handles pagination.
-    ''' </summary>
-    ''' <param name="endpoint">The API endpoint URL.</param>
-    ''' <param name="limit">Maximum number of items to fetch.</param>
-    ''' <returns>JArray containing paginated response data.</returns>
-    Private Async Function FetchAndPaginateAsync(endpoint As String, limit As Integer) As Task(Of JArray)
-        Dim allItems As New JArray()
-        Dim lastItemId As String = String.Empty
-        Dim paginate As Boolean = limit > 100
-
-        While allItems.Count < limit
-            Dim paginationEndpoint As String = If(paginate And Not String.IsNullOrEmpty(lastItemId), $"{endpoint}&after={lastItemId}", endpoint)
-            Dim responseData As JObject = Await AsyncGetData(paginationEndpoint)
-            Dim dataItems As JArray = ProcessApiResponse(responseData("data")("children"), "data")
-
-            If dataItems.Count = 0 Then
-                Exit While
-            End If
-
-            allItems.Merge(dataItems)
-            lastItemId = dataItems.Last("data")("id").ToString()
-
-            If allItems.Count >= limit Then
-                Exit While
-            End If
-        End While
-
-        Return allItems
-    End Function
-
-
+    ''' Asynchronously fetches the program's update information from GitHub.
     ''' <summary>
-    ''' Processes the API response, ensuring valid data is returned.
-    ''' </summary>
-    ''' <param name="data">The JToken response from the API.</param>
-    ''' <param name="validKey">A key to validate in the response object.</param>
-    ''' <returns>Processed JToken with valid data, or a default JToken in case of invalid data.</returns>
-    Private Shared Function ProcessApiResponse(data As JToken, validKey As String) As JToken
-        If data Is Nothing Then
-            Return New JObject()
-        End If
-
-        If data.Type = JTokenType.Object Then
-            Dim dataObj As JObject = CType(data, JObject)
-            If Not String.IsNullOrEmpty(validKey) AndAlso dataObj.ContainsKey(validKey) Then
-                Return dataObj
-            Else
-                MessageBox.Show($"The expected key '{validKey}' was not found in the response.", "API Response Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Return New JObject()
-            End If
-        ElseIf data.Type = JTokenType.Array Then
-            Dim dataArray As JArray = CType(data, JArray)
-            If dataArray.Count > 0 Then
-                Return dataArray
-            Else
-                MessageBox.Show("The response array is empty.", "API Response Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Return New JArray()
-            End If
-        Else
-            MessageBox.Show($"Unexpected data type in response: {data.Type}", "API Response Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Return New JObject()
-        End If
-    End Function
-
-
-    ''' <summary>
-    ''' Asynchronously fetches the program's update information from GitHub and compares it with the current version.
-    ''' Assumes version format: major.minor.patch.prefix
-    ''' </summary>
-    ''' <returns>Task representing the asynchronous operation.</returns>
     Public Async Function AsyncGetUpdates() As Task
-        Dim response As JObject = Await AsyncGetData(endpoint:="https://api.github.com/repos/bellingcat/knewkarma/releases/latest")
-        If response IsNot Nothing AndAlso response.ContainsKey("tag_name") Then
-            Dim remoteVersion As String = response("tag_name").ToString()
+        AboutWindow.Version.Text = "Checking for updates..."
+        ' Making an asynchronous request to check for updates.
+        Dim data As JObject = Await AsyncGetData(endpoint:="https://api.github.com/repos/rly0nheart/knewkarma/releases/latest")
 
-            ' Splitting the version strings into components
-            Dim remoteParts As List(Of String) = remoteVersion.Split(".").ToList()
+        ' Checking if data is not null before proceeding with extracting information from it.
+        If data IsNot Nothing Then
+            ' Extracting the tag name, body, and HTML URL from the data.
+            Dim tagName As String = data("tag_name")?.ToString
 
-            Dim updateMessage As String = "{0} update available: {1}"
-            Dim isUpdateAvailable As Boolean = False
-
-            ' Check for differences in version parts
-            If remoteParts(0) <> My.Application.Info.Version.Major.ToString(CultureInfo.InvariantCulture) Then
-                updateMessage = String.Format(CultureInfo.InvariantCulture, updateMessage, "MAJOR", remoteVersion)
-                isUpdateAvailable = True
-            ElseIf remoteParts(1) <> My.Application.Info.Version.Minor.ToString(CultureInfo.InvariantCulture) Then
-                updateMessage = String.Format(CultureInfo.InvariantCulture, updateMessage, "MINOR", remoteVersion)
-                isUpdateAvailable = True
-            ElseIf remoteParts.Count > 2 AndAlso remoteParts(2) <> My.Application.Info.Version.Build.ToString(CultureInfo.InvariantCulture) Then
-                updateMessage = String.Format(CultureInfo.InvariantCulture, updateMessage, "PATCH", remoteVersion)
-                isUpdateAvailable = True
-            End If
-
-            If isUpdateAvailable Then
-                AboutWindow.VersionStatus.Text = updateMessage
+            ' Checking if the current version is the latest version.
+            If tagName = My.Application.Info.Version.ToString Then
+                AboutWindow.Version.Text = $"Up-to-date: {My.Application.Info.Version}"
+            Else
+                AboutWindow.Version.Text = $"Updates found: {tagName}"
                 AboutWindow.ButtonGetUpdates.Enabled = True
             End If
         End If
@@ -158,121 +84,80 @@ Public Class ApiHandler
 
 
     ''' <summary>
-    ''' Asynchronously retrieves a user or community profile from Reddit.
+    ''' Asynchronously retrieves profile data from a specified source.
     ''' </summary>
-    ''' <param name="type">The type of profile to fetch (e.g., 'user', 'community').</param>
-    ''' <param name="from">Identifier for the user or community.</param>
-    ''' <returns>Task representing the asynchronous operation, returning a JObject with profile data.</returns>
-    Public Async Function AsyncGetProfile(type As String, from As String) As Task(Of JObject)
-        Dim endpointMap As New Dictionary(Of String, String) From {
-        {"user", $"{USER_DATA_ENDPOINT}/{from}/about.json"},
-        {"community", $"{COMMUNITY_DATA_ENDPOINT}/{from}/about.json"}
-    }
+    ''' <param name="profileType">The type of profile to retrieve.</param>
+    ''' <param name="profileSource">The source from where the profile should be fetched (e.g., specific user or subreddit).</param>
+    ''' <returns>A Task(Of JObject) representing the asynchronous operation, which upon completion returns a Jobject of profile data.</returns>
+    Public Async Function AsyncGetProfile(
+                                         profileType As String, profileSource As String) As Task(Of JObject)
+        Dim profileTypeMap As New List(Of Tuple(Of String, String)) From {
+            Tuple.Create("user_profile", $"{BASE_ENDPOINT}/user/{profileSource}/about.json"),
+            Tuple.Create("subreddit_profile", $"{BASE_ENDPOINT}/r/{profileSource}/about.json")
+        }
 
-        If endpointMap.ContainsKey(type) Then
-            Dim endpoint As String = endpointMap(type)
-            Dim response As JToken = Await AsyncGetData(endpoint)
-            Dim processedResponse As JObject = CType(ProcessApiResponse(response, "data"), JObject)
-            Return processedResponse("data")
-        Else
-            Return New JObject()
-        End If
+        Dim profileEndpoint As String = Nothing
+
+        For Each Type In profileTypeMap
+            If Type.Item1 = profileType Then
+                profileEndpoint = Type.Item2
+                Exit For
+            End If
+        Next
+
+        Dim profile As JObject = Await AsyncGetData(endpoint:=profileEndpoint)
+
+        Return If(profile IsNot Nothing AndAlso profile?("data") IsNot Nothing, profile?("data"), New JObject())
     End Function
 
 
     ''' <summary>
-    ''' Asynchronously retrieves a collection of posts from Reddit based on specified criteria.
+    ''' Asynchronously retrieves posts from a specified source with pagination.
     ''' </summary>
-    ''' <param name="limit">The maximum number of posts to retrieve.</param>
-    ''' <param name="type">The type of posts to retrieve, such as 'new', 'front_page', 'listing', 'community', 'user_posts', etc.</param>
-    ''' <param name="from">An optional parameter specifying the source of the posts (e.g., specific user or community).</param>
-    ''' <param name="sort">An optional parameter to define the sorting method of the posts (e.g., 'hot', 'new', 'top'). Default is 'all'.</param>
-    ''' <param name="timeframe">An optional parameter specifying the timeframe for the posts (e.g., 'day', 'week', 'month'). Default is 'all'.</param>
-    ''' <returns>Task representing the asynchronous operation, returning a JArray of posts.</returns>
+    ''' <param name="sortCriterion">The criterion by which the posts should be sorted.</param>
+    ''' <param name="postsLimit">The limit on the number of posts to retrieve.</param>
+    ''' <param name="postsType">The type of posts to retrieve (e.g., user_posts, user_comments).</param>
+    ''' <param name="postsSource">The source from where the posts should be fetched (e.g., specific user or subreddit).</param>
+    ''' <returns>A Task(Of JArray) representing the asynchronous operation, which upon completion returns a JArray of posts.</returns>
     Public Async Function AsyncGetPosts(
-        ByVal limit As Integer,
-        ByVal type As String,
-        Optional ByVal from As String = Nothing,
-        Optional ByVal sort As String = "all",
-        Optional ByVal timeframe As String = "all"
-    ) As Task(Of JArray)
-
+                                       ByVal sortCriterion As String,
+                                       ByVal postsLimit As Integer,
+                                       ByVal postsType As String,
+                                       Optional ByVal postsSource As String = Nothing
+                                   ) As Task(Of JArray)
         Dim postsTypeMap As New Dictionary(Of String, String) From {
-        {"new", $"{BASE_REDDIT_ENDPOINT}/new.json"},
-        {"front_page", $"{BASE_REDDIT_ENDPOINT}/.json"},
-        {"listing", $"{COMMUNITY_DATA_ENDPOINT}/{from}.json"},
-        {"community", $"{COMMUNITY_DATA_ENDPOINT}/{from}.json"},
-        {"user_posts", $"{USER_DATA_ENDPOINT}/{from}/submitted.json"},
-        {"user_overview", $"{USER_DATA_ENDPOINT}/{from}/overview.json"},
-        {"user_comments", $"{USER_DATA_ENDPOINT}/{from}/comments.json"}
-    }
-        If Not postsTypeMap.ContainsKey(type) Then
-            Throw New ArgumentException($"Invalid post type: {type}")
+            {"user_posts", $"{BASE_ENDPOINT}/user/{postsSource}/submitted.json?sort={sortCriterion}&limit={postsLimit}"},
+            {"user_comments", $"{BASE_ENDPOINT}/user/{postsSource}/comments.json?sort={sortCriterion}&limit={postsLimit}"},
+            {"subreddit_posts", $"{BASE_ENDPOINT}/r/{postsSource}.json?sort={sortCriterion}&limit={postsLimit}"},
+            {"search_posts", $"{BASE_ENDPOINT}/search.json?q={postsSource}&sort={sortCriterion}&limit={postsLimit}"},
+            {"listing_posts", $"{BASE_ENDPOINT}/r/{postsSource}.json?sort={sortCriterion}&limit={postsLimit}"},
+            {"front_page_posts", $"{BASE_ENDPOINT}/.json?sort={sortCriterion}&limit={postsLimit}"}
+        }
+
+        If Not postsTypeMap.ContainsKey(postsType) Then
+            Throw New ArgumentException($"Invalid post type: {postsType}")
         End If
 
-        Dim postsEndpoint As String = postsTypeMap(type)
+        Dim postsEndpoint As String = postsTypeMap(postsType)
+        Dim allPosts As New JArray()
+        Dim lastPostId As String = String.Empty
+        Dim paginatePosts As Boolean = postsLimit > 100
 
-        If type = "new" Then
-            postsEndpoint &= $"?limit={limit}&sort={sort}"
-        Else
-            postsEndpoint &= $"?limit={limit}&sort={sort}&t={timeframe}"
-        End If
+        While allPosts.Count < postsLimit
+            Dim paginationEndpoint As String = If(paginatePosts And Not String.IsNullOrEmpty(lastPostId), $"{postsEndpoint}&after={lastPostId}", postsEndpoint)
+            Dim postsData As JObject = Await AsyncGetData(endpoint:=paginationEndpoint)
+            Dim postsChildren As JArray = postsData("data")("children")
 
+            If postsChildren.Count = 0 Then
+                Exit While
+            End If
 
+            allPosts.Merge(postsChildren)
 
-        Return Await FetchAndPaginateAsync(endpoint:=postsEndpoint, limit:=limit)
-    End Function
+            lastPostId = postsChildren.Last("data")("id").ToString()
+        End While
 
-
-    ''' <summary>
-    ''' Asynchronously performs a search on Reddit for users, communities, or posts based on a query.
-    ''' </summary>
-    ''' <param name="searchType">The type of search to perform ('users', 'communities', or 'posts').</param>
-    ''' <param name="query">The search query string.</param>
-    ''' <param name="limit">The maximum number of search results to retrieve.</param>
-    ''' <returns>Task representing the asynchronous operation, returning a JArray of search results.</returns>
-    Public Async Function AsyncSearch(searchType As String, query As String, limit As Integer) As Task(Of JArray)
-        Dim sourceMap As New Dictionary(Of String, String) From {
-        {"users", $"{USERS_DATA_ENDPOINT}/search.json?q={query}"},
-        {"communities", $"{COMMUNITIES_DATA_ENDPOINT}/search.json?q={query}"},
-        {"posts", $"{BASE_REDDIT_ENDPOINT}/search.json?q={query}"}
-    }
-
-        If Not sourceMap.ContainsKey(searchType) Then
-            Throw New ArgumentException($"Invalid search type: {searchType}")
-        End If
-
-        Dim searchEndpoint As String = sourceMap(searchType)
-        searchEndpoint &= $"&limit={limit}"
-
-        Return Await FetchAndPaginateAsync(endpoint:=searchEndpoint, limit:=limit)
-    End Function
-
-
-    ''' <summary>
-    ''' Asynchronously retrieves information about Reddit communities based on a specified type.
-    ''' </summary>
-    ''' <param name="communityType">The type of communities to retrieve (e.g., 'all', 'default', 'new', 'popular').</param>
-    ''' <param name="limit">The maximum number of communities to retrieve.</param>
-    ''' <returns>Task representing the asynchronous operation, returning a JArray of community information.</returns>
-    Public Async Function AsyncGetCommunities(communityType As String, limit As Integer) As Task(Of JArray)
-        Dim sourceMap As New Dictionary(Of String, String) From {
-         {"all", $"{COMMUNITIES_DATA_ENDPOINT}.json"},
-         {"default", $"{COMMUNITIES_DATA_ENDPOINT}/default.json"},
-         {"new", $"{COMMUNITIES_DATA_ENDPOINT}/new.json"},
-         {"popular", $"{COMMUNITIES_DATA_ENDPOINT}/popular.json"}
-     }
-
-        If Not sourceMap.ContainsKey(communityType) Then
-            Throw New ArgumentException($"Invalid community type: {communityType}")
-        End If
-
-        Dim communityEndpoint As String = sourceMap(communityType)
-        communityEndpoint &= $"?limit={limit}"
-
-        Dim responseData As JObject = Await AsyncGetData(communityEndpoint)
-        Dim communities As JArray = ProcessApiResponse(responseData("data")("children"), "data")
-
-        Return communities
+        Return allPosts
     End Function
 End Class
+

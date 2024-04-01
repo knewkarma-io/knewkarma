@@ -1,4 +1,3 @@
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 import getpass
 import locale
 import os
@@ -10,9 +9,6 @@ from typing import Union, Literal
 import pandas as pd
 from rich.console import Console
 from rich.tree import Tree
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
 def systeminfo():
@@ -35,10 +31,7 @@ def pathfinder(directories: list[str]):
         os.makedirs(directory, exist_ok=True)
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-def _timestamp_to_locale(timestamp: float) -> str:
+def _timestamp_to_datetime(timestamp: float) -> str:
     """
     Converts a unix timestamp to a localized datetime string based on the system's locale.
 
@@ -57,9 +50,6 @@ def _timestamp_to_locale(timestamp: float) -> str:
 
     # Format the datetime object according to the locale's conventions
     return local_object.strftime("%x, %X")
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
 def _time_since(timestamp: int) -> str:
@@ -112,7 +102,7 @@ def _time_since(timestamp: int) -> str:
 
 
 def timestamp_to_readable(
-    timestamp: float, time_format: Literal["concise", "locale"] = "locale"
+    timestamp: float, time_format: Literal["concise", "datetime"] = "datetime"
 ) -> str:
     """
     Converts a Unix timestamp into a more readable format based on the specified `time_format`.
@@ -122,23 +112,20 @@ def timestamp_to_readable(
     :param timestamp: The Unix timestamp to be converted.
     :type timestamp: float
     :param time_format: Determines the format of the output time. Use "concise" for a human-readable
-                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
-    :type time_format: Literal["concise", "locale"]
+                        time difference, or "datetime" for a localized datetime string. Defaults to "datetime".
+    :type time_format: Literal["concise", "datetime"]
     :return: A string representing the formatted time. The format is determined by the `time_format` parameter.
     :rtype: str
-    :raises ValueError: If `time_format` is not one of the expected values ("concise" or "locale").
+    :raises ValueError: If `time_format` is not one of the expected values ("concise" or "datetime").
     """
     if time_format == "concise":
         return _time_since(timestamp=int(timestamp))
-    elif time_format == "locale":
-        return _timestamp_to_locale(timestamp=timestamp)
+    elif time_format == "datetime":
+        return _timestamp_to_datetime(timestamp=timestamp)
     else:
         raise ValueError(
-            f"Unknown time format {time_format}. Expected `concise` or `locale`."
+            f"Unknown time format {time_format}. Expected `concise` or `datetime`."
         )
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
 def filename_timestamp() -> str:
@@ -161,9 +148,6 @@ def filename_timestamp() -> str:
         if os.name == "nt"
         else now.strftime("%d-%B-%Y-%I:%M:%S%p")
     )
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
 def create_dataframe(
@@ -197,9 +181,6 @@ def create_dataframe(
     dataframe = pd.DataFrame(data)
 
     return dataframe
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 
 def show_exported_files(tree: Tree, directory: str, base_path: str = ""):
@@ -267,8 +248,4 @@ def export_dataframe(
             console.log(f"Unsupported file format: {file_format}")
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
 console = Console(color_system="auto", log_time=False)
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

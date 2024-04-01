@@ -202,13 +202,27 @@ Public Class SettingsManager
         MainWindow.TreeView1.ForeColor = color("PrimaryTextColor")
         MainWindow.TreeView1.LineColor = color("SecondaryTextColor")
 
+        ''' <summary>
+        ''' Apply colors to tab pages
+        ''' </summary>
+        Dim tabpages As New List(Of TabPage) From {
+            UserProfileWindow.TabPage1,
+            UserProfileWindow.TabPage2
+        }
+        For Each tabpage In tabpages
+            tabpage.BackColor = color("InputFieldBackgroundColor")
+            tabpage.ForeColor = color("PrimaryTextColor")
+        Next
 
         ''' <summary>
         ''' Apply colors to Forms
         ''' </summary>
         Dim forms As New List(Of Form) From {
             MainWindow,
-            AboutWindow
+            AboutWindow,
+            CommentsWindow,
+            SubredditProfileWindow,
+            PostsWindow
             }
         For Each form In forms
             form.BackColor = color("MainBackgroundColor")
@@ -219,15 +233,15 @@ Public Class SettingsManager
         ''' Apply colors to buttons
         ''' </summary>
         Dim buttons As New List(Of Button) From {
-            MainWindow.ButtonGetFrontPageAndNewPosts,
-            MainWindow.ButtonGetListingPosts,
-            MainWindow.ButtonGetCommunityData,
-            MainWindow.ButtonGetUserData,
+            MainWindow.ButtonFetchFrontPageData,
+            MainWindow.ButtonFetchListingPosts,
+            MainWindow.ButtonFetchSubredditData,
+            MainWindow.ButtonFetchUserData,
             MainWindow.ButtonSearch,
             AboutWindow.ButtonViewLicense,
             AboutWindow.ButtonGetUpdates
         }
-        ' MainWindow.ButtonGetPostData,
+        ' MainWindow.ButtonFetchPostData,
         For Each button In buttons
             button.BackColor = color("InputFieldBackgroundColor")
             button.ForeColor = color("PrimaryTextColor")
@@ -245,17 +259,14 @@ Public Class SettingsManager
             MainWindow.LabelSearchResultsListing,
             MainWindow.LabelUserPostsListing,
             MainWindow.LabelUserDataLimit,
-            MainWindow.LabelCommunityPostsListing,
-            MainWindow.LabelCommunityPostsLimit,
+            MainWindow.LabelSubredditPostsListing,
+            MainWindow.LabelSubredditPostsLimit,
             AboutWindow.LabelProgramFirstName,
-            MainWindow.LabelProgramFirstName,
-            AboutWindow.Description,
             MainWindow.Label1,
             MainWindow.Label2,
             MainWindow.Label3,
             MainWindow.Label4,
-            MainWindow.Label5,
-            MainWindow.Label6
+            MainWindow.Label5
             }
         AboutWindow.LabelProgramLastName.ForeColor = color("SecondaryTextColor")
         For Each label In labels
@@ -266,11 +277,6 @@ Public Class SettingsManager
         ''' Apply colors to RadioButton controls
         ''' </summary>
         Dim radioButtons As New List(Of RadioButton) From {
-            MainWindow.RadioButtonSearchUsers,
-            MainWindow.RadioButtonSearchPosts,
-            MainWindow.RadioButtonNewPosts,
-            MainWindow.RadioButtonFrontPagePosts,
-            MainWindow.RadioButtonSearchCommunities,
             MainWindow.RadioButtonBest,
             MainWindow.RadioButtonRising,
             MainWindow.RadioButtonPopular,
@@ -278,8 +284,8 @@ Public Class SettingsManager
             MainWindow.RadioButtonUserProfile,
             MainWindow.RadioButtonUserPosts,
             MainWindow.RadioButtonUserComments,
-            MainWindow.RadioButtonCommunityProfile,
-            MainWindow.RadioButtonCommunityPosts
+            MainWindow.RadioButtonSubredditProfile,
+            MainWindow.RadioButtonSubredditPosts
             }
         ' MainWindow.RadioButtonPostProfile,
         ' MainWindow.RadioButtonPostComments,
@@ -294,7 +300,7 @@ Public Class SettingsManager
         Dim textBoxes As New List(Of TextBox) From {
             MainWindow.TextBoxUsername,
             MainWindow.TextBoxQuery,
-            MainWindow.TextBoxCommunity
+            MainWindow.TextBoxSubreddit
             }
 
         For Each textBox In textBoxes
@@ -307,8 +313,8 @@ Public Class SettingsManager
         ''' </summary>
         Dim numericUpDowns As New List(Of NumericUpDown) From {
             MainWindow.NumericUpDownPostListingsLimit,
-            MainWindow.NumericUpDownFrontPageAndNewPostsLimit,
-            MainWindow.NumericUpDownCommunityPostsLimit,
+            MainWindow.NumericUpDownFrontPageDataLimit,
+            MainWindow.NumericUpDownSubredditPostsLimit,
             MainWindow.NumericUpDownUserDataLimit,
             MainWindow.NumericUpDownSearchResultLimit
             }
@@ -322,8 +328,8 @@ Public Class SettingsManager
         ''' </summary>
         Dim comboBoxes As New List(Of ComboBox) From {
             MainWindow.ComboBoxPostListingsListing,
-            MainWindow.ComboBoxFrontPageAndNewPostsListing,
-            MainWindow.ComboBoxCommunityPostsListing,
+            MainWindow.ComboBoxFrontPageDataListing,
+            MainWindow.ComboBoxSubredditPostsListing,
             MainWindow.ComboBoxUserDataListing,
             MainWindow.ComboBoxSearchResultListing
             }
@@ -336,16 +342,14 @@ Public Class SettingsManager
         ''' Apply colors to GroupBox controls
         ''' </summary>
         Dim GroupBoxes As New List(Of GroupBox) From {
-            MainWindow.GroupBoxSearchData,
             MainWindow.GroupBoxPostListings,
-            MainWindow.GroupBoxFrontPageAndNewPostsFiltering,
-            MainWindow.GroupBoxFrontPageAndNewPosts,
-            MainWindow.GroupBoxCommunityDataFiltering,
+            MainWindow.GroupBoxFrontPageDataFiltering,
+            MainWindow.GroupBoxSubredditDataFiltering,
             MainWindow.GroupBoxUserDataFiltering,
             MainWindow.GroupBoxSearchResultsFiltering,
             MainWindow.GroupBoxPostListingsFiltering,
             MainWindow.GroupBoxUserData,
-            MainWindow.GroupBoxCommunityData
+            MainWindow.GroupBoxSubredditData
             }
         ' MainWindow.GroupBoxPostDataFiltering,
         ' MainWindow.GroupBoxPostData,
@@ -372,6 +376,31 @@ Public Class SettingsManager
             menuItem.BackColor = color("MainBackgroundColor")
             menuItem.ForeColor = color("PrimaryTextColor")
         Next
+
+        ''' <summary>
+        ''' Apply colors to data grid view cells
+        ''' </summary>
+        Dim cellStyles As New List(Of DataGridViewCellStyle) From {
+            SubredditProfileWindow.DataGridViewProfile.AlternatingRowsDefaultCellStyle,
+            SubredditProfileWindow.DataGridViewProfile.DefaultCellStyle,
+            UserProfileWindow.DataGridViewUserProfile.AlternatingRowsDefaultCellStyle,
+            UserProfileWindow.DataGridViewUserProfile.DefaultCellStyle,
+            UserProfileWindow.DataGridViewUserSubreddit.AlternatingRowsDefaultCellStyle,
+            UserProfileWindow.DataGridViewUserSubreddit.DefaultCellStyle,
+            PostsWindow.DataGridViewPosts.AlternatingRowsDefaultCellStyle,
+            PostsWindow.DataGridViewPosts.RowHeadersDefaultCellStyle,
+            PostsWindow.DataGridViewPosts.ColumnHeadersDefaultCellStyle,
+            PostsWindow.DataGridViewPosts.DefaultCellStyle,
+            CommentsWindow.DataGridViewComments.AlternatingRowsDefaultCellStyle,
+            CommentsWindow.DataGridViewComments.RowHeadersDefaultCellStyle,
+            CommentsWindow.DataGridViewComments.ColumnHeadersDefaultCellStyle,
+            CommentsWindow.DataGridViewComments.DefaultCellStyle
+            }
+        For Each cellStyle In cellStyles
+            cellStyle.BackColor = color("InputFieldBackgroundColor")
+            cellStyle.ForeColor = color("PrimaryTextColor")
+        Next
+
 
         ''' <summary>
         ''' Apply mouse enter/mouse leave colors to ToolStripMenuItem and ContextMenuStrip controls

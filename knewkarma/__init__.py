@@ -1,23 +1,17 @@
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-from .base import (
-    RedditCommunity,
-    RedditCommunities,
-    RedditPost,
-    RedditPosts,
-    RedditUser,
-    RedditSearch,
+from ._core import (
+    Post,
+    Posts,
+    Subreddit,
+    Subreddits,
+    User,
+    Search,
 )
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
 __all__ = [
-    "RedditCommunity",
-    "RedditCommunities",
-    "RedditPost",
-    "RedditPosts",
-    "RedditUser",
-    "RedditSearch",
+    "Post",
+    "Posts",
+    "Subreddit",
+    "Subreddits",
+    "User",
+    "Search",
 ]
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #

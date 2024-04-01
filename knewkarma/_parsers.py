@@ -1,12 +1,7 @@
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
 from typing import Union
 
-from ._coreutils import timestamp_to_readable
-from .docs import TIME_FORMAT
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+from ._api import TIME_FORMAT
+from ._utils import timestamp_to_readable
 
 
 def parse_users(
@@ -29,15 +24,13 @@ def parse_users(
             "link_karma": user.get("link_karma"),
             "awardee_karma": user.get("awardee_karma"),
             "total_karma": user.get("total_karma"),
-            "community": user.get("subreddit"),
+            "subreddit": user.get("subreddit"),
             "created": timestamp_to_readable(
                 timestamp=user.get("created"), time_format=time_format
             )
             if user.get("created")
             else "NaN",
         }
-
-    # ------------------------------------------------------------------------------- #
 
     converted_data = None
     if isinstance(data, list) and len(data) != 0:
@@ -49,9 +42,6 @@ def parse_users(
     return converted_data
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
 def parse_posts(
     data: Union[dict, list], time_format: TIME_FORMAT
 ) -> Union[list[dict], dict]:
@@ -61,9 +51,9 @@ def parse_posts(
             "title": post.get("title"),
             "body": post.get("selftext"),
             "id": post.get("id"),
-            "community": post.get("subreddit"),
-            "community_id": post.get("subreddit_id"),
-            "community_type": post.get("subreddit_type"),
+            "subreddit": post.get("subreddit"),
+            "subreddit_id": post.get("subreddit_id"),
+            "subreddit_type": post.get("subreddit_type"),
             "upvotes": post.get("ups"),
             "upvote_ratio": post.get("upvote_ratio"),
             "downvotes": post.get("downs"),
@@ -97,9 +87,6 @@ def parse_posts(
         return [build_post(post.get("data")) for post in data if post.get("data")]
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
 def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]:
     if len(comments) != 0:
         comments_list: list = []
@@ -113,8 +100,8 @@ def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
                     "author_is_premium": comment_data.get("author_premium"),
                     "upvotes": comment_data.get("ups"),
                     "downvotes": comment_data.get("downs"),
-                    "community": comment_data.get("subreddit_name_prefixed"),
-                    "community_type": comment_data.get("subreddit_type"),
+                    "subreddit": comment_data.get("subreddit_name_prefixed"),
+                    "subreddit_type": comment_data.get("subreddit_type"),
                     "post_id": comment_data.get("link_id"),
                     "post_title": comment_data.get("link_title"),
                     "is_nsfw": comment_data.get("over_18"),
@@ -136,69 +123,61 @@ def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
         return comments_list
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-def parse_communities(
+def parse_subreddits(
     data: Union[list, dict], time_format, is_preview: bool = False
 ) -> Union[list[dict], dict]:
-    def build_community(
-        community: dict,
+    def build_subreddit(
+        subreddit: dict,
     ) -> dict:
         if is_preview:
-            community_obj = {
-                "name": community.get("display_name"),
-                "id": community.get("id"),
-                "type": community.get("subreddit_type"),
-                "icon": community.get("community_icon", "").split("?")[0],
-                "subscribers": community.get("subscribers"),
-                "whitelist_status": community.get("whitelist_status"),
-                "url": community.get("url"),
+            subreddit_obj = {
+                "name": subreddit.get("display_name"),
+                "id": subreddit.get("id"),
+                "type": subreddit.get("subreddit_type"),
+                "icon": subreddit.get("subreddit_icon", "").split("?")[0],
+                "subscribers": subreddit.get("subscribers"),
+                "whitelist_status": subreddit.get("whitelist_status"),
+                "url": subreddit.get("url"),
                 "created": timestamp_to_readable(
-                    timestamp=community.get("created"), time_format=time_format
+                    timestamp=subreddit.get("created"), time_format=time_format
                 ),
             }
         else:
-            community_obj = {
-                "name": community.get("display_name"),
-                "id": community.get("id"),
-                "description": community.get("public_description"),
-                "submit_text": community.get("submit_text"),
-                "icon": community.get("community_icon", "").split("?")[0],
-                "type": community.get("subreddit_type"),
-                "subscribers": community.get("subscribers"),
-                "current_active_users": community.get("accounts_active"),
-                "is_nsfw": community.get("over18"),
-                "language": community.get("lang"),
-                "whitelist_status": community.get("whitelist_status"),
-                "url": community.get("url"),
+            subreddit_obj = {
+                "name": subreddit.get("display_name"),
+                "id": subreddit.get("id"),
+                "description": subreddit.get("public_description"),
+                "submit_text": subreddit.get("submit_text"),
+                "icon": subreddit.get("subreddit_icon", "").split("?")[0],
+                "type": subreddit.get("subreddit_type"),
+                "subscribers": subreddit.get("subscribers"),
+                "current_active_users": subreddit.get("accounts_active"),
+                "is_nsfw": subreddit.get("over18"),
+                "language": subreddit.get("lang"),
+                "whitelist_status": subreddit.get("whitelist_status"),
+                "url": subreddit.get("url"),
                 "created": timestamp_to_readable(
-                    timestamp=community.get("created"), time_format=time_format
+                    timestamp=subreddit.get("created"), time_format=time_format
                 )
-                if community.get("created")
+                if subreddit.get("created")
                 else "NaN",
             }
 
-        return community_obj
+        return subreddit_obj
 
-    # ------------------------------------------------------------------------------- #
-
-    community_data = None
+    subreddit_data = None
     if isinstance(data, list) and len(data) != 0:
-        community_data = [
-            build_community(community=community.get("data")) for community in data
+        subreddit_data = [
+            build_subreddit(subreddit=subreddit.get("data")) for subreddit in data
         ]
 
     elif isinstance(data, dict) and "subreddit_type" in data:
-        community_data = build_community(community=data)
+        subreddit_data = build_subreddit(subreddit=data)
 
-    return community_data
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+    return subreddit_data
 
 
-def parse_community_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
+def parse_subreddit_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
     if "revision_id" in wiki_page:
         page_data: dict = wiki_page.get("data")
         user: dict = page_data.get("revision_by").get("data")
@@ -225,12 +204,9 @@ def parse_community_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict
                 "link_karma": user.get("link_karma"),
                 "awardee_karma": user.get("awardee_karma"),
                 "total_karma": user.get("total_karma"),
-                "community": user.get("subreddit"),
+                "subreddit": user.get("subreddit"),
                 "created": timestamp_to_readable(
                     timestamp=user.get("created"), time_format=time_format
                 ),
             },
         }
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
