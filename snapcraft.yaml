@@ -1,4 +1,4 @@
-name: Knew Karma
+name: knewkarma
 summary: A Reddit Data Analysis Toolkit
 description: |
   Knew Karma (/nuː ‘kɑːrmə/) is a Reddit Data Analysis Toolkit designed to provide an extensive range of functionalities for exploring and analysing Reddit data. 
@@ -14,5 +14,5 @@ parts:
     source: .
 
 apps:
-  knewkarma:
+  Knew Karma:
     command: bin/knewkarma
