@@ -1,0 +1,18 @@
+name: Knew Karma
+summary: A Reddit Data Analysis Toolkit
+description: |
+  Knew Karma (/nuː ‘kɑːrmə/) is a Reddit Data Analysis Toolkit designed to provide an extensive range of functionalities for exploring and analysing Reddit data. 
+  It includes a Command-Line Interface (CLI), an Application Programming Interface (API) to enable an easy integration in other Python Projects and a Graphical User Interface (GUI) for Windows machines, 
+  making it adaptable for various user preferences.
+version: 4.0.0
+base: core22
+confinement: strict
+
+parts:
+  knewkarma:
+    plugin: python
+    source: .
+
+apps:
+  knewkarma:
+    command: bin/knewkarma
