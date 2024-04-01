@@ -81,16 +81,17 @@ def create_parser() -> argparse.ArgumentParser:
     main_parser.add_argument(
         "-v",
         "--version",
-        version=Markdown(
-            f"Knew Karma {Version.release} {Docs.copyright}. All Rights Reserved"
-        ),
+        version=Markdown(f"Knew Karma {Version.release} {Docs.copyright}"),
         action="version",
     )
 
     post_parser = subparsers.add_parser(
         "post",
         help="post module",
-        description=Markdown("# Post", style="argparse.text"),
+        description=Markdown(
+            "# Post Module",
+            style="argparse.text",
+        ),
         epilog=Markdown(Docs.examples["post"]),
         formatter_class=RichHelpFormatter,
     )
@@ -107,7 +108,7 @@ def create_parser() -> argparse.ArgumentParser:
     posts_parser = subparsers.add_parser(
         "posts",
         help="posts module",
-        description=Markdown("# Posts", style="argparse.text"),
+        description=Markdown("# Posts Module", style="argparse.text"),
         epilog=Markdown(Docs.examples["posts"]),
         formatter_class=RichHelpFormatter,
     )
@@ -134,7 +135,7 @@ def create_parser() -> argparse.ArgumentParser:
     search_parser = subparsers.add_parser(
         "search",
         help="search module",
-        description=Markdown("# Search", style="argparse.text"),
+        description=Markdown("# Search Module", style="argparse.text"),
         epilog=Markdown(Docs.examples["search"]),
         formatter_class=RichHelpFormatter,
     )
@@ -153,7 +154,7 @@ def create_parser() -> argparse.ArgumentParser:
         "subreddit",
         help="subreddit module",
         description=Markdown(
-            "# Subreddit",
+            "# Subreddit Module",
             style="argparse.text",
         ),
         epilog=Markdown(Docs.examples["subreddit"]),
@@ -201,7 +202,7 @@ def create_parser() -> argparse.ArgumentParser:
         "subreddits",
         help="subreddits module",
         description=Markdown(
-            "# Subreddits",
+            "# Subreddits Module",
             style="argparse.text",
         ),
         epilog=Markdown(Docs.examples["subreddits"]),
@@ -235,7 +236,7 @@ def create_parser() -> argparse.ArgumentParser:
     user_parser = subparsers.add_parser(
         "user",
         help="user module",
-        description=Markdown("# User", style="argparse.text"),
+        description=Markdown("# User Module", style="argparse.text"),
         epilog=Markdown(Docs.examples["user"]),
         formatter_class=RichHelpFormatter,
     )
