@@ -39,8 +39,8 @@ description: |
       - *Popular* — Retrieves popular subreddits.
   
   - Post
-    - Data — Retrieves an individual post's data.
-    - Comments — Retrieves an individual post's comments.
+    - *Data* — Retrieves an individual post's data.
+    - *Comments* — Retrieves an individual post's comments.
 
   - Posts
       - *New* — Retrieves new posts.
