@@ -15,7 +15,7 @@ Interface (GUI)** for Windows machines, making it adaptable for various user pre
 
 Knew Karma offers a variety of features for accessing and analysing Reddit data, including:
 
-- **User Data**
+- **User**
     - *Profile* — Retrieves user profile information.
     - *Posts* — Retrieves user posts.
     - *Comments* — Retrieves user comments.
@@ -26,22 +26,22 @@ Knew Karma offers a variety of features for accessing and analysing Reddit data,
     - *Moderated Subreddits* — Lists subreddits moderated by the user.
 
 
-- **Subreddit Data**
+- **Subreddit**
     - *Profile* — Retrieves subreddit profile information.
     - *Posts* — Retrieves posts from a specified subreddit.
     - *Search Posts* — Returns a subreddit's posts that contain the specified keyword.
     - *Wiki Pages* — Lists wiki pages in a subreddit.
-    - *Wiki Page Data* — Retrieves content from specific wiki pages.
+    - *Wiki Page* — Retrieves content from specific wiki pages.
 
 
-- **Subreddits Data**
+- **Subreddits**
     - *All* — Retrieves all subreddits.
     - *Default* — Retrieves default subreddits.
     - *New* — Retrieves new subreddits.
     - *Popular* — Retrieves popular subreddits.
 
 
-- **Posts Data**
+- **Posts**
     - *New* — Retrieves new posts.
     - *Reddit Front-Page* — Retrieves front-page posts.
     - *Listing* — Retrieves posts from specified Reddit listings.
