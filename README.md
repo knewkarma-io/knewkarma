@@ -40,6 +40,9 @@ Knew Karma offers a variety of features for accessing and analysing Reddit data,
     - *New* — Retrieves new subreddits.
     - *Popular* — Retrieves popular subreddits.
 
+- **Post**
+    - *Data* — Retrieves an individual post's data.
+    - *Comments* — Retrieves an individual post's comments.
 
 - **Posts**
     - *New* — Retrieves new posts.
