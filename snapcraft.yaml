@@ -1,18 +1,74 @@
 name: knewkarma
+icon: snap/gui/icon.png
+title: Knew Karma
 summary: A Reddit Data Analysis Toolkit
 description: |
-  Knew Karma (/nuː ‘kɑːrmə/) is a Reddit Data Analysis Toolkit designed to provide an extensive range of functionalities for exploring and analysing Reddit data. 
-  It includes a Command-Line Interface (CLI), an Application Programming Interface (API) to enable an easy integration in other Python Projects and a Graphical User Interface (GUI) for Windows machines, 
+  **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
+  functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** snap package, 
+  an **Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical User Interface (GUI)** for Windows machines, 
   making it adaptable for various user preferences.
+  
+  
+  **Feature Overview:**
+  
+  Knew Karma offers a variety of features for accessing and analysing Reddit data, including:
+  
+  - User Data
+      - *Profile* — Retrieves user profile information.
+      - *Posts* — Retrieves user posts.
+      - *Comments* — Retrieves user comments.
+      - *Overview* — Retrieves user's most recent comment activity.
+      - *Search Posts* — Returns a user's posts that contain the specified keyword.
+      - *Search Comments* — Returns a user's comments that contain the specified keyword.
+      - *Top *n* Communities* — Identifies top subreddits based on user activity.
+      - *Moderated Communities* — Lists subreddits moderated by the user.
+  
+  
+  - Community (Subreddit) Data
+      - *Profile* — Retrieves subreddit profile information.
+      - *Posts* — Retrieves posts from a specified subreddit.
+      - *Search Posts* — Returns a subreddit's posts that contain the specified keyword.
+      - *Wiki Pages* — Lists wiki pages in a subreddit.
+      - *Wiki Page Data* — Retrieves content from specific wiki pages.
+  
+  
+  - Communities (Subreddits) Data
+      - *All* — Retrieves all subreddits.
+      - *Default* — Retrieves default subreddits.
+      - *New* — Retrieves new subreddits.
+      - *Popular* — Retrieves popular subreddits.
+  
+  
+  - Posts Data
+      - *New* — Retrieves new posts.
+      - *Reddit Front-Page* — Retrieves front-page posts.
+      - *Listing* — Retrieves posts from specified Reddit listings.
+  
+  
+  - Search & Discovery
+      - *Users* — Searches for users.
+      - *Communities* — Searches for subreddits.
+      - *Posts* — Searches for posts.
+
 version: 4.0.0
+license: MIT
 base: core22
 confinement: strict
-
+source-code: https://github.com/bellingcat/knewkarma
+issues:
+  - https://github.com/bellingcat/knewkarma/issues
+donation:
+  - https://buymeacoffee.com/rly0nheart/
+website: https://knewkarma-wiki.readthedocs.io/
+contact:
+  - mailto:rly0nheart@gagpasta.com
 parts:
   knewkarma:
     plugin: python
     source: .
 
+type: app
 apps:
-  Knew Karma:
+  knewkarma:
     command: bin/knewkarma
+    plugs: [ network, network-bind, home ]
