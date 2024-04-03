@@ -1,6 +1,4 @@
-﻿Imports System.Globalization
-
-Public Class MainWindow
+﻿Public Class MainWindow
     Public Shared ReadOnly settings As New SettingsManager()
     Private bytesSentCounter As PerformanceCounter
     Private bytesReceivedCounter As PerformanceCounter
@@ -35,7 +33,7 @@ Public Class MainWindow
                                       ) Handles MyBase.HelpButtonClicked
         ' Cancel the default behavior (opening system help)
         e.Cancel = True
-        Shell("cmd.exe /c start https://github.com/bellingcat/knewkarma/wiki")
+        Shell("cmd.exe /c start https://knewkarma-wiki.readthedocs.io")
     End Sub
 
     Private Sub ExitProgram()
@@ -335,7 +333,7 @@ Public Class MainWindow
                                  ) Handles TreeView1.AfterSelect
 
         HideAllPanels()
-        Me.Width = 393 ' Set the Window's width to 393 (normal width)
+        Me.Width = 393
         Me.Text = My.Application.Info.AssemblyName
         Select Case e.Node.Text
             Case "User"
@@ -349,7 +347,7 @@ Public Class MainWindow
             Case "Front Page"
                 PanelFrontPageData.Visible = True
             Case Else
-                Me.Width = 169 ' Set the Window's width to 169
+                Me.Width = 169
                 Me.Text = ""
         End Select
     End Sub

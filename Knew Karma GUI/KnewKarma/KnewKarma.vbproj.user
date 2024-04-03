@@ -7,6 +7,9 @@
     <Compile Update="Windows\AboutWindow.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Windows\DataWindow.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Windows\MainWindow.vb">
       <SubType>Form</SubType>
     </Compile>
