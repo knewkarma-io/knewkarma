@@ -204,7 +204,7 @@ def create_parser() -> argparse.ArgumentParser:
         "subreddits",
         help="subreddits module ([bold][green]bulk[/][/])",
         description=Markdown(
-            "**Subreddits*: *Pull subreddits from various sources.*",
+            "**Subreddits**: *Pull subreddits from various sources.*",
             style="argparse.text",
         ),
         epilog=Markdown(Docs.examples["subreddits"]),
