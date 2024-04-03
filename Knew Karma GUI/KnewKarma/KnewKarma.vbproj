@@ -8,15 +8,15 @@
     <MyType>WindowsForms</MyType>
     <Company>Richard Mwewa</Company>
     <Description>A Reddit Data Analysis Toolkit.</Description>
-    <Copyright>© 2023 Richard Mwewa. All rights reserved.</Copyright>
+    <Copyright>© 2023-2024 Richard Mwewa. All rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/bellingcat/knewkarma</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/bellingcat/knewkarma</RepositoryUrl>
-    <AssemblyVersion>3.5.0.0</AssemblyVersion>
-    <FileVersion>3.5.0.0</FileVersion>
+    <AssemblyVersion>4.0.0.0</AssemblyVersion>
+    <FileVersion>4.0.0.0</FileVersion>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>3.5.0</Version>
+    <Version>4.0.0</Version>
     <PackageTags>reddit;scraper;reddit-scraper;osint;reddit-data</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
     <AnalysisLevel>6.0-recommended</AnalysisLevel>
