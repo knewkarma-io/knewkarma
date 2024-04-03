@@ -14,44 +14,44 @@ description: |
   Knew Karma offers a variety of features for accessing and analysing Reddit data, including:
   
   - User
-      - *Profile* — Retrieves user profile information.
-      - *Posts* — Retrieves user posts.
-      - *Comments* — Retrieves user comments.
-      - *Overview* — Retrieves user's most recent comment activity.
-      - *Search Posts* — Returns a user's posts that contain the specified keyword.
-      - *Search Comments* — Returns a user's comments that contain the specified keyword.
-      - *Top *n* Subreddits* — Identifies top subreddits based on user activity.
-      - *Moderated Subreddits* — Lists subreddits moderated by the user.
+      - _Profile_ — Retrieves user profile information.
+      - _Posts_ — Retrieves user posts.
+      - _Comments_ — Retrieves user comments.
+      - _Overview_ — Retrieves user's most recent comment activity.
+      - _Search Posts_ — Returns a user's posts that contain the specified keyword.
+      - _Search Comments_ — Returns a user's comments that contain the specified keyword.
+      - _Top n Subreddits_ — Identifies top subreddits based on user activity.
+      - _Moderated Subreddits_ — Lists subreddits moderated by the user.
   
   
   - Subreddit
-      - *Profile* — Retrieves subreddit profile information.
-      - *Posts* — Retrieves posts from a specified subreddit.
-      - *Search Posts* — Returns a subreddit's posts that contain the specified keyword.
-      - *Wiki Pages* — Lists wiki pages in a subreddit.
-      - *Wiki Page* — Retrieves content from specific wiki pages.
+      - _Profile_ — Retrieves subreddit profile information.
+      - _Posts_ — Retrieves posts from a specified subreddit.
+      - _Search Posts_ — Returns a subreddit's posts that contain the specified keyword.
+      - _Wiki Pages_ — Lists wiki pages in a subreddit.
+      - _Wiki Page_ — Retrieves content from specific wiki pages.
   
   
   - Subreddits
-      - *All* — Retrieves all subreddits.
-      - *Default* — Retrieves default subreddits.
-      - *New* — Retrieves new subreddits.
-      - *Popular* — Retrieves popular subreddits.
+      - _All_ — Retrieves all subreddits.
+      - _Default_ — Retrieves default subreddits.
+      - _New_ — Retrieves new subreddits.
+      - _Popular_ — Retrieves popular subreddits.
   
   - Post
-    - *Data* — Retrieves an individual post's data.
-    - *Comments* — Retrieves an individual post's comments.
+    - _Data_ — Retrieves an individual post's data.
+    - _Comments_ — Retrieves an individual post's comments.
 
   - Posts
-      - *New* — Retrieves new posts.
-      - *Reddit Front-Page* — Retrieves front-page posts.
-      - *Listing* — Retrieves posts from specified Reddit listings.
+      - _New_ — Retrieves new posts.
+      - _Reddit Front-Page_ — Retrieves front-page posts.
+      - _Listing_ — Retrieves posts from specified Reddit listings.
   
   
   - Search & Discovery
-      - *Users* — Searches for users.
-      - *Subreddits* — Searches for subreddits.
-      - *Posts* — Searches for posts.
+      - _Users_ — Searches for users.
+      - _Subreddits_ — Searches for subreddits.
+      - _Posts_ — Searches for posts.
 
 version: 4.0.0
 license: MIT
