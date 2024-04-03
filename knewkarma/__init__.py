@@ -1,5 +1,17 @@
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+from ._core import (
+    Post,
+    Posts,
+    Subreddit,
+    Subreddits,
+    User,
+    Search,
+)
 
-from .base import RedditUser, RedditSub, RedditPosts
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+__all__ = [
+    "Post",
+    "Posts",
+    "Subreddit",
+    "Subreddits",
+    "User",
+    "Search",
+]

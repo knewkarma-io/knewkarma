@@ -1,35 +1,131 @@
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-import csv
-import json
-import logging
+import getpass
+import locale
 import os
-from datetime import datetime
-from typing import Union, List
+import platform
+import time
+from datetime import datetime, timezone
+from typing import Union, Literal
 
-from ._parser import create_parser
-from .data import Comment, Post, Subreddit, User
+import pandas as pd
+from rich.console import Console
+from rich.tree import Tree
 
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+def systeminfo():
+    """Shows some basic system info"""
+    return {
+        "python": platform.python_version(),
+        "username": getpass.getuser(),
+        "system": f"{platform.node()} {platform.release()} ({platform.system()})",
+    }
 
 
-def unix_timestamp_to_utc(timestamp: int) -> str:
+def pathfinder(directories: list[str]):
     """
-    Converts a UNIX timestamp to a formatted datetime.utc string.
+    Creates directories in knewkarma-data directory of the user's home folder.
 
-    :param timestamp: The UNIX timestamp to be converted.
-    :type timestamp: int
-    :return: A formatted datetime.utc string in the format "dd MMMM yyyy, hh:mm:ssAM/PM"
+    :param directories: A list of file directories to create.
+    :type directories: list[str]
+    """
+    for directory in directories:
+        os.makedirs(directory, exist_ok=True)
+
+
+def _timestamp_to_datetime(timestamp: float) -> str:
+    """
+    Converts a unix timestamp to a localized datetime string based on the system's locale.
+
+    :param timestamp: Unix timestamp to convert.
+    :type timestamp: float
+    :return: A localized datetime string from the converted timestamp.
     :rtype: str
     """
-    utc_from_timestamp: datetime = datetime.utcfromtimestamp(timestamp)
-    datetime_string: str = utc_from_timestamp.strftime("%d %B %Y, %I:%M:%S%p")
+    # Set the locale to the user's system default
+    locale.setlocale(locale.LC_TIME, "")
 
-    return datetime_string
+    # Convert timestamp to a timezone-aware datetime object in UTC
+    utc_object = datetime.fromtimestamp(timestamp, timezone.utc)
+
+    local_object = utc_object.astimezone()
+
+    # Format the datetime object according to the locale's conventions
+    return local_object.strftime("%x, %X")
 
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+def _time_since(timestamp: int) -> str:
+    """
+    Convert a Unix timestamp into a human-readable time difference.
+
+    :param timestamp: A Unix timestamp.
+    :type timestamp: int
+    :return: A string representing the time difference from now.
+    :rtype: str
+    """
+    # Convert the current time to a Unix timestamp
+    now = int(time.time())
+
+    # Calculate the difference in seconds
+    diff = now - timestamp
+
+    # Define the time thresholds in seconds
+    minute = 60
+    hour = 60 * minute
+    day = 24 * hour
+    week = 7 * day
+    month = 30 * day
+    year = 12 * month
+
+    # Determine the time unit and value
+    if diff < minute:
+        count = diff
+        label = "seconds" if int(count) > 1 else "second"  # seconds
+    elif diff < hour:
+        count = diff // minute
+        label = "minutes" if int(count) > 1 else "minute"  # minutes
+    elif diff < day:
+        count = diff // hour
+        label = "hours" if int(count) > 1 else "hour"  # hours
+    elif diff < week:
+        count = diff // day
+        label = "days" if int(count) > 1 else "day"
+    elif diff < month:
+        count = diff // week
+        label = "weeks" if int(count) > 1 else "week"
+    elif diff < year:
+        count = diff // month
+        label = "months" if int(count) > 1 else "month"
+    else:
+        count = diff // year
+        label = "years" if int(count) > 1 else "year"
+
+    return "just now" if int(count) == 0 else f"{int(count)} {label} ago"
+
+
+def timestamp_to_readable(
+    timestamp: float, time_format: Literal["concise", "datetime"] = "datetime"
+) -> str:
+    """
+    Converts a Unix timestamp into a more readable format based on the specified `time_format`.
+    The function supports converting the timestamp into either a localized datetime string or a concise
+    human-readable time difference (e.g., "3 hours ago").
+
+    :param timestamp: The Unix timestamp to be converted.
+    :type timestamp: float
+    :param time_format: Determines the format of the output time. Use "concise" for a human-readable
+                        time difference, or "datetime" for a localized datetime string. Defaults to "datetime".
+    :type time_format: Literal["concise", "datetime"]
+    :return: A string representing the formatted time. The format is determined by the `time_format` parameter.
+    :rtype: str
+    :raises ValueError: If `time_format` is not one of the expected values ("concise" or "datetime").
+    """
+    if time_format == "concise":
+        return _time_since(timestamp=int(timestamp))
+    elif time_format == "datetime":
+        return _timestamp_to_datetime(timestamp=timestamp)
+    else:
+        raise ValueError(
+            f"Unknown time format {time_format}. Expected `concise` or `datetime`."
+        )
 
 
 def filename_timestamp() -> str:
@@ -44,7 +140,7 @@ def filename_timestamp() -> str:
     Example
     -------
     - Windows: "20-July-1969-08-17-45PM"
-    - Non-Windows: "20-July-1969-08:17:45PM" (format may vary based on the current date and time)
+    - Non-Windows: "20-July-1969-08:17:45PM"
     """
     now = datetime.now()
     return (
@@ -54,117 +150,102 @@ def filename_timestamp() -> str:
     )
 
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-def pathfinder(directories: list[str]):
-    """
-    Creates directories in knewkarma-data directory of the user's home folder.
-
-    :param directories: A list of file directories to create.
-    :type directories: list[str]
-    """
-    for directory in directories:
-        os.makedirs(directory, exist_ok=True)
-
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-
-def save_data(
-    data: Union[User, Subreddit, List[Union[Post, Comment]]],
-    save_to_dir: str,
-    save_json: Union[bool, str] = False,
-    save_csv: Union[bool, str] = False,
+def create_dataframe(
+    data: Union[dict, list[dict], list[tuple]],
 ):
     """
-    Save the given (Reddit) data to a JSON/CSV file based on the save_csv and save_json parameters.
+    Converts provided data into a pandas DataFrame.
 
-    :param data: The data to be saved, which can be a dict or a list of dicts.
-    :type data: Union[User, Subreddit, List[Union[Post, Comment]]]
-    :param save_to_dir: Directory to save data to.
-    :type save_to_dir: str
-    :param save_json: Used to get the True value and the filename for the created JSON file if specified.
-    :type save_json: bool
-    :param save_csv: Used to get the True value and the filename for the created CSV file if specified.
-    :type save_csv: bool
+    :param data: Data to be converted.
+    :type data: Union[dict, list[dict], list[str]]
+    :return: A pandas DataFrame constructed from the provided data. Excludes any 'raw_data'
+             column from the dataframe.
+    :rtype: pd.DataFrame
     """
-    # -------------------------------------------------------------------- #
 
-    if isinstance(data, (User, Subreddit)):
-        function_data = data.__dict__
-    elif isinstance(data, list):
-        function_data = [item.__dict__ for item in data]
-    else:
-        log.critical(
-            f"Got an unexpected data type ({type(data)}), "
-            f"expected {type(User)}, {type(Subreddit)} or {List[Union[type(Post), type(Comment)]]}."
-        )
-        return
+    if isinstance(data, dict):
+        # Transform each attribute of the object into a dictionary entry
+        data = [{"key": key, "value": value} for key, value in data.items()]
 
-    # -------------------------------------------------------------------- #
+    # Convert a list of objects (Comment, Community, Post, PreviewCommunity, User) to a list of dictionaries
+    elif isinstance(data, list) and all(
+        isinstance(item, (dict, tuple)) for item in data
+    ):
+        # Each object in the list is converted to its dictionary representation
+        data = [item for item in data]
 
-    if save_json:
-        json_path = os.path.join(
-            save_to_dir, "json", f"{save_json.upper()}-{filename_timestamp()}.json"
-        )
-        with open(json_path, "w", encoding="utf-8") as json_file:
-            json.dump(function_data, json_file, indent=4)
-        log.info(
-            f"{os.path.getsize(json_file.name)} bytes written to [link file://{json_file.name}]{json_file.name}"
-        )
+    # Set pandas display option to show all rows
+    pd.set_option("display.max_rows", None)
 
-    # -------------------------------------------------------------------- #
+    # Create a DataFrame from the processed data
+    dataframe = pd.DataFrame(data)
 
-    if save_csv:
-        csv_path = os.path.join(
-            save_to_dir, "csv", f"{save_csv.upper()}-{filename_timestamp()}.csv"
-        )
-        with open(csv_path, "w", newline="", encoding="utf-8") as csv_file:
-            writer = csv.writer(csv_file)
-            if isinstance(function_data, dict):
-                writer.writerow(function_data.keys())
-                writer.writerow(function_data.values())
-            elif isinstance(function_data, list):
-                if function_data:
-                    writer.writerow(
-                        function_data[0].keys()
-                    )  # header from keys of the first item
-                    for item in function_data:
-                        writer.writerow(item.values())
-        log.info(
-            f"{os.path.getsize(csv_file.name)} bytes written to [link file://{csv_file.name}]{csv_file.name}"
-        )
+    return dataframe
 
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+def show_exported_files(tree: Tree, directory: str, base_path: str = ""):
+    for item in sorted(os.listdir(directory)):
+        path = os.path.join(directory, item)
+        if os.path.isdir(path):
+            branch = tree.add(f":open_file_folder: {item}", guide_style="blue")
+            show_exported_files(branch, path, os.path.join(base_path, item))
+        else:
+            filepath: str = os.path.join(directory, path, item, path)
+            tree.add(f":page_facing_up: [italic][link file://{filepath}]{item}[/]")
 
 
-def setup_logging(debug_mode: bool) -> logging.getLogger:
+def export_dataframe(
+    dataframe: pd.DataFrame,
+    filename: str,
+    directory: str,
+    formats: list[Literal["csv", "html", "json", "xml"]],
+):
     """
-    Configure and return a logging object with the specified log level.
+    Exports a Pandas dataframe to specified file formats.
 
-    :param debug_mode: A boolean value indicating whether log level should be set to DEBUG.
-    :type debug_mode: bool
-    :return: A logging object configured with the specified log level.
-    :rtype: logging.getLogger
+    :param dataframe: Pandas dataframe to export.
+    :type dataframe: pandas.DataFrame
+    :param filename: Name of the file to which the dataframe will be exported.
+    :type filename: str
+    :param directory: Directory to which the dataframe files will be saved.
+    :type directory: str
+    :param formats: A list of file formats to which the data will be exported.
+    :type formats: list[Literal]
     """
-    from rich.logging import RichHandler
+    file_mapping: dict = {
+        "csv": lambda: dataframe.to_csv(
+            os.path.join(directory, "csv", f"{filename}.csv"), encoding="utf-8"
+        ),
+        "html": lambda: dataframe.to_html(
+            os.path.join(directory, "html", f"{filename}.html"),
+            escape=False,
+            encoding="utf-8",
+        ),
+        "json": lambda: dataframe.to_json(
+            os.path.join(directory, "json", f"{filename}.json"),
+            orient="records",
+            lines=True,
+            force_ascii=False,
+            indent=4,
+        ),
+        "xml": lambda: dataframe.to_xml(
+            os.path.join(directory, "xml", f"{filename}.xml"),
+            parser="etree",
+            encoding="utf-8",
+        ),
+    }
 
-    logging.basicConfig(
-        level="DEBUG" if debug_mode else "INFO",
-        format="%(message)s",
-        handlers=[
-            RichHandler(
-                markup=True, log_time_format="[%I:%M:%S %p]", show_level=debug_mode
+    for file_format in formats:
+        if file_format in file_mapping:
+            filepath: str = os.path.join(
+                directory, file_format, f"{filename}.{file_format}"
             )
-        ],
-    )
-    return logging.getLogger("Knew Karma")
+            file_mapping.get(file_format)()
+            console.log(
+                f"[green]✔[/] {os.path.getsize(filepath)} bytes written to [link file://{filepath}]{filepath}"
+            )
+        else:
+            console.log(f"Unsupported file format: {file_format}")
 
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
-log: logging.getLogger = setup_logging(debug_mode=create_parser().parse_args().debug)
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+console = Console(color_system="auto", log_time=False)
