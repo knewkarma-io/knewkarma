@@ -43,7 +43,7 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default="all",
         choices=list(get_args(DATA_TIMEFRAME)),
-        help="([bold][green]bulk/semi-bulk[/][/]) timeframe to get data from (default: %(default)s)",
+        help="([bold][green]bulk/semi-bulk[/][/]) timeframe to get data from (default: [green]%(default)s[/])",
     )
     main_parser.add_argument(
         "-s",
@@ -51,19 +51,19 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default="all",
         choices=list(get_args(SORT_CRITERION)),
-        help="([bold][green]bulk/semi-bulk[/][/]) sort criterion (default: %(default)s)",
+        help="([bold][green]bulk/semi-bulk[/][/]) sort criterion (default: [green]%(default)s[/])",
     )
     main_parser.add_argument(
         "-l",
         "--limit",
         type=int,
         default=100,
-        help="([bold][green]bulk/semi-bulk[/][/]) data output limit (default: %(default)s)",
+        help="([bold][green]bulk/semi-bulk[/][/]) data output limit (default: [cyan]%(default)s[/])",
     )
     main_parser.add_argument(
         "--time-format",
         default="datetime",
-        help="determines the format of the output time",
+        help="determines the format of the output time (default: [green]%(default)s[/])",
         choices=["concise", "datetime"],
     )
     main_parser.add_argument(
