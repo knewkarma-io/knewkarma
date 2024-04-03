@@ -16,7 +16,7 @@ class Docs:
         f"© Copyright 2023-{date.today().year} {author}. All Rights Reserved"
     )
 
-    about: str = f"**Knew Karma**: *Reddit Data Analysis Toolkit.* — by {author}"
+    about: str = f"**Knew Karma**: *A Reddit Data Analysis Toolkit* — by {author}"
     description: str = """
 **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, an
@@ -27,6 +27,9 @@ Interface (GUI)** for Windows machines, making it adaptable for various user pre
 
     examples: dict = {
         "user": """
+The **User** module is used to pull a specified user's data including profile, comments, posts, 
+searching posts that contain the specified kwyword, or even searching comments that contain the specified keyword.
+
 # Examples
 ## Get user profile
 ```
@@ -38,7 +41,7 @@ knewkarma user  AutoModerator --profile
 knewkarma user  AutoModerator --comments
 ```
 
-## Get user comments
+## Get user posts
 ```
 knewkarma user  AutoModerator --posts
 ```
@@ -69,6 +72,9 @@ knewkarma --limit 500 user TheRealKSi --top-subreddits 10
 ```
 """,
         "subreddit": """
+The **Subreddit** module is used to pull a specified subreddit's data including profile, posts, wiki pages,
+ or even searching posts that have the specified keyword.
+
 # Examples
 ## Get subreddit profile
 ```
@@ -96,6 +102,8 @@ knewkarma subreddit MachineLearning --wiki-page config/description
 ```
     """,
         "subreddits": """
+The **Subreddits** module is used to pull subreddits from various sources such as new, default, or popular.
+
 # Examples
 ## Get all subreddits
 ```
@@ -118,18 +126,23 @@ knewkarma subreddits --popular
 ```
     """,
         "post": """
+The **Post** module is used to pull an individual post's data including its comments, 
+provided the post's **id** and source **subreddit** are provided.
+
 # Examples
-## Get a post's 'profile'
+### Get a post's data
 ```
-knewkarma post 12csg48 OSINT --profile
+knewkarma post 12csg48 OSINT --data
 ```
 
-## Get a post's comments
+### Get a post's comments
 ```
 knewkarma post 12csg48 OSINT --comments
 ```
 """,
         "posts": """
+The **Posts** is used to pull posts from sources like the front page, a listing, or new posts.
+
 # Examples
 ## Get new posts
 ```
@@ -147,6 +160,8 @@ knewkarma posts --listing best
 ```
     """,
         "search": """
+The **Search** module is used for search/discovery of targets in users, subreddits, and posts.
+
 # Examples
 ## Search users
 ```

@@ -43,7 +43,7 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default="all",
         choices=list(get_args(DATA_TIMEFRAME)),
-        help="timeframe to get [[bold][green]bulk[/][/]] data from (default: %(default)s)",
+        help="([bold][green]bulk/semi-bulk[/][/]) timeframe to get data from (default: %(default)s)",
     )
     main_parser.add_argument(
         "-s",
@@ -51,14 +51,14 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default="all",
         choices=list(get_args(SORT_CRITERION)),
-        help="[[bold][green]bulk[/][/]] sort criterion (default: %(default)s)",
+        help="([bold][green]bulk/semi-bulk[/][/]) sort criterion (default: %(default)s)",
     )
     main_parser.add_argument(
         "-l",
         "--limit",
         type=int,
         default=100,
-        help="[[bold][green]bulk[/][/]] data output limit (default: %(default)s)",
+        help="([bold][green]bulk/semi-bulk[/][/]) data output limit (default: %(default)s)",
     )
     main_parser.add_argument(
         "--time-format",
@@ -87,9 +87,9 @@ def create_parser() -> argparse.ArgumentParser:
 
     post_parser = subparsers.add_parser(
         "post",
-        help="post module",
+        help="post module ([bold][green]semi-bulk[/][/])",
         description=Markdown(
-            "# Post Module",
+            "**Post Module**: *Pull an individual post's data*",
             style="argparse.text",
         ),
         epilog=Markdown(Docs.examples["post"]),
@@ -98,17 +98,17 @@ def create_parser() -> argparse.ArgumentParser:
 
     post_parser.add_argument("id", help="post id", type=str)
     post_parser.add_argument("subreddit", help="post source subreddit", type=str)
-    post_parser.add_argument(
-        "-p", "--profile", help="get post 'profile' data", action="store_true"
-    )
+    post_parser.add_argument("-d", "--data", help="get post data", action="store_true")
     post_parser.add_argument(
         "-c", "--comments", help="get post comments", action="store_true"
     )
 
     posts_parser = subparsers.add_parser(
         "posts",
-        help="posts module",
-        description=Markdown("# Posts Module", style="argparse.text"),
+        help="posts module ([bold][green]bulk[/][/])",
+        description=Markdown(
+            "**Posts**: *Pull posts from various sources.*", style="argparse.text"
+        ),
         epilog=Markdown(Docs.examples["posts"]),
         formatter_class=RichHelpFormatter,
     )
@@ -134,8 +134,11 @@ def create_parser() -> argparse.ArgumentParser:
 
     search_parser = subparsers.add_parser(
         "search",
-        help="search module",
-        description=Markdown("# Search Module", style="argparse.text"),
+        help="search module ([bold][green]bulk[/][/])",
+        description=Markdown(
+            "**Search**: *Get search results from various sources.*",
+            style="argparse.text",
+        ),
         epilog=Markdown(Docs.examples["search"]),
         formatter_class=RichHelpFormatter,
     )
@@ -147,14 +150,14 @@ def create_parser() -> argparse.ArgumentParser:
         "-p", "--posts", help="search posts", action="store_true"
     )
     search_parser.add_argument(
-        "-c", "--subreddits", help="search subreddits", action="store_true"
+        "-s", "--subreddits", help="search subreddits", action="store_true"
     )
 
     subreddit_parser = subparsers.add_parser(
         "subreddit",
-        help="subreddit module",
+        help="subreddit module ([bold][green]semi-bulk[/][/])",
         description=Markdown(
-            "# Subreddit Module",
+            "**Subreddit**: *Pull a specified subreddit's data.*",
             style="argparse.text",
         ),
         epilog=Markdown(Docs.examples["subreddit"]),
@@ -173,7 +176,6 @@ def create_parser() -> argparse.ArgumentParser:
     subreddit_parser.add_argument(
         "-s",
         "--search",
-        metavar="KEYWORD",
         help="get a subreddit's posts that contain the specified keyword",
         type=str,
     )
@@ -200,9 +202,9 @@ def create_parser() -> argparse.ArgumentParser:
 
     subreddits_parser = subparsers.add_parser(
         "subreddits",
-        help="subreddits module",
+        help="subreddits module ([bold][green]bulk[/][/])",
         description=Markdown(
-            "# Subreddits Module",
+            "**Subreddits*: *Pull subreddits from various sources.*",
             style="argparse.text",
         ),
         epilog=Markdown(Docs.examples["subreddits"]),
@@ -235,8 +237,10 @@ def create_parser() -> argparse.ArgumentParser:
 
     user_parser = subparsers.add_parser(
         "user",
-        help="user module",
-        description=Markdown("# User Module", style="argparse.text"),
+        help="user module ([bold][green]semi-bulk[/][/])",
+        description=Markdown(
+            "**User**: *Pull a specified user's data.*", style="argparse.text"
+        ),
         epilog=Markdown(Docs.examples["user"]),
         formatter_class=RichHelpFormatter,
     )
@@ -270,7 +274,6 @@ def create_parser() -> argparse.ArgumentParser:
         "-sp",
         "--search-posts",
         dest="search_posts",
-        metavar="KEYWORD",
         help="get a user's posts that contain the specified keyword",
         type=str,
     )
@@ -278,7 +281,6 @@ def create_parser() -> argparse.ArgumentParser:
         "-sc",
         "--search-comments",
         dest="search_comments",
-        metavar="KEYWORD",
         help="get a user's comments that contain the specified keyword",
         type=str,
     )
