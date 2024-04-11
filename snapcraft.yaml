@@ -6,65 +6,20 @@ description: |
   **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
   functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** snap package, 
   an **Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical User Interface (GUI)** for Windows machines, 
-  making it adaptable for various user preferences.
-  
-  
-  **Feature Overview:**
-  
-  Knew Karma offers a variety of features for accessing and analysing Reddit data, including:
-  
-  - User
-      - _Profile_ — Retrieves user profile information.
-      - _Posts_ — Retrieves user posts.
-      - _Comments_ — Retrieves user comments.
-      - _Overview_ — Retrieves user's most recent comment activity.
-      - _Search Posts_ — Returns a user's posts that contain the specified keyword.
-      - _Search Comments_ — Returns a user's comments that contain the specified keyword.
-      - _Top n Subreddits_ — Identifies top subreddits based on user activity.
-      - _Moderated Subreddits_ — Lists subreddits moderated by the user.
-  
-  
-  - Subreddit
-      - _Profile_ — Retrieves subreddit profile information.
-      - _Posts_ — Retrieves posts from a specified subreddit.
-      - _Search Posts_ — Returns a subreddit's posts that contain the specified keyword.
-      - _Wiki Pages_ — Lists wiki pages in a subreddit.
-      - _Wiki Page_ — Retrieves content from specific wiki pages.
-  
-  
-  - Subreddits
-      - _All_ — Retrieves all subreddits.
-      - _Default_ — Retrieves default subreddits.
-      - _New_ — Retrieves new subreddits.
-      - _Popular_ — Retrieves popular subreddits.
-  
-  - Post
-    - _Data_ — Retrieves an individual post's data.
-    - _Comments_ — Retrieves an individual post's comments.
-
-  - Posts
-      - _New_ — Retrieves new posts.
-      - _Reddit Front-Page_ — Retrieves front-page posts.
-      - _Listing_ — Retrieves posts from specified Reddit listings.
-  
-  
-  - Search & Discovery
-      - _Users_ — Searches for users.
-      - _Subreddits_ — Searches for subreddits.
-      - _Posts_ — Searches for posts.
-
-version: 4.0.0
+  making it adaptable for various user preferences. Refer to the wiki (https://knewkarma-wiki.readthedocs.io) for the usage guide.
+version: 4.0.1
 license: MIT
 base: core22
 confinement: strict
+
 source-code: https://github.com/bellingcat/knewkarma
 issues:
   - https://github.com/bellingcat/knewkarma/issues
 donation:
   - https://buymeacoffee.com/rly0nheart/
-website: https://knewkarma-wiki.readthedocs.io/
 contact:
   - mailto:rly0nheart@gagpasta.com
+
 parts:
   knewkarma:
     plugin: python
