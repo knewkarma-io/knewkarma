@@ -23,7 +23,7 @@ Partial Class AboutWindow
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
-        Dim resources As ComponentModel.ComponentResourceManager = New ComponentModel.ComponentResourceManager(GetType(AboutWindow))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(AboutWindow))
         LabelProgramFirstName = New Label()
         Version = New Label()
         ToolTipMainAboutBox = New ToolTip(components)
@@ -117,7 +117,7 @@ Partial Class AboutWindow
         ' 
         Copyright.AutoSize = True
         Copyright.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        Copyright.Location = New Point(77, 180)
+        Copyright.Location = New Point(62, 180)
         Copyright.Name = "Copyright"
         Copyright.Size = New Size(56, 15)
         Copyright.TabIndex = 15
@@ -147,7 +147,7 @@ Partial Class AboutWindow
         ButtonGetUpdates.Text = "Get Updates"
         ButtonGetUpdates.UseVisualStyleBackColor = True
         ' 
-        ' About
+        ' AboutWindow
         ' 
         AutoScaleDimensions = New SizeF(7F, 16F)
         AutoScaleMode = AutoScaleMode.Font
@@ -169,7 +169,7 @@ Partial Class AboutWindow
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         MaximizeBox = False
         MinimizeBox = False
-        Name = "About"
+        Name = "AboutWindow"
         ShowInTaskbar = False
         StartPosition = FormStartPosition.CenterScreen
         Text = "About"
