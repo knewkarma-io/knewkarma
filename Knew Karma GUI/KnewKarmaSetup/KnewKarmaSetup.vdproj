@@ -100,6 +100,11 @@
                     "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
                     "ProductCode" = "8:.NETFramework,Version=v4.7.2"
                     }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.DesktopRuntime.6.0.x64"
+                    {
+                    "Name" = "8:.NET Desktop Runtime 6.0.28 (x64)"
+                    "ProductCode" = "8:Microsoft.NetCore.DesktopRuntime.6.0.x64"
+                    }
                 }
             }
         }
@@ -229,15 +234,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Knew Karma"
-        "ProductCode" = "8:{E95D13CE-2743-4453-84A1-E5188FA52673}"
-        "PackageCode" = "8:{BF0BDC0B-82FE-4F4D-8421-84A302E63821}"
+        "ProductCode" = "8:{E9CF5B2D-89D6-4463-A60F-5A8E32E5705C}"
+        "PackageCode" = "8:{185E21F1-0963-44D3-9561-A12DECC1C584}"
         "UpgradeCode" = "8:{9B03AD0F-0C14-4075-AB75-01CD38A594B4}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:4.0.0"
+        "ProductVersion" = "8:4.1.0"
         "Manufacturer" = "8:Richard Mwewa"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/bellingcat/knewkarma/wiki"
@@ -777,7 +782,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_6E15D9F422094BD9809550AF1BA1C161"
             {
-            "SourcePath" = "8:..\\KnewKarma\\obj\\Debug\\net6.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\KnewKarma\\obj\\Release\\net6.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_C0F76EDD899B4FFF80C2AC1B5526BC22"
