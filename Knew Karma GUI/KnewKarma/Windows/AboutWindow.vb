@@ -1,5 +1,6 @@
 ﻿Public Class AboutWindow
     ReadOnly settings As New SettingsManager()
+    ReadOnly Coreutils As New CoreUtils()
 
     ''' <summary>
     ''' Handles the Load event for the AboutBox form.
@@ -20,7 +21,7 @@
 
         LabelBuildPlatform.Text = $"Build platform: {osArchitecture} Windows {osVersion}"
         'Version.Text = $"Version {My.Application.Info.Version}"
-        Copyright.Text = My.Application.Info.Copyright
+        Copyright.Text = Coreutils.Copyright
 
         Dim ApiHandler As New ApiHandler()
         Await ApiHandler.AsyncGetUpdates()
