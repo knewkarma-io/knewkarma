@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|c:\\users\\dudle\\source\\repos\\knewkarma\\knew karma gui\\knewkarma\\windows\\splashscreen1.resx||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\windows\\splashscreen1.resx||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|c:\\users\\dudle\\source\\repos\\knewkarma\\knew karma gui\\knewkarma\\knewkarma.vbproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\knewkarma.vbproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
@@ -39,6 +43,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "SplashScreen1.resx",
+              "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\SplashScreen1.resx",
+              "RelativeDocumentMoniker": "KnewKarma\\Windows\\SplashScreen1.resx",
+              "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\SplashScreen1.resx",
+              "RelativeToolTip": "KnewKarma\\Windows\\SplashScreen1.resx",
+              "ViewState": "AQIAAOkrAAAAAAAAAICyPfsrAAAHAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
+              "WhenOpened": "2024-04-12T02:30:15.081Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "KnewKarma.vbproj",
               "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\KnewKarma.vbproj",
               "RelativeDocumentMoniker": "KnewKarma\\KnewKarma.vbproj",
@@ -51,7 +68,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "CoreUtils.vb",
               "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Helpers\\CoreUtils.vb",
               "RelativeDocumentMoniker": "KnewKarma\\Helpers\\CoreUtils.vb",
@@ -63,7 +80,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "AboutWindow.vb",
               "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\AboutWindow.vb",
               "RelativeDocumentMoniker": "KnewKarma\\Windows\\AboutWindow.vb",
@@ -75,7 +92,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "SplashScreen1.vb",
               "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\SplashScreen1.vb",
               "RelativeDocumentMoniker": "KnewKarma\\Windows\\SplashScreen1.vb",
@@ -87,7 +104,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "AboutWindow.vb [Design]",
               "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\AboutWindow.vb",
               "RelativeDocumentMoniker": "KnewKarma\\Windows\\AboutWindow.vb",
@@ -98,7 +115,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "SplashScreen1.vb [Design]",
               "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\SplashScreen1.vb",
               "RelativeDocumentMoniker": "KnewKarma\\Windows\\SplashScreen1.vb",
