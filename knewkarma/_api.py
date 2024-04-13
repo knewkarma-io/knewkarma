@@ -1,4 +1,3 @@
-import asyncio
 from random import randint
 from sys import version as python_version
 from typing import Union, Literal
@@ -6,7 +5,7 @@ from typing import Union, Literal
 import aiohttp
 from rich.markdown import Markdown
 
-from ._utils import console
+from ._utils import console, countdown_timer, get_status
 from .version import Version
 
 SORT_CRITERION = Literal[
@@ -161,16 +160,18 @@ class Api:
         :return: A dictionary object containing profile data from the specified source.
         :rtype: dict
         """
-        # Use a dictionary for direct mapping
-        profile_mapping: dict = {
-            "user": f"{self._user_data_endpoint}/{profile_source}/about.json",
-            "subreddit": f"{self.subreddit_data_endpoint}/{profile_source}/about.json",
-        }
+        with get_status():
+            # Use a dictionary for direct mapping
+            profile_mapping: dict = {
+                "user": f"{self._user_data_endpoint}/{profile_source}/about.json",
+                "subreddit": f"{self.subreddit_data_endpoint}/{profile_source}/about.json",
+            }
 
-        # Get the endpoint directly from the dictionary
-        endpoint: str = profile_mapping.get(profile_type, "")
+            # Get the endpoint directly from the dictionary
+            endpoint: str = profile_mapping.get(profile_type, "")
 
-        profile_data = await self.get_data(endpoint=endpoint, session=session)
+            profile_data = await self.get_data(endpoint=endpoint, session=session)
+
         return self._process_response(
             response_data=profile_data.get("data", {}), valid_key="created_utc"
         )
@@ -201,35 +202,41 @@ class Api:
         """
         all_items = []
         last_item_id = None
-        while len(all_items) < limit:
-            paginated_endpoint = (
-                f"{endpoint}&after={last_item_id}&count={len(all_items)}"
-                if last_item_id
-                else endpoint
-            )
+        with get_status() as status:
+            while len(all_items) < limit:
+                paginated_endpoint = (
+                    f"{endpoint}&after={last_item_id}&count={len(all_items)}"
+                    if last_item_id
+                    else endpoint
+                )
 
-            response = await self.get_data(session=session, endpoint=paginated_endpoint)
-            items = response.get("data", {}).get("children", [])
+                response = await self.get_data(
+                    session=session, endpoint=paginated_endpoint
+                )
+                items = response.get("data", {}).get("children", [])
 
-            if not items:
-                break
+                if not items:
+                    break
 
-            processed_items = process_func(response_data=items)
-            items_to_limit = limit - len(all_items)
-            all_items.extend(processed_items[:items_to_limit])
+                processed_items = process_func(response_data=items)
+                items_to_limit = limit - len(all_items)
+                all_items.extend(processed_items[:items_to_limit])
 
-            last_item_id = response.get("data").get("after")
+                last_item_id = response.get("data").get("after")
 
-            if len(all_items) == limit:
-                break
+                if len(all_items) == limit:
+                    break
 
-            sleep_delay: int = randint(1, 10)
-            console.log(
-                f"[green]✔[/] Fetched {len(all_items)}/{limit} items so far. Resuming in {sleep_delay} seconds...",
-            )
-            await asyncio.sleep(sleep_delay)
+                sleep_delay: int = randint(1, 10)
 
-        console.log(f"[green]✔[/] Successfully fetched {len(all_items)}/{limit} items!")
+                await countdown_timer(
+                    status=status,
+                    duration=sleep_delay,
+                    current_count=len(all_items),
+                    limit=limit,
+                )
+
+        # console.log(f"[green]✔[/] {len(all_items)}/{limit} items fetched successfully!")
         return all_items
 
     async def get_posts(
