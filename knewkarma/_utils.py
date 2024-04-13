@@ -1,23 +1,91 @@
+import asyncio
 import getpass
 import locale
 import os
 import platform
+import sys
 import time
 from datetime import datetime, timezone
 from typing import Union, Literal
 
 import pandas as pd
+import psutil
 from rich.console import Console
+from rich.status import Status
+from rich.table import Table
 from rich.tree import Tree
 
 
-def systeminfo():
-    """Shows some basic system info"""
-    return {
-        "python": platform.python_version(),
-        "username": getpass.getuser(),
-        "system": f"{platform.node()} {platform.release()} ({platform.system()})",
-    }
+def system_info():
+    """
+    Displays system information in a table format.
+    """
+    table = Table(show_header=False, show_edge=False, highlight=True)
+    table.add_column("header", style="dim")
+    table.add_column("header")
+
+    uptime_timestamp = int(psutil.boot_time())
+
+    table.add_row("Username", getpass.getuser())
+    table.add_row(
+        "System", f"{platform.node()} {platform.release()} ({platform.system()})"
+    )
+    table.add_row("Python", sys.version)
+    table.add_row(
+        "CPU", f"{psutil.cpu_count(logical=True)} cores, {platform.processor()}"
+    )
+    table.add_row(
+        "Disk",
+        f"{psutil.disk_usage('/').free / (1024**3):.2f} GB free"
+        f" / {psutil.disk_usage('/').total / (1024**3):.2f} GB",
+    )
+    table.add_row(
+        "Memory",
+        f"{psutil.virtual_memory().available / (1024**3):.2f} GB free"
+        f" / {psutil.virtual_memory().total / (1024**3):.2f} GB",
+    )
+    table.add_row(
+        "Uptime",
+        _time_since(timestamp=uptime_timestamp, suffix="since boot")
+        if isinstance(uptime_timestamp, int)
+        else "N/A",
+    )
+    console.print(table)
+
+
+def get_status() -> Status:
+    """
+    Creates and returns a Status object initialized with a specific message and spinner style.
+
+    :return: A configured rich Status object ready to be used in a context manager.
+    :rtype: rich.status.Status
+    """
+    with Status(
+        status="Initialising[yellow]...[/]",
+        spinner="dots2",
+    ) as status:
+        return status
+
+
+async def countdown_timer(status, duration: int, current_count: int, limit: int):
+    """
+    Handles the countdown during the asynchronous pagination, updating the status bar with the remaining time.
+
+    :param status: The rich status object used to display the countdown.
+    :type status: rich.status.Status
+    :param duration: The duration for which to run the countdown.
+    :type duration: int
+    :param current_count: Current number of items fetched.
+    :type current_count: int
+    :param limit: Total number of items to fetch.
+    :type limit: int
+    """
+    for remaining in range(duration, 0, -1):
+        status.update(
+            f"[cyan]{current_count}[/]/[cyan]{limit}[/] "
+            f"items fetched so far. Resuming in [cyan]{remaining}[/]s[yellow]...[/]"
+        )
+        await asyncio.sleep(1)  # Sleep for one second as part of countdown
 
 
 def pathfinder(directories: list[str]):
@@ -52,7 +120,7 @@ def _timestamp_to_datetime(timestamp: float) -> str:
     return local_object.strftime("%x, %X")
 
 
-def _time_since(timestamp: int) -> str:
+def _time_since(timestamp: int, suffix: str = "ago") -> str:
     """
     Convert a Unix timestamp into a human-readable time difference.
 
@@ -98,7 +166,7 @@ def _time_since(timestamp: int) -> str:
         count = diff // year
         label = "years" if int(count) > 1 else "year"
 
-    return "just now" if int(count) == 0 else f"{int(count)} {label} ago"
+    return "just now" if int(count) == 0 else f"{int(count)} {label} {suffix}"
 
 
 def timestamp_to_readable(

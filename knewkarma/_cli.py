@@ -14,7 +14,7 @@ from ._core import Post, Posts, Subreddit, Subreddits, User, Search
 from ._utils import (
     console,
     pathfinder,
-    systeminfo,
+    system_info,
     export_dataframe,
     filename_timestamp,
     create_dataframe,
@@ -554,35 +554,23 @@ def stage_and_start():
     }
 
     if args.module:
-        print(
-            """
+        console.log(
+            f"""
 ┓┏┓         ┓┏┓
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
-┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
+┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻ {Version.release}"""
         )
-        print(f"{'='*40}")
-        with console.status(
-            status=f"Working: [bold]Knew Karma (CLI) [cyan]{Version.release}[/][/]",
-            spinner="dots2",
-        ):
-            for key, value in systeminfo().items():
-                console.log(f"[green]◉[/] [bold]{key}[/]: {value}")
+        system_info()
 
-            print(f"{'='*40}")
-
-            try:
-                start_time: datetime = datetime.now()
-                asyncio.run(
-                    call_functions(args=args, function_mapping=function_mapping)
-                )
-            except KeyboardInterrupt:
-                console.log(
-                    "[yellow]✘[/] User interruption detected ([yellow]Ctrl+C[/])"
-                )
-            finally:
-                elapsed_time = datetime.now() - start_time
-                console.log(
-                    f"[green]✔[/] Done! {elapsed_time.total_seconds():.2f} seconds elapsed."
-                )
+        try:
+            start_time: datetime = datetime.now()
+            asyncio.run(call_functions(args=args, function_mapping=function_mapping))
+        except KeyboardInterrupt:
+            console.log("[yellow]✘[/] User interruption detected ([yellow]Ctrl+C[/])")
+        finally:
+            elapsed_time = datetime.now() - start_time
+            console.log(
+                f"[green]✔[/] Done! {elapsed_time.total_seconds():.2f} seconds elapsed."
+            )
     else:
         parser.print_usage()
