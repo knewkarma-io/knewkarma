@@ -28,7 +28,7 @@ def system_info():
 
     table.add_row("Username", getpass.getuser())
     table.add_row(
-        "System", f"{platform.node()} {platform.release()} ({platform.system()})"
+        "System", f"{platform.system()} {platform.version()}"
     )
     table.add_row("Python", sys.version)
     table.add_row(
