@@ -62,9 +62,9 @@ def create_parser() -> argparse.ArgumentParser:
     )
     main_parser.add_argument(
         "--time-format",
-        default="datetime",
+        default="locale",
         help="determines the format of the output time (default: [green]%(default)s[/])",
-        choices=["concise", "datetime"],
+        choices=["concise", "locale"],
     )
     main_parser.add_argument(
         "-e",

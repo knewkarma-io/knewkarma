@@ -100,7 +100,7 @@ def pathfinder(directories: list[str]):
         os.makedirs(directory, exist_ok=True)
 
 
-def _timestamp_to_datetime(timestamp: float) -> str:
+def _timestamp_to_locale(timestamp: float) -> str:
     """
     Converts a unix timestamp to a localized datetime string based on the system's locale.
 
@@ -171,7 +171,7 @@ def _time_since(timestamp: int, suffix: str = "ago") -> str:
 
 
 def timestamp_to_readable(
-    timestamp: float, time_format: Literal["concise", "datetime"] = "datetime"
+    timestamp: float, time_format: Literal["concise", "locale"] = "locale"
 ) -> str:
     """
     Converts a Unix timestamp into a more readable format based on the specified `time_format`.
@@ -181,19 +181,19 @@ def timestamp_to_readable(
     :param timestamp: The Unix timestamp to be converted.
     :type timestamp: float
     :param time_format: Determines the format of the output time. Use "concise" for a human-readable
-                        time difference, or "datetime" for a localized datetime string. Defaults to "datetime".
-    :type time_format: Literal["concise", "datetime"]
+                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
+    :type time_format: Literal["concise", "locale"]
     :return: A string representing the formatted time. The format is determined by the `time_format` parameter.
     :rtype: str
-    :raises ValueError: If `time_format` is not one of the expected values ("concise" or "datetime").
+    :raises ValueError: If `time_format` is not one of the expected values ("concise" or "locale").
     """
     if time_format == "concise":
         return _time_since(timestamp=int(timestamp))
-    elif time_format == "datetime":
-        return _timestamp_to_datetime(timestamp=timestamp)
+    elif time_format == "locale":
+        return _timestamp_to_locale(timestamp=timestamp)
     else:
         raise ValueError(
-            f"Unknown time format {time_format}. Expected `concise` or `datetime`."
+            f"Unknown time format {time_format}. Expected `concise` or `locale`."
         )
 
 
