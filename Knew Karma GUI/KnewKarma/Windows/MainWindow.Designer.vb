@@ -103,6 +103,10 @@ Partial Class MainWindow
         Panel1 = New Panel()
         Label4 = New Label()
         NotifyIcon1 = New NotifyIcon(components)
+        PanelAbout = New Panel()
+        Panel3 = New Panel()
+        Label6 = New Label()
+        StatusStrip1 = New StatusStrip()
         ContextMenuStripRightClick.SuspendLayout()
         GroupBoxSearchResultsFiltering.SuspendLayout()
         CType(NumericUpDownSearchResultLimit, ComponentModel.ISupportInitialize).BeginInit()
@@ -127,6 +131,8 @@ Partial Class MainWindow
         GroupBoxPostListings.SuspendLayout()
         PanelSearchPosts.SuspendLayout()
         Panel1.SuspendLayout()
+        PanelAbout.SuspendLayout()
+        Panel3.SuspendLayout()
         SuspendLayout()
         ' 
         ' TextBoxQuery
@@ -158,7 +164,7 @@ Partial Class MainWindow
         ContextMenuStripRightClick.Items.AddRange(New ToolStripItem() {AboutToolStripMenuItem, SettingsToolStripMenuItem, ExitToolStripMenuItem})
         ContextMenuStripRightClick.LayoutStyle = ToolStripLayoutStyle.Table
         ContextMenuStripRightClick.Name = "ContextMenuStrip1"
-        ContextMenuStripRightClick.Size = New Size(118, 70)
+        ContextMenuStripRightClick.Size = New Size(181, 92)
         ContextMenuStripRightClick.Text = "Menu"
         ' 
         ' AboutToolStripMenuItem
@@ -167,7 +173,7 @@ Partial Class MainWindow
         AboutToolStripMenuItem.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         AboutToolStripMenuItem.Image = CType(resources.GetObject("AboutToolStripMenuItem.Image"), Image)
         AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        AboutToolStripMenuItem.Size = New Size(117, 22)
+        AboutToolStripMenuItem.Size = New Size(180, 22)
         AboutToolStripMenuItem.Text = "About"
         ' 
         ' SettingsToolStripMenuItem
@@ -177,7 +183,7 @@ Partial Class MainWindow
         SettingsToolStripMenuItem.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         SettingsToolStripMenuItem.Image = CType(resources.GetObject("SettingsToolStripMenuItem.Image"), Image)
         SettingsToolStripMenuItem.Name = "SettingsToolStripMenuItem"
-        SettingsToolStripMenuItem.Size = New Size(117, 22)
+        SettingsToolStripMenuItem.Size = New Size(180, 22)
         SettingsToolStripMenuItem.Text = "Settings"
         ' 
         ' DarkModeToolStripMenuItem
@@ -241,7 +247,7 @@ Partial Class MainWindow
         ExitToolStripMenuItem.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         ExitToolStripMenuItem.Image = CType(resources.GetObject("ExitToolStripMenuItem.Image"), Image)
         ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        ExitToolStripMenuItem.Size = New Size(117, 22)
+        ExitToolStripMenuItem.Size = New Size(180, 22)
         ExitToolStripMenuItem.Text = "&Exit"
         ' 
         ' TextBoxUsername
@@ -258,10 +264,10 @@ Partial Class MainWindow
         ' TextBoxSubreddit
         ' 
         TextBoxSubreddit.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
-        TextBoxSubreddit.Location = New Point(3, 163)
+        TextBoxSubreddit.Location = New Point(3, 197)
         TextBoxSubreddit.Name = "TextBoxSubreddit"
         TextBoxSubreddit.PlaceholderText = "Subreddit (e.g., Ask)"
-        TextBoxSubreddit.Size = New Size(131, 23)
+        TextBoxSubreddit.Size = New Size(162, 23)
         TextBoxSubreddit.TabIndex = 5
         ' 
         ' RadioButtonUserComments
@@ -372,7 +378,7 @@ Partial Class MainWindow
         ComboBoxSubredditPostsListing.Items.AddRange(New Object() {"all", "best", "controversial", "hot", "new", "rising", "top"})
         ComboBoxSubredditPostsListing.Location = New Point(6, 40)
         ComboBoxSubredditPostsListing.Name = "ComboBoxSubredditPostsListing"
-        ComboBoxSubredditPostsListing.Size = New Size(116, 23)
+        ComboBoxSubredditPostsListing.Size = New Size(135, 23)
         ComboBoxSubredditPostsListing.Sorted = True
         ComboBoxSubredditPostsListing.TabIndex = 11
         ' 
@@ -569,7 +575,7 @@ Partial Class MainWindow
         GroupBoxSubredditDataFiltering.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
         GroupBoxSubredditDataFiltering.Location = New Point(3, 81)
         GroupBoxSubredditDataFiltering.Name = "GroupBoxSubredditDataFiltering"
-        GroupBoxSubredditDataFiltering.Size = New Size(215, 70)
+        GroupBoxSubredditDataFiltering.Size = New Size(249, 70)
         GroupBoxSubredditDataFiltering.TabIndex = 11
         GroupBoxSubredditDataFiltering.TabStop = False
         GroupBoxSubredditDataFiltering.Text = "Set posts sort criterion and output limit"
@@ -578,7 +584,7 @@ Partial Class MainWindow
         ' 
         LabelSubredditPostsLimit.AutoSize = True
         LabelSubredditPostsLimit.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        LabelSubredditPostsLimit.Location = New Point(126, 23)
+        LabelSubredditPostsLimit.Location = New Point(144, 23)
         LabelSubredditPostsLimit.Name = "LabelSubredditPostsLimit"
         LabelSubredditPostsLimit.Size = New Size(75, 15)
         LabelSubredditPostsLimit.TabIndex = 19
@@ -598,12 +604,12 @@ Partial Class MainWindow
         ' 
         NumericUpDownSubredditPostsLimit.Enabled = False
         NumericUpDownSubredditPostsLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
-        NumericUpDownSubredditPostsLimit.Location = New Point(130, 41)
+        NumericUpDownSubredditPostsLimit.Location = New Point(147, 41)
         NumericUpDownSubredditPostsLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         NumericUpDownSubredditPostsLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
         NumericUpDownSubredditPostsLimit.Name = "NumericUpDownSubredditPostsLimit"
         NumericUpDownSubredditPostsLimit.ReadOnly = True
-        NumericUpDownSubredditPostsLimit.Size = New Size(79, 22)
+        NumericUpDownSubredditPostsLimit.Size = New Size(98, 22)
         NumericUpDownSubredditPostsLimit.TabIndex = 17
         NumericUpDownSubredditPostsLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
         ' 
@@ -613,7 +619,7 @@ Partial Class MainWindow
         ButtonFetchSubredditData.FlatStyle = FlatStyle.Popup
         ButtonFetchSubredditData.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonFetchSubredditData.ForeColor = Color.Black
-        ButtonFetchSubredditData.Location = New Point(140, 163)
+        ButtonFetchSubredditData.Location = New Point(173, 197)
         ButtonFetchSubredditData.Name = "ButtonFetchSubredditData"
         ButtonFetchSubredditData.Size = New Size(79, 24)
         ButtonFetchSubredditData.TabIndex = 6
@@ -630,7 +636,7 @@ Partial Class MainWindow
         GroupBoxSubredditData.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
         GroupBoxSubredditData.Location = New Point(3, 26)
         GroupBoxSubredditData.Name = "GroupBoxSubredditData"
-        GroupBoxSubredditData.Size = New Size(215, 49)
+        GroupBoxSubredditData.Size = New Size(249, 49)
         GroupBoxSubredditData.TabIndex = 9
         GroupBoxSubredditData.TabStop = False
         GroupBoxSubredditData.Text = "Select subreddit data to fetch"
@@ -731,7 +737,7 @@ Partial Class MainWindow
         TreeNode7.Text = "Username"
         TreeView1.Nodes.AddRange(New TreeNode() {TreeNode7})
         TreeView1.ShowNodeToolTips = True
-        TreeView1.Size = New Size(129, 186)
+        TreeView1.Size = New Size(129, 224)
         TreeView1.TabIndex = 17
         ' 
         ' PanelUserData
@@ -780,7 +786,7 @@ Partial Class MainWindow
         PanelSubredditData.Controls.Add(GroupBoxSubredditData)
         PanelSubredditData.Location = New Point(147, 12)
         PanelSubredditData.Name = "PanelSubredditData"
-        PanelSubredditData.Size = New Size(221, 188)
+        PanelSubredditData.Size = New Size(256, 224)
         PanelSubredditData.TabIndex = 21
         PanelSubredditData.Visible = False
         ' 
@@ -792,7 +798,7 @@ Partial Class MainWindow
         PanelSubredditDataHeader.Enabled = False
         PanelSubredditDataHeader.Location = New Point(3, 0)
         PanelSubredditDataHeader.Name = "PanelSubredditDataHeader"
-        PanelSubredditDataHeader.Size = New Size(215, 20)
+        PanelSubredditDataHeader.Size = New Size(249, 20)
         PanelSubredditDataHeader.TabIndex = 30
         ' 
         ' Label2
@@ -801,7 +807,7 @@ Partial Class MainWindow
         Label2.BackColor = Color.Transparent
         Label2.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         Label2.ForeColor = Color.Black
-        Label2.Location = New Point(34, 0)
+        Label2.Location = New Point(59, 0)
         Label2.Name = "Label2"
         Label2.Size = New Size(138, 16)
         Label2.TabIndex = 29
@@ -996,14 +1002,57 @@ Partial Class MainWindow
         NotifyIcon1.Text = "Knew Karma"
         NotifyIcon1.Visible = True
         ' 
+        ' PanelAbout
+        ' 
+        PanelAbout.BackColor = Color.Transparent
+        PanelAbout.Controls.Add(Panel3)
+        PanelAbout.Location = New Point(147, 12)
+        PanelAbout.Name = "PanelAbout"
+        PanelAbout.Size = New Size(256, 224)
+        PanelAbout.TabIndex = 28
+        PanelAbout.Visible = False
+        ' 
+        ' Panel3
+        ' 
+        Panel3.BackColor = Color.Transparent
+        Panel3.BorderStyle = BorderStyle.FixedSingle
+        Panel3.Controls.Add(Label6)
+        Panel3.Enabled = False
+        Panel3.Location = New Point(3, 0)
+        Panel3.Name = "Panel3"
+        Panel3.Size = New Size(249, 20)
+        Panel3.TabIndex = 30
+        ' 
+        ' Label6
+        ' 
+        Label6.AutoSize = True
+        Label6.BackColor = Color.Transparent
+        Label6.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
+        Label6.ForeColor = Color.Black
+        Label6.Location = New Point(39, 0)
+        Label6.Name = "Label6"
+        Label6.Size = New Size(174, 16)
+        Label6.TabIndex = 29
+        Label6.Text = "A Reddit Data Ananlysis Toolkit"
+        ' 
+        ' StatusStrip1
+        ' 
+        StatusStrip1.Location = New Point(0, 239)
+        StatusStrip1.Name = "StatusStrip1"
+        StatusStrip1.Size = New Size(413, 22)
+        StatusStrip1.TabIndex = 29
+        StatusStrip1.Text = "StatusStrip1"
+        ' 
         ' MainWindow
         ' 
         AccessibleRole = AccessibleRole.Window
         AutoScaleDimensions = New SizeF(7F, 16F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.White
-        ClientSize = New Size(377, 211)
+        ClientSize = New Size(413, 261)
         ContextMenuStrip = ContextMenuStripRightClick
+        Controls.Add(StatusStrip1)
+        Controls.Add(PanelAbout)
         Controls.Add(PanelSubredditData)
         Controls.Add(PanelSearchPosts)
         Controls.Add(PanelPostListings)
@@ -1059,7 +1108,11 @@ Partial Class MainWindow
         PanelSearchPosts.PerformLayout()
         Panel1.ResumeLayout(False)
         Panel1.PerformLayout()
+        PanelAbout.ResumeLayout(False)
+        Panel3.ResumeLayout(False)
+        Panel3.PerformLayout()
         ResumeLayout(False)
+        PerformLayout()
     End Sub
 
     Friend WithEvents TextBoxQuery As TextBox
@@ -1101,7 +1154,6 @@ Partial Class MainWindow
     Friend WithEvents ComboBoxSubredditPostsListing As ComboBox
     Friend WithEvents NumericUpDown2 As NumericUpDown
     Friend WithEvents ButtonFetchFrontPageData As Button
-    Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents GroupBoxFrontPageDataFiltering As GroupBox
     Friend WithEvents LabelFrontPageDataLimit As Label
     Friend WithEvents LabelFrontPageDataListing As Label
@@ -1138,4 +1190,8 @@ Partial Class MainWindow
     Friend WithEvents Label5 As Label
     Friend WithEvents NotifyIcon1 As NotifyIcon
     Friend WithEvents ButtonFetchListingPosts As Button
+    Friend WithEvents PanelAbout As Panel
+    Friend WithEvents Panel3 As Panel
+    Friend WithEvents Label6 As Label
+    Friend WithEvents StatusStrip1 As StatusStrip
 End Class

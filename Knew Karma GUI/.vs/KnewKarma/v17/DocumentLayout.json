@@ -3,16 +3,32 @@
   "WorkspaceRootPath": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|c:\\users\\dudle\\source\\repos\\knewkarma\\knew karma gui\\knewkarma\\knewkarma.vbproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\knewkarma.vbproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|c:\\users\\dudle\\source\\repos\\knewkarma\\knew karma gui\\knewkarma\\knewkarma.vbproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\knewkarma.vbproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\knewkarma\\windows\\aboutwindow.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
+      "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|c:\\users\\dudle\\source\\repos\\knewkarma\\knew karma gui\\knewkarma\\windows\\aboutwindow.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
       "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\windows\\aboutwindow.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\knewkarma\\windows\\splashscreen1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
-      "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\windows\\splashscreen1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+      "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\knewkarma\\windows\\mainwindow.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
+      "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\windows\\mainwindow.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\knewkarma\\windows\\mainwindow.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\windows\\mainwindow.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\knewkarma\\handlers\\apihandler.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\handlers\\apihandler.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\knewkarma\\handlers\\datagridviewhandler.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\handlers\\datagridviewhandler.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\knewkarma\\windows\\aboutwindow.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
@@ -23,8 +39,8 @@
       "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\helpers\\coreutils.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\knewkarma\\windows\\splashscreen1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
-      "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\windows\\splashscreen1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
+      "AbsoluteMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\knewkarma\\helpers\\settings.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{46C2541E-6F65-461A-A479-F65D445C36EA}|KnewKarma\\KnewKarma.vbproj|solutionrelative:knewkarma\\helpers\\settings.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     }
   ],
   "DocumentGroupContainers": [
@@ -39,73 +55,123 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "KnewKarma.vbproj",
+              "Title": "KnewKarma",
               "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\KnewKarma.vbproj",
               "RelativeDocumentMoniker": "KnewKarma\\KnewKarma.vbproj",
               "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\KnewKarma.vbproj",
               "RelativeToolTip": "KnewKarma\\KnewKarma.vbproj",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAA+AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003380|",
-              "WhenOpened": "2024-04-12T01:29:33.141Z",
+              "WhenOpened": "2024-04-13T21:21:44.867Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 1,
+              "Title": "KnewKarma",
+              "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\KnewKarma.vbproj",
+              "RelativeDocumentMoniker": "KnewKarma\\KnewKarma.vbproj",
+              "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\KnewKarma.vbproj",
+              "RelativeToolTip": "KnewKarma\\KnewKarma.vbproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABIAAAArAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003380|",
+              "WhenOpened": "2024-04-13T21:20:34.486Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ApiHandler.vb",
+              "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Handlers\\ApiHandler.vb",
+              "RelativeDocumentMoniker": "KnewKarma\\Handlers\\ApiHandler.vb",
+              "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Handlers\\ApiHandler.vb",
+              "RelativeToolTip": "KnewKarma\\Handlers\\ApiHandler.vb",
+              "ViewState": "AQIAADAAAAAAAAAAAAAqwEwAAABCAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2024-04-13T12:24:57.154Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "CoreUtils.vb",
               "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Helpers\\CoreUtils.vb",
               "RelativeDocumentMoniker": "KnewKarma\\Helpers\\CoreUtils.vb",
               "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Helpers\\CoreUtils.vb",
               "RelativeToolTip": "KnewKarma\\Helpers\\CoreUtils.vb",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABUAAAAAAAAA",
+              "ViewState": "AQIAADgAAAAAAAAAAAAkwHQAAAAMAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2024-04-12T01:19:44.19Z"
+              "WhenOpened": "2024-04-13T12:24:09.658Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 7,
               "Title": "AboutWindow.vb",
               "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\AboutWindow.vb",
               "RelativeDocumentMoniker": "KnewKarma\\Windows\\AboutWindow.vb",
               "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\AboutWindow.vb",
               "RelativeToolTip": "KnewKarma\\Windows\\AboutWindow.vb",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAqwA4AAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2024-04-12T01:14:44.914Z"
+              "WhenOpened": "2024-04-13T12:18:44.524Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "SplashScreen1.vb",
-              "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\SplashScreen1.vb",
-              "RelativeDocumentMoniker": "KnewKarma\\Windows\\SplashScreen1.vb",
-              "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\SplashScreen1.vb",
-              "RelativeToolTip": "KnewKarma\\Windows\\SplashScreen1.vb",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2024-04-12T01:14:29.043Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
               "Title": "AboutWindow.vb [Design]",
               "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\AboutWindow.vb",
               "RelativeDocumentMoniker": "KnewKarma\\Windows\\AboutWindow.vb",
               "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\AboutWindow.vb [Design]",
               "RelativeToolTip": "KnewKarma\\Windows\\AboutWindow.vb [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2024-04-12T01:14:26.46Z"
+              "WhenOpened": "2024-04-13T12:03:50.781Z",
+              "EditorCaption": " [Design]"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "SplashScreen1.vb [Design]",
-              "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\SplashScreen1.vb",
-              "RelativeDocumentMoniker": "KnewKarma\\Windows\\SplashScreen1.vb",
-              "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\SplashScreen1.vb [Design]",
-              "RelativeToolTip": "KnewKarma\\Windows\\SplashScreen1.vb [Design]",
+              "DocumentIndex": 4,
+              "Title": "MainWindow.vb",
+              "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\MainWindow.vb",
+              "RelativeDocumentMoniker": "KnewKarma\\Windows\\MainWindow.vb",
+              "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\MainWindow.vb",
+              "RelativeToolTip": "KnewKarma\\Windows\\MainWindow.vb",
+              "ViewState": "AQIAAPQAAAAAAAAAAAAAAB0AAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2024-04-12T01:14:20.977Z"
+              "WhenOpened": "2024-04-13T11:55:20.301Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Settings.vb",
+              "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Helpers\\Settings.vb",
+              "RelativeDocumentMoniker": "KnewKarma\\Helpers\\Settings.vb",
+              "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Helpers\\Settings.vb",
+              "RelativeToolTip": "KnewKarma\\Helpers\\Settings.vb",
+              "ViewState": "AQIAAL4AAAAAAAAAAAAUwMsAAABIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2024-04-13T11:55:06.856Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MainWindow.vb [Design]",
+              "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\MainWindow.vb",
+              "RelativeDocumentMoniker": "KnewKarma\\Windows\\MainWindow.vb",
+              "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Windows\\MainWindow.vb [Design]",
+              "RelativeToolTip": "KnewKarma\\Windows\\MainWindow.vb [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2024-04-13T11:38:35.492Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "DataGridViewHandler.vb",
+              "DocumentMoniker": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Handlers\\DataGridViewHandler.vb",
+              "RelativeDocumentMoniker": "KnewKarma\\Handlers\\DataGridViewHandler.vb",
+              "ToolTip": "C:\\Users\\dudle\\source\\repos\\knewkarma\\Knew Karma GUI\\KnewKarma\\Handlers\\DataGridViewHandler.vb",
+              "RelativeToolTip": "KnewKarma\\Handlers\\DataGridViewHandler.vb",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2024-04-13T13:53:19.613Z"
             }
           ]
         }
