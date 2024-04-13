@@ -18,15 +18,15 @@ api = Api()
 class User:
     """Represents a Reddit user and provides methods for getting data from the specified user."""
 
-    def __init__(self, username: str, time_format: TIME_FORMAT = "datetime"):
+    def __init__(self, username: str, time_format: TIME_FORMAT = "locale"):
         """
         Initialises a User instance for getting profile, posts and comments data from the specified user.
 
         :param username: Username of the user to get data from.
         :type username: str
         :param time_format: Determines the format of the output. Use "concise" for a human-readable
-                        time difference, or "datetime" for a localized datetime string. Defaults to "datetime".
-        :type time_format: Literal["concise", "datetime"]
+                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
+        :type time_format: Literal["concise", "locale"]
         """
         self._username = username
         self._time_format = time_format
@@ -290,7 +290,7 @@ class User:
 class Search:
     """Represents Readit search functionality and provides methods for getting search results from different entities"""
 
-    def __init__(self, time_format: TIME_FORMAT = "datetime"):
+    def __init__(self, time_format: TIME_FORMAT = "locale"):
         self._time_format = time_format
 
     async def users(
@@ -382,15 +382,15 @@ class Search:
 class Subreddit:
     """Represents a Reddit Community (Subreddit) and provides methods for getting data from the specified subreddit."""
 
-    def __init__(self, subreddit: str, time_format: TIME_FORMAT = "datetime"):
+    def __init__(self, subreddit: str, time_format: TIME_FORMAT = "locale"):
         """
         Initialises a RedditCommunity instance for getting profile and posts from the specified subreddit.
 
         :param subreddit: Name of the subreddit to get data from.
         :type subreddit: str
         :param time_format: Determines the format of the output. Use "concise" for a human-readable
-                        time difference, or "datetime" for a localized datetime string. Defaults to "datetime".
-        :type time_format: Literal["concise", "datetime"]
+                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
+        :type time_format: Literal["concise", "locale"]
         """
         self._subreddit = subreddit
         self._time_format = time_format
@@ -534,7 +534,7 @@ class Subreddit:
 class Subreddits:
     """Represents Reddit subreddits and provides methods for getting related data."""
 
-    def __init__(self, time_format: TIME_FORMAT = "datetime"):
+    def __init__(self, time_format: TIME_FORMAT = "locale"):
         self._time_format = time_format
 
     async def all(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
@@ -626,7 +626,7 @@ class Post:
     """Represents a Reddit post and provides method(s) for getting data from the specified post."""
 
     def __init__(
-        self, post_id: str, subreddit: str, time_format: TIME_FORMAT = "datetime"
+        self, post_id: str, subreddit: str, time_format: TIME_FORMAT = "locale"
     ):
         self._post_id = post_id
         self._subreddit = subreddit
@@ -665,7 +665,7 @@ class Post:
 class Posts:
     """Represents Reddit posts and provides methods for getting posts from various sources."""
 
-    def __init__(self, time_format: TIME_FORMAT = "datetime"):
+    def __init__(self, time_format: TIME_FORMAT = "locale"):
         self._time_format = time_format
 
     async def listing(
