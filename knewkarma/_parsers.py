@@ -61,7 +61,7 @@ def parse_posts(
             "gilded": post.get("gilded"),
             "is_nsfw": post.get("over_18"),
             "is_shareable": post.get("is_reddit_media_domain"),
-            "hide_from_bots": post.get("is_robot_indexable"),
+            "is_robot_indexable": post.get("is_robot_indexable"),
             "permalink": post.get("permalink"),
             "is_locked": post.get("locked"),
             "is_archived": post.get("archived"),
