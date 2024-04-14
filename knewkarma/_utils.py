@@ -1,15 +1,11 @@
 import asyncio
-import getpass
 import locale
 import os
-import platform
-import sys
 import time
 from datetime import datetime, timezone
 from typing import Union, Literal
 
 import pandas as pd
-import psutil
 from rich.console import Console
 from rich.status import Status
 from rich.table import Table
@@ -20,17 +16,24 @@ def system_info():
     """
     Displays system information in a table format.
     """
+    import getpass
+    import platform
+    import sys
+
+    import psutil
+
+    from .version import Version
+
     table = Table(show_header=False, show_edge=False, highlight=True)
     table.add_column("header", style="dim")
     table.add_column("header")
 
     uptime_timestamp = int(psutil.boot_time())
 
-    table.add_row("Username", getpass.getuser())
-    table.add_row(
-        "System", f"{platform.system()} {platform.version()}"
-    )
+    table.add_row("Knew Karma", Version.full)
     table.add_row("Python", sys.version)
+    table.add_row("Username", getpass.getuser())
+    table.add_row("System", f"{platform.system()} {platform.version()}")
     table.add_row(
         "CPU", f"{psutil.cpu_count(logical=True)} cores, {platform.processor()}"
     )
