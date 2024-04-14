@@ -19,7 +19,7 @@ SORT_CRITERION = Literal[
 
 DATA_LISTING = Literal["best", "controversial", "popular", "rising"]
 DATA_TIMEFRAME = Literal["hour", "day", "week", "month", "year"]
-TIME_FORMAT = Literal["concise", "datetime"]
+TIME_FORMAT = Literal["concise", "locale"]
 
 
 class Api:
