@@ -1,7 +1,6 @@
 import asyncio
 import locale
 import os
-import time
 from datetime import datetime, timezone
 from typing import Union, Literal
 
@@ -133,6 +132,8 @@ def _time_since(timestamp: int, suffix: str = "ago") -> str:
     :return: A string representing the time difference from now.
     :rtype: str
     """
+    import time
+
     # Convert the current time to a Unix timestamp
     now = int(time.time())
 
