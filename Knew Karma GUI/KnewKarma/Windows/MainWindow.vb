@@ -337,14 +337,19 @@
         Me.Text = My.Application.Info.AssemblyName
         Select Case e.Node.Text
             Case "User"
+                Me.Text = "User"
                 PanelUserData.Visible = True
             Case "Subreddit"
+                Me.Text = "Subreddit"
                 PanelSubredditData.Visible = True
             Case "Search"
+                Me.Text = "Search"
                 PanelSearchPosts.Visible = True
             Case "Listings"
+                Me.Text = "Listings"
                 PanelPostListings.Visible = True
             Case "Front Page"
+                Me.Text = "Front Page"
                 PanelFrontPageData.Visible = True
             Case Else
                 PanelAbout.Visible = True

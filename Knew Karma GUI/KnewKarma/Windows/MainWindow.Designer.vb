@@ -106,7 +106,6 @@ Partial Class MainWindow
         PanelAbout = New Panel()
         Panel3 = New Panel()
         Label6 = New Label()
-        StatusStrip1 = New StatusStrip()
         ContextMenuStripRightClick.SuspendLayout()
         GroupBoxSearchResultsFiltering.SuspendLayout()
         CType(NumericUpDownSearchResultLimit, ComponentModel.ISupportInitialize).BeginInit()
@@ -143,7 +142,7 @@ Partial Class MainWindow
         TextBoxQuery.Location = New Point(3, 103)
         TextBoxQuery.Name = "TextBoxQuery"
         TextBoxQuery.PlaceholderText = "Search query (e.g., osint)"
-        TextBoxQuery.Size = New Size(131, 23)
+        TextBoxQuery.Size = New Size(162, 23)
         TextBoxQuery.TabIndex = 0
         ' 
         ' ButtonSearch
@@ -151,7 +150,7 @@ Partial Class MainWindow
         ButtonSearch.FlatStyle = FlatStyle.Popup
         ButtonSearch.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonSearch.ForeColor = Color.Black
-        ButtonSearch.Location = New Point(140, 103)
+        ButtonSearch.Location = New Point(174, 102)
         ButtonSearch.Name = "ButtonSearch"
         ButtonSearch.Size = New Size(79, 24)
         ButtonSearch.TabIndex = 6
@@ -164,7 +163,7 @@ Partial Class MainWindow
         ContextMenuStripRightClick.Items.AddRange(New ToolStripItem() {AboutToolStripMenuItem, SettingsToolStripMenuItem, ExitToolStripMenuItem})
         ContextMenuStripRightClick.LayoutStyle = ToolStripLayoutStyle.Table
         ContextMenuStripRightClick.Name = "ContextMenuStrip1"
-        ContextMenuStripRightClick.Size = New Size(181, 92)
+        ContextMenuStripRightClick.Size = New Size(118, 70)
         ContextMenuStripRightClick.Text = "Menu"
         ' 
         ' AboutToolStripMenuItem
@@ -173,7 +172,7 @@ Partial Class MainWindow
         AboutToolStripMenuItem.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         AboutToolStripMenuItem.Image = CType(resources.GetObject("AboutToolStripMenuItem.Image"), Image)
         AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        AboutToolStripMenuItem.Size = New Size(180, 22)
+        AboutToolStripMenuItem.Size = New Size(117, 22)
         AboutToolStripMenuItem.Text = "About"
         ' 
         ' SettingsToolStripMenuItem
@@ -183,7 +182,7 @@ Partial Class MainWindow
         SettingsToolStripMenuItem.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         SettingsToolStripMenuItem.Image = CType(resources.GetObject("SettingsToolStripMenuItem.Image"), Image)
         SettingsToolStripMenuItem.Name = "SettingsToolStripMenuItem"
-        SettingsToolStripMenuItem.Size = New Size(180, 22)
+        SettingsToolStripMenuItem.Size = New Size(117, 22)
         SettingsToolStripMenuItem.Text = "Settings"
         ' 
         ' DarkModeToolStripMenuItem
@@ -247,7 +246,7 @@ Partial Class MainWindow
         ExitToolStripMenuItem.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         ExitToolStripMenuItem.Image = CType(resources.GetObject("ExitToolStripMenuItem.Image"), Image)
         ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        ExitToolStripMenuItem.Size = New Size(180, 22)
+        ExitToolStripMenuItem.Size = New Size(117, 22)
         ExitToolStripMenuItem.Text = "&Exit"
         ' 
         ' TextBoxUsername
@@ -255,10 +254,10 @@ Partial Class MainWindow
         TextBoxUsername.BackColor = SystemColors.Window
         TextBoxUsername.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         TextBoxUsername.ForeColor = SystemColors.WindowText
-        TextBoxUsername.Location = New Point(3, 163)
+        TextBoxUsername.Location = New Point(3, 197)
         TextBoxUsername.Name = "TextBoxUsername"
         TextBoxUsername.PlaceholderText = "Username (e.g., JohnDoe)"
-        TextBoxUsername.Size = New Size(131, 23)
+        TextBoxUsername.Size = New Size(162, 23)
         TextBoxUsername.TabIndex = 1
         ' 
         ' TextBoxSubreddit
@@ -343,7 +342,7 @@ Partial Class MainWindow
         ComboBoxUserDataListing.Items.AddRange(New Object() {"all", "best", "controversial", "hot", "new", "rising", "top"})
         ComboBoxUserDataListing.Location = New Point(6, 40)
         ComboBoxUserDataListing.Name = "ComboBoxUserDataListing"
-        ComboBoxUserDataListing.Size = New Size(116, 23)
+        ComboBoxUserDataListing.Size = New Size(135, 23)
         ComboBoxUserDataListing.Sorted = True
         ComboBoxUserDataListing.TabIndex = 11
         ' 
@@ -360,7 +359,7 @@ Partial Class MainWindow
         ComboBoxSearchResultListing.Items.AddRange(New Object() {"all", "best", "controversial", "hot", "new", "rising", "top"})
         ComboBoxSearchResultListing.Location = New Point(6, 40)
         ComboBoxSearchResultListing.Name = "ComboBoxSearchResultListing"
-        ComboBoxSearchResultListing.Size = New Size(116, 23)
+        ComboBoxSearchResultListing.Size = New Size(135, 23)
         ComboBoxSearchResultListing.Sorted = True
         ComboBoxSearchResultListing.TabIndex = 11
         ' 
@@ -395,7 +394,7 @@ Partial Class MainWindow
         ComboBoxFrontPageDataListing.Items.AddRange(New Object() {"all", "best", "controversial", "hot", "new", "rising", "top"})
         ComboBoxFrontPageDataListing.Location = New Point(6, 40)
         ComboBoxFrontPageDataListing.Name = "ComboBoxFrontPageDataListing"
-        ComboBoxFrontPageDataListing.Size = New Size(116, 23)
+        ComboBoxFrontPageDataListing.Size = New Size(135, 23)
         ComboBoxFrontPageDataListing.Sorted = True
         ComboBoxFrontPageDataListing.TabIndex = 11
         ' 
@@ -458,7 +457,7 @@ Partial Class MainWindow
         ComboBoxPostListingsListing.Items.AddRange(New Object() {"all", "hot", "new", "top"})
         ComboBoxPostListingsListing.Location = New Point(6, 40)
         ComboBoxPostListingsListing.Name = "ComboBoxPostListingsListing"
-        ComboBoxPostListingsListing.Size = New Size(116, 23)
+        ComboBoxPostListingsListing.Size = New Size(135, 23)
         ComboBoxPostListingsListing.Sorted = True
         ComboBoxPostListingsListing.TabIndex = 11
         ' 
@@ -471,7 +470,7 @@ Partial Class MainWindow
         GroupBoxSearchResultsFiltering.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
         GroupBoxSearchResultsFiltering.Location = New Point(3, 23)
         GroupBoxSearchResultsFiltering.Name = "GroupBoxSearchResultsFiltering"
-        GroupBoxSearchResultsFiltering.Size = New Size(215, 70)
+        GroupBoxSearchResultsFiltering.Size = New Size(249, 70)
         GroupBoxSearchResultsFiltering.TabIndex = 11
         GroupBoxSearchResultsFiltering.TabStop = False
         GroupBoxSearchResultsFiltering.Text = "Set posts sort criterion and results limit"
@@ -480,7 +479,7 @@ Partial Class MainWindow
         ' 
         LabelSearchResultsLimit.AutoSize = True
         LabelSearchResultsLimit.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        LabelSearchResultsLimit.Location = New Point(126, 23)
+        LabelSearchResultsLimit.Location = New Point(144, 23)
         LabelSearchResultsLimit.Name = "LabelSearchResultsLimit"
         LabelSearchResultsLimit.Size = New Size(82, 15)
         LabelSearchResultsLimit.TabIndex = 19
@@ -499,12 +498,12 @@ Partial Class MainWindow
         ' NumericUpDownSearchResultLimit
         ' 
         NumericUpDownSearchResultLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
-        NumericUpDownSearchResultLimit.Location = New Point(130, 41)
+        NumericUpDownSearchResultLimit.Location = New Point(147, 41)
         NumericUpDownSearchResultLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         NumericUpDownSearchResultLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
         NumericUpDownSearchResultLimit.Name = "NumericUpDownSearchResultLimit"
         NumericUpDownSearchResultLimit.ReadOnly = True
-        NumericUpDownSearchResultLimit.Size = New Size(79, 22)
+        NumericUpDownSearchResultLimit.Size = New Size(98, 22)
         NumericUpDownSearchResultLimit.TabIndex = 17
         NumericUpDownSearchResultLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
         ' 
@@ -517,7 +516,7 @@ Partial Class MainWindow
         GroupBoxFrontPageDataFiltering.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
         GroupBoxFrontPageDataFiltering.Location = New Point(3, 23)
         GroupBoxFrontPageDataFiltering.Name = "GroupBoxFrontPageDataFiltering"
-        GroupBoxFrontPageDataFiltering.Size = New Size(215, 70)
+        GroupBoxFrontPageDataFiltering.Size = New Size(249, 70)
         GroupBoxFrontPageDataFiltering.TabIndex = 19
         GroupBoxFrontPageDataFiltering.TabStop = False
         GroupBoxFrontPageDataFiltering.Text = "Set posts sort criterion and output limit"
@@ -526,7 +525,7 @@ Partial Class MainWindow
         ' 
         LabelFrontPageDataLimit.AutoSize = True
         LabelFrontPageDataLimit.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        LabelFrontPageDataLimit.Location = New Point(126, 23)
+        LabelFrontPageDataLimit.Location = New Point(144, 23)
         LabelFrontPageDataLimit.Name = "LabelFrontPageDataLimit"
         LabelFrontPageDataLimit.Size = New Size(81, 15)
         LabelFrontPageDataLimit.TabIndex = 19
@@ -545,12 +544,12 @@ Partial Class MainWindow
         ' NumericUpDownFrontPageDataLimit
         ' 
         NumericUpDownFrontPageDataLimit.Font = New Font("Segoe UI Variable Text Semibold", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
-        NumericUpDownFrontPageDataLimit.Location = New Point(130, 41)
+        NumericUpDownFrontPageDataLimit.Location = New Point(147, 41)
         NumericUpDownFrontPageDataLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         NumericUpDownFrontPageDataLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
         NumericUpDownFrontPageDataLimit.Name = "NumericUpDownFrontPageDataLimit"
         NumericUpDownFrontPageDataLimit.ReadOnly = True
-        NumericUpDownFrontPageDataLimit.Size = New Size(79, 22)
+        NumericUpDownFrontPageDataLimit.Size = New Size(98, 22)
         NumericUpDownFrontPageDataLimit.TabIndex = 17
         NumericUpDownFrontPageDataLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
         ' 
@@ -559,7 +558,7 @@ Partial Class MainWindow
         ButtonFetchFrontPageData.FlatStyle = FlatStyle.Popup
         ButtonFetchFrontPageData.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonFetchFrontPageData.ForeColor = Color.Black
-        ButtonFetchFrontPageData.Location = New Point(139, 103)
+        ButtonFetchFrontPageData.Location = New Point(173, 99)
         ButtonFetchFrontPageData.Name = "ButtonFetchFrontPageData"
         ButtonFetchFrontPageData.Size = New Size(79, 24)
         ButtonFetchFrontPageData.TabIndex = 17
@@ -650,7 +649,7 @@ Partial Class MainWindow
         GroupBoxUserDataFiltering.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
         GroupBoxUserDataFiltering.Location = New Point(3, 81)
         GroupBoxUserDataFiltering.Name = "GroupBoxUserDataFiltering"
-        GroupBoxUserDataFiltering.Size = New Size(215, 70)
+        GroupBoxUserDataFiltering.Size = New Size(249, 70)
         GroupBoxUserDataFiltering.TabIndex = 10
         GroupBoxUserDataFiltering.TabStop = False
         GroupBoxUserDataFiltering.Text = "Set sort criterion and output limit"
@@ -659,7 +658,7 @@ Partial Class MainWindow
         ' 
         LabelUserDataLimit.AutoSize = True
         LabelUserDataLimit.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        LabelUserDataLimit.Location = New Point(126, 23)
+        LabelUserDataLimit.Location = New Point(144, 23)
         LabelUserDataLimit.Name = "LabelUserDataLimit"
         LabelUserDataLimit.Size = New Size(81, 15)
         LabelUserDataLimit.TabIndex = 19
@@ -679,12 +678,12 @@ Partial Class MainWindow
         ' 
         NumericUpDownUserDataLimit.Enabled = False
         NumericUpDownUserDataLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
-        NumericUpDownUserDataLimit.Location = New Point(130, 41)
+        NumericUpDownUserDataLimit.Location = New Point(147, 41)
         NumericUpDownUserDataLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         NumericUpDownUserDataLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
         NumericUpDownUserDataLimit.Name = "NumericUpDownUserDataLimit"
         NumericUpDownUserDataLimit.ReadOnly = True
-        NumericUpDownUserDataLimit.Size = New Size(79, 22)
+        NumericUpDownUserDataLimit.Size = New Size(98, 22)
         NumericUpDownUserDataLimit.TabIndex = 17
         NumericUpDownUserDataLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
         ' 
@@ -693,7 +692,7 @@ Partial Class MainWindow
         ButtonFetchUserData.FlatStyle = FlatStyle.Popup
         ButtonFetchUserData.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonFetchUserData.ForeColor = Color.Black
-        ButtonFetchUserData.Location = New Point(140, 163)
+        ButtonFetchUserData.Location = New Point(173, 197)
         ButtonFetchUserData.Name = "ButtonFetchUserData"
         ButtonFetchUserData.Size = New Size(79, 24)
         ButtonFetchUserData.TabIndex = 4
@@ -710,7 +709,7 @@ Partial Class MainWindow
         GroupBoxUserData.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
         GroupBoxUserData.Location = New Point(3, 26)
         GroupBoxUserData.Name = "GroupBoxUserData"
-        GroupBoxUserData.Size = New Size(215, 49)
+        GroupBoxUserData.Size = New Size(249, 49)
         GroupBoxUserData.TabIndex = 8
         GroupBoxUserData.TabStop = False
         GroupBoxUserData.Text = "Select user data to fetch"
@@ -749,7 +748,7 @@ Partial Class MainWindow
         PanelUserData.Controls.Add(GroupBoxUserDataFiltering)
         PanelUserData.Location = New Point(147, 12)
         PanelUserData.Name = "PanelUserData"
-        PanelUserData.Size = New Size(221, 188)
+        PanelUserData.Size = New Size(256, 224)
         PanelUserData.TabIndex = 18
         PanelUserData.Visible = False
         ' 
@@ -761,7 +760,7 @@ Partial Class MainWindow
         PanelUserDataHeader.Enabled = False
         PanelUserDataHeader.Location = New Point(3, 0)
         PanelUserDataHeader.Name = "PanelUserDataHeader"
-        PanelUserDataHeader.Size = New Size(215, 20)
+        PanelUserDataHeader.Size = New Size(249, 20)
         PanelUserDataHeader.TabIndex = 29
         ' 
         ' Label1
@@ -770,7 +769,7 @@ Partial Class MainWindow
         Label1.BackColor = Color.Transparent
         Label1.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         Label1.ForeColor = Color.Black
-        Label1.Location = New Point(53, 0)
+        Label1.Location = New Point(68, 1)
         Label1.Name = "Label1"
         Label1.Size = New Size(108, 16)
         Label1.TabIndex = 29
@@ -818,9 +817,9 @@ Partial Class MainWindow
         PanelFrontPageData.Controls.Add(ButtonFetchFrontPageData)
         PanelFrontPageData.Controls.Add(PanelFrontPageHeader)
         PanelFrontPageData.Controls.Add(GroupBoxFrontPageDataFiltering)
-        PanelFrontPageData.Location = New Point(147, 12)
+        PanelFrontPageData.Location = New Point(147, 13)
         PanelFrontPageData.Name = "PanelFrontPageData"
-        PanelFrontPageData.Size = New Size(221, 188)
+        PanelFrontPageData.Size = New Size(256, 224)
         PanelFrontPageData.TabIndex = 25
         PanelFrontPageData.Visible = False
         ' 
@@ -832,7 +831,7 @@ Partial Class MainWindow
         PanelFrontPageHeader.Enabled = False
         PanelFrontPageHeader.Location = New Point(3, 0)
         PanelFrontPageHeader.Name = "PanelFrontPageHeader"
-        PanelFrontPageHeader.Size = New Size(215, 20)
+        PanelFrontPageHeader.Size = New Size(249, 20)
         PanelFrontPageHeader.TabIndex = 32
         ' 
         ' Label5
@@ -841,7 +840,7 @@ Partial Class MainWindow
         Label5.BackColor = Color.Transparent
         Label5.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         Label5.ForeColor = Color.Black
-        Label5.Location = New Point(7, 0)
+        Label5.Location = New Point(25, 0)
         Label5.Name = "Label5"
         Label5.Size = New Size(199, 16)
         Label5.TabIndex = 29
@@ -855,7 +854,7 @@ Partial Class MainWindow
         PanelPostListings.Controls.Add(GroupBoxPostListings)
         PanelPostListings.Location = New Point(147, 12)
         PanelPostListings.Name = "PanelPostListings"
-        PanelPostListings.Size = New Size(221, 188)
+        PanelPostListings.Size = New Size(256, 224)
         PanelPostListings.TabIndex = 26
         PanelPostListings.Visible = False
         ' 
@@ -864,7 +863,7 @@ Partial Class MainWindow
         ButtonFetchListingPosts.FlatStyle = FlatStyle.Popup
         ButtonFetchListingPosts.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonFetchListingPosts.ForeColor = Color.Black
-        ButtonFetchListingPosts.Location = New Point(140, 162)
+        ButtonFetchListingPosts.Location = New Point(173, 197)
         ButtonFetchListingPosts.Name = "ButtonFetchListingPosts"
         ButtonFetchListingPosts.Size = New Size(79, 24)
         ButtonFetchListingPosts.TabIndex = 31
@@ -879,7 +878,7 @@ Partial Class MainWindow
         PanelPostListingsDataHeader.Enabled = False
         PanelPostListingsDataHeader.Location = New Point(3, 0)
         PanelPostListingsDataHeader.Name = "PanelPostListingsDataHeader"
-        PanelPostListingsDataHeader.Size = New Size(215, 20)
+        PanelPostListingsDataHeader.Size = New Size(249, 20)
         PanelPostListingsDataHeader.TabIndex = 30
         ' 
         ' Label3
@@ -888,7 +887,7 @@ Partial Class MainWindow
         Label3.BackColor = Color.Transparent
         Label3.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         Label3.ForeColor = Color.Black
-        Label3.Location = New Point(35, 0)
+        Label3.Location = New Point(52, 0)
         Label3.Name = "Label3"
         Label3.Size = New Size(147, 16)
         Label3.TabIndex = 29
@@ -901,9 +900,9 @@ Partial Class MainWindow
         GroupBoxPostListingsFiltering.Controls.Add(NumericUpDownPostListingsLimit)
         GroupBoxPostListingsFiltering.Controls.Add(ComboBoxPostListingsListing)
         GroupBoxPostListingsFiltering.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
-        GroupBoxPostListingsFiltering.Location = New Point(3, 91)
+        GroupBoxPostListingsFiltering.Location = New Point(3, 98)
         GroupBoxPostListingsFiltering.Name = "GroupBoxPostListingsFiltering"
-        GroupBoxPostListingsFiltering.Size = New Size(215, 69)
+        GroupBoxPostListingsFiltering.Size = New Size(249, 70)
         GroupBoxPostListingsFiltering.TabIndex = 27
         GroupBoxPostListingsFiltering.TabStop = False
         GroupBoxPostListingsFiltering.Text = "Set posts sort criterion and output limit"
@@ -922,7 +921,7 @@ Partial Class MainWindow
         ' 
         LabelPostListingsLimit.AutoSize = True
         LabelPostListingsLimit.Font = New Font("Segoe UI Variable Text", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        LabelPostListingsLimit.Location = New Point(126, 23)
+        LabelPostListingsLimit.Location = New Point(144, 23)
         LabelPostListingsLimit.Name = "LabelPostListingsLimit"
         LabelPostListingsLimit.Size = New Size(81, 15)
         LabelPostListingsLimit.TabIndex = 19
@@ -931,12 +930,12 @@ Partial Class MainWindow
         ' NumericUpDownPostListingsLimit
         ' 
         NumericUpDownPostListingsLimit.Font = New Font("Segoe UI Variable Display Semib", 8.25F, FontStyle.Bold, GraphicsUnit.Point)
-        NumericUpDownPostListingsLimit.Location = New Point(130, 41)
+        NumericUpDownPostListingsLimit.Location = New Point(147, 41)
         NumericUpDownPostListingsLimit.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         NumericUpDownPostListingsLimit.Minimum = New Decimal(New Integer() {100, 0, 0, 0})
         NumericUpDownPostListingsLimit.Name = "NumericUpDownPostListingsLimit"
         NumericUpDownPostListingsLimit.ReadOnly = True
-        NumericUpDownPostListingsLimit.Size = New Size(79, 22)
+        NumericUpDownPostListingsLimit.Size = New Size(98, 22)
         NumericUpDownPostListingsLimit.TabIndex = 17
         NumericUpDownPostListingsLimit.Value = New Decimal(New Integer() {100, 0, 0, 0})
         ' 
@@ -952,7 +951,7 @@ Partial Class MainWindow
         GroupBoxPostListings.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Underline, GraphicsUnit.Point)
         GroupBoxPostListings.Location = New Point(3, 23)
         GroupBoxPostListings.Name = "GroupBoxPostListings"
-        GroupBoxPostListings.Size = New Size(215, 67)
+        GroupBoxPostListings.Size = New Size(249, 69)
         GroupBoxPostListings.TabIndex = 26
         GroupBoxPostListings.TabStop = False
         GroupBoxPostListings.Text = "Fetch posts from selected listing"
@@ -965,7 +964,7 @@ Partial Class MainWindow
         PanelSearchPosts.Controls.Add(GroupBoxSearchResultsFiltering)
         PanelSearchPosts.Location = New Point(147, 12)
         PanelSearchPosts.Name = "PanelSearchPosts"
-        PanelSearchPosts.Size = New Size(221, 188)
+        PanelSearchPosts.Size = New Size(256, 224)
         PanelSearchPosts.TabIndex = 27
         PanelSearchPosts.Visible = False
         ' 
@@ -977,7 +976,7 @@ Partial Class MainWindow
         Panel1.Enabled = False
         Panel1.Location = New Point(3, 0)
         Panel1.Name = "Panel1"
-        Panel1.Size = New Size(215, 20)
+        Panel1.Size = New Size(249, 20)
         Panel1.TabIndex = 31
         ' 
         ' Label4
@@ -986,7 +985,7 @@ Partial Class MainWindow
         Label4.BackColor = Color.Transparent
         Label4.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         Label4.ForeColor = Color.Black
-        Label4.Location = New Point(64, 0)
+        Label4.Location = New Point(85, 0)
         Label4.Name = "Label4"
         Label4.Size = New Size(76, 16)
         Label4.TabIndex = 29
@@ -1035,23 +1034,14 @@ Partial Class MainWindow
         Label6.TabIndex = 29
         Label6.Text = "A Reddit Data Ananlysis Toolkit"
         ' 
-        ' StatusStrip1
-        ' 
-        StatusStrip1.Location = New Point(0, 239)
-        StatusStrip1.Name = "StatusStrip1"
-        StatusStrip1.Size = New Size(413, 22)
-        StatusStrip1.TabIndex = 29
-        StatusStrip1.Text = "StatusStrip1"
-        ' 
         ' MainWindow
         ' 
         AccessibleRole = AccessibleRole.Window
         AutoScaleDimensions = New SizeF(7F, 16F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.White
-        ClientSize = New Size(413, 261)
+        ClientSize = New Size(413, 251)
         ContextMenuStrip = ContextMenuStripRightClick
-        Controls.Add(StatusStrip1)
         Controls.Add(PanelAbout)
         Controls.Add(PanelSubredditData)
         Controls.Add(PanelSearchPosts)
@@ -1068,6 +1058,7 @@ Partial Class MainWindow
         MinimizeBox = False
         Name = "MainWindow"
         StartPosition = FormStartPosition.CenterScreen
+        Text = "Knew Karma"
         ContextMenuStripRightClick.ResumeLayout(False)
         GroupBoxSearchResultsFiltering.ResumeLayout(False)
         GroupBoxSearchResultsFiltering.PerformLayout()
@@ -1112,7 +1103,6 @@ Partial Class MainWindow
         Panel3.ResumeLayout(False)
         Panel3.PerformLayout()
         ResumeLayout(False)
-        PerformLayout()
     End Sub
 
     Friend WithEvents TextBoxQuery As TextBox
@@ -1193,5 +1183,4 @@ Partial Class MainWindow
     Friend WithEvents PanelAbout As Panel
     Friend WithEvents Panel3 As Panel
     Friend WithEvents Label6 As Label
-    Friend WithEvents StatusStrip1 As StatusStrip
 End Class

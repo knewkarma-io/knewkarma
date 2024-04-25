@@ -201,7 +201,6 @@ Public Class SettingsManager
         MainWindow.TreeView1.BackColor = color("InputFieldBackgroundColor")
         MainWindow.TreeView1.ForeColor = color("PrimaryTextColor")
         MainWindow.TreeView1.LineColor = color("SecondaryTextColor")
-        MainWindow.StatusStrip1.BackColor = color("MainBackgroundColor")
 
         ''' <summary>
         ''' Apply colors to tab pages
