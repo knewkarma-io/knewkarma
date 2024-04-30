@@ -11,64 +11,6 @@ from rich.table import Table
 from rich.tree import Tree
 
 
-def system_info():
-    """
-    Displays system information in a table format.
-    """
-    import getpass
-    import platform
-    import sys
-
-    import psutil
-
-    from .version import Version
-
-    table = Table(show_header=False, show_edge=False, highlight=True)
-    table.add_column("header", style="dim")
-    table.add_column("header")
-
-    uptime_timestamp = int(psutil.boot_time())
-
-    table.add_row("Knew Karma", Version.full)
-    table.add_row("Python", sys.version)
-    table.add_row("Username", getpass.getuser())
-    table.add_row("System", f"{platform.system()} {platform.version()}")
-    table.add_row(
-        "CPU", f"{psutil.cpu_count(logical=True)} cores, {platform.processor()}"
-    )
-    table.add_row(
-        "Disk",
-        f"{psutil.disk_usage('/').free / (1024**3):.2f} GB free"
-        f" / {psutil.disk_usage('/').total / (1024**3):.2f} GB",
-    )
-    table.add_row(
-        "Memory",
-        f"{psutil.virtual_memory().available / (1024**3):.2f} GB free"
-        f" / {psutil.virtual_memory().total / (1024**3):.2f} GB",
-    )
-    table.add_row(
-        "Uptime",
-        _time_since(timestamp=uptime_timestamp, suffix="since boot")
-        if isinstance(uptime_timestamp, int)
-        else "N/A",
-    )
-    console.print(table)
-
-
-def get_status() -> Status:
-    """
-    Creates and returns a Status object initialized with a specific message and spinner style.
-
-    :return: A configured rich Status object ready to be used in a context manager.
-    :rtype: rich.status.Status
-    """
-    with Status(
-        status="Initialising[yellow]...[/]",
-        spinner="dots2",
-    ) as status:
-        return status
-
-
 async def countdown_timer(status, duration: int, current_count: int, limit: int):
     """
     Handles the countdown during the asynchronous pagination, updating the status bar with the remaining time.
@@ -89,17 +31,6 @@ async def countdown_timer(status, duration: int, current_count: int, limit: int)
             f" {'second' if remaining <= 1 else 'seconds'}[yellow]...[/]"
         )
         await asyncio.sleep(1)  # Sleep for one second as part of countdown
-
-
-def pathfinder(directories: list[str]):
-    """
-    Creates directories in knewkarma-data directory of the user's home folder.
-
-    :param directories: A list of file directories to create.
-    :type directories: list[str]
-    """
-    for directory in directories:
-        os.makedirs(directory, exist_ok=True)
 
 
 def _timestamp_to_locale(timestamp: float) -> str:
@@ -221,6 +152,103 @@ def filename_timestamp() -> str:
         if os.name == "nt"
         else now.strftime("%d-%B-%Y-%I:%M:%S%p")
     )
+
+
+def system_info():
+    """
+    Displays system information in a table format.
+    """
+    import getpass
+    import platform
+    import sys
+
+    import psutil
+
+    from .version import Version
+
+    table = Table(show_header=False, show_edge=False, highlight=True)
+    table.add_column("header", style="dim")
+    table.add_column("header")
+
+    if os.name == "nt":
+        # https://www.geeksforgeeks.org/getting-the-time-since-os-startup-using-python/
+        # ctypes required for using GetTickCount64()
+        import ctypes
+
+        # getting the library in which GetTickCount64() resides
+        lib = ctypes.windll.kernel32
+
+        # calling the function and storing the return value
+        t = lib.GetTickCount64()
+
+        # since the time is in milliseconds i.e. 1000 * seconds
+        # therefore truncating the value
+        t = int(str(t)[:-3])
+
+        # extracting hours, minutes, seconds & days from t
+        # variable (which stores total time in seconds)
+        minutes, seconds = divmod(t, 60)
+        hours, minutes = divmod(minutes, 60)
+        days, hours = divmod(hours, 24)
+
+        system_uptime = (
+            "just now"
+            if days == hours == minutes == seconds == 0
+            else f"{days} days, {hours:02} hours, {minutes:02} minutes, and {seconds:02} seconds since boot"
+        )
+    else:
+        system_uptime = _time_since(
+            timestamp=int(psutil.boot_time()), suffix="since boot"
+        )
+
+    table.add_row("Knew Karma", Version.full)
+    table.add_row("Python", sys.version)
+    table.add_row("Username", getpass.getuser())
+    table.add_row("System", f"{platform.system()} {platform.version()}")
+    table.add_row(
+        "CPU", f"{psutil.cpu_count(logical=True)} cores, {platform.processor()}"
+    )
+    table.add_row(
+        "Disk",
+        f"{psutil.disk_usage('/').free / (1024**3):.2f} GB free"
+        f" / {psutil.disk_usage('/').total / (1024**3):.2f} GB",
+    )
+    table.add_row(
+        "Memory",
+        f"{psutil.virtual_memory().available / (1024**3):.2f} GB free"
+        f" / {psutil.virtual_memory().total / (1024**3):.2f} GB",
+    )
+
+    table.add_row(
+        "Uptime",
+        system_uptime,
+    )
+    console.print(table)
+
+
+def get_status() -> Status:
+    """
+    Creates and returns a Status object initialized with a specific message and spinner style.
+
+    :return: A configured rich Status object ready to be used in a context manager.
+    :rtype: rich.status.Status
+    """
+    with Status(
+        status="Initialising[yellow]...[/]",
+        spinner="dots2",
+    ) as status:
+        return status
+
+
+def pathfinder(directories: list[str]):
+    """
+    Creates directories in knewkarma-output directory of the user's home folder.
+
+    :param directories: A list of file directories to create.
+    :type directories: list[str]
+    """
+    for directory in directories:
+        os.makedirs(directory, exist_ok=True)
 
 
 def create_dataframe(

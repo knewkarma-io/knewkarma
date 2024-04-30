@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "knewkarma"
-version = "4.2.0rc1"
+version = "4.2.0rc2"
 description = "A Reddit Data Analysis Toolkit"
 authors = ["Richard Mwewa <rly0nheart@gagpasta.com>"]
 readme = "README.md"
@@ -28,7 +28,7 @@ classifiers = [
 "Bug Tracker" = "https://github.com/bellingcat/knewkarma/issues"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 aiohttp = "^3.8.4"
 pandas = "^2.1.4"
 psutil = "^5.9.4"

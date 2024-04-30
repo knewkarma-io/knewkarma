@@ -3,7 +3,7 @@ from collections import Counter
 
 import aiohttp
 
-from ._api import Api, DATA_TIMEFRAME, SORT_CRITERION, DATA_LISTING, TIME_FORMAT
+from ._api import Api, TIMEFRAME, SORT_CRITERION, LISTING, TIME_FORMAT
 from ._parsers import (
     parse_comments,
     parse_subreddits,
@@ -52,7 +52,7 @@ class User:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns a user's posts.
@@ -85,7 +85,7 @@ class User:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns a user's comments.
@@ -144,7 +144,7 @@ class User:
         keyword: str,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns a user's posts that contain the specified keywords.
@@ -187,7 +187,7 @@ class User:
         keyword: str,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns a user's comments that contain the specified keyword.
@@ -248,7 +248,7 @@ class User:
         top_n: int,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[tuple]:
         """
         Returns a user's top n subreddits based on subreddit frequency in n posts.
@@ -346,7 +346,7 @@ class Search:
         limit: int,
         session: aiohttp.ClientSession,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns posts.
@@ -457,7 +457,7 @@ class Subreddit:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns a subreddit's posts.
@@ -493,7 +493,7 @@ class Subreddit:
         keyword: str,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns posts that contain a specified keyword from a subreddit.
@@ -671,10 +671,10 @@ class Posts:
     async def listing(
         self,
         session: aiohttp.ClientSession,
-        listings_name: DATA_LISTING,
+        listings_name: LISTING,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns posts from a specified listing.
@@ -736,7 +736,7 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns posts from the Reddit front-page.

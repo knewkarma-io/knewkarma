@@ -9,7 +9,7 @@ from rich.markdown import Markdown
 from rich.tree import Tree
 from rich_argparse import RichHelpFormatter
 
-from ._api import Api, DATA_TIMEFRAME, SORT_CRITERION, DATA_LISTING
+from ._api import Api, TIMEFRAME, SORT_CRITERION, LISTING
 from ._core import Post, Posts, Subreddit, Subreddits, User, Search
 from ._utils import (
     console,
@@ -32,7 +32,7 @@ def create_parser() -> argparse.ArgumentParser:
     :rtype: argparse.ArgumentParser
     """
     main_parser = argparse.ArgumentParser(
-        description=Markdown(Docs.about, style="argparse.text"),
+        description=Markdown(Docs.summary, style="argparse.text"),
         epilog=Markdown(Docs.description),
         formatter_class=RichHelpFormatter,
     )
@@ -42,7 +42,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--timeframe",
         type=str,
         default="all",
-        choices=list(get_args(DATA_TIMEFRAME)),
+        choices=list(get_args(TIMEFRAME)),
         help="([bold][green]bulk/semi-bulk[/][/]) timeframe to get data from (default: [green]%(default)s[/])",
     )
     main_parser.add_argument(
@@ -129,7 +129,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--listing",
         default="all",
         help="get posts from a specified listing",
-        choices=list(get_args(DATA_LISTING)),
+        choices=list(get_args(LISTING)),
     )
 
     search_parser = subparsers.add_parser(
@@ -326,7 +326,7 @@ async def call_functions(args: argparse.Namespace, function_mapping: dict):
 
                 if args.export:
                     output_dir: str = os.path.expanduser(
-                        os.path.join("~", "knewkarma-data")
+                        os.path.join("~", "knewkarma-output")
                     )
                     # Create path to main directory in which target data files will be exported
                     directory = os.path.join(output_dir, args.module, action)

@@ -17,8 +17,8 @@ SORT_CRITERION = Literal[
     "rising",
 ]
 
-DATA_LISTING = Literal["best", "controversial", "popular", "rising"]
-DATA_TIMEFRAME = Literal["hour", "day", "week", "month", "year"]
+LISTING = Literal["best", "controversial", "popular", "rising"]
+TIMEFRAME = Literal["hour", "day", "week", "month", "year"]
 TIME_FORMAT = Literal["concise", "locale"]
 
 
@@ -255,7 +255,7 @@ class Api:
             "user_comments",
         ],
         posts_source: str = None,
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
         sort: SORT_CRITERION = "all",
     ) -> list[dict]:
         """
@@ -309,7 +309,7 @@ class Api:
         query: str,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Asynchronously searches from a specified results type that match the specified query.
