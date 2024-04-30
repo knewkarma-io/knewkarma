@@ -1,17 +1,17 @@
 from ._core import (
     Post,
     Posts,
+    Search,
     Subreddit,
     Subreddits,
     User,
-    Search,
 )
 
 __all__ = [
     "Post",
     "Posts",
+    "Search",
     "Subreddit",
     "Subreddits",
     "User",
-    "Search",
 ]
