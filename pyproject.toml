@@ -39,6 +39,7 @@ rich-argparse = "^1.4.0"
 pytest = "^7.4.3"
 pytest-asyncio = "^0.23.2"
 pytest-html = "^4.1.1"
+pytest-rerunfailures = "^14.0"
 
 [tool.poetry.scripts]
 knewkarma = "knewkarma._cli:stage_and_start"
