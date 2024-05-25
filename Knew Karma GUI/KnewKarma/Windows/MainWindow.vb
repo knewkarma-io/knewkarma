@@ -2,6 +2,7 @@
     Public Shared ReadOnly settings As New SettingsManager()
     Private bytesSentCounter As PerformanceCounter
     Private bytesReceivedCounter As PerformanceCounter
+    ReadOnly Coreutils As New CoreUtils()
 
     ''' <summary>
     ''' Event handler for the form load event.
@@ -179,7 +180,7 @@
                                                     sender As Object,
                                                     e As EventArgs
                                                 ) Handles ButtonFetchSubredditData.Click
-        Dim subreddit As String = CheckInput(txtBox:=TextBoxSubreddit)
+        Dim subreddit = CheckInput(txtBox:=TextBoxSubreddit)
         If subreddit IsNot Nothing Then
             Await DataGridViewer.LoadSubredditDataAsync(subreddit:=subreddit)
         End If
@@ -197,7 +198,7 @@
                                           ) Handles TextBoxSubreddit.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
-            Dim subreddit As String = CheckInput(txtBox:=TextBoxSubreddit)
+            Dim subreddit = CheckInput(txtBox:=TextBoxSubreddit)
             If subreddit IsNot Nothing Then
                 Await DataGridViewer.LoadSubredditDataAsync(subreddit:=subreddit)
             End If
@@ -210,7 +211,7 @@
                                                          ) Handles NumericUpDownSubredditPostsLimit.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
-            Dim subreddit As String = CheckInput(txtBox:=TextBoxSubreddit)
+            Dim subreddit = CheckInput(txtBox:=TextBoxSubreddit)
             If subreddit IsNot Nothing Then
                 Await DataGridViewer.LoadSubredditDataAsync(subreddit:=subreddit)
             End If
@@ -332,23 +333,26 @@
                                      e As TreeViewEventArgs
                                  ) Handles TreeView1.AfterSelect
 
-        HideAllPanels()
-        Me.Width = 393
+        HideAllPanels() ' 429, 287
         Me.Text = My.Application.Info.AssemblyName
         Select Case e.Node.Text
             Case "User"
+                Me.Text = "User"
                 PanelUserData.Visible = True
             Case "Subreddit"
+                Me.Text = "Subreddit"
                 PanelSubredditData.Visible = True
             Case "Search"
+                Me.Text = "Search"
                 PanelSearchPosts.Visible = True
             Case "Listings"
+                Me.Text = "Listings"
                 PanelPostListings.Visible = True
             Case "Front Page"
+                Me.Text = "Front Page"
                 PanelFrontPageData.Visible = True
             Case Else
-                Me.Width = 169
-                Me.Text = ""
+                PanelAbout.Visible = True
         End Select
     End Sub
 
@@ -527,4 +531,5 @@
             settings.ToggleSettings(False, "darkmode")
         End If
     End Sub
+
 End Class

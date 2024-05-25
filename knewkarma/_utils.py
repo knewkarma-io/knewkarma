@@ -1,37 +1,39 @@
-import getpass
+import asyncio
 import locale
 import os
-import platform
-import time
 from datetime import datetime, timezone
 from typing import Union, Literal
 
 import pandas as pd
 from rich.console import Console
+from rich.status import Status
+from rich.table import Table
 from rich.tree import Tree
 
 
-def systeminfo():
-    """Shows some basic system info"""
-    return {
-        "python": platform.python_version(),
-        "username": getpass.getuser(),
-        "system": f"{platform.node()} {platform.release()} ({platform.system()})",
-    }
-
-
-def pathfinder(directories: list[str]):
+async def countdown_timer(status, duration: int, current_count: int, limit: int):
     """
-    Creates directories in knewkarma-data directory of the user's home folder.
+    Handles the countdown during the asynchronous pagination, updating the status bar with the remaining time.
 
-    :param directories: A list of file directories to create.
-    :type directories: list[str]
+    :param status: The rich status object used to display the countdown.
+    :type status: rich.status.Status
+    :param duration: The duration for which to run the countdown.
+    :type duration: int
+    :param current_count: Current number of items fetched.
+    :type current_count: int
+    :param limit: Total number of items to fetch.
+    :type limit: int
     """
-    for directory in directories:
-        os.makedirs(directory, exist_ok=True)
+    for remaining in range(duration, 0, -1):
+        status.update(
+            f"[cyan]{current_count}[/] of [cyan]{limit}[/] "
+            f"items fetched so far. Resuming in [cyan]{remaining}[/]"
+            f" {'second' if remaining <= 1 else 'seconds'}[yellow]...[/]"
+        )
+        await asyncio.sleep(1)  # Sleep for one second as part of countdown
 
 
-def _timestamp_to_datetime(timestamp: float) -> str:
+def _timestamp_to_locale(timestamp: float) -> str:
     """
     Converts a unix timestamp to a localized datetime string based on the system's locale.
 
@@ -52,7 +54,7 @@ def _timestamp_to_datetime(timestamp: float) -> str:
     return local_object.strftime("%x, %X")
 
 
-def _time_since(timestamp: int) -> str:
+def _time_since(timestamp: int, suffix: str = "ago") -> str:
     """
     Convert a Unix timestamp into a human-readable time difference.
 
@@ -61,6 +63,8 @@ def _time_since(timestamp: int) -> str:
     :return: A string representing the time difference from now.
     :rtype: str
     """
+    import time
+
     # Convert the current time to a Unix timestamp
     now = int(time.time())
 
@@ -98,11 +102,11 @@ def _time_since(timestamp: int) -> str:
         count = diff // year
         label = "years" if int(count) > 1 else "year"
 
-    return "just now" if int(count) == 0 else f"{int(count)} {label} ago"
+    return "just now" if int(count) == 0 else f"{int(count)} {label} {suffix}"
 
 
 def timestamp_to_readable(
-    timestamp: float, time_format: Literal["concise", "datetime"] = "datetime"
+    timestamp: float, time_format: Literal["concise", "locale"] = "locale"
 ) -> str:
     """
     Converts a Unix timestamp into a more readable format based on the specified `time_format`.
@@ -112,19 +116,19 @@ def timestamp_to_readable(
     :param timestamp: The Unix timestamp to be converted.
     :type timestamp: float
     :param time_format: Determines the format of the output time. Use "concise" for a human-readable
-                        time difference, or "datetime" for a localized datetime string. Defaults to "datetime".
-    :type time_format: Literal["concise", "datetime"]
+                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
+    :type time_format: Literal["concise", "locale"]
     :return: A string representing the formatted time. The format is determined by the `time_format` parameter.
     :rtype: str
-    :raises ValueError: If `time_format` is not one of the expected values ("concise" or "datetime").
+    :raises ValueError: If `time_format` is not one of the expected values ("concise" or "locale").
     """
     if time_format == "concise":
         return _time_since(timestamp=int(timestamp))
-    elif time_format == "datetime":
-        return _timestamp_to_datetime(timestamp=timestamp)
+    elif time_format == "locale":
+        return _timestamp_to_locale(timestamp=timestamp)
     else:
         raise ValueError(
-            f"Unknown time format {time_format}. Expected `concise` or `datetime`."
+            f"Unknown time format {time_format}. Expected `concise` or `locale`."
         )
 
 
@@ -148,6 +152,103 @@ def filename_timestamp() -> str:
         if os.name == "nt"
         else now.strftime("%d-%B-%Y-%I:%M:%S%p")
     )
+
+
+def system_info():
+    """
+    Displays system information in a table format.
+    """
+    import getpass
+    import platform
+    import sys
+
+    import psutil
+
+    from .version import Version
+
+    table = Table(show_header=False, show_edge=False, highlight=True)
+    table.add_column("header", style="dim")
+    table.add_column("header")
+
+    if os.name == "nt":
+        # https://www.geeksforgeeks.org/getting-the-time-since-os-startup-using-python/
+        # ctypes required for using GetTickCount64()
+        import ctypes
+
+        # getting the library in which GetTickCount64() resides
+        lib = ctypes.windll.kernel32
+
+        # calling the function and storing the return value
+        t = lib.GetTickCount64()
+
+        # since the time is in milliseconds i.e. 1000 * seconds
+        # therefore truncating the value
+        t = int(str(t)[:-3])
+
+        # extracting hours, minutes, seconds & days from t
+        # variable (which stores total time in seconds)
+        minutes, seconds = divmod(t, 60)
+        hours, minutes = divmod(minutes, 60)
+        days, hours = divmod(hours, 24)
+
+        system_uptime = (
+            "just now"
+            if days == hours == minutes == seconds == 0
+            else f"{days} days, {hours:02} hours, {minutes:02} minutes, and {seconds:02} seconds since boot"
+        )
+    else:
+        system_uptime = _time_since(
+            timestamp=int(psutil.boot_time()), suffix="since boot"
+        )
+
+    table.add_row("Knew Karma", Version.full)
+    table.add_row("Python", sys.version)
+    table.add_row("Username", getpass.getuser())
+    table.add_row("System", f"{platform.system()} {platform.version()}")
+    table.add_row(
+        "CPU", f"{psutil.cpu_count(logical=True)} cores, {platform.processor()}"
+    )
+    table.add_row(
+        "Disk",
+        f"{psutil.disk_usage('/').free / (1024**3):.2f} GB free"
+        f" / {psutil.disk_usage('/').total / (1024**3):.2f} GB",
+    )
+    table.add_row(
+        "Memory",
+        f"{psutil.virtual_memory().available / (1024**3):.2f} GB free"
+        f" / {psutil.virtual_memory().total / (1024**3):.2f} GB",
+    )
+
+    table.add_row(
+        "Uptime",
+        system_uptime,
+    )
+    console.print(table)
+
+
+def get_status() -> Status:
+    """
+    Creates and returns a Status object initialized with a specific message and spinner style.
+
+    :return: A configured rich Status object ready to be used in a context manager.
+    :rtype: rich.status.Status
+    """
+    with Status(
+        status="Initialising[yellow]...[/]",
+        spinner="dots2",
+    ) as status:
+        return status
+
+
+def pathfinder(directories: list[str]):
+    """
+    Creates directories in knewkarma-output directory of the user's home folder.
+
+    :param directories: A list of file directories to create.
+    :type directories: list[str]
+    """
+    for directory in directories:
+        os.makedirs(directory, exist_ok=True)
 
 
 def create_dataframe(

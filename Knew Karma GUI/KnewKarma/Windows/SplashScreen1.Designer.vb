@@ -23,20 +23,21 @@ Partial Class SplashScreen1
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(SplashScreen1))
-        Copyright = New Label()
+        Loading = New Label()
         SuspendLayout()
         ' 
-        ' Copyright
+        ' Loading
         ' 
-        Copyright.AutoSize = True
-        Copyright.BackColor = Color.Transparent
-        Copyright.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
-        Copyright.ForeColor = SystemColors.Control
-        Copyright.Location = New Point(212, 214)
-        Copyright.Name = "Copyright"
-        Copyright.Size = New Size(56, 15)
-        Copyright.TabIndex = 0
-        Copyright.Text = "Copyright"
+        Loading.AutoSize = True
+        Loading.BackColor = Color.Transparent
+        Loading.Font = New Font("Segoe UI Variable Display", 8.25F, FontStyle.Regular, GraphicsUnit.Point)
+        Loading.ForeColor = SystemColors.Control
+        Loading.Location = New Point(195, 207)
+        Loading.Name = "Loading"
+        Loading.Size = New Size(63, 15)
+        Loading.TabIndex = 0
+        Loading.Text = "Initialising..."
+        Loading.UseWaitCursor = True
         ' 
         ' SplashScreen1
         ' 
@@ -44,9 +45,9 @@ Partial Class SplashScreen1
         AutoScaleMode = AutoScaleMode.Font
         BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), Image)
         BackgroundImageLayout = ImageLayout.Zoom
-        ClientSize = New Size(476, 238)
+        ClientSize = New Size(460, 230)
         ControlBox = False
-        Controls.Add(Copyright)
+        Controls.Add(Loading)
         DoubleBuffered = True
         FormBorderStyle = FormBorderStyle.FixedSingle
         MaximizeBox = False
@@ -54,11 +55,12 @@ Partial Class SplashScreen1
         Name = "SplashScreen1"
         ShowInTaskbar = False
         StartPosition = FormStartPosition.CenterScreen
+        UseWaitCursor = True
         ResumeLayout(False)
         PerformLayout()
 
     End Sub
 
-    Friend WithEvents Copyright As Label
+    Friend WithEvents Loading As Label
 
 End Class

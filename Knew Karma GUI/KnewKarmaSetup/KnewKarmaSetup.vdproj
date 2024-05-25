@@ -100,10 +100,10 @@
                     "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
                     "ProductCode" = "8:.NETFramework,Version=v4.7.2"
                     }
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.DesktopRuntime.6.0.x64"
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.DesktopRuntime.7.0.x64"
                     {
-                    "Name" = "8:.NET Desktop Runtime 6.0.28 (x64)"
-                    "ProductCode" = "8:Microsoft.NetCore.DesktopRuntime.6.0.x64"
+                    "Name" = "8:.NET Desktop Runtime 7.0.18 (x64)"
+                    "ProductCode" = "8:Microsoft.NetCore.DesktopRuntime.7.0.x64"
                     }
                 }
             }
@@ -782,7 +782,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_6E15D9F422094BD9809550AF1BA1C161"
             {
-            "SourcePath" = "8:..\\KnewKarma\\obj\\Release\\net6.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\KnewKarma\\obj\\Debug\\net7.0-windows8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_C0F76EDD899B4FFF80C2AC1B5526BC22"

@@ -1,4 +1,3 @@
-import asyncio
 from random import randint
 from sys import version as python_version
 from typing import Union, Literal
@@ -6,7 +5,7 @@ from typing import Union, Literal
 import aiohttp
 from rich.markdown import Markdown
 
-from ._utils import console
+from ._utils import console, countdown_timer, get_status
 from .version import Version
 
 SORT_CRITERION = Literal[
@@ -18,20 +17,20 @@ SORT_CRITERION = Literal[
     "rising",
 ]
 
-DATA_LISTING = Literal["best", "controversial", "popular", "rising"]
-DATA_TIMEFRAME = Literal["hour", "day", "week", "month", "year"]
-TIME_FORMAT = Literal["concise", "datetime"]
+LISTING = Literal["best", "controversial", "popular", "rising"]
+TIMEFRAME = Literal["hour", "day", "week", "month", "year"]
+TIME_FORMAT = Literal["concise", "locale"]
 
 
 class Api:
     """Represents the Knew Karma API and provides methods for getting various data from the Reddit API."""
 
     def __init__(self):
-        self.base_reddit_endpoint: str = "https://www.reddit.com"
-        self._user_data_endpoint: str = f"{self.base_reddit_endpoint}/u"
-        self._users_data_endpoint: str = f"{self.base_reddit_endpoint}/users"
-        self.subreddit_data_endpoint: str = f"{self.base_reddit_endpoint}/r"
-        self._subreddits_data_endpoint: str = f"{self.base_reddit_endpoint}/subreddits"
+        self._base_reddit_endpoint: str = "https://www.reddit.com"
+        self._user_data_endpoint: str = f"{self._base_reddit_endpoint}/u"
+        self._users_data_endpoint: str = f"{self._base_reddit_endpoint}/users"
+        self.subreddit_data_endpoint: str = f"{self._base_reddit_endpoint}/r"
+        self._subreddits_data_endpoint: str = f"{self._base_reddit_endpoint}/subreddits"
         self._github_release_endpoint: str = (
             "https://api.github.com/repos/bellingcat/knewkarma/releases/latest"
         )
@@ -55,7 +54,7 @@ class Api:
                 endpoint,
                 headers={
                     "User-Agent": f"Knew-Karma/{Version.release} "
-                    f"(Python {python_version}; +https://knewkarma-wiki.readthedocs.io)"
+                    f"(Python {python_version}; +https://knewkarma.readthedocs.io)"
                 },
             ) as response:
                 if response.status == 200:
@@ -161,16 +160,18 @@ class Api:
         :return: A dictionary object containing profile data from the specified source.
         :rtype: dict
         """
-        # Use a dictionary for direct mapping
-        profile_mapping: dict = {
-            "user": f"{self._user_data_endpoint}/{profile_source}/about.json",
-            "subreddit": f"{self.subreddit_data_endpoint}/{profile_source}/about.json",
-        }
+        with get_status():
+            # Use a dictionary for direct mapping
+            profile_mapping: dict = {
+                "user": f"{self._user_data_endpoint}/{profile_source}/about.json",
+                "subreddit": f"{self.subreddit_data_endpoint}/{profile_source}/about.json",
+            }
 
-        # Get the endpoint directly from the dictionary
-        endpoint: str = profile_mapping.get(profile_type, "")
+            # Get the endpoint directly from the dictionary
+            endpoint: str = profile_mapping.get(profile_type, "")
 
-        profile_data = await self.get_data(endpoint=endpoint, session=session)
+            profile_data = await self.get_data(endpoint=endpoint, session=session)
+
         return self._process_response(
             response_data=profile_data.get("data", {}), valid_key="created_utc"
         )
@@ -201,35 +202,43 @@ class Api:
         """
         all_items = []
         last_item_id = None
-        while len(all_items) < limit:
-            paginated_endpoint = (
-                f"{endpoint}&after={last_item_id}&count={len(all_items)}"
-                if last_item_id
-                else endpoint
-            )
+        with get_status() as status:
+            while len(all_items) < limit:
+                paginated_endpoint = (
+                    f"{endpoint}&after={last_item_id}&count={len(all_items)}"
+                    if last_item_id
+                    else endpoint
+                )
 
-            response = await self.get_data(session=session, endpoint=paginated_endpoint)
-            items = response.get("data", {}).get("children", [])
+                response = await self.get_data(
+                    session=session, endpoint=paginated_endpoint
+                )
+                items = response.get("data", {}).get("children", [])
 
-            if not items:
-                break
+                if not items:
+                    break
 
-            processed_items = process_func(response_data=items)
-            items_to_limit = limit - len(all_items)
-            all_items.extend(processed_items[:items_to_limit])
+                processed_items = process_func(response_data=items)
+                items_to_limit = limit - len(all_items)
+                all_items.extend(processed_items[:items_to_limit])
 
-            last_item_id = response.get("data").get("after")
+                last_item_id = response.get("data").get("after")
 
-            if len(all_items) == limit:
-                break
+                if len(all_items) == limit:
+                    break
 
-            sleep_delay: int = randint(1, 10)
-            console.log(
-                f"[green]✔[/] Fetched {len(all_items)}/{limit} items so far. Resuming in {sleep_delay} seconds...",
-            )
-            await asyncio.sleep(sleep_delay)
+                sleep_delay: int = randint(1, 10)
 
-        console.log(f"[green]✔[/] Successfully fetched {len(all_items)}/{limit} items!")
+                await countdown_timer(
+                    status=status,
+                    duration=sleep_delay,
+                    current_count=len(all_items),
+                    limit=limit,
+                )
+
+        console.log(
+            f"[green]✔[/] {len(all_items)} of {limit} items fetched successfully!"
+        )
         return all_items
 
     async def get_posts(
@@ -246,7 +255,7 @@ class Api:
             "user_comments",
         ],
         posts_source: str = None,
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
         sort: SORT_CRITERION = "all",
     ) -> list[dict]:
         """
@@ -269,8 +278,8 @@ class Api:
         :rtype: list[dict]
         """
         source_map = {
-            "new_posts": f"{self.base_reddit_endpoint}/new.json",
-            "front_page_posts": f"{self.base_reddit_endpoint}/.json",
+            "new_posts": f"{self._base_reddit_endpoint}/new.json",
+            "front_page_posts": f"{self._base_reddit_endpoint}/.json",
             "listing_posts": f"{self.subreddit_data_endpoint}/{posts_source}.json?",
             "subreddit_posts": f"{self.subreddit_data_endpoint}/{posts_source}.json",
             "user_posts": f"{self._user_data_endpoint}/{posts_source}/submitted.json",
@@ -300,7 +309,7 @@ class Api:
         query: str,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Asynchronously searches from a specified results type that match the specified query.
@@ -321,7 +330,7 @@ class Api:
         search_mapping: dict = {
             "users": f"{self._users_data_endpoint}/search.json",
             "subreddits": f"{self._subreddits_data_endpoint}/search.json",
-            "posts": f"{self.base_reddit_endpoint}/search.json",
+            "posts": f"{self._base_reddit_endpoint}/search.json",
         }
 
         endpoint = search_mapping.get(search_type, "")

@@ -1,13 +1,32 @@
 from typing import Union
 
-from ._api import TIME_FORMAT
 from ._utils import timestamp_to_readable
+from .api import TIME_FORMAT
 
 
 def parse_users(
     data: Union[list[dict], dict], time_format: TIME_FORMAT
 ) -> Union[list[dict], dict]:
+    """
+    Parses a list/single object of raw user data.
+
+    :param data: A list of dict objects, each containing raw user data.
+    :type data: list[dict]
+    :param time_format: TIme format for the parsed data.
+    :type time_format: Literal[locale, concise]
+    :return: A list of parsed dict objects, each containing user data Or a dict object containing user data.
+    :rtype: Union[list[dict], dict]
+    """
+
     def build_user(user: dict) -> dict:
+        """
+        Parses raw user data to get only the needed data.
+
+        :param user: Raw user data.
+        :type user: dict
+        :return: A dict object containing parsed user data.
+        :rtype: dict
+        """
         return {
             "name": user.get("name"),
             "id": user.get("id"),
@@ -45,7 +64,26 @@ def parse_users(
 def parse_posts(
     data: Union[dict, list], time_format: TIME_FORMAT
 ) -> Union[list[dict], dict]:
+    """
+    Parses a list/single object of raw post data.
+
+    :param data: A list of dict objects, each containing raw post data.
+    :type data: list[dict]
+    :param time_format: TIme format for the parsed data.
+    :type time_format: Literal[locale, concise]
+    :return: A list of parsed dict objects, each containing post data Or a dict object containing post data.
+    :rtype: Union[list[dict], dict]
+    """
+
     def build_post(post: dict) -> dict:
+        """
+        Parses raw post data to get only the needed data.
+
+        :param post: Raw post data.
+        :type post: dict
+        :return: A dict object containing parsed post data.
+        :rtype: dict
+        """
         return {
             "author": post.get("author"),
             "title": post.get("title"),
@@ -61,7 +99,7 @@ def parse_posts(
             "gilded": post.get("gilded"),
             "is_nsfw": post.get("over_18"),
             "is_shareable": post.get("is_reddit_media_domain"),
-            "hide_from_bots": post.get("is_robot_indexable"),
+            "is_robot_indexable": post.get("is_robot_indexable"),
             "permalink": post.get("permalink"),
             "is_locked": post.get("locked"),
             "is_archived": post.get("archived"),
@@ -88,6 +126,16 @@ def parse_posts(
 
 
 def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]:
+    """
+    Parses a list of raw comments data to get only the needed data in each item.
+
+    :param comments: A list of dict objects, each containing raw comment data.
+    :type comments: list[dict]
+    :param time_format: TIme format for the parsed data.
+    :type time_format: Literal[locale, concise]
+    :return: A list of parsed dict objects, each containing comments data.
+    :rtype: list[dict]
+    """
     if len(comments) != 0:
         comments_list: list = []
         for comment in comments:
@@ -126,9 +174,30 @@ def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
 def parse_subreddits(
     data: Union[list, dict], time_format, is_preview: bool = False
 ) -> Union[list[dict], dict]:
+    """
+    Parses a list/single object of raw subreddits data.
+
+    :param data: A list of dict objects, each containing raw subreddit data.
+    :type data: list[dict]
+    :param time_format: TIme format for the parsed data.
+    :type time_format: Literal[locale, concise]
+    :param is_preview: A boolean value to determine whether a subreddit is a preview,
+        i.e. Its object contains fewer data.
+    :return: A list of parsed dict objects, each containing subreddits data Or a dict object containing subreddit data.
+    :rtype: Union[list[dict], dict]
+    """
+
     def build_subreddit(
         subreddit: dict,
     ) -> dict:
+        """
+        Parses raw subreddit data to get only the needed data.
+
+        :param subreddit: Raw subreddit data.
+        :type subreddit: dict
+        :return: A dict object containing parsed subreddit data.
+        :rtype: dict
+        """
         if is_preview:
             subreddit_obj = {
                 "name": subreddit.get("display_name"),
@@ -178,6 +247,16 @@ def parse_subreddits(
 
 
 def parse_subreddit_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
+    """
+    Parses raw subreddit wiki page data to get only the needed data.
+
+    :param wiki_page: Raw wiki page data.
+    :type wiki_page: dict
+    :param time_format: TIme format for the parsed data.
+    :type time_format: Literal[locale, concise]
+    :return: A dict object of parsed wiki page data.
+    :rtype: dict
+    """
     if "revision_id" in wiki_page:
         page_data: dict = wiki_page.get("data")
         user: dict = page_data.get("revision_by").get("data")
