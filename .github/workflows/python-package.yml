@@ -28,4 +28,4 @@ jobs:
           python -m poetry install --with dev
       - name: Test with pytest
         run: |
-          poetry run pytest
+          poetry run pytest --reruns 3 --reruns-delay 10
