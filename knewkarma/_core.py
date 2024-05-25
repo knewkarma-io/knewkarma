@@ -3,7 +3,6 @@ from collections import Counter
 
 import aiohttp
 
-from ._api import Api, DATA_TIMEFRAME, SORT_CRITERION, DATA_LISTING, TIME_FORMAT
 from ._parsers import (
     parse_comments,
     parse_subreddits,
@@ -11,6 +10,7 @@ from ._parsers import (
     parse_posts,
     parse_users,
 )
+from .api import Api, TIMEFRAME, SORT_CRITERION, LISTING, TIME_FORMAT
 
 api = Api()
 
@@ -18,15 +18,15 @@ api = Api()
 class User:
     """Represents a Reddit user and provides methods for getting data from the specified user."""
 
-    def __init__(self, username: str, time_format: TIME_FORMAT = "datetime"):
+    def __init__(self, username: str, time_format: TIME_FORMAT = "locale"):
         """
         Initialises a User instance for getting profile, posts and comments data from the specified user.
 
         :param username: Username of the user to get data from.
         :type username: str
         :param time_format: Determines the format of the output. Use "concise" for a human-readable
-                        time difference, or "datetime" for a localized datetime string. Defaults to "datetime".
-        :type time_format: Literal["concise", "datetime"]
+                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
+        :type time_format: Literal["concise", "locale"]
         """
         self._username = username
         self._time_format = time_format
@@ -52,7 +52,7 @@ class User:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns a user's posts.
@@ -85,7 +85,7 @@ class User:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns a user's comments.
@@ -144,7 +144,7 @@ class User:
         keyword: str,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns a user's posts that contain the specified keywords.
@@ -187,7 +187,7 @@ class User:
         keyword: str,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns a user's comments that contain the specified keyword.
@@ -248,7 +248,7 @@ class User:
         top_n: int,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[tuple]:
         """
         Returns a user's top n subreddits based on subreddit frequency in n posts.
@@ -290,7 +290,7 @@ class User:
 class Search:
     """Represents Readit search functionality and provides methods for getting search results from different entities"""
 
-    def __init__(self, time_format: TIME_FORMAT = "datetime"):
+    def __init__(self, time_format: TIME_FORMAT = "locale"):
         self._time_format = time_format
 
     async def users(
@@ -346,7 +346,7 @@ class Search:
         limit: int,
         session: aiohttp.ClientSession,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns posts.
@@ -382,15 +382,15 @@ class Search:
 class Subreddit:
     """Represents a Reddit Community (Subreddit) and provides methods for getting data from the specified subreddit."""
 
-    def __init__(self, subreddit: str, time_format: TIME_FORMAT = "datetime"):
+    def __init__(self, subreddit: str, time_format: TIME_FORMAT = "locale"):
         """
         Initialises a RedditCommunity instance for getting profile and posts from the specified subreddit.
 
         :param subreddit: Name of the subreddit to get data from.
         :type subreddit: str
         :param time_format: Determines the format of the output. Use "concise" for a human-readable
-                        time difference, or "datetime" for a localized datetime string. Defaults to "datetime".
-        :type time_format: Literal["concise", "datetime"]
+                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
+        :type time_format: Literal["concise", "locale"]
         """
         self._subreddit = subreddit
         self._time_format = time_format
@@ -457,7 +457,7 @@ class Subreddit:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns a subreddit's posts.
@@ -493,7 +493,7 @@ class Subreddit:
         keyword: str,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns posts that contain a specified keyword from a subreddit.
@@ -534,7 +534,7 @@ class Subreddit:
 class Subreddits:
     """Represents Reddit subreddits and provides methods for getting related data."""
 
-    def __init__(self, time_format: TIME_FORMAT = "datetime"):
+    def __init__(self, time_format: TIME_FORMAT = "locale"):
         self._time_format = time_format
 
     async def all(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
@@ -626,7 +626,7 @@ class Post:
     """Represents a Reddit post and provides method(s) for getting data from the specified post."""
 
     def __init__(
-        self, post_id: str, subreddit: str, time_format: TIME_FORMAT = "datetime"
+        self, post_id: str, subreddit: str, time_format: TIME_FORMAT = "locale"
     ):
         self._post_id = post_id
         self._subreddit = subreddit
@@ -665,16 +665,16 @@ class Post:
 class Posts:
     """Represents Reddit posts and provides methods for getting posts from various sources."""
 
-    def __init__(self, time_format: TIME_FORMAT = "datetime"):
+    def __init__(self, time_format: TIME_FORMAT = "locale"):
         self._time_format = time_format
 
     async def listing(
         self,
         session: aiohttp.ClientSession,
-        listings_name: DATA_LISTING,
+        listings_name: LISTING,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns posts from a specified listing.
@@ -736,7 +736,7 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: DATA_TIMEFRAME = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns posts from the Reddit front-page.

@@ -63,7 +63,8 @@ Public Class ApiHandler
     ''' Asynchronously fetches the program's update information from GitHub.
     ''' <summary>
     Public Async Function AsyncGetUpdates() As Task
-        AboutWindow.Version.Text = "Checking for updates..."
+        AboutWindow.VersionStatus.ForeColor = Color.White
+        AboutWindow.VersionStatus.Text = "Checking..."
         ' Making an asynchronous request to check for updates.
         Dim data As JObject = Await AsyncGetData(endpoint:="https://api.github.com/repos/rly0nheart/knewkarma/releases/latest")
 
@@ -74,10 +75,13 @@ Public Class ApiHandler
 
             ' Checking if the current version is the latest version.
             If tagName = My.Application.Info.Version.ToString Then
-                AboutWindow.Version.Text = $"Up-to-date: {My.Application.Info.Version}"
+                AboutWindow.VersionStatus.ForeColor = Color.Green
+                AboutWindow.VersionStatus.Text = $"✔ {My.Application.Info.Version}"
             Else
-                AboutWindow.Version.Text = $"Updates found: {tagName}"
+                AboutWindow.VersionStatus.ForeColor = Color.Orange
+                AboutWindow.VersionStatus.Text = $"▼ {tagName}"
                 AboutWindow.ButtonGetUpdates.Enabled = True
+                AboutWindow.ButtonGetUpdates.BackColor = Color.Orange
             End If
         End If
     End Function

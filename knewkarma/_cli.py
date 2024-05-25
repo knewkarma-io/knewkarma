@@ -9,18 +9,18 @@ from rich.markdown import Markdown
 from rich.tree import Tree
 from rich_argparse import RichHelpFormatter
 
-from ._api import Api, DATA_TIMEFRAME, SORT_CRITERION, DATA_LISTING
 from ._core import Post, Posts, Subreddit, Subreddits, User, Search
 from ._utils import (
     console,
     pathfinder,
-    systeminfo,
+    system_info,
     export_dataframe,
     filename_timestamp,
     create_dataframe,
     show_exported_files,
 )
-from .docs import Docs
+from .api import Api, TIMEFRAME, SORT_CRITERION, LISTING
+from .help import Help
 from .version import Version
 
 
@@ -32,8 +32,8 @@ def create_parser() -> argparse.ArgumentParser:
     :rtype: argparse.ArgumentParser
     """
     main_parser = argparse.ArgumentParser(
-        description=Markdown(Docs.about, style="argparse.text"),
-        epilog=Markdown(Docs.description),
+        description=Markdown(Help.summary, style="argparse.text"),
+        epilog=Markdown(Help.description),
         formatter_class=RichHelpFormatter,
     )
     subparsers = main_parser.add_subparsers(dest="module", help="module")
@@ -42,7 +42,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--timeframe",
         type=str,
         default="all",
-        choices=list(get_args(DATA_TIMEFRAME)),
+        choices=list(get_args(TIMEFRAME)),
         help="([bold][green]bulk/semi-bulk[/][/]) timeframe to get data from (default: [green]%(default)s[/])",
     )
     main_parser.add_argument(
@@ -62,9 +62,9 @@ def create_parser() -> argparse.ArgumentParser:
     )
     main_parser.add_argument(
         "--time-format",
-        default="datetime",
+        default="locale",
         help="determines the format of the output time (default: [green]%(default)s[/])",
-        choices=["concise", "datetime"],
+        choices=["concise", "locale"],
     )
     main_parser.add_argument(
         "-e",
@@ -81,7 +81,7 @@ def create_parser() -> argparse.ArgumentParser:
     main_parser.add_argument(
         "-v",
         "--version",
-        version=Markdown(f"Knew Karma {Version.release} {Docs.copyright}"),
+        version=Markdown(f"Knew Karma {Version.release} {Help.copyright}"),
         action="version",
     )
 
@@ -92,7 +92,7 @@ def create_parser() -> argparse.ArgumentParser:
             "**Post Module**: *Pull an individual post's data*",
             style="argparse.text",
         ),
-        epilog=Markdown(Docs.examples["post"]),
+        epilog=Markdown(Help.examples["post"]),
         formatter_class=RichHelpFormatter,
     )
 
@@ -109,7 +109,7 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             "**Posts**: *Pull posts from various sources.*", style="argparse.text"
         ),
-        epilog=Markdown(Docs.examples["posts"]),
+        epilog=Markdown(Help.examples["posts"]),
         formatter_class=RichHelpFormatter,
     )
     posts_parser.add_argument(
@@ -129,7 +129,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--listing",
         default="all",
         help="get posts from a specified listing",
-        choices=list(get_args(DATA_LISTING)),
+        choices=list(get_args(LISTING)),
     )
 
     search_parser = subparsers.add_parser(
@@ -139,7 +139,7 @@ def create_parser() -> argparse.ArgumentParser:
             "**Search**: *Get search results from various sources.*",
             style="argparse.text",
         ),
-        epilog=Markdown(Docs.examples["search"]),
+        epilog=Markdown(Help.examples["search"]),
         formatter_class=RichHelpFormatter,
     )
     search_parser.add_argument("query", help="search query")
@@ -160,7 +160,7 @@ def create_parser() -> argparse.ArgumentParser:
             "**Subreddit**: *Pull a specified subreddit's data.*",
             style="argparse.text",
         ),
-        epilog=Markdown(Docs.examples["subreddit"]),
+        epilog=Markdown(Help.examples["subreddit"]),
         formatter_class=RichHelpFormatter,
     )
     subreddit_parser.add_argument(
@@ -207,7 +207,7 @@ def create_parser() -> argparse.ArgumentParser:
             "**Subreddits**: *Pull subreddits from various sources.*",
             style="argparse.text",
         ),
-        epilog=Markdown(Docs.examples["subreddits"]),
+        epilog=Markdown(Help.examples["subreddits"]),
         formatter_class=RichHelpFormatter,
     )
     subreddits_parser.add_argument(
@@ -241,7 +241,7 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             "**User**: *Pull a specified user's data.*", style="argparse.text"
         ),
-        epilog=Markdown(Docs.examples["user"]),
+        epilog=Markdown(Help.examples["user"]),
         formatter_class=RichHelpFormatter,
     )
     user_parser.add_argument("username", help="username")
@@ -326,7 +326,7 @@ async def call_functions(args: argparse.Namespace, function_mapping: dict):
 
                 if args.export:
                     output_dir: str = os.path.expanduser(
-                        os.path.join("~", "knewkarma-data")
+                        os.path.join("~", "knewkarma-output")
                     )
                     # Create path to main directory in which target data files will be exported
                     directory = os.path.join(output_dir, args.module, action)
@@ -554,35 +554,23 @@ def stage_and_start():
     }
 
     if args.module:
-        print(
-            """
+        console.log(
+            f"""
 ┓┏┓         ┓┏┓
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
         )
-        print(f"{'='*40}")
-        with console.status(
-            status=f"Working: [bold]Knew Karma (CLI) [cyan]{Version.release}[/][/]",
-            spinner="dots2",
-        ):
-            for key, value in systeminfo().items():
-                console.log(f"[green]◉[/] [bold]{key}[/]: {value}")
+        system_info()
 
-            print(f"{'='*40}")
-
-            try:
-                start_time: datetime = datetime.now()
-                asyncio.run(
-                    call_functions(args=args, function_mapping=function_mapping)
-                )
-            except KeyboardInterrupt:
-                console.log(
-                    "[yellow]✘[/] User interruption detected ([yellow]Ctrl+C[/])"
-                )
-            finally:
-                elapsed_time = datetime.now() - start_time
-                console.log(
-                    f"[green]✔[/] Done! {elapsed_time.total_seconds():.2f} seconds elapsed."
-                )
+        try:
+            start_time: datetime = datetime.now()
+            asyncio.run(call_functions(args=args, function_mapping=function_mapping))
+        except KeyboardInterrupt:
+            console.log("[yellow]✘[/] User interruption detected ([yellow]Ctrl+C[/])")
+        finally:
+            elapsed_time = datetime.now() - start_time
+            console.log(
+                f"[green]✔[/] Done! {elapsed_time.total_seconds():.2f} seconds elapsed."
+            )
     else:
         parser.print_usage()

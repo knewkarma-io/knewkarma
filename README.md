@@ -3,8 +3,6 @@
 [![Upload Python Package](https://github.com/bellingcat/knewkarma/actions/workflows/python-publish.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/python-publish.yml) ![Read the Docs](https://img.shields.io/readthedocs/knewkarma-wiki?logo=readthedocs) [![CodeQL](https://github.com/bellingcat/knewkarma/actions/workflows/codeql.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/codeql.yml) [![PyPI - Version](https://img.shields.io/pypi/v/knewkarma?style=flat&logo=pypi&logoColor=ffdd54&label=PyPI&labelColor=3670A0&color=3670A0)](https://pypi.org/project/knewkarma) [![.Net](https://img.shields.io/badge/Visual%20Basic%20.NET-5C2D91?style=flat&logo=.net&logoColor=white)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3A%22Visual+Basic+.NET%22&type=code) [![Python](https://img.shields.io/badge/Python-3670A0?style=flat&logo=python&logoColor=ffdd54)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3APython&type=code) [![Docker](https://img.shields.io/badge/Docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3ADockerfile&type=code)
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/rly0nheart)
 
-![banner](https://github.com/bellingcat/knewkarma/assets/74001397/337b76c9-e951-45a2-a547-b76ae15de3a6)
-
 **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** snap package, an
 **Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical
@@ -49,6 +47,18 @@ complete overview of the features available:
 # Documentation
 
 [Refer to the Wiki](https://knewkarma-wiki.readthedocs.io) for Installation and Usage instructions.
-***
-[![me](https://github.com/bellingcat/knewkarma/assets/74001397/efd19c7e-9840-4969-b33c-04087e73e4da)](https://rly0nheart.github.io)
+
+## Star History
+
+<a href="https://star-history.com/#bellingcat/knewkarma&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=bellingcat/knewkarma&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=bellingcat/knewkarma&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=bellingcat/knewkarma&type=Date" />
+ </picture>
+</a>
+
+# License
+
+MIT License © [Richard Mwewa](https://rly0nheart.github.io)
 

@@ -1,22 +1,25 @@
 from datetime import date
 
 
-class Docs:
+class Help:
     """
     Container for documentation-related data for Knew Karma.
 
     Attributes:
+          author (str): A markdown-formatted string of author name and url.
           copyright (str): Copyright notice for the current year, including the author's details.
-          description (str): A brief description of Knew Karma as a CLI tool for Reddit data analysis.
+          summary (str): A brief description of Knew Karma as a tool for Reddit data analysis.
+          description (str): A full description of Knew Karma as a CLI, Library,
+                and GUI program for Reddit data analysis.
           examples (dict): Usage examples for different operations within Knew Karma.
     """
 
     author: str = "[Richard Mwewa](https://rly0nheart.github.io)"
     copyright: str = (
-        f"© Copyright 2023-{date.today().year} {author}. All Rights Reserved"
+        f"© Copyright 2023-{date.today().year} {author}. All rights reserved."
     )
 
-    about: str = f"**Knew Karma**: *A Reddit Data Analysis Toolkit* — by {author}"
+    summary: str = f"**Knew Karma**: *A Reddit Data Analysis Toolkit* — by {author}"
     description: str = """
 **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, an
