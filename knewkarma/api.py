@@ -26,11 +26,11 @@ class Api:
     """Represents the Knew Karma API and provides methods for getting various data from the Reddit API."""
 
     def __init__(self):
-        self.base_reddit_endpoint: str = "https://www.reddit.com"
-        self._user_data_endpoint: str = f"{self.base_reddit_endpoint}/u"
-        self._users_data_endpoint: str = f"{self.base_reddit_endpoint}/users"
-        self.subreddit_data_endpoint: str = f"{self.base_reddit_endpoint}/r"
-        self._subreddits_data_endpoint: str = f"{self.base_reddit_endpoint}/subreddits"
+        self._base_reddit_endpoint: str = "https://www.reddit.com"
+        self._user_data_endpoint: str = f"{self._base_reddit_endpoint}/u"
+        self._users_data_endpoint: str = f"{self._base_reddit_endpoint}/users"
+        self.subreddit_data_endpoint: str = f"{self._base_reddit_endpoint}/r"
+        self._subreddits_data_endpoint: str = f"{self._base_reddit_endpoint}/subreddits"
         self._github_release_endpoint: str = (
             "https://api.github.com/repos/bellingcat/knewkarma/releases/latest"
         )
@@ -54,7 +54,7 @@ class Api:
                 endpoint,
                 headers={
                     "User-Agent": f"Knew-Karma/{Version.release} "
-                    f"(Python {python_version}; +https://knewkarma-wiki.readthedocs.io)"
+                    f"(Python {python_version}; +https://knewkarma.readthedocs.io)"
                 },
             ) as response:
                 if response.status == 200:
@@ -278,8 +278,8 @@ class Api:
         :rtype: list[dict]
         """
         source_map = {
-            "new_posts": f"{self.base_reddit_endpoint}/new.json",
-            "front_page_posts": f"{self.base_reddit_endpoint}/.json",
+            "new_posts": f"{self._base_reddit_endpoint}/new.json",
+            "front_page_posts": f"{self._base_reddit_endpoint}/.json",
             "listing_posts": f"{self.subreddit_data_endpoint}/{posts_source}.json?",
             "subreddit_posts": f"{self.subreddit_data_endpoint}/{posts_source}.json",
             "user_posts": f"{self._user_data_endpoint}/{posts_source}/submitted.json",
@@ -330,7 +330,7 @@ class Api:
         search_mapping: dict = {
             "users": f"{self._users_data_endpoint}/search.json",
             "subreddits": f"{self._subreddits_data_endpoint}/search.json",
-            "posts": f"{self.base_reddit_endpoint}/search.json",
+            "posts": f"{self._base_reddit_endpoint}/search.json",
         }
 
         endpoint = search_mapping.get(search_type, "")

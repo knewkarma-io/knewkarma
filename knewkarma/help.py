@@ -1,7 +1,7 @@
 from datetime import date
 
 
-class Docs:
+class Help:
     """
     Container for documentation-related data for Knew Karma.
 

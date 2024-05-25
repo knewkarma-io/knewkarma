@@ -3,7 +3,6 @@ from collections import Counter
 
 import aiohttp
 
-from ._api import Api, TIMEFRAME, SORT_CRITERION, LISTING, TIME_FORMAT
 from ._parsers import (
     parse_comments,
     parse_subreddits,
@@ -11,6 +10,7 @@ from ._parsers import (
     parse_posts,
     parse_users,
 )
+from .api import Api, TIMEFRAME, SORT_CRITERION, LISTING, TIME_FORMAT
 
 api = Api()
 
