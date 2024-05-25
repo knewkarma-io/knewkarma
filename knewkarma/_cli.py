@@ -9,7 +9,6 @@ from rich.markdown import Markdown
 from rich.tree import Tree
 from rich_argparse import RichHelpFormatter
 
-from ._api import Api, TIMEFRAME, SORT_CRITERION, LISTING
 from ._core import Post, Posts, Subreddit, Subreddits, User, Search
 from ._utils import (
     console,
@@ -20,7 +19,8 @@ from ._utils import (
     create_dataframe,
     show_exported_files,
 )
-from .docs import Docs
+from .api import Api, TIMEFRAME, SORT_CRITERION, LISTING
+from .help import Help
 from .version import Version
 
 
@@ -32,8 +32,8 @@ def create_parser() -> argparse.ArgumentParser:
     :rtype: argparse.ArgumentParser
     """
     main_parser = argparse.ArgumentParser(
-        description=Markdown(Docs.summary, style="argparse.text"),
-        epilog=Markdown(Docs.description),
+        description=Markdown(Help.summary, style="argparse.text"),
+        epilog=Markdown(Help.description),
         formatter_class=RichHelpFormatter,
     )
     subparsers = main_parser.add_subparsers(dest="module", help="module")
@@ -81,7 +81,7 @@ def create_parser() -> argparse.ArgumentParser:
     main_parser.add_argument(
         "-v",
         "--version",
-        version=Markdown(f"Knew Karma {Version.release} {Docs.copyright}"),
+        version=Markdown(f"Knew Karma {Version.release} {Help.copyright}"),
         action="version",
     )
 
@@ -92,7 +92,7 @@ def create_parser() -> argparse.ArgumentParser:
             "**Post Module**: *Pull an individual post's data*",
             style="argparse.text",
         ),
-        epilog=Markdown(Docs.examples["post"]),
+        epilog=Markdown(Help.examples["post"]),
         formatter_class=RichHelpFormatter,
     )
 
@@ -109,7 +109,7 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             "**Posts**: *Pull posts from various sources.*", style="argparse.text"
         ),
-        epilog=Markdown(Docs.examples["posts"]),
+        epilog=Markdown(Help.examples["posts"]),
         formatter_class=RichHelpFormatter,
     )
     posts_parser.add_argument(
@@ -139,7 +139,7 @@ def create_parser() -> argparse.ArgumentParser:
             "**Search**: *Get search results from various sources.*",
             style="argparse.text",
         ),
-        epilog=Markdown(Docs.examples["search"]),
+        epilog=Markdown(Help.examples["search"]),
         formatter_class=RichHelpFormatter,
     )
     search_parser.add_argument("query", help="search query")
@@ -160,7 +160,7 @@ def create_parser() -> argparse.ArgumentParser:
             "**Subreddit**: *Pull a specified subreddit's data.*",
             style="argparse.text",
         ),
-        epilog=Markdown(Docs.examples["subreddit"]),
+        epilog=Markdown(Help.examples["subreddit"]),
         formatter_class=RichHelpFormatter,
     )
     subreddit_parser.add_argument(
@@ -207,7 +207,7 @@ def create_parser() -> argparse.ArgumentParser:
             "**Subreddits**: *Pull subreddits from various sources.*",
             style="argparse.text",
         ),
-        epilog=Markdown(Docs.examples["subreddits"]),
+        epilog=Markdown(Help.examples["subreddits"]),
         formatter_class=RichHelpFormatter,
     )
     subreddits_parser.add_argument(
@@ -241,7 +241,7 @@ def create_parser() -> argparse.ArgumentParser:
         description=Markdown(
             "**User**: *Pull a specified user's data.*", style="argparse.text"
         ),
-        epilog=Markdown(Docs.examples["user"]),
+        epilog=Markdown(Help.examples["user"]),
         formatter_class=RichHelpFormatter,
     )
     user_parser.add_argument("username", help="username")

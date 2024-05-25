@@ -9,7 +9,7 @@ from conftest import (
     TEST_COMMUNITY_ID,
     TEST_COMMUNITY_CREATED_TIMESTAMP,
 )
-from knewkarma._api import Api
+from knewkarma.api import Api
 
 api = Api()
 
