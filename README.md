@@ -10,7 +10,7 @@ Interface (GUI)** for Windows machines, making it adaptable for various user pre
 
 ## Feature Overview
 
-Knew Karma provides detailed access to Reddit data across various categories. Please refer to the table below for a
+Knew Karma provides detailed access to Reddit data across various categories. Refer to the table below for a
 complete overview of the features available:
 
 | Category               | Feature              | Description                                                     |
