@@ -234,8 +234,7 @@ def get_status() -> Status:
     :rtype: rich.status.Status
     """
     with Status(
-        status="Initialising[yellow]...[/]",
-        spinner="dots2",
+        status="Initialising[yellow]...[/]", spinner="dots2", console=console
     ) as status:
         return status
 
