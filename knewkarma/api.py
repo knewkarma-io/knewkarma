@@ -236,9 +236,6 @@ class Api:
                     limit=limit,
                 )
 
-        console.log(
-            f"[green]✔[/] {len(all_items)} of {limit} items fetched successfully!"
-        )
         return all_items
 
     async def get_posts(
