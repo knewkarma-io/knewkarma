@@ -1,7 +1,7 @@
 # Knew Karma
 
-[![Upload Python Package](https://github.com/bellingcat/knewkarma/actions/workflows/python-publish.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/python-publish.yml) [![CodeQL](https://github.com/bellingcat/knewkarma/actions/workflows/codeql.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/codeql.yml)  [![Read the Docs](https://img.shields.io/readthedocs/knewkarma?logo=readthedocs)](https://knewkarma.readthedocs.io) [![PyPI - Version](https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma)](https://pypi.org/project/knewkarma) [![Snapcraft version](https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A)](https://snapcraft.io/knewkarma)
- [![.Net](https://img.shields.io/badge/Visual%20Basic%20.NET-5C2D91?style=flat&logo=.net&logoColor=white)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3A%22Visual+Basic+.NET%22&type=code) [![Python](https://img.shields.io/badge/Python-3670A0?style=flat&logo=python&logoColor=ffdd54)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3APython&type=code) [![Docker](https://img.shields.io/badge/Docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3ADockerfile&type=code)
+[![Snapcraft version](https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A)](https://snapcraft.io/knewkarma) [![PyPI - Version](https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma)](https://pypi.org/project/knewkarma) [![Upload Python Package](https://github.com/bellingcat/knewkarma/actions/workflows/python-publish.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/python-publish.yml) [![CodeQL](https://github.com/bellingcat/knewkarma/actions/workflows/codeql.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/codeql.yml) [![Read the Docs](https://img.shields.io/readthedocs/knewkarma?logo=readthedocs)](https://knewkarma.readthedocs.io)
+[![.Net](https://img.shields.io/badge/Visual%20Basic%20.NET-5C2D91?style=flat&logo=.net&logoColor=white)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3A%22Visual+Basic+.NET%22&type=code) [![Python](https://img.shields.io/badge/Python-3670A0?style=flat&logo=python&logoColor=ffdd54)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3APython&type=code) [![Docker](https://img.shields.io/badge/Docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://github.com/search?q=repo%3Abellingcat%2Fknewkarma++language%3ADockerfile&type=code)
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/rly0nheart)
 
 **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
@@ -9,8 +9,6 @@ functionalities for exploring and analysing Reddit data. It includes a **Command
 **Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical
 User
 Interface (GUI)** for Windows machines, making it adaptable for various user preferences.
-
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/knewkarma)
 
 ## Feature Overview
 
