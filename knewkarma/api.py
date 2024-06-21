@@ -5,7 +5,7 @@ from typing import Union, Literal
 import aiohttp
 from rich.markdown import Markdown
 
-from ._utils import console, countdown_timer, get_status
+from ._utilities import console, countdown_timer, get_status
 from .version import Version
 
 SORT_CRITERION = Literal[
