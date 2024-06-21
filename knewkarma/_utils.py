@@ -6,15 +6,31 @@ from typing import Union, Literal
 
 import pandas as pd
 from rich.console import Console
+from rich.status import Status
 from rich.table import Table
 from rich.tree import Tree
 
 
-async def countdown_timer(status, duration: int, current_count: int, limit: int):
+def get_status(status_message: str = "Initialising...") -> Status:
+    """
+    Creates and returns a Status object initialized with a specific status message.
+
+    :param status_message: A message to initialise the Status with.
+    :type status_message: str
+    :return: A configured rich.status.Status object ready to be used in a context manager.
+    :rtype: rich.status.Status
+    """
+    with Status(status=status_message, spinner="dots2", console=console) as status:
+        return status
+
+
+async def countdown_timer(
+    status: Status, duration: int, current_count: int, limit: int
+):
     """
     Handles the countdown during the asynchronous pagination, updating the status bar with the remaining time.
 
-    :param status: The rich status object used to display the countdown.
+    :param status: The rich.status.Status object used to display the countdown.
     :type status: rich.status.Status
     :param duration: The duration for which to run the countdown.
     :type duration: int

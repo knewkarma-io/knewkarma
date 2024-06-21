@@ -4,7 +4,6 @@ from typing import Union, Literal
 
 import aiohttp
 from rich.markdown import Markdown
-from rich.status import Status
 
 from ._utils import console, countdown_timer, get_status
 from .version import Version
@@ -114,37 +113,40 @@ class Api:
         :param session: aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         """
-        # Make a GET request to PyPI to get the project's latest release.
-        response: dict = await self.get_data(
-            endpoint=self._github_release_endpoint, session=session
-        )
-        release: dict = self._process_response(
-            response_data=response, valid_key="tag_name"
-        )
+        with get_status(status_message=f"Checking for updates..."):
+            # Make a GET request to PyPI to get the project's latest release.
+            response: dict = await self.get_data(
+                endpoint=self._github_release_endpoint, session=session
+            )
+            release: dict = self._process_response(
+                response_data=response, valid_key="tag_name"
+            )
 
-        if release:
-            remote_version: str = release.get("tag_name")
-            markup_release_notes: str = release.get("body")
-            markdown_release_notes = Markdown(markup=markup_release_notes)
+            if release:
+                remote_version: str = release.get("tag_name")
+                markup_release_notes: str = release.get("body")
+                markdown_release_notes = Markdown(markup=markup_release_notes)
 
-            # Splitting the version strings into components
-            remote_parts: list = remote_version.split(".")
+                # Splitting the version strings into components
+                remote_parts: list = remote_version.split(".")
 
-            update_message: str = f"%s update ({remote_version}) available"
+                update_message: str = (
+                    f"[underline]%s[/] update ([underline]{remote_version}[/]) available"
+                )
 
-            # Check for differences in version parts
-            if remote_parts[0] != Version.major:
-                update_message = update_message % "MAJOR"
+                # Check for differences in version parts
+                if remote_parts[0] != Version.major:
+                    update_message = update_message % "MAJOR"
 
-            elif remote_parts[1] != Version.minor:
-                update_message = update_message % "MINOR"
+                elif remote_parts[1] != Version.minor:
+                    update_message = update_message % "MINOR"
 
-            elif remote_parts[2] != Version.patch:
-                update_message = update_message % "PATCH"
+                elif remote_parts[2] != Version.patch:
+                    update_message = update_message % "PATCH"
 
-            if update_message:
-                console.log(update_message)
-                console.log(markdown_release_notes)
+                if update_message:
+                    console.log(update_message)
+                    console.log(markdown_release_notes)
 
     async def get_profile(
         self,
@@ -163,7 +165,9 @@ class Api:
         :return: A dictionary object containing profile data from the specified source.
         :rtype: dict
         """
-        with get_status():
+        with get_status(
+            status_message=f"Initialising [underline]single data[/] retrieval..."
+        ):
             # Use a dictionary for direct mapping
             profile_mapping: dict = {
                 "user": f"{self._user_data_endpoint}/{profile_source}/about.json",
@@ -205,8 +209,8 @@ class Api:
         """
         all_items = []
         last_item_id = None
-        with Status(
-            status="Initialising[yellow]...[/]", spinner="dots2", console=console
+        with get_status(
+            status_message="Initialising [underline]bulk data[/] retrieval..."
         ) as status:
             while len(all_items) < limit:
                 paginated_endpoint = (
