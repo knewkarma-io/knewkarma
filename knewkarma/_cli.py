@@ -369,7 +369,7 @@ async def call_functions(args: argparse.Namespace, function_mapping: dict):
 
             if not arg_is_present:
                 console.log(
-                    f"knewkarma {args.module}: missing one or more expected argument(s)"
+                    f"knewkarma [underline]{args.module}[/]: missing one or more expected argument(s)"
                 )
 
 
