@@ -1,6 +1,6 @@
 from typing import Union
 
-from ._utils import timestamp_to_readable
+from ._utilities import timestamp_to_readable
 from .api import TIME_FORMAT
 
 
@@ -44,11 +44,13 @@ def parse_users(
             "awardee_karma": user.get("awardee_karma"),
             "total_karma": user.get("total_karma"),
             "subreddit": user.get("subreddit"),
-            "created": timestamp_to_readable(
-                timestamp=user.get("created"), time_format=time_format
-            )
-            if user.get("created")
-            else "NaN",
+            "created": (
+                timestamp_to_readable(
+                    timestamp=user.get("created"), time_format=time_format
+                )
+                if user.get("created")
+                else "NaN"
+            ),
         }
 
     converted_data = None
@@ -105,17 +107,21 @@ def parse_posts(
             "is_archived": post.get("archived"),
             "domain": post.get("domain"),
             "score": post.get("score"),
-            "edited": timestamp_to_readable(
-                timestamp=post.get("edited"), time_format=time_format
-            )
-            if post.get("edited")
-            else False,
+            "edited": (
+                timestamp_to_readable(
+                    timestamp=post.get("edited"), time_format=time_format
+                )
+                if post.get("edited")
+                else False
+            ),
             "comments": post.get("num_comments"),
-            "created": timestamp_to_readable(
-                timestamp=post.get("created"), time_format=time_format
-            )
-            if post.get("created")
-            else "NaN",
+            "created": (
+                timestamp_to_readable(
+                    timestamp=post.get("created"), time_format=time_format
+                )
+                if post.get("created")
+                else "NaN"
+            ),
         }
 
     if isinstance(data, dict):
@@ -160,11 +166,13 @@ def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
                     "is_stickied": comment_data.get("stickied"),
                     "is_locked": comment_data.get("locked"),
                     "is_archived": comment_data.get("archived"),
-                    "created": timestamp_to_readable(
-                        timestamp=comment.get("created"), time_format=time_format
-                    )
-                    if comment.get("created")
-                    else "NaN",
+                    "created": (
+                        timestamp_to_readable(
+                            timestamp=comment.get("created"), time_format=time_format
+                        )
+                        if comment.get("created")
+                        else "NaN"
+                    ),
                 }
             )
 
@@ -225,11 +233,13 @@ def parse_subreddits(
                 "language": subreddit.get("lang"),
                 "whitelist_status": subreddit.get("whitelist_status"),
                 "url": subreddit.get("url"),
-                "created": timestamp_to_readable(
-                    timestamp=subreddit.get("created"), time_format=time_format
-                )
-                if subreddit.get("created")
-                else "NaN",
+                "created": (
+                    timestamp_to_readable(
+                        timestamp=subreddit.get("created"), time_format=time_format
+                    )
+                    if subreddit.get("created")
+                    else "NaN"
+                ),
             }
 
         return subreddit_obj

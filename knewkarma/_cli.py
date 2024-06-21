@@ -10,7 +10,7 @@ from rich.tree import Tree
 from rich_argparse import RichHelpFormatter
 
 from ._core import Post, Posts, Subreddit, Subreddits, User, Search
-from ._utils import (
+from ._utilities import (
     console,
     create_dataframe,
     export_dataframe,
