@@ -6,7 +6,6 @@ from typing import Union, Literal
 
 import pandas as pd
 from rich.console import Console
-from rich.status import Status
 from rich.table import Table
 from rich.tree import Tree
 
@@ -224,19 +223,6 @@ def system_info():
         system_uptime,
     )
     console.print(table)
-
-
-def get_status() -> Status:
-    """
-    Creates and returns a Status object initialized with a specific message and spinner style.
-
-    :return: A configured rich Status object ready to be used in a context manager.
-    :rtype: rich.status.Status
-    """
-    with Status(
-        status="Initialising[yellow]...[/]", spinner="dots2", console=console
-    ) as status:
-        return status
 
 
 def pathfinder(directories: list[str]):
