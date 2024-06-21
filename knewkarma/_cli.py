@@ -75,7 +75,7 @@ def create_parser() -> argparse.ArgumentParser:
     main_parser.add_argument(
         "-u",
         "--updates",
-        help="check for updates on run",
+        help="check for updates",
         action="store_true",
     )
     main_parser.add_argument(
@@ -313,66 +313,67 @@ async def call_functions(args: argparse.Namespace, function_mapping: dict):
     :type function_mapping: dict
     """
 
-    async with aiohttp.ClientSession() as request_session:
+    async with aiohttp.ClientSession() as session:
         if args.updates:
-            await Api().get_updates(session=request_session)
+            await Api().get_updates(session=session)
+        if args.module:
 
-        mode_action = function_mapping.get(args.module)
-        directory: str = ""
-        for action, function in mode_action:
-            arg_is_present: bool = False
-            if getattr(args, action, False):
-                arg_is_present = True
-
-                if args.export:
-                    output_dir: str = os.path.expanduser(
-                        os.path.join("~", "knewkarma-output")
-                    )
-                    # Create path to main directory in which target data files will be exported
-                    directory = os.path.join(output_dir, args.module, action)
-
-                    # Create file directories for supported data file types
-                    pathfinder(
-                        directories=[
-                            os.path.join(directory, "csv"),
-                            os.path.join(directory, "html"),
-                            os.path.join(directory, "json"),
-                            os.path.join(directory, "xml"),
-                        ]
-                    )
-
-                function_data = await function(session=request_session)
-                if function_data:
-                    dataframe = create_dataframe(data=function_data)
-
-                    # Print the DataFrame, excluding the 'raw_data' column if it exists
-                    console.log(dataframe)
+            mode_action = function_mapping.get(args.module)
+            directory: str = ""
+            for action, function in mode_action:
+                arg_is_present: bool = False
+                if getattr(args, action, False):
+                    arg_is_present = True
 
                     if args.export:
-                        export_dataframe(
-                            dataframe=dataframe,
-                            filename=filename_timestamp(),
-                            directory=directory,
-                            formats=args.export.split(","),
+                        output_dir: str = os.path.expanduser(
+                            os.path.join("~", "knewkarma-output")
+                        )
+                        # Create path to main directory in which target data files will be exported
+                        directory = os.path.join(output_dir, args.module, action)
+
+                        # Create file directories for supported data file types
+                        pathfinder(
+                            directories=[
+                                os.path.join(directory, "csv"),
+                                os.path.join(directory, "html"),
+                                os.path.join(directory, "json"),
+                                os.path.join(directory, "xml"),
+                            ]
                         )
 
-                        # Show exported files
-                        tree = Tree(
-                            f":open_file_folder: [bold]{directory}[/]",
-                            guide_style="bold bright_blue",
-                        )
-                        show_exported_files(tree=tree, directory=directory)
-                        console.log(tree)
+                    function_data = await function(session=session)
+                    if function_data:
+                        dataframe = create_dataframe(data=function_data)
 
-                break
+                        # Print the DataFrame, excluding the 'raw_data' column if it exists
+                        console.log(dataframe)
 
-        if not arg_is_present:
-            console.log(
-                f"knewkarma {args.module}: missing one or more expected argument(s)"
-            )
+                        if args.export:
+                            export_dataframe(
+                                dataframe=dataframe,
+                                filename=filename_timestamp(),
+                                directory=directory,
+                                formats=args.export.split(","),
+                            )
+
+                            # Show exported files
+                            tree = Tree(
+                                f":open_file_folder: [bold]{directory}[/]",
+                                guide_style="bold bright_blue",
+                            )
+                            show_exported_files(tree=tree, directory=directory)
+                            console.log(tree)
+
+                    break
+
+            if not arg_is_present:
+                console.log(
+                    f"knewkarma {args.module}: missing one or more expected argument(s)"
+                )
 
 
-def stage_and_start():
+def start_cli():
     """
     Main entrypoint for the Knew Karma command-line interface.
     """
@@ -448,9 +449,9 @@ def stage_and_start():
             (
                 "top_subreddits",
                 lambda session: user.top_subreddits(
-                    top_n=args.top_subreddits
-                    if hasattr(args, "top_subreddits")
-                    else None,
+                    top_n=(
+                        args.top_subreddits if hasattr(args, "top_subreddits") else None
+                    ),
                     limit=limit,
                     sort=sort,
                     timeframe=timeframe,
@@ -553,7 +554,7 @@ def stage_and_start():
         ],
     }
 
-    if args.module:
+    if args:
         console.log(
             f"""
 ┓┏┓         ┓┏┓

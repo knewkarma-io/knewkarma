@@ -42,4 +42,4 @@ pytest-asyncio = "^0.23.2"
 tenacity = "^8.3.0"
 
 [tool.poetry.scripts]
-knewkarma = "knewkarma._cli:stage_and_start"
+knewkarma = "knewkarma._cli:start_cli"
