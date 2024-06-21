@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "knewkarma"
-version = "4.1.1"
+version = "4.2.0"
 description = "A Reddit Data Analysis Toolkit"
 authors = ["Richard Mwewa <rly0nheart@gagpasta.com>"]
 readme = "README.md"
@@ -35,9 +35,11 @@ rich = "^13.3.1"
 rich-argparse = "^1.4.0"
 
 [tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+poetry = "^1.8.3"
 pytest = "^7.4.3"
 pytest-asyncio = "^0.23.2"
 tenacity = "^8.3.0"
 
 [tool.poetry.scripts]
-knewkarma = "knewkarma._cli:stage_and_start"
+knewkarma = "knewkarma._cli:start_cli"

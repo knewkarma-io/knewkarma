@@ -31,7 +31,7 @@ Interface (GUI)** for Windows machines, making it adaptable for various user pre
     examples: dict = {
         "user": """
 The **User** module is used to pull a specified user's data including profile, comments, posts, 
-searching posts that contain the specified kwyword, or even searching comments that contain the specified keyword.
+searching posts that contain the specified keyword, or even searching comments that contain the specified keyword.
 
 # Examples
 ## Get user profile

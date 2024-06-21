@@ -6,8 +6,8 @@ description: |
   **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
   functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** snap package, 
   an **Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical User Interface (GUI)** for Windows machines, 
-  making it adaptable for various user preferences. Refer to the wiki (https://knewkarma-wiki.readthedocs.io) for the usage guide.
-version: 4.2.0rc2
+  making it adaptable for various user preferences. Refer to the wiki (https://knewkarma.readthedocs.io) for the usage guide.
+version: 4.2.0
 license: MIT
 base: core22
 confinement: strict
@@ -18,7 +18,7 @@ issues:
 donation:
   - https://buymeacoffee.com/rly0nheart/
 contact:
-  - mailto:rly0nheart@gagpasta.com
+  - mailto:rly0nheart@duck.com
 
 parts:
   knewkarma:
