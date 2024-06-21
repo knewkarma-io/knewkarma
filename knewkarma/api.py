@@ -101,7 +101,7 @@ class Api:
             return response_data if response_data else []
         else:
             console.log(
-                f"Unknown data type ({response_data}: {type(response_data)}), expected a list or dict."
+                f"[yellow]✘[/] Unknown data type ({response_data}: {type(response_data)}), expected a list or dict."
             )
 
     async def get_updates(self, session: aiohttp.ClientSession):
