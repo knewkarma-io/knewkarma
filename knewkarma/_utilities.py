@@ -24,7 +24,7 @@ def print_banner():
     system_info()
 
 
-def get_status(status_message: str = "Initialising...") -> Status:
+def get_status(status_message: str) -> Status:
     """
     Creates and returns a Status object initialized with a specific status message.
 
