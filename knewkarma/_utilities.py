@@ -40,8 +40,8 @@ def system_info():
     table.add_column("header", style="dim")
     table.add_column("header")
 
+    # https://www.geeksforgeeks.org/getting-the-time-since-os-startup-using-python/
     if os.name == "nt":
-        # https://www.geeksforgeeks.org/getting-the-time-since-os-startup-using-python/
         # ctypes required for using GetTickCount64()
         import ctypes
 
