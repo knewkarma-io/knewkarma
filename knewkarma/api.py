@@ -5,7 +5,7 @@ from typing import Union, Literal
 import aiohttp
 from rich.markdown import Markdown
 
-from ._utils import console, countdown_timer, get_status
+from ._utilities import console, countdown_timer, get_status
 from .version import Version
 
 SORT_CRITERION = Literal[
@@ -61,14 +61,16 @@ class Api:
                     return await response.json()
                 else:
                     error_message = await response.json()
-                    console.log(f"[red]✘[/] An API error occurred: {error_message}")
+                    console.log(
+                        f"[red]✘[/] An API error occurred: [red]{error_message}[/]"
+                    )
                     return {}
 
         except aiohttp.ClientConnectionError as error:
-            console.log(f"[red]✘[/] An HTTP error occurred: {error}")
+            console.log(f"[red]✘[/] An HTTP error occurred: [red]{error}[/]")
             return {}
         except Exception as error:
-            console.log(f"[red]✘[/] An unknown error occurred: {error}")
+            console.log(f"[red]✘[/] An unknown error occurred: [red]{error}[/]")
             return {}
 
     @staticmethod
@@ -99,7 +101,7 @@ class Api:
             return response_data if response_data else []
         else:
             console.log(
-                f"Unknown data type ({response_data}: {type(response_data)}), expected a list or dict."
+                f"[yellow]✘[/] Unknown data type ({response_data}: {type(response_data)}), expected a list or dict."
             )
 
     async def get_updates(self, session: aiohttp.ClientSession):
@@ -111,37 +113,40 @@ class Api:
         :param session: aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         """
-        # Make a GET request to PyPI to get the project's latest release.
-        response: dict = await self.get_data(
-            endpoint=self._github_release_endpoint, session=session
-        )
-        release: dict = self._process_response(
-            response_data=response, valid_key="tag_name"
-        )
+        with get_status(status_message=f"Checking for updates..."):
+            # Make a GET request to PyPI to get the project's latest release.
+            response: dict = await self.get_data(
+                endpoint=self._github_release_endpoint, session=session
+            )
+            release: dict = self._process_response(
+                response_data=response, valid_key="tag_name"
+            )
 
-        if release:
-            remote_version: str = release.get("tag_name")
-            markup_release_notes: str = release.get("body")
-            markdown_release_notes = Markdown(markup=markup_release_notes)
+            if release:
+                remote_version: str = release.get("tag_name")
+                markup_release_notes: str = release.get("body")
+                markdown_release_notes = Markdown(markup=markup_release_notes)
 
-            # Splitting the version strings into components
-            remote_parts: list = remote_version.split(".")
+                # Splitting the version strings into components
+                remote_parts: list = remote_version.split(".")
 
-            update_message: str = f"%s update ({remote_version}) available"
+                update_message: str = (
+                    f"[underline]%s[/] update ([underline]{remote_version}[/]) available"
+                )
 
-            # Check for differences in version parts
-            if remote_parts[0] != Version.major:
-                update_message = update_message % "MAJOR"
+                # Check for differences in version parts
+                if remote_parts[0] != Version.major:
+                    update_message = update_message % "MAJOR"
 
-            elif remote_parts[1] != Version.minor:
-                update_message = update_message % "MINOR"
+                elif remote_parts[1] != Version.minor:
+                    update_message = update_message % "MINOR"
 
-            elif remote_parts[2] != Version.patch:
-                update_message = update_message % "PATCH"
+                elif remote_parts[2] != Version.patch:
+                    update_message = update_message % "PATCH"
 
-            if update_message:
-                console.log(update_message)
-                console.log(markdown_release_notes)
+                if update_message:
+                    console.log(update_message)
+                    console.log(markdown_release_notes)
 
     async def get_profile(
         self,
@@ -160,7 +165,9 @@ class Api:
         :return: A dictionary object containing profile data from the specified source.
         :rtype: dict
         """
-        with get_status():
+        with get_status(
+            status_message=f"Initialising [underline]single data[/] retrieval..."
+        ):
             # Use a dictionary for direct mapping
             profile_mapping: dict = {
                 "user": f"{self._user_data_endpoint}/{profile_source}/about.json",
@@ -202,7 +209,9 @@ class Api:
         """
         all_items = []
         last_item_id = None
-        with get_status() as status:
+        with get_status(
+            status_message="Initialising [underline]bulk data[/] retrieval..."
+        ) as status:
             while len(all_items) < limit:
                 paginated_endpoint = (
                     f"{endpoint}&after={last_item_id}&count={len(all_items)}"
@@ -236,9 +245,6 @@ class Api:
                     limit=limit,
                 )
 
-        console.log(
-            f"[green]✔[/] {len(all_items)} of {limit} items fetched successfully!"
-        )
         return all_items
 
     async def get_posts(

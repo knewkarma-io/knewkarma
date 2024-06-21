@@ -6,6 +6,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install --upgrade pip && pip install .
+RUN pip install --upgrade pip
 
-ENTRYPOINT ["knewkarma"]
+RUN pip install poetry && poetry install
+
+ENTRYPOINT ["poetry", "run", "knewkarma"]
