@@ -4,6 +4,7 @@ from typing import Union, Literal
 
 import aiohttp
 from rich.markdown import Markdown
+from rich.status import Status
 
 from ._utils import console, countdown_timer, get_status
 from .version import Version
@@ -204,7 +205,9 @@ class Api:
         """
         all_items = []
         last_item_id = None
-        with get_status() as status:
+        with Status(
+            status="Initialising[yellow]...[/]", spinner="dots2", console=console
+        ) as status:
             while len(all_items) < limit:
                 paginated_endpoint = (
                     f"{endpoint}&after={last_item_id}&count={len(all_items)}"
