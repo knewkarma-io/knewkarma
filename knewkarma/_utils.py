@@ -11,6 +11,19 @@ from rich.table import Table
 from rich.tree import Tree
 
 
+def print_banner():
+    """
+    Prints the projects banner and system information.
+    """
+    console.log(
+        f"""
+    ┓┏┓         ┓┏┓
+    ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
+    ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
+    )
+    system_info()
+
+
 def get_status(status_message: str = "Initialising...") -> Status:
     """
     Creates and returns a Status object initialized with a specific status message.

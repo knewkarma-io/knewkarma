@@ -12,11 +12,11 @@ from rich_argparse import RichHelpFormatter
 from ._core import Post, Posts, Subreddit, Subreddits, User, Search
 from ._utils import (
     console,
-    pathfinder,
-    system_info,
+    create_dataframe,
     export_dataframe,
     filename_timestamp,
-    create_dataframe,
+    pathfinder,
+    print_banner,
     show_exported_files,
 )
 from .api import Api, TIMEFRAME, SORT_CRITERION, LISTING
@@ -555,14 +555,7 @@ def start_cli():
     }
 
     if args:
-        console.log(
-            f"""
-┓┏┓         ┓┏┓
-┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
-┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
-        )
-        system_info()
-
+        print_banner()
         try:
             start_time: datetime = datetime.now()
             asyncio.run(call_functions(args=args, function_mapping=function_mapping))
