@@ -61,14 +61,16 @@ class Api:
                     return await response.json()
                 else:
                     error_message = await response.json()
-                    console.log(f"[red]✘[/] An API error occurred: {error_message}")
+                    console.log(
+                        f"[red]✘[/] An API error occurred: [red]{error_message}[/]"
+                    )
                     return {}
 
         except aiohttp.ClientConnectionError as error:
-            console.log(f"[red]✘[/] An HTTP error occurred: {error}")
+            console.log(f"[red]✘[/] An HTTP error occurred: [red]{error}[/]")
             return {}
         except Exception as error:
-            console.log(f"[red]✘[/] An unknown error occurred: {error}")
+            console.log(f"[red]✘[/] An unknown error occurred: [red]{error}[/]")
             return {}
 
     @staticmethod
