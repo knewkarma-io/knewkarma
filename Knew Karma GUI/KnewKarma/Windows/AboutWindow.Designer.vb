@@ -61,7 +61,7 @@ Partial Class AboutWindow
         ButtonViewLicense.FlatStyle = FlatStyle.Popup
         ButtonViewLicense.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonViewLicense.ForeColor = Color.Black
-        ButtonViewLicense.Location = New Point(12, 313)
+        ButtonViewLicense.Location = New Point(12, 130)
         ButtonViewLicense.Name = "ButtonViewLicense"
         ButtonViewLicense.Size = New Size(92, 25)
         ButtonViewLicense.TabIndex = 10
@@ -74,7 +74,7 @@ Partial Class AboutWindow
         ButtonClose.FlatStyle = FlatStyle.Popup
         ButtonClose.Font = New Font("Segoe UI Variable Display Semib", 9F, FontStyle.Bold, GraphicsUnit.Point)
         ButtonClose.ForeColor = Color.White
-        ButtonClose.Location = New Point(252, 313)
+        ButtonClose.Location = New Point(252, 130)
         ButtonClose.Name = "ButtonClose"
         ButtonClose.Size = New Size(86, 25)
         ButtonClose.TabIndex = 12
@@ -108,7 +108,7 @@ Partial Class AboutWindow
         ButtonGetUpdates.FlatStyle = FlatStyle.Popup
         ButtonGetUpdates.Font = New Font("Segoe UI Variable Display", 9F, FontStyle.Regular, GraphicsUnit.Point)
         ButtonGetUpdates.ForeColor = Color.Black
-        ButtonGetUpdates.Location = New Point(110, 313)
+        ButtonGetUpdates.Location = New Point(133, 130)
         ButtonGetUpdates.Name = "ButtonGetUpdates"
         ButtonGetUpdates.Size = New Size(89, 25)
         ButtonGetUpdates.TabIndex = 17
@@ -141,7 +141,7 @@ Partial Class AboutWindow
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.Gainsboro
         CancelButton = ButtonClose
-        ClientSize = New Size(350, 350)
+        ClientSize = New Size(350, 168)
         Controls.Add(VersionStatus)
         Controls.Add(Copyright)
         Controls.Add(ButtonGetUpdates)
