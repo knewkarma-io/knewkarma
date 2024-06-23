@@ -3,7 +3,7 @@ name: Build and Release Snap Package
 on:
   push:
     tags:
-      - '*.*.*'
+      - '*.*.*.*'
 
 jobs:
   build:
