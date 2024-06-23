@@ -7,7 +7,7 @@ description: |
   functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** snap package, 
   an **Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical User Interface (GUI)** for Windows machines, 
   making it adaptable for various user preferences. Refer to the wiki (https://knewkarma.readthedocs.io) for the usage guide.
-version: 4.2.0
+version: 4.2.1
 license: MIT
 base: core22
 confinement: strict
