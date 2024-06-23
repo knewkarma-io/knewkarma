@@ -24,13 +24,13 @@ Partial Class MainWindow
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainWindow))
-        Dim TreeNode1 As TreeNode = New TreeNode("Subreddit")
-        Dim TreeNode2 As TreeNode = New TreeNode("User")
-        Dim TreeNode3 As TreeNode = New TreeNode("Front Page")
-        Dim TreeNode4 As TreeNode = New TreeNode("Listings")
-        Dim TreeNode5 As TreeNode = New TreeNode("Search")
-        Dim TreeNode6 As TreeNode = New TreeNode("Posts", New TreeNode() {TreeNode3, TreeNode4, TreeNode5})
-        Dim TreeNode7 As TreeNode = New TreeNode("Username", New TreeNode() {TreeNode1, TreeNode2, TreeNode6})
+        Dim TreeNode8 As TreeNode = New TreeNode("Subreddit")
+        Dim TreeNode9 As TreeNode = New TreeNode("User")
+        Dim TreeNode10 As TreeNode = New TreeNode("Front Page")
+        Dim TreeNode11 As TreeNode = New TreeNode("Listings")
+        Dim TreeNode12 As TreeNode = New TreeNode("Search")
+        Dim TreeNode13 As TreeNode = New TreeNode("Posts", New TreeNode() {TreeNode10, TreeNode11, TreeNode12})
+        Dim TreeNode14 As TreeNode = New TreeNode("Username", New TreeNode() {TreeNode8, TreeNode9, TreeNode13})
         TextBoxQuery = New TextBox()
         ButtonSearch = New Button()
         ContextMenuStripRightClick = New ContextMenuStrip(components)
@@ -106,6 +106,7 @@ Partial Class MainWindow
         PanelAbout = New Panel()
         Panel3 = New Panel()
         Label6 = New Label()
+        PictureBox1 = New PictureBox()
         ContextMenuStripRightClick.SuspendLayout()
         GroupBoxSearchResultsFiltering.SuspendLayout()
         CType(NumericUpDownSearchResultLimit, ComponentModel.ISupportInitialize).BeginInit()
@@ -132,6 +133,7 @@ Partial Class MainWindow
         Panel1.SuspendLayout()
         PanelAbout.SuspendLayout()
         Panel3.SuspendLayout()
+        CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' TextBoxQuery
@@ -720,21 +722,21 @@ Partial Class MainWindow
         TreeView1.HotTracking = True
         TreeView1.Location = New Point(12, 12)
         TreeView1.Name = "TreeView1"
-        TreeNode1.Name = "childSubreddit"
-        TreeNode1.Text = "Subreddit"
-        TreeNode2.Name = "childUser"
-        TreeNode2.Text = "User"
-        TreeNode3.Name = "subchildFrontPage"
-        TreeNode3.Text = "Front Page"
-        TreeNode4.Name = "subchildListings"
-        TreeNode4.Text = "Listings"
-        TreeNode5.Name = "subchildSearch"
-        TreeNode5.Text = "Search"
-        TreeNode6.Name = "childPosts"
-        TreeNode6.Text = "Posts"
-        TreeNode7.Name = "MainRoot"
-        TreeNode7.Text = "Username"
-        TreeView1.Nodes.AddRange(New TreeNode() {TreeNode7})
+        TreeNode8.Name = "childSubreddit"
+        TreeNode8.Text = "Subreddit"
+        TreeNode9.Name = "childUser"
+        TreeNode9.Text = "User"
+        TreeNode10.Name = "subchildFrontPage"
+        TreeNode10.Text = "Front Page"
+        TreeNode11.Name = "subchildListings"
+        TreeNode11.Text = "Listings"
+        TreeNode12.Name = "subchildSearch"
+        TreeNode12.Text = "Search"
+        TreeNode13.Name = "childPosts"
+        TreeNode13.Text = "Posts"
+        TreeNode14.Name = "MainRoot"
+        TreeNode14.Text = "Username"
+        TreeView1.Nodes.AddRange(New TreeNode() {TreeNode14})
         TreeView1.ShowNodeToolTips = True
         TreeView1.Size = New Size(129, 224)
         TreeView1.TabIndex = 17
@@ -1004,6 +1006,7 @@ Partial Class MainWindow
         ' PanelAbout
         ' 
         PanelAbout.BackColor = Color.Transparent
+        PanelAbout.Controls.Add(PictureBox1)
         PanelAbout.Controls.Add(Panel3)
         PanelAbout.Location = New Point(147, 12)
         PanelAbout.Name = "PanelAbout"
@@ -1033,6 +1036,16 @@ Partial Class MainWindow
         Label6.Size = New Size(174, 16)
         Label6.TabIndex = 29
         Label6.Text = "A Reddit Data Ananlysis Toolkit"
+        ' 
+        ' PictureBox1
+        ' 
+        PictureBox1.Image = CType(resources.GetObject("PictureBox1.Image"), Image)
+        PictureBox1.Location = New Point(23, 27)
+        PictureBox1.Name = "PictureBox1"
+        PictureBox1.Size = New Size(205, 193)
+        PictureBox1.SizeMode = PictureBoxSizeMode.Zoom
+        PictureBox1.TabIndex = 31
+        PictureBox1.TabStop = False
         ' 
         ' MainWindow
         ' 
@@ -1102,6 +1115,7 @@ Partial Class MainWindow
         PanelAbout.ResumeLayout(False)
         Panel3.ResumeLayout(False)
         Panel3.PerformLayout()
+        CType(PictureBox1, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
     End Sub
 
@@ -1183,4 +1197,5 @@ Partial Class MainWindow
     Friend WithEvents PanelAbout As Panel
     Friend WithEvents Panel3 As Panel
     Friend WithEvents Label6 As Label
+    Friend WithEvents PictureBox1 As PictureBox
 End Class
