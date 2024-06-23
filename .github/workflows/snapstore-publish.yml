@@ -25,8 +25,7 @@ jobs:
 
       - name: Notify Success
         if: success()
-        run: echo "Snap package successfully built and released!"
-
+        run: echo "Snap package successfully built and released. View at https://snapcraft.io/knewkarma"
       - name: Notify Failure
         if: failure()
         run: echo "Snap package build/release failed."
