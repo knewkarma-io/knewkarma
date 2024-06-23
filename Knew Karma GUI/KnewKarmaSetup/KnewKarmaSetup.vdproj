@@ -234,15 +234,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Knew Karma"
-        "ProductCode" = "8:{E9CF5B2D-89D6-4463-A60F-5A8E32E5705C}"
-        "PackageCode" = "8:{185E21F1-0963-44D3-9561-A12DECC1C584}"
+        "ProductCode" = "8:{8C99083A-8A70-4BBE-820E-5F5F32C7B297}"
+        "PackageCode" = "8:{A093D32F-C829-476B-9310-865213842F5D}"
         "UpgradeCode" = "8:{9B03AD0F-0C14-4075-AB75-01CD38A594B4}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:4.1.0"
+        "ProductVersion" = "8:4.2.0"
         "Manufacturer" = "8:Richard Mwewa"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/bellingcat/knewkarma/wiki"
@@ -782,7 +782,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_6E15D9F422094BD9809550AF1BA1C161"
             {
-            "SourcePath" = "8:..\\KnewKarma\\obj\\Debug\\net7.0-windows8.0\\apphost.exe"
+            "SourcePath" = "8:..\\KnewKarma\\obj\\Release\\net7.0-windows8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_C0F76EDD899B4FFF80C2AC1B5526BC22"
