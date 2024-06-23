@@ -13,14 +13,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Snapcraft
+      - name: Set up Snapcraft & Build Snap
         uses: snapcore/action-build@v1
         with:
           snapcraft-channel: 'latest/stable'
-          setup-snaps: 'snapcraft'
-
-      - name: Build Snap
-        run: snapcraft --use-lxd
+          napcraft-args: '--use-multipass'
 
       - name: Publish Snap
         env:
