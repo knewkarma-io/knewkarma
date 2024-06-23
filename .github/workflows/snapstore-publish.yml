@@ -17,7 +17,6 @@ jobs:
         uses: snapcore/action-build@v1
         with:
           snapcraft-channel: 'latest/stable'
-          snapcraft-args: '--use-multipass'
 
       - name: Publish Snap
         env:
