@@ -3,7 +3,7 @@ name: Build and Release Snap Package
 on:
   push:
     tags:
-      - '*.*.*'
+      - '*.*.*.*'
 
 jobs:
   build:
@@ -17,7 +17,6 @@ jobs:
         uses: snapcore/action-build@v1
         with:
           snapcraft-channel: 'latest/stable'
-          napcraft-args: '--use-multipass'
 
       - name: Publish Snap
         env:
