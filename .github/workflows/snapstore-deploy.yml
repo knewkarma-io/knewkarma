@@ -17,10 +17,9 @@ jobs:
         uses: snapcore/action-build@v1
         with:
           snapcraft-channel: 'latest/stable'
-          setup-snaps: 'snapcraft'
 
       - name: Build Snap
-        run: snapcraft --use-lxd
+        run: snapcraft
 
       - name: Publish Snap
         env:
