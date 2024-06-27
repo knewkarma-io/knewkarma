@@ -19,12 +19,12 @@ from ._utilities import (
     print_banner,
     show_exported_files,
 )
-from .api import Api, TIMEFRAME, SORT_CRITERION, LISTING
+from .api import TIMEFRAME, SORT_CRITERION, LISTING, Api
 from .help import Help
 from .version import Version
 
 
-def create_parser() -> argparse.ArgumentParser:
+def args_parser() -> argparse.ArgumentParser:
     """
     Creates and configures an argument parser for the command line arguments.
 
@@ -303,82 +303,83 @@ def create_parser() -> argparse.ArgumentParser:
     return main_parser
 
 
-async def call_functions(args: argparse.Namespace, function_mapping: dict):
+async def function_executor(args: argparse.Namespace, function_map: dict):
     """
-    Calls command-line arguments' functions based on user-input.
+    Calls/executes command-line arguments' functions based on user-input.
 
     :param args: Argparse namespace object  containing parsed command-line arguments.
     :type args: argparse.Namespace
-    :param function_mapping: Mapping of command-line commands to their respective functions
-    :type function_mapping: dict
+    :param function_map: Mapping of command-line commands to their respective functions
+    :type function_map: dict
     """
 
     async with aiohttp.ClientSession() as session:
-        if args.updates:
-            await Api().get_updates(session=session)
-        if args.module:
 
-            mode_action = function_mapping.get(args.module)
-            directory: str = ""
-            for action, function in mode_action:
-                arg_is_present: bool = False
-                if getattr(args, action, False):
-                    arg_is_present = True
+        if args.updates:
+            await Api().update_checker(session=session)
+            return
+
+        mode_action = function_map.get(args.module)
+        directory: str = ""
+        for action, function in mode_action:
+            arg_is_present: bool = False
+            if getattr(args, action, False):
+                arg_is_present = True
+
+                if args.export:
+                    output_dir: str = os.path.expanduser(
+                        os.path.join("~", "knewkarma-output")
+                    )
+                    # Create path to main directory in which target data files will be exported
+                    directory = os.path.join(output_dir, args.module, action)
+
+                    # Create file directories for supported data file types
+                    pathfinder(
+                        directories=[
+                            os.path.join(directory, "csv"),
+                            os.path.join(directory, "html"),
+                            os.path.join(directory, "json"),
+                            os.path.join(directory, "xml"),
+                        ]
+                    )
+
+                function_data = await function(session=session)
+                if function_data:
+                    dataframe = create_dataframe(data=function_data)
+
+                    # Print the DataFrame, excluding the 'raw_data' column if it exists
+                    console.log(dataframe)
 
                     if args.export:
-                        output_dir: str = os.path.expanduser(
-                            os.path.join("~", "knewkarma-output")
-                        )
-                        # Create path to main directory in which target data files will be exported
-                        directory = os.path.join(output_dir, args.module, action)
-
-                        # Create file directories for supported data file types
-                        pathfinder(
-                            directories=[
-                                os.path.join(directory, "csv"),
-                                os.path.join(directory, "html"),
-                                os.path.join(directory, "json"),
-                                os.path.join(directory, "xml"),
-                            ]
+                        export_dataframe(
+                            dataframe=dataframe,
+                            filename=filename_timestamp(),
+                            directory=directory,
+                            formats=args.export.split(","),
                         )
 
-                    function_data = await function(session=session)
-                    if function_data:
-                        dataframe = create_dataframe(data=function_data)
+                        # Show exported files
+                        tree = Tree(
+                            f":open_file_folder: [bold]{directory}[/]",
+                            guide_style="bold bright_blue",
+                        )
+                        show_exported_files(tree=tree, directory=directory)
+                        console.log(tree)
 
-                        # Print the DataFrame, excluding the 'raw_data' column if it exists
-                        console.log(dataframe)
+                break
 
-                        if args.export:
-                            export_dataframe(
-                                dataframe=dataframe,
-                                filename=filename_timestamp(),
-                                directory=directory,
-                                formats=args.export.split(","),
-                            )
-
-                            # Show exported files
-                            tree = Tree(
-                                f":open_file_folder: [bold]{directory}[/]",
-                                guide_style="bold bright_blue",
-                            )
-                            show_exported_files(tree=tree, directory=directory)
-                            console.log(tree)
-
-                    break
-
-            if not arg_is_present:
-                console.log(
-                    f"knewkarma [underline]{args.module}[/]: missing one or more expected argument(s)"
-                )
+        if not arg_is_present:
+            console.log(
+                f"knewkarma [underline]{args.module}[/]: missing one or more expected argument(s)"
+            )
 
 
-def start_cli():
+def start():
     """
     Main entrypoint for the Knew Karma command-line interface.
     """
-    parser = create_parser()
-    args: argparse = parser.parse_args()
+    parser = args_parser()
+    args = parser.parse_args()
 
     start_time: datetime = datetime.now()
 
@@ -406,7 +407,7 @@ def start_cli():
     )
     posts = Posts(time_format=time_format)
 
-    function_mapping: dict = {
+    function_map: dict = {
         "user": [
             ("profile", lambda session: user.profile(session=session)),
             (
@@ -554,11 +555,11 @@ def start_cli():
         ],
     }
 
-    if args:
+    if args.module or args.updates:
         print_banner()
         try:
             start_time: datetime = datetime.now()
-            asyncio.run(call_functions(args=args, function_mapping=function_mapping))
+            asyncio.run(function_executor(args=args, function_map=function_map))
         except KeyboardInterrupt:
             console.log("[yellow]✘[/] User interruption detected ([yellow]Ctrl+C[/])")
         finally:

@@ -127,7 +127,7 @@ async def countdown_timer(
     for remaining in range(duration, 0, -1):
         status.update(
             f"[cyan]{current_count}[/] of [cyan]{limit}[/] "
-            f"items fetched so far. Resuming in [cyan]{remaining}[/]"
+            f"items fetched (so far). Resuming in [cyan]{remaining}[/]"
             f" {'second' if remaining <= 1 else 'seconds'}[yellow]...[/]"
         )
         await asyncio.sleep(1)  # Sleep for one second as part of countdown

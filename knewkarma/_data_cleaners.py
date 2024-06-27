@@ -4,11 +4,11 @@ from ._utilities import timestamp_to_readable
 from .api import TIME_FORMAT
 
 
-def parse_users(
+def clean_users(
     data: Union[list[dict], dict], time_format: TIME_FORMAT
 ) -> Union[list[dict], dict]:
     """
-    Parses a list/single object of raw user data.
+    Cleans a list/single object of raw user data.
 
     :param data: A list of dict objects, each containing raw user data.
     :type data: list[dict]
@@ -20,7 +20,7 @@ def parse_users(
 
     def build_user(user: dict) -> dict:
         """
-        Parses raw user data to get only the needed data.
+        Cleans raw user data to get only the needed data.
 
         :param user: Raw user data.
         :type user: dict
@@ -63,11 +63,11 @@ def parse_users(
     return converted_data
 
 
-def parse_posts(
+def clean_posts(
     data: Union[dict, list], time_format: TIME_FORMAT
 ) -> Union[list[dict], dict]:
     """
-    Parses a list/single object of raw post data.
+    Cleans a list/single object of raw post data.
 
     :param data: A list of dict objects, each containing raw post data.
     :type data: list[dict]
@@ -79,7 +79,7 @@ def parse_posts(
 
     def build_post(post: dict) -> dict:
         """
-        Parses raw post data to get only the needed data.
+        Cleans raw post data to get only the needed data.
 
         :param post: Raw post data.
         :type post: dict
@@ -131,9 +131,9 @@ def parse_posts(
         return [build_post(post.get("data")) for post in data if post.get("data")]
 
 
-def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]:
+def clean_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]:
     """
-    Parses a list of raw comments data to get only the needed data in each item.
+    Cleans a list of raw comments data to get only the needed data in each item.
 
     :param comments: A list of dict objects, each containing raw comment data.
     :type comments: list[dict]
@@ -179,11 +179,11 @@ def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
         return comments_list
 
 
-def parse_subreddits(
+def clean_subreddits(
     data: Union[list, dict], time_format, is_preview: bool = False
 ) -> Union[list[dict], dict]:
     """
-    Parses a list/single object of raw subreddits data.
+    Cleans a list/single object of raw subreddits data.
 
     :param data: A list of dict objects, each containing raw subreddit data.
     :type data: list[dict]
@@ -199,7 +199,7 @@ def parse_subreddits(
         subreddit: dict,
     ) -> dict:
         """
-        Parses raw subreddit data to get only the needed data.
+        Cleans raw subreddit data to get only the needed data.
 
         :param subreddit: Raw subreddit data.
         :type subreddit: dict
@@ -256,9 +256,9 @@ def parse_subreddits(
     return subreddit_data
 
 
-def parse_subreddit_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
+def clean_subreddit_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
     """
-    Parses raw subreddit wiki page data to get only the needed data.
+    Cleans raw subreddit wiki page data to get only the needed data.
 
     :param wiki_page: Raw wiki page data.
     :type wiki_page: dict
