@@ -5,12 +5,6 @@
 
 version: 2
 updates:
-  - package-ecosystem: "nuget"
-    schedule:
-      interval: "daily"
-    directory: "Knew Karma GUI"
-    ignore:
-      - dependency-name: "Newtonsoft.Json"
   - package-ecosystem: "pip"
     schedule:
       interval: "daily"

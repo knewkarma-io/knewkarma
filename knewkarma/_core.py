@@ -3,12 +3,12 @@ from collections import Counter
 
 import aiohttp
 
-from ._parsers import (
-    parse_comments,
-    parse_subreddits,
-    parse_subreddit_wiki_page,
-    parse_posts,
-    parse_users,
+from ._data_cleaners import (
+    clean_comments,
+    clean_subreddits,
+    clean_subreddit_wiki_page,
+    clean_posts,
+    clean_users,
 )
 from .api import Api, TIMEFRAME, SORT_CRITERION, LISTING, TIME_FORMAT
 
@@ -43,7 +43,7 @@ class User:
         raw_user: dict = await api.get_profile(
             profile_source=self._username, profile_type="user", session=session
         )
-        user_profile: dict = parse_users(raw_user, time_format=self._time_format)
+        user_profile: dict = clean_users(raw_user, time_format=self._time_format)
 
         return user_profile
 
@@ -76,7 +76,7 @@ class User:
             timeframe=timeframe,
             session=session,
         )
-        user_posts: list[dict] = parse_posts(raw_posts, time_format=self._time_format)
+        user_posts: list[dict] = clean_posts(raw_posts, time_format=self._time_format)
 
         return user_posts
 
@@ -109,7 +109,7 @@ class User:
             timeframe=timeframe,
             session=session,
         )
-        user_comments: list[dict] = parse_comments(
+        user_comments: list[dict] = clean_comments(
             raw_comments, time_format=self._time_format
         )
 
@@ -132,7 +132,7 @@ class User:
             limit=limit,
             session=session,
         )
-        user_overview: list[dict] = parse_comments(
+        user_overview: list[dict] = clean_comments(
             raw_comments, time_format=self._time_format
         )
 
@@ -179,7 +179,7 @@ class User:
             ):
                 found_posts.append(post)
 
-        return parse_posts(found_posts, time_format=self._time_format)
+        return clean_posts(found_posts, time_format=self._time_format)
 
     async def search_comments(
         self,
@@ -219,7 +219,7 @@ class User:
             if pattern.search(comment.get("data").get("body")):
                 found_comments.append(comment)
 
-        return parse_comments(found_comments, time_format=self._time_format)
+        return clean_comments(found_comments, time_format=self._time_format)
 
     async def moderated_subreddits(self, session: aiohttp.ClientSession) -> list[dict]:
         """
@@ -234,7 +234,7 @@ class User:
             endpoint=f"{api.base_reddit_endpoint}/user/{self._username}/moderated_subreddits.json",
             session=session,
         )
-        preview_subreddits: list[dict] = parse_subreddits(
+        preview_subreddits: list[dict] = clean_subreddits(
             raw_preview_subreddits.get("data"),
             is_preview=True,
             time_format=self._time_format,
@@ -312,7 +312,7 @@ class Search:
         search_users: list = await api.get_search_results(
             query=query, search_type="users", limit=limit, session=session
         )
-        users_results: list[dict] = parse_users(
+        users_results: list[dict] = clean_users(
             search_users, time_format=self._time_format
         )
 
@@ -334,7 +334,7 @@ class Search:
         search_subreddits: list = await api.get_search_results(
             query=query, search_type="subreddits", limit=limit, session=session
         )
-        subreddits_results: list[dict] = parse_subreddits(
+        subreddits_results: list[dict] = clean_subreddits(
             search_subreddits, time_format=self._time_format
         )
 
@@ -372,7 +372,7 @@ class Search:
             timeframe=timeframe,
             session=session,
         )
-        posts_results: list[dict] = parse_posts(
+        posts_results: list[dict] = clean_posts(
             search_posts, time_format=self._time_format
         )
 
@@ -409,7 +409,7 @@ class Subreddit:
             profile_source=self._subreddit,
             session=session,
         )
-        subreddit_profile: dict = parse_subreddits(
+        subreddit_profile: dict = clean_subreddits(
             raw_subreddit, time_format=self._time_format
         )
 
@@ -446,7 +446,7 @@ class Subreddit:
             endpoint=f"{api.subreddit_data_endpoint}/{self._subreddit}/wiki/{page}.json",
             session=session,
         )
-        wiki_page: dict = parse_subreddit_wiki_page(
+        wiki_page: dict = clean_subreddit_wiki_page(
             wiki_page=raw_page, time_format=self._time_format
         )
 
@@ -481,7 +481,7 @@ class Subreddit:
             timeframe=timeframe,
             session=session,
         )
-        subreddit_posts: list[dict] = parse_posts(
+        subreddit_posts: list[dict] = clean_posts(
             raw_posts, time_format=self._time_format
         )
 
@@ -528,7 +528,7 @@ class Subreddit:
             ):
                 found_posts.append(post)
 
-        return parse_posts(found_posts, time_format=self._time_format)
+        return clean_posts(found_posts, time_format=self._time_format)
 
 
 class Subreddits:
@@ -555,7 +555,7 @@ class Subreddits:
         raw_subreddits: list = await api.get_subreddits(
             subreddits_type="all", limit=limit, session=session
         )
-        all_subreddits: list[dict] = parse_subreddits(
+        all_subreddits: list[dict] = clean_subreddits(
             raw_subreddits, is_preview=True, time_format=self._time_format
         )
 
@@ -575,7 +575,7 @@ class Subreddits:
         raw_subreddits: list = await api.get_subreddits(
             subreddits_type="default", limit=limit, session=session
         )
-        default_subreddits: list[dict] = parse_subreddits(
+        default_subreddits: list[dict] = clean_subreddits(
             raw_subreddits, is_preview=True, time_format=self._time_format
         )
 
@@ -595,7 +595,7 @@ class Subreddits:
         raw_subreddits: list = await api.get_subreddits(
             subreddits_type="new", limit=limit, session=session
         )
-        new_subreddits: list[dict] = parse_subreddits(
+        new_subreddits: list[dict] = clean_subreddits(
             raw_subreddits, is_preview=True, time_format=self._time_format
         )
 
@@ -615,7 +615,7 @@ class Subreddits:
         raw_subreddits: list = await api.get_subreddits(
             subreddits_type="popular", limit=limit, session=session
         )
-        popular_subreddits: list[dict] = parse_subreddits(
+        popular_subreddits: list[dict] = clean_subreddits(
             raw_subreddits, is_preview=True, time_format=self._time_format
         )
 
@@ -642,7 +642,7 @@ class Post:
             post_data[0].get("data", {}).get("children", [])[0].get("data", {})
         )
         if raw_post:
-            return parse_posts(data=raw_post, time_format=self._time_format)
+            return clean_posts(data=raw_post, time_format=self._time_format)
 
     async def comments(
         self,
@@ -659,7 +659,7 @@ class Post:
         raw_comments: list = post_data[1].get("data", {}).get("children", [])
 
         if raw_comments:
-            return parse_comments(comments=raw_comments, time_format=self._time_format)
+            return clean_comments(comments=raw_comments, time_format=self._time_format)
 
 
 class Posts:
@@ -701,7 +701,7 @@ class Posts:
             session=session,
         )
         if listing_posts:
-            return parse_posts(listing_posts, time_format=self._time_format)
+            return clean_posts(listing_posts, time_format=self._time_format)
 
     async def new(
         self,
@@ -727,7 +727,7 @@ class Posts:
             sort=sort,
             session=session,
         )
-        new_posts: list[dict] = parse_posts(raw_posts, time_format=self._time_format)
+        new_posts: list[dict] = clean_posts(raw_posts, time_format=self._time_format)
 
         return new_posts
 
@@ -759,6 +759,6 @@ class Posts:
             timeframe=timeframe,
             session=session,
         )
-        front_page_posts: list = parse_posts(raw_posts, time_format=self._time_format)
+        front_page_posts: list = clean_posts(raw_posts, time_format=self._time_format)
 
         return front_page_posts

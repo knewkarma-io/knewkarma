@@ -26,11 +26,11 @@ class Api:
     """Represents the Knew Karma API and provides methods for getting various data from the Reddit API."""
 
     def __init__(self):
-        self._base_reddit_endpoint: str = "https://www.reddit.com"
-        self._user_data_endpoint: str = f"{self._base_reddit_endpoint}/u"
-        self._users_data_endpoint: str = f"{self._base_reddit_endpoint}/users"
-        self.subreddit_data_endpoint: str = f"{self._base_reddit_endpoint}/r"
-        self._subreddits_data_endpoint: str = f"{self._base_reddit_endpoint}/subreddits"
+        self.base_reddit_endpoint: str = "https://www.reddit.com"
+        self._user_data_endpoint: str = f"{self.base_reddit_endpoint}/u"
+        self._users_data_endpoint: str = f"{self.base_reddit_endpoint}/users"
+        self.subreddit_data_endpoint: str = f"{self.base_reddit_endpoint}/r"
+        self._subreddits_data_endpoint: str = f"{self.base_reddit_endpoint}/subreddits"
         self._github_release_endpoint: str = (
             "https://api.github.com/repos/bellingcat/knewkarma/releases/latest"
         )
@@ -104,16 +104,16 @@ class Api:
                 f"[yellow]✘[/] Unknown data type ({response_data}: {type(response_data)}), expected a list or dict."
             )
 
-    async def get_updates(self, session: aiohttp.ClientSession):
+    async def update_checker(self, session: aiohttp.ClientSession):
         """
-        Asynchronously gets and compares the current program version with the remote version.
+        Asynchronously checks for updates by comparing the current local version with the remote version.
 
         Assumes version format: major.minor.patch.prefix
 
         :param session: aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         """
-        with get_status(status_message=f"Checking for updates..."):
+        with get_status(status_message="Checking for updates..."):
             # Make a GET request to PyPI to get the project's latest release.
             response: dict = await self.get_data(
                 endpoint=self._github_release_endpoint, session=session
@@ -166,7 +166,7 @@ class Api:
         :rtype: dict
         """
         with get_status(
-            status_message=f"Initialising [underline]single data[/] retrieval..."
+            status_message=f"Initialising [underline]single data[/] retrieval process..."
         ):
             # Use a dictionary for direct mapping
             profile_mapping: dict = {
@@ -210,7 +210,7 @@ class Api:
         all_items = []
         last_item_id = None
         with get_status(
-            status_message="Initialising [underline]bulk data[/] retrieval..."
+            status_message="Initialising [underline]bulk data[/] retrieval process..."
         ) as status:
             while len(all_items) < limit:
                 paginated_endpoint = (
@@ -284,8 +284,8 @@ class Api:
         :rtype: list[dict]
         """
         source_map = {
-            "new_posts": f"{self._base_reddit_endpoint}/new.json",
-            "front_page_posts": f"{self._base_reddit_endpoint}/.json",
+            "new_posts": f"{self.base_reddit_endpoint}/new.json",
+            "front_page_posts": f"{self.base_reddit_endpoint}/.json",
             "listing_posts": f"{self.subreddit_data_endpoint}/{posts_source}.json?",
             "subreddit_posts": f"{self.subreddit_data_endpoint}/{posts_source}.json",
             "user_posts": f"{self._user_data_endpoint}/{posts_source}/submitted.json",
@@ -336,7 +336,7 @@ class Api:
         search_mapping: dict = {
             "users": f"{self._users_data_endpoint}/search.json",
             "subreddits": f"{self._subreddits_data_endpoint}/search.json",
-            "posts": f"{self._base_reddit_endpoint}/search.json",
+            "posts": f"{self.base_reddit_endpoint}/search.json",
         }
 
         endpoint = search_mapping.get(search_type, "")

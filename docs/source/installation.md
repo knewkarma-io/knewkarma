@@ -41,23 +41,3 @@ cd knewkarma
 ```
 docker build -t knewkarma .
 ```
-
-## GUI Installation for Windows
-
-Knew Karma offers a graphical interface for Windows users, providing an intuitive way to access its features. Follow
-these steps to install:
-
-## GUI
-
-The GUI instance of Knew Karma is only available for Windows systems, and can be installed by doing the following:
-
-1. **Download the latest setup files from the
-   ** [releases page](https://github.com/bellingcat/knewkarma/releases/latest).
-2. **Extract the ZIP file** to find the `KnewKarmaSetup.msi` and `setup.exe`.
-3. **Install Knew Karma**:
-    * If you **don't have the .NET Desktop Runtime** installed or **not sure if it's installed**, run `setup.exe`
-    * If you **have the .NET Desktop Runtime**, directly run `KnewKarmaSetup.msi`
-4. **Follow the on-screen instructions** to complete the installation, which includes creating desktop and app menu
-   shortcuts for easy access.
-
-> This process installs Knew Karma on your Windows system, ready for you to start exploring its capabilities.
