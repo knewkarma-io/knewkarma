@@ -1,6 +1,4 @@
-# Usage
-
-## CLI (and Docker Container) Usage
+# CLI Usage
 
 After installation, the *cli* instance can be called with the `knewkarma` command (or `docker run -it [container-name]`
 for Docker Containers)
