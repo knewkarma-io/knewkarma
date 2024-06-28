@@ -3,8 +3,12 @@
 ## Overview
 
 The Knew Karma API offers a seamless way to interact with Reddit data, providing asynchronous access to user profiles,
-subreddit information, posts, comments, and more. This API is designed for developers with a basic understanding of
-asynchronous programming. To help you get started, we've included detailed examples showcasing how to utilize various
+subreddit information, posts, comments, and more.
+
+This API is designed for developers with a basic understanding of
+asynchronous programming.
+
+To help you get started, I've included detailed examples showcasing how to utilise various
 API features effectively.
 Key Classes
 
