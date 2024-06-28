@@ -1,4 +1,4 @@
-# Installation Guide for Knew Karma
+# Installation Guide
 
 Get started with Knew Karma through the simple installation process, whether you prefer using a CLI, Python library,
 Docker, or GUI for Windows. Follow these steps to get up and running.
