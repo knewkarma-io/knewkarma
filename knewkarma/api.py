@@ -166,7 +166,7 @@ class Api:
         :rtype: dict
         """
         with get_status(
-            status_message=f"Initialising [underline]single data[/] retrieval process..."
+            status_message=f"Initialising [italic]single data[/] retrieval process..."
         ):
             # Use a dictionary for direct mapping
             profile_mapping: dict = {
@@ -210,7 +210,7 @@ class Api:
         all_items = []
         last_item_id = None
         with get_status(
-            status_message="Initialising [underline]bulk data[/] retrieval process..."
+            status_message="Initialising [italic]bulk data[/] retrieval process..."
         ) as status:
             while len(all_items) < limit:
                 paginated_endpoint = (
