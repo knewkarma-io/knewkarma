@@ -76,7 +76,7 @@ subreddit.
 
 Initialisation:
 
-```
+```python
 Subreddit(subreddit: str, time_format: Literal["concise", "locale"])
 ```
 
