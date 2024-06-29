@@ -6,9 +6,9 @@ from conftest import (
     TEST_USERNAME,
     TEST_USER_ID,
     TEST_USER_CREATED_TIMESTAMP,
-    TEST_COMMUNITY,
-    TEST_COMMUNITY_ID,
-    TEST_COMMUNITY_CREATED_TIMESTAMP,
+    TEST_SUBREDDIT,
+    TEST_SUBREDDIT_ID,
+    TEST_SUBREDDIT_CREATED_TIMESTAMP,
 )
 from knewkarma.api import Api
 
@@ -41,16 +41,16 @@ async def test_search():
         or search_posts[0].get("data").get("title").lower()
     )
 
-    search_communities: list[dict] = await fetch_with_retry(
+    search_subreddits: list[dict] = await fetch_with_retry(
         api.get_search_results,
         search_type="subreddits",
         query="ask",
         limit=13,
     )
 
-    assert isinstance(search_communities, list)
-    assert len(search_communities) == 13
-    assert "ask" in search_communities[0].get("data").get("display_name").lower()
+    assert isinstance(search_subreddits, list)
+    assert len(search_subreddits) == 13
+    assert "ask" in search_subreddits[0].get("data").get("display_name").lower()
 
     search_users: list[dict] = await fetch_with_retry(
         api.get_search_results,
@@ -78,54 +78,54 @@ async def test_get_profile():
     community_profile: dict = await fetch_with_retry(
         api.get_profile,
         profile_type="subreddit",
-        profile_source=TEST_COMMUNITY,
+        profile_source=TEST_SUBREDDIT,
     )
 
-    assert community_profile.get("id") == TEST_COMMUNITY_ID
-    assert community_profile.get("created") == TEST_COMMUNITY_CREATED_TIMESTAMP
+    assert community_profile.get("id") == TEST_SUBREDDIT_ID
+    assert community_profile.get("created") == TEST_SUBREDDIT_CREATED_TIMESTAMP
 
 
 @pytest.mark.asyncio
-async def test_get_communities():
-    all_communities = await fetch_with_retry(
+async def test_get_subreddits():
+    all_subreddits = await fetch_with_retry(
         api.get_subreddits,
         subreddits_type="all",
         limit=100,
     )
 
-    assert isinstance(all_communities, list)
-    assert "subreddit_type" in all_communities[0].get("data")
-    assert len(all_communities) == 100
+    assert isinstance(all_subreddits, list)
+    assert "subreddit_type" in all_subreddits[0].get("data")
+    assert len(all_subreddits) == 100
 
-    default_communities = await fetch_with_retry(
+    default_subreddits = await fetch_with_retry(
         api.get_subreddits,
         subreddits_type="default",
         limit=150,
     )
 
-    assert isinstance(default_communities, list)
-    assert "community_icon" in default_communities[1].get("data")
-    assert len(default_communities) == 150
+    assert isinstance(default_subreddits, list)
+    assert "community_icon" in default_subreddits[1].get("data")
+    assert len(default_subreddits) == 150
 
-    new_communities = await fetch_with_retry(
+    new_subreddits = await fetch_with_retry(
         api.get_subreddits,
         subreddits_type="new",
         limit=200,
     )
 
-    assert isinstance(new_communities, list)
-    assert "whitelist_status" in new_communities[3].get("data")
-    assert len(new_communities) == 200
+    assert isinstance(new_subreddits, list)
+    assert "whitelist_status" in new_subreddits[3].get("data")
+    assert len(new_subreddits) == 200
 
-    popular_communities = await fetch_with_retry(
+    popular_subreddits = await fetch_with_retry(
         api.get_subreddits,
         subreddits_type="popular",
         limit=200,
     )
 
-    assert isinstance(popular_communities, list)
-    assert "display_name" in popular_communities[3].get("data")
-    assert len(new_communities) == 200
+    assert isinstance(popular_subreddits, list)
+    assert "display_name" in popular_subreddits[3].get("data")
+    assert len(new_subreddits) == 200
 
 
 @pytest.mark.asyncio
@@ -146,7 +146,7 @@ async def test_get_posts():
     community_posts: list = await fetch_with_retry(
         api.get_posts,
         posts_type="subreddit_posts",
-        posts_source=TEST_COMMUNITY,
+        posts_source=TEST_SUBREDDIT,
         sort="top",
         timeframe="week",
         limit=200,
@@ -154,7 +154,7 @@ async def test_get_posts():
 
     assert isinstance(community_posts, list)
     assert len(community_posts) == 200
-    assert community_posts[0].get("data").get("subreddit") == TEST_COMMUNITY
+    assert community_posts[0].get("data").get("subreddit") == TEST_SUBREDDIT
 
     listing_posts: list = await fetch_with_retry(
         api.get_posts,
