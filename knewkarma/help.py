@@ -73,6 +73,25 @@ knewkarma user TheRealKSi --moderated-subreddits
 knewkarma --limit 500 user TheRealKSi --top-subreddits 10
 ```
 """,
+        "users": """
+    The **Users** module is used to pull users from various sources such as new, all or popular.
+
+    # Examples
+    ## Get all users
+    ```
+    knewkarma users --all
+    ```
+
+    ## Get new users
+    ```
+    knewkarma users --new
+    ```
+
+    ## Get popular users
+    ```
+    knewkarma users --popular
+    ```
+        """,
         "subreddit": """
 The **Subreddit** module is used to pull a specified subreddit's data including profile, posts, wiki pages,
  or even searching posts that have the specified keyword.

@@ -64,7 +64,7 @@ class User:
         :param sort: Sort criterion for the posts.
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
-        :type timeframe: str
+        :type timeframe: Literal
         :return: A list of dictionaries, each containing data about a post.
         :rtype: list[dict]
         """
@@ -97,7 +97,7 @@ class User:
         :param sort: Sort criterion for the comments.
         :type sort: str
         :param timeframe: Timeframe from which tyo get comments.
-        :type timeframe: str
+        :type timeframe: Literal
         :return: A list of dictionaries, each containing data about a comment.
         :rtype: list[dict]
         """
@@ -158,7 +158,7 @@ class User:
         :param sort: Sort criterion for the posts.
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
-        :type timeframe: str
+        :type timeframe: Literal
         :return: A list of dictionaries, each containing data about a post.
         :rtype: list[dict]
         """
@@ -201,7 +201,7 @@ class User:
         :param sort: Sort criterion for the comments.
         :type sort: str
         :param timeframe: Timeframe from which to get comments.
-        :type timeframe: str
+        :type timeframe: Literal
         :return: A list of dictionaries, each containing data about a comment.
         :rtype: list[dict]
         """
@@ -260,7 +260,7 @@ class User:
         :param sort: Sort criterion for the posts.
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
-        :type timeframe: str
+        :type timeframe: Literal
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         :return: Dictionary of top n subreddits and their counts.
@@ -287,30 +287,106 @@ class User:
         return []
 
 
-class Search:
-    """Represents Readit search functionality and provides methods for getting search results from different entities"""
+class Users:
+    """Represents Reddit users and provides methods for getting related data."""
 
     def __init__(self, time_format: TIME_FORMAT = "locale"):
         self._time_format = time_format
 
+    async def new(
+        self, limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all"
+    ) -> list[dict]:
+        """
+        Get new users.
+
+        :param limit: Maximum number of new users to return.
+        :type limit: int
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession
+        :param timeframe: Timeframe from which to get new posts.
+        :type timeframe: Literal
+        :return: A list of dictionaries, each containing a user's data.
+        :rtype: list[dict]
+        """
+        raw_users: list = await api.get_users(
+            users_type="new", limit=limit, timeframe=timeframe, session=session
+        )
+        new_users: list[dict] = clean_users(raw_users, time_format=self._time_format)
+
+        return new_users
+
+    async def popular(
+        self, limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all"
+    ) -> list[dict]:
+        """
+        Get popular users.
+
+        :param limit: Maximum number of popular users to return.
+        :type limit: int
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession
+        :param timeframe: Timeframe from which to get popular posts.
+        :type timeframe: Literal
+        :return: A list of dictionaries, each containing a user's data.
+        :rtype: list[dict]
+        """
+        raw_users: list = await api.get_users(
+            users_type="popular",
+            limit=limit,
+            timeframe=timeframe,
+            session=session,
+        )
+        popular_users: list[dict] = clean_users(
+            raw_users, time_format=self._time_format
+        )
+
+        return popular_users
+
+    async def all(
+        self, limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all"
+    ) -> list[dict]:
+        """
+        Get all users.
+
+        :param limit: Maximum number of all users to return.
+        :type limit: int
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession
+        :param timeframe: Timeframe from which to get all posts.
+        :type timeframe: Literal
+        :return: A list of dictionaries, each containing a user's data.
+        :rtype: list[dict]
+        """
+        raw_users: list = await api.get_users(
+            users_type="all", limit=limit, timeframe=timeframe, session=session
+        )
+        all_users: list[dict] = clean_users(raw_users, time_format=self._time_format)
+
+        return all_users
+
+
+class Search:
+    """Represents Readit search functionality and provides methods for getting search results from different entities"""
+
+    def __init__(self, query: str, time_format: TIME_FORMAT = "locale"):
+        self._query = query
+        self._time_format = time_format
+
     async def users(
         self,
-        query: str,
         limit: int,
         session: aiohttp.ClientSession,
     ) -> list[dict]:
         """
         Search users.
 
-        :param query: Search query.
-        :type query: str
         :param limit: Maximum number of search results to return.
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         """
         search_users: list = await api.get_search_results(
-            query=query, search_type="users", limit=limit, session=session
+            query=self._query, search_type="users", limit=limit, session=session
         )
         users_results: list[dict] = clean_users(
             search_users, time_format=self._time_format
@@ -319,20 +395,18 @@ class Search:
         return users_results
 
     async def subreddits(
-        self, query: str, limit: int, session: aiohttp.ClientSession
+        self, limit: int, session: aiohttp.ClientSession
     ) -> list[dict]:
         """
         Search subreddits.
 
-        :param query: Search query.
-        :type query: str
         :param limit: Maximum number of search results to return.
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         """
         search_subreddits: list = await api.get_search_results(
-            query=query, search_type="subreddits", limit=limit, session=session
+            query=self._query, search_type="subreddits", limit=limit, session=session
         )
         subreddits_results: list[dict] = clean_subreddits(
             search_subreddits, time_format=self._time_format
@@ -342,34 +416,23 @@ class Search:
 
     async def posts(
         self,
-        query: str,
         limit: int,
         session: aiohttp.ClientSession,
-        sort: SORT_CRITERION = "all",
-        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns posts.
 
-        :param query: Search query.
-        :type query: str
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession.
-        :param sort: Sort criterion for the posts.
-        :type sort: str
-        :param timeframe: Timeframe from which to get posts.
-        :type timeframe: str
         :return: A list of dictionaries, each containing data about a post.
         :rtype: list[dict]
         """
         search_posts: list = await api.get_search_results(
-            query=query,
+            query=self._query,
             search_type="posts",
             limit=limit,
-            sort=sort,
-            timeframe=timeframe,
             session=session,
         )
         posts_results: list[dict] = clean_posts(
@@ -469,7 +532,7 @@ class Subreddit:
         :param sort: Sort criterion for the posts.
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
-        :type timeframe: str
+        :type timeframe: Literal
         :return: A list of dictionaries, each containing data about a post.
         :rtype: list[dict]
         """
@@ -507,7 +570,7 @@ class Subreddit:
         :param sort: Sort criterion for the posts.
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
-        :type timeframe: str
+        :type timeframe: Literal
         :return: A list of dictionaries, each containing data about a post.
         :rtype: list[dict]
         """
@@ -537,7 +600,9 @@ class Subreddits:
     def __init__(self, time_format: TIME_FORMAT = "locale"):
         self._time_format = time_format
 
-    async def all(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
+    async def all(
+        self, limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all"
+    ) -> list[dict]:
         """
         Return all subreddits.
 
@@ -545,15 +610,17 @@ class Subreddits:
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param timeframe: Timeframe from which to get all subreddits.
+        :type timeframe: Literal
         :return: A list of dictionaries, each containing data about a subreddit.
         :rtype: list[dict]
 
         Note
         ----
-            *in Morphius' voice* "the only limitation you have at this point is the matrix's rate limit."
+            *in Morphius' voice* "the only limitation you have at this point is the matrix's rate-limit."
         """
         raw_subreddits: list = await api.get_subreddits(
-            subreddits_type="all", limit=limit, session=session
+            subreddits_type="all", limit=limit, timeframe=timeframe, session=session
         )
         all_subreddits: list[dict] = clean_subreddits(
             raw_subreddits, is_preview=True, time_format=self._time_format
@@ -581,7 +648,9 @@ class Subreddits:
 
         return default_subreddits
 
-    async def new(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
+    async def new(
+        self, limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all"
+    ) -> list[dict]:
         """
         Return new subreddits.
 
@@ -589,11 +658,13 @@ class Subreddits:
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param timeframe: Timeframe from which to get new subreddits.
+        :type timeframe: Literal
         :return: A list of dictionaries, each containing data about a subreddit.
         :rtype: list[dict]
         """
         raw_subreddits: list = await api.get_subreddits(
-            subreddits_type="new", limit=limit, session=session
+            subreddits_type="new", limit=limit, timeframe=timeframe, session=session
         )
         new_subreddits: list[dict] = clean_subreddits(
             raw_subreddits, is_preview=True, time_format=self._time_format
@@ -601,7 +672,9 @@ class Subreddits:
 
         return new_subreddits
 
-    async def popular(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
+    async def popular(
+        self, limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all"
+    ) -> list[dict]:
         """
         Return popular subreddits.
 
@@ -609,11 +682,13 @@ class Subreddits:
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param timeframe: Timeframe from which to get popular subreddits.
+        :type timeframe: Literal
         :return: A list of dictionaries, each containing data about a subreddit.
         :rtype: list[dict]
         """
         raw_subreddits: list = await api.get_subreddits(
-            subreddits_type="popular", limit=limit, session=session
+            subreddits_type="popular", limit=limit, timeframe=timeframe, session=session
         )
         popular_subreddits: list[dict] = clean_subreddits(
             raw_subreddits, is_preview=True, time_format=self._time_format
@@ -687,8 +762,8 @@ class Posts:
         :type limit: int
         :param sort: Sort criterion for the posts.
         :type sort: str
-        :param timeframe: Timeframe from which to get posts.
-        :type timeframe: str
+        :param timeframe: Timeframe from which to get listing posts.
+        :type timeframe: Literal
         :return: A list of dictionaries, each containing data about a post.
         :rtype: list[dict]
         """
@@ -707,6 +782,7 @@ class Posts:
         self,
         session: aiohttp.ClientSession,
         limit: int,
+        timeframe: TIMEFRAME = "all",
         sort: SORT_CRITERION = "all",
     ) -> list[dict]:
         """
@@ -716,6 +792,8 @@ class Posts:
         :type session: aiohttp.ClientSession.
         :param limit: Maximum number of posts to return.
         :type limit: int
+        :param timeframe: Timeframe from which to get new posts.
+        :type timeframe: Literal
         :param sort: Sort criterion for the posts.
         :type sort: str
         :return: A list of dictionaries, each containing data about a post.
@@ -724,6 +802,7 @@ class Posts:
         raw_posts: list = await api.get_posts(
             posts_type="new_posts",
             limit=limit,
+            timeframe=timeframe,
             sort=sort,
             session=session,
         )
@@ -736,7 +815,6 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
-        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Returns posts from the Reddit front-page.
@@ -747,8 +825,6 @@ class Posts:
         :type limit: int
         :param sort: Sort criterion for the posts.
         :type sort: str
-        :param timeframe: Timeframe from which to get posts.
-        :type timeframe: str
         :return: A list of dictionaries, each containing data about a post.
         :rtype: list[dict]
         """
@@ -756,7 +832,6 @@ class Posts:
             posts_type="front_page_posts",
             limit=limit,
             sort=sort,
-            timeframe=timeframe,
             session=session,
         )
         front_page_posts: list = clean_posts(raw_posts, time_format=self._time_format)
