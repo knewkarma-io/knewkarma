@@ -113,10 +113,12 @@ Initialises an instance for getting data from multiple subreddits.
 
 ### Methods:
 
-* **all(limit: int, timeframe: Literal[] = str, session: aiohttp.ClientSession) -> list[dict]**: Returns all subreddits.
+* **all(limit: int, timeframe: TIMEFRAME = "all", session: aiohttp.ClientSession) -> list[dict]**: Returns all
+  subreddits.
 * **default(limit: int, session: aiohttp.ClientSession) -> list[dict]**: Returns default subreddits.
-* **new(limit: int, session: aiohttp.ClientSession, timeframe: Literal[] = str) -> list[dict]**: Returns new subreddits.
-* **popular(limit: int, session: aiohttp.ClientSession, timeframe: Literal[] = str) -> list[dict]**: Returns popular
+* **new(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict]**: Returns new
+  subreddits.
+* **popular(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict]**: Returns popular
   subreddits.
 
 ## Post
@@ -161,8 +163,9 @@ Initialises an instance for getting data from multiple posts.
 
 * listing(session: aiohttp.ClientSession, listings_name: LISTING, limit: int, sort: SORT_CRITERION = "all", timeframe:
   TIMEFRAME = "all") -> list[dict]**: Returns posts from a specified listing.
-* new(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all") -> list[dict]: Returns new posts.
-* front_page(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
+* new(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = str) ->
+  list[dict]: Returns new posts.
+* front_page(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all") ->
   list[dict]: Returns posts from the Reddit front-page.
 
 ## Search
