@@ -21,7 +21,7 @@ The API exposes six primary classes, each tailored for different types of data r
 Initialisation:
 
 ```python
-User(username: str, time_format: TIME_FORMAT = "locale")
+User(username: str, time_format: Literal["concise", "locale"])
 ```
 
 Initialises a **User** instance for getting profile, posts, and comments data from the specified user.
@@ -48,6 +48,27 @@ Initialises a **User** instance for getting profile, posts, and comments data fr
 * **top_subreddits(session: aiohttp.ClientSession, top_n: int, limit: int, sort: SORT_CRITERION = "all", timeframe:
   TIMEFRAME = "all") -> list[tuple]**: Returns a user's top n subreddits based on subreddit frequency in n posts.
 
+## Users
+
+**Users**: Represents Reddit users and provides methods for getting related data.
+
+Initialisation:
+
+```python
+Users(time_format: Literal["concise", "locale"])
+```
+
+Initialises an instance for getting data from multiple users.
+
+* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
+  or "locale" for a localized datetime string. Defaults to "locale".
+
+### Methods:
+
+* **all(limit: int, session: aiohttp.ClientSession) -> list[dict]**: Returns all users.
+* **new(limit: int, session: aiohttp.ClientSession) -> list[dict]**: Returns new users.
+* **popular(limit: int, session: aiohttp.ClientSession) -> list[dict]**: Returns popular users.
+
 ## Subreddit
 
 **Subreddit**: Represents a Reddit Community (Subreddit) and provides methods for getting data from the specified
@@ -56,7 +77,7 @@ subreddit.
 Initialisation:
 
 ```
-Subreddit(subreddit: str, time_format: TIME_FORMAT = "locale")
+Subreddit(subreddit: str, time_format: Literal["concise", "locale"])
 ```
 
 Initialises a RedditCommunity instance for getting profile and posts from the specified subreddit.
@@ -82,7 +103,7 @@ Initialises a RedditCommunity instance for getting profile and posts from the sp
 Initialisation:
 
 ```python
-Subreddits(time_format: TIME_FORMAT = "locale")
+Subreddits(time_format: Literal["concise", "locale"])
 ```
 
 Initialises an instance for getting data from multiple subreddits.
@@ -104,7 +125,7 @@ Initialises an instance for getting data from multiple subreddits.
 Initialisation:
 
 ```python
-Post(post_id: str, subreddit: str, time_format: TIME_FORMAT = "locale")
+Post(post_id: str, subreddit: str, time_format: Literal["concise", "locale"])
 ```
 
 Initialises an instance for getting data from a specified post.
@@ -127,7 +148,7 @@ Initialises an instance for getting data from a specified post.
 Initialisation:
 
 ```python
-Posts(time_format: TIME_FORMAT = "locale")
+Posts(time_format: Literal["concise", "locale"])
 ```
 
 Initialises an instance for getting data from multiple posts.
@@ -151,20 +172,20 @@ entities.
 Initialisation:
 
 ```python
-Search(time_format: TIME_FORMAT = "locale")
+Search(query: str, time_format: Literal["concise", "locale"])
 ```
 
 Initialises an instance for performing searches across Reddit.
 
+* `query`: Search query.
 * `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
   or "locale" for a localized datetime string. Defaults to "locale".
 
 ### Methods:
 
-* **users(query: str, limit: int, session: aiohttp.ClientSession) -> list[dict]**: Search users.
-* **subreddits(query: str, limit: int, session: aiohttp.ClientSession) -> list[dict]**: Search subreddits.
-* **posts(query: str, limit: int, session: aiohttp.ClientSession, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "
-  all") -> list[dict]**: Returns posts matching the search query.
+* **users(limit: int, session: aiohttp.ClientSession) -> list[dict]**: Search users.
+* **subreddits(limit: int, session: aiohttp.ClientSession) -> list[dict]**: Search subreddits.
+* **posts(limit: int, session: aiohttp.ClientSession) -> list[dict]**: Returns posts matching the search query.
 
 ## Timeframes and Sorting
 
@@ -204,5 +225,5 @@ The `time_format` parameter affects how timestamps are displayed in your results
 e.g., "*5 minutes ago*") or "`locale`" for locale-based formatting. Here's how to apply it:
 
 ```python
-posts = await user.posts(limit=5, session=session, time_format="concise")
+posts = await user.posts(limit=5, time_format="concise", session=session)
 ```

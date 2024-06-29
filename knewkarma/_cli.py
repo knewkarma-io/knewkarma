@@ -9,7 +9,7 @@ from rich.markdown import Markdown
 from rich.tree import Tree
 from rich_argparse import RichHelpFormatter
 
-from ._core import Post, Posts, Subreddit, Subreddits, User, Search
+from ._core import Post, Posts, Subreddit, Subreddits, User, Search, Users
 from ._utilities import (
     console,
     create_dataframe,
@@ -300,6 +300,35 @@ def args_parser() -> argparse.ArgumentParser:
         help="get a user's top n subreddits based on subreddit frequency in n posts",
     )
 
+    users_parser = subparsers.add_parser(
+        "users",
+        help="users module ([bold][green]bulk[/][/])",
+        description=Markdown(
+            "**Users**: *Pull users from various sources.*",
+            style="argparse.text",
+        ),
+        epilog=Markdown(Help.examples["users"]),
+        formatter_class=RichHelpFormatter,
+    )
+    users_parser.add_argument(
+        "-a",
+        "--all",
+        help="get all users",
+        action="store_true",
+    )
+    users_parser.add_argument(
+        "-n",
+        "--new",
+        help="get new users",
+        action="store_true",
+    )
+    users_parser.add_argument(
+        "-p",
+        "--popular",
+        help="get popular users",
+        action="store_true",
+    )
+
     return main_parser
 
 
@@ -394,7 +423,8 @@ def start():
         username=args.username if hasattr(args, "username") else None,
         time_format=time_format,
     )
-    search = Search(time_format=time_format)
+    users = Users(time_format=time_format)
+    search = Search(query=search_query, time_format=time_format)
     subreddit = Subreddit(
         subreddit=args.subreddit if hasattr(args, "subreddit") else None,
         time_format=time_format,
@@ -460,6 +490,14 @@ def start():
                 ),
             ),
         ],
+        "users": [
+            ("all", lambda session: users.all(limit=limit, session=session)),
+            ("new", lambda session: users.new(limit=limit, session=session)),
+            (
+                "popular",
+                lambda session: users.popular(limit=limit, session=session),
+            ),
+        ],
         "subreddit": [
             ("profile", lambda session: subreddit.profile(session=session)),
             (
@@ -515,7 +553,7 @@ def start():
             (
                 "front_page",
                 lambda session: posts.front_page(
-                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                    limit=limit, sort=sort, session=session
                 ),
             ),
             (
@@ -532,23 +570,16 @@ def start():
         "search": [
             (
                 "users",
-                lambda session: search.users(
-                    query=search_query, limit=limit, session=session
-                ),
+                lambda session: search.users(limit=limit, session=session),
             ),
             (
                 "subreddits",
-                lambda session: search.subreddits(
-                    query=search_query, limit=limit, session=session
-                ),
+                lambda session: search.subreddits(limit=limit, session=session),
             ),
             (
                 "posts",
                 lambda session: search.posts(
-                    query=search_query,
                     limit=limit,
-                    sort=sort,
-                    timeframe=timeframe,
                     session=session,
                 ),
             ),

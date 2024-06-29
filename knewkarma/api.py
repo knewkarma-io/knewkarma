@@ -18,7 +18,7 @@ SORT_CRITERION = Literal[
 ]
 
 LISTING = Literal["best", "controversial", "popular", "rising"]
-TIMEFRAME = Literal["hour", "day", "week", "month", "year"]
+TIMEFRAME = Literal["hour", "day", "week", "month", "year", "all"]
 TIME_FORMAT = Literal["concise", "locale"]
 
 
@@ -260,8 +260,8 @@ class Api:
             "user_overview",
             "user_comments",
         ],
-        posts_source: str = None,
         timeframe: TIMEFRAME = "all",
+        posts_source: str = None,
         sort: SORT_CRITERION = "all",
     ) -> list[dict]:
         """
@@ -278,7 +278,7 @@ class Api:
         :param sort: Posts' sort criterion.
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
-        :type timeframe: str
+        :type timeframe: Literal
 
         :return: A list of dictionaries, each containing data of a post.
         :rtype: list[dict]
@@ -294,10 +294,7 @@ class Api:
         }
 
         endpoint = source_map.get(posts_type, "")
-        if posts_type == "new_posts":
-            endpoint += f"?limit={limit}&sort={sort}&raw_json=1"
-        else:
-            endpoint += f"?limit={limit}&sort={sort}&t={timeframe}&raw_json=1"
+        endpoint += f"?limit={limit}&sort={sort}&t={timeframe}&raw_json=1"
 
         posts: list[dict] = await self._paginate(
             session=session,
@@ -340,10 +337,7 @@ class Api:
         }
 
         endpoint = search_mapping.get(search_type, "")
-        if search_type == "posts":
-            endpoint += f"?q={query}&limit={limit}&sort={sort}&t={timeframe}"
-        else:
-            endpoint += f"?q={query}&limit={limit}"
+        endpoint += f"?q={query}&limit={limit}&sort={sort}&t={timeframe}"
 
         search_results: list[dict] = await self._paginate(
             session=session,
@@ -359,6 +353,7 @@ class Api:
         subreddits_type: Literal["all", "default", "new", "popular"],
         limit: int,
         session: aiohttp.ClientSession,
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -367,6 +362,8 @@ class Api:
         :type subreddits_type: str
         :param limit: Maximum number of subreddits to return.
         :type limit: int
+        :param timeframe: Timeframe from which to get subreddits.
+        :type timeframe: Literal
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         """
@@ -378,7 +375,7 @@ class Api:
         }
 
         endpoint = subreddits_mapping.get(subreddits_type, "")
-        endpoint += f"?limit={limit}"
+        endpoint += f"?limit={limit}&t={timeframe}"
 
         subreddits: list[dict] = await self._paginate(
             session=session,
@@ -388,3 +385,39 @@ class Api:
         )
 
         return subreddits
+
+    async def get_users(
+        self,
+        users_type: Literal["all", "popular", "new"],
+        limit: int,
+        session: aiohttp.ClientSession,
+        timeframe: TIMEFRAME = "all",
+    ) -> list[dict]:
+        """
+        Asynchronously gets the specified type of subreddits.
+
+        :param users_type: Type of users to get.
+        :type users_type: str
+        :param limit: Maximum number of users to return.
+        :type limit: int
+        :param timeframe: Timeframe from which to get users.
+        :type timeframe: Literal
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession
+        """
+        users_mapping: dict = {
+            "all": f"{self._users_data_endpoint}.json",
+            "new": f"{self._users_data_endpoint}/new.json",
+            "popular": f"{self._users_data_endpoint}/popular.json",
+        }
+
+        endpoint = users_mapping.get(users_type, "")
+        endpoint += f"?limit={limit}&t={timeframe}"
+        users: list[dict] = await self._paginate(
+            session=session,
+            endpoint=endpoint,
+            process_func=self._process_response,
+            limit=limit,
+        )
+
+        return users
