@@ -332,9 +332,9 @@ def args_parser() -> argparse.ArgumentParser:
     return main_parser
 
 
-async def function_executor(args: argparse.Namespace, function_map: dict):
+async def function_caller(args: argparse.Namespace, function_map: dict):
     """
-    Calls/executes command-line arguments' functions based on user-input.
+    Calls command-line arguments' functions based on user-input.
 
     :param args: Argparse namespace object  containing parsed command-line arguments.
     :type args: argparse.Namespace
@@ -590,7 +590,7 @@ def start():
         print_banner()
         try:
             start_time: datetime = datetime.now()
-            asyncio.run(function_executor(args=args, function_map=function_map))
+            asyncio.run(function_caller(args=args, function_map=function_map))
         except KeyboardInterrupt:
             console.log("[yellow]✘[/] User interruption detected ([yellow]Ctrl+C[/])")
         finally:
