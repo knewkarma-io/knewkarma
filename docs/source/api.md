@@ -113,10 +113,11 @@ Initialises an instance for getting data from multiple subreddits.
 
 ### Methods:
 
-* **all(limit: int, session: aiohttp.ClientSession) -> list[dict]**: Returns all subreddits.
+* **all(limit: int, timeframe: Literal[] = str, session: aiohttp.ClientSession) -> list[dict]**: Returns all subreddits.
 * **default(limit: int, session: aiohttp.ClientSession) -> list[dict]**: Returns default subreddits.
-* **new(limit: int, session: aiohttp.ClientSession) -> list[dict]**: Returns new subreddits.
-* **popular(limit: int, session: aiohttp.ClientSession) -> list[dict]**: Returns popular subreddits.
+* **new(limit: int, session: aiohttp.ClientSession, timeframe: Literal[] = str) -> list[dict]**: Returns new subreddits.
+* **popular(limit: int, session: aiohttp.ClientSession, timeframe: Literal[] = str) -> list[dict]**: Returns popular
+  subreddits.
 
 ## Post
 
