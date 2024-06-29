@@ -71,8 +71,7 @@ Initialises an instance for getting data from multiple users.
 
 ## Subreddit
 
-**Subreddit**: Represents a Reddit Community (Subreddit) and provides methods for getting data from the specified
-subreddit.
+**Subreddit**: Represents a Reddit subreddit and provides methods for getting data from it.
 
 Initialisation:
 
@@ -98,7 +97,7 @@ Initialises a RedditCommunity instance for getting profile and posts from the sp
 
 ## Subreddits
 
-**Subreddits**: Represents Reddit subreddits and provides methods for getting related data.
+**Subreddits**: Represents subreddits and provides methods for getting related data.
 
 Initialisation:
 
