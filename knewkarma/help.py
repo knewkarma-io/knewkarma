@@ -15,9 +15,7 @@ class Help:
     """
 
     author: str = "[Richard Mwewa](https://rly0nheart.github.io)"
-    copyright: str = (
-        f"© Copyright 2023-{date.today().year} {author}. All rights reserved."
-    )
+    copyright: str = f"© Copyright {date.today().year} {author}. All rights reserved."
 
     summary: str = f"**Knew Karma**: *A Reddit Data Analysis Toolkit* — by {author}"
     description: str = """
