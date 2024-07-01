@@ -20,7 +20,7 @@ complete overview of the features available:
 |                        | `Overview`             | Retrieves user's most recent comment activity.                  |
 |                        | `Search Posts`         | Returns a user's posts that contain the specified keyword.      |
 |                        | `Search Comments`      | Returns a user's comments that contain the specified keyword.   |
-|                        | `Top *n* Subreddits`   | Identifies top subreddits based on user activity.               |
+|                        | `Top n Subreddits`     | Identifies top subreddits based on user activity.               |
 |                        | `Moderated Subreddits` | Lists subreddits moderated by the user.                         |
 | **Users**              | `All`                  | Retrieves all users.                                            |
 |                        | `New`                  | Retrieves new users.                                            |
