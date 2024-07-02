@@ -3,7 +3,7 @@ from knewkarma.version import Version
 
 class Help:
     """
-    Container for documentation-related data for Knew Karma.
+    Container for help-related data for Knew Karma.
 
     Attributes:
           author (str): A markdown-formatted string of author name and url.
