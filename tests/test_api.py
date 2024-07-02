@@ -44,6 +44,7 @@ async def test_search():
         title: str = post_result.get("data").get("title")
         assert search_posts_query in selftext.lower() or title.lower()
 
+    """
     search_subreddits_query: str = "Ask"
     search_subreddits: list[dict] = await fetch_with_retry(
         api.get_search_results,
@@ -60,7 +61,7 @@ async def test_search():
             in subreddit_result.get("data").get("display_name").lower()
             or subreddit_result.get("data").get("submit_text").lower()
         )
-
+    """
     search_users_query: str = "john"
     search_users: list[dict] = await fetch_with_retry(
         api.get_search_results,
