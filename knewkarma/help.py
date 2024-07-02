@@ -1,3 +1,6 @@
+from knewkarma.version import Version
+
+
 class Help:
     """
     Container for documentation-related data for Knew Karma.
@@ -14,7 +17,9 @@ class Help:
     author: str = "[Richard Mwewa](https://rly0nheart.github.io)"
     copyright: str = f"© MIT License {author}. All rights reserved."
 
-    summary: str = f"**Knew Karma**: *A Reddit Data Analysis Toolkit* — by {author}"
+    summary: str = (
+        f"**Knew Karma** {Version.release}: *A Reddit Data Analysis Toolkit* — by {author}"
+    )
     description: str = """
 **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** (*Snap/PyPI

@@ -21,7 +21,6 @@ from ._utilities import (
 )
 from .api import TIMEFRAME, SORT_CRITERION, Api
 from .help import Help
-from .version import Version
 
 
 def args_parser() -> argparse.ArgumentParser:
@@ -81,7 +80,7 @@ def args_parser() -> argparse.ArgumentParser:
     main_parser.add_argument(
         "-v",
         "--version",
-        version=Markdown(f"Knew Karma {Version.release} {Help.copyright}"),
+        version=Markdown(f"Knew Karma {Help.copyright}"),
         action="version",
     )
 
