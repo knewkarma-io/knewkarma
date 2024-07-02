@@ -163,9 +163,14 @@ knewkarma post 12csg48 OSINT --comments
 The **Posts** is used to pull posts from sources like the front page, a listing, or new posts.
 
 # Examples
-## Get new posts
+## Get posts from *best* listing
 ```
-knewkarma posts --new
+knewkarma posts --best
+```
+
+## Get posts from *controversial* listing
+```
+knewkarma posts --controversial
 ```
 
 ## Get posts from Reddit Front-Page
@@ -173,18 +178,33 @@ knewkarma posts --new
 knewkarma posts --front-page
 ```
 
-## Get posts from specified listing
+## Get new posts
 ```
-knewkarma posts --listing best
+knewkarma posts --new
+```
+
+## Get posts from *popular* listing
+```
+knewkarma posts --popular
+```
+
+## Get posts from *rising* listing
+```
+knewkarma posts --rising
 ```
     """,
         "search": """
 The **Search** module is used for search/discovery of targets in users, subreddits, and posts.
 
 # Examples
-## Search users
+## Search comments
 ```
-knewkarma search john --users
+knewkarma search "this is automated" --comments
+```
+
+## Search posts
+```
+knewkarma search coronavirus --posts
 ```
 
 ## Search subreddits
@@ -192,9 +212,9 @@ knewkarma search john --users
 knewkarma search ask --subreddits
 ```
 
-## Search posts
+## Search users
 ```
-knewkarma search covid-19 --posts
+knewkarma search john --users
 ```
     """,
     }

@@ -19,7 +19,7 @@ from ._utilities import (
     print_banner,
     show_exported_files,
 )
-from .api import TIMEFRAME, SORT_CRITERION, LISTING, Api
+from .api import TIMEFRAME, SORT_CRITERION, Api
 from .help import Help
 from .version import Version
 
@@ -113,23 +113,40 @@ def args_parser() -> argparse.ArgumentParser:
         formatter_class=RichHelpFormatter,
     )
     posts_parser.add_argument(
+        "-b",
+        "--best",
+        help="get posts from the [italic]best[/] listing",
+        action="store_true",
+    )
+    posts_parser.add_argument(
+        "-c",
+        "--controversial",
+        help="get posts from the [italic]controversial[/] listing",
+        action="store_true",
+    )
+    posts_parser.add_argument(
+        "-f",
+        "--front-page",
+        help="get posts from the reddit [italic]front-page[/]",
+        action="store_true",
+    )
+    posts_parser.add_argument(
         "-n",
         "--new",
         help="get new posts",
         action="store_true",
     )
     posts_parser.add_argument(
-        "-f",
-        "--front-page",
-        help="get posts from the reddit front-page",
+        "-p",
+        "--popular",
+        help="get posts from the [italic]popular[/] listing",
         action="store_true",
     )
     posts_parser.add_argument(
-        "-l",
-        "--listing",
-        default="all",
-        help="get posts from a specified listing",
-        choices=list(get_args(LISTING)),
+        "-r",
+        "--rising",
+        help="get posts from the [italic]rising[/] listing",
+        action="store_true",
     )
 
     search_parser = subparsers.add_parser(
@@ -144,13 +161,13 @@ def args_parser() -> argparse.ArgumentParser:
     )
     search_parser.add_argument("query", help="search query")
     search_parser.add_argument(
-        "-u", "--users", help="search users", action="store_true"
-    )
-    search_parser.add_argument(
         "-p", "--posts", help="search posts", action="store_true"
     )
     search_parser.add_argument(
         "-s", "--subreddits", help="search subreddits", action="store_true"
+    )
+    search_parser.add_argument(
+        "-u", "--users", help="search users", action="store_true"
     )
 
     subreddit_parser = subparsers.add_parser(
@@ -174,17 +191,18 @@ def args_parser() -> argparse.ArgumentParser:
         action="store_true",
     )
     subreddit_parser.add_argument(
-        "-s",
-        "--search",
-        help="get a subreddit's posts that contain the specified keyword",
-        type=str,
-    )
-    subreddit_parser.add_argument(
         "-pp",
         "--posts",
         help="get a subreddit's posts",
         action="store_true",
     )
+    subreddit_parser.add_argument(
+        "-s",
+        "--search",
+        help="get a subreddit's posts that contain the specified keyword",
+        type=str,
+    )
+
     subreddit_parser.add_argument(
         "-wp",
         "--wiki-page",
@@ -246,18 +264,18 @@ def args_parser() -> argparse.ArgumentParser:
     )
     user_parser.add_argument("username", help="username")
     user_parser.add_argument(
-        "-p",
-        "--profile",
-        help="get a user's profile",
-        action="store_true",
-    )
-    user_parser.add_argument(
         "-c",
         "--comments",
         help="get a user's comments",
         action="store_true",
     )
-
+    user_parser.add_argument(
+        "-mc",
+        "--moderated-subreddits",
+        dest="moderated_subreddits",
+        help="get subreddits moderated by the user",
+        action="store_true",
+    )
     user_parser.add_argument(
         "-o",
         "--overview",
@@ -269,6 +287,12 @@ def args_parser() -> argparse.ArgumentParser:
         "--posts",
         action="store_true",
         help="get a user's posts",
+    )
+    user_parser.add_argument(
+        "-p",
+        "--profile",
+        help="get a user's profile",
+        action="store_true",
     )
     user_parser.add_argument(
         "-sp",
@@ -284,13 +308,7 @@ def args_parser() -> argparse.ArgumentParser:
         help="get a user's comments that contain the specified keyword",
         type=str,
     )
-    user_parser.add_argument(
-        "-mc",
-        "--moderated-subreddits",
-        dest="moderated_subreddits",
-        help="get subreddits moderated by the user",
-        action="store_true",
-    )
+
     user_parser.add_argument(
         "-tc",
         "--top-subreddits",
@@ -549,38 +567,62 @@ def start():
             ),
         ],
         "posts": [
-            ("new", lambda session: posts.new(limit=limit, sort=sort, session=session)),
+            (
+                "best",
+                lambda session: posts.best(
+                    limit=limit,
+                    session=session,
+                ),
+            ),
+            (
+                "controversial",
+                lambda session: posts.controversial(
+                    limit=limit,
+                    session=session,
+                ),
+            ),
             (
                 "front_page",
                 lambda session: posts.front_page(
                     limit=limit, sort=sort, session=session
                 ),
             ),
+            ("new", lambda session: posts.new(limit=limit, session=session)),
             (
-                "listing",
-                lambda session: posts.listing(
-                    listings_name=args.listing,
+                "popular",
+                lambda session: posts.popular(
                     limit=limit,
-                    sort=sort,
-                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+            (
+                "rising",
+                lambda session: posts.rising(
+                    limit=limit,
                     session=session,
                 ),
             ),
         ],
         "search": [
             (
-                "users",
-                lambda session: search.users(limit=limit, session=session),
+                "posts",
+                lambda session: search.posts(
+                    timeframe=timeframe,
+                    sort=sort,
+                    limit=limit,
+                    session=session,
+                ),
             ),
             (
                 "subreddits",
-                lambda session: search.subreddits(limit=limit, session=session),
+                lambda session: search.subreddits(
+                    timeframe=timeframe, sort=sort, limit=limit, session=session
+                ),
             ),
             (
-                "posts",
-                lambda session: search.posts(
-                    limit=limit,
-                    session=session,
+                "users",
+                lambda session: search.users(
+                    timeframe=timeframe, sort=sort, limit=limit, session=session
                 ),
             ),
         ],
