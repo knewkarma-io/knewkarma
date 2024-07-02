@@ -289,12 +289,12 @@ class Api:
         :rtype: list[dict]
         """
         source_map = {
-            "best": f"{self.base_reddit_endpoint}/r/best.json",
-            "controversial": f"{self.base_reddit_endpoint}/r/controversial.json",
+            "best": f"{self.base_reddit_endpoint}/r/{posts_type}.json",
+            "controversial": f"{self.base_reddit_endpoint}/r/{posts_type}.json",
             "front_page": f"{self.base_reddit_endpoint}/.json",
             "new": f"{self.base_reddit_endpoint}/new.json",
-            "popular": f"{self.base_reddit_endpoint}/r/popular.json",
-            "rising": f"{self.base_reddit_endpoint}/r/rising.json",
+            "popular": f"{self.base_reddit_endpoint}/r/{posts_type}.json",
+            "rising": f"{self.base_reddit_endpoint}/r/{posts_type}.json",
             "subreddit_posts": f"{self.subreddit_data_endpoint}/{posts_source}.json",
             "user_posts": f"{self._user_data_endpoint}/{posts_source}/submitted.json",
             "user_overview": f"{self._user_data_endpoint}/{posts_source}/overview.json",
