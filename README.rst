@@ -1,4 +1,4 @@
 Knew Karma Wiki
 ===============
 
-A complete installation, usage and API intergration documentation for `Knew Karma <https://snapcraft.io/knewkarma>`_
+A complete **installation**, **usage** and **integration** guide for `Knew Karma <https://snapcraft.io/knewkarma>`_
