@@ -47,16 +47,6 @@ complete overview of the features available:
 
 [Refer to the Docs](https://knewkarma.readthedocs.io) for the **Installation**, **Usage** and **integration** guide.
 
-## Star History
-
-<a href="https://star-history.com/#bellingcat/knewkarma&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=bellingcat/knewkarma&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=bellingcat/knewkarma&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=bellingcat/knewkarma&type=Date" />
- </picture>
-</a>
-
 ## Important Note on Data Fetching
 
 Knew Karma is designed to fetch recent data from Reddit. It directly interacts with the Reddit API to access up-to-date
@@ -66,6 +56,16 @@ If you need to access historical Reddit data, I recommend using the [Pushshift A
 which is
 specifically designed for retrieving large volumes of historical data, including posts, comments, and
 other Reddit activity.
+
+## Star History
+
+<a href="https://star-history.com/#bellingcat/knewkarma&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=bellingcat/knewkarma&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=bellingcat/knewkarma&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=bellingcat/knewkarma&type=Date" />
+ </picture>
+</a>
 
 # License
 
