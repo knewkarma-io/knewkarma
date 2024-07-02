@@ -312,10 +312,12 @@ class Api:
 
     async def get_search_results(
         self,
-        query: str,
-        search_type: Literal["users", "subreddits", "posts"],
-        limit: int,
         session: aiohttp.ClientSession,
+        search_type: Literal["users", "subreddits", "posts"],
+        query: str,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Asynchronously searches from a specified results type that match the specified query.
@@ -328,6 +330,10 @@ class Api:
         :type query: str
         :param limit: Maximum number of results to get.
         :type limit: int
+        :param sort: Posts' sort criterion.
+        :type sort: str
+        :param timeframe: Timeframe from which to get posts.
+        :type timeframe: str
         """
         search_mapping: dict = {
             "posts": self.base_reddit_endpoint,
@@ -336,7 +342,7 @@ class Api:
         }
 
         endpoint = search_mapping.get(search_type, "")
-        endpoint += f"/search.json?q={query}&limit={limit}"
+        endpoint += f"/search.json?q={query}&limit={limit}&sort={sort}&t={timeframe}"
 
         search_results: list[dict] = await self._paginate(
             session=session,
