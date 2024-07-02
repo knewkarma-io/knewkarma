@@ -67,7 +67,7 @@ other Reddit activity.
  </picture>
 </a>
 
-# License
+## License
 
 MIT License © [Richard Mwewa](https://rly0nheart.github.io)
 
