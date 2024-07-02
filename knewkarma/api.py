@@ -187,7 +187,7 @@ class Api:
         self,
         session: aiohttp.ClientSession,
         endpoint: str,
-        process_func: callable,
+        data_processor: callable,
         limit: int,
     ) -> list[dict]:
         """
@@ -200,8 +200,8 @@ class Api:
         :type session: aiohttp.ClientSession
         :param endpoint: Endpoint to get paginated data from.
         :type endpoint: str
-        :param process_func: A callable function for processing response data.
-        :type process_func: callable
+        :param data_processor: A callable function for processing response data.
+        :type data_processor: callable
         :param limit: Maximum number of results to return.
         :type limit: int
         :return: A list of dict objects, each containing paginated data.
@@ -229,7 +229,7 @@ class Api:
                 if not items:
                     break
 
-                processed_items = process_func(response_data=items)
+                processed_items = data_processor(response_data=items)
                 items_to_limit = limit - len(all_items)
                 all_items.extend(processed_items[:items_to_limit])
 
@@ -307,7 +307,7 @@ class Api:
         posts: list[dict] = await self._paginate(
             session=session,
             endpoint=endpoint,
-            process_func=self._process_response,
+            data_processor=self._process_response,
             limit=limit,
         )
 
@@ -350,7 +350,7 @@ class Api:
         search_results: list[dict] = await self._paginate(
             session=session,
             endpoint=endpoint,
-            process_func=self._process_response,
+            data_processor=self._process_response,
             limit=limit,
         )
 
@@ -388,7 +388,7 @@ class Api:
         subreddits: list[dict] = await self._paginate(
             session=session,
             endpoint=endpoint,
-            process_func=self._process_response,
+            data_processor=self._process_response,
             limit=limit,
         )
 
@@ -424,7 +424,7 @@ class Api:
         users: list[dict] = await self._paginate(
             session=session,
             endpoint=endpoint,
-            process_func=self._process_response,
+            data_processor=self._process_response,
             limit=limit,
         )
 
