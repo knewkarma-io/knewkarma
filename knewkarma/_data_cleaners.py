@@ -1,7 +1,6 @@
 from typing import Union
 
-from ._utilities import timestamp_to_readable
-from .api import TIME_FORMAT
+from ._utilities import timestamp_to_readable, TIME_FORMAT
 
 
 def clean_users(
