@@ -312,10 +312,10 @@ class Api:
 
     async def get_search_results(
         self,
-        session: aiohttp.ClientSession,
-        search_type: Literal["users", "subreddits", "posts"],
         query: str,
+        search_type: Literal["users", "subreddits", "posts"],
         limit: int,
+        session: aiohttp.ClientSession,
     ) -> list[dict]:
         """
         Asynchronously searches from a specified results type that match the specified query.
@@ -328,10 +328,6 @@ class Api:
         :type query: str
         :param limit: Maximum number of results to get.
         :type limit: int
-        :param sort: Posts' sort criterion.
-        :type sort: str
-        :param timeframe: Timeframe from which to get posts.
-        :type timeframe: str
         """
         search_mapping: dict = {
             "posts": self.base_reddit_endpoint,
