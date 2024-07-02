@@ -316,8 +316,6 @@ class Api:
         search_type: Literal["users", "subreddits", "posts"],
         query: str,
         limit: int,
-        sort: SORT_CRITERION = "all",
-        timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
         Asynchronously searches from a specified results type that match the specified query.
@@ -342,7 +340,7 @@ class Api:
         }
 
         endpoint = search_mapping.get(search_type, "")
-        endpoint += f"/search.json?q={query}&limit={limit}&sort={sort}&t={timeframe}"
+        endpoint += f"/search.json?q={query}&limit={limit}"
 
         search_results: list[dict] = await self._paginate(
             session=session,
