@@ -1,6 +1,3 @@
-from datetime import date
-
-
 class Help:
     """
     Container for documentation-related data for Knew Karma.
@@ -15,7 +12,7 @@ class Help:
     """
 
     author: str = "[Richard Mwewa](https://rly0nheart.github.io)"
-    copyright: str = f"© Copyright {date.today().year} {author}. All rights reserved."
+    copyright: str = f"© MIT License {author}. All rights reserved."
 
     summary: str = f"**Knew Karma**: *A Reddit Data Analysis Toolkit* — by {author}"
     description: str = """
