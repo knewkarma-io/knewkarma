@@ -7,7 +7,7 @@ class Help:
 
     Attributes:
           author (str): A markdown-formatted string of author name and url.
-          copyright (str): Copyright notice for the current year, including the author's details.
+          copyright (str): Copyright notice for license and the author's details.
           summary (str): A brief description of Knew Karma as a tool for Reddit data analysis.
           description (str): A full description of Knew Karma as a CLI, Library,
                 and GUI program for Reddit data analysis.
