@@ -10,7 +10,8 @@ from ._data_cleaners import (
     clean_posts,
     clean_users,
 )
-from .api import Api, TIMEFRAME, SORT_CRITERION, TIME_FORMAT
+from ._utilities import TIME_FORMAT
+from .api import Api, TIMEFRAME, SORT_CRITERION
 
 api = Api()
 

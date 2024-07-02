@@ -16,10 +16,7 @@ SORT_CRITERION = Literal[
     "hot",
     "rising",
 ]
-
-
 TIMEFRAME = Literal["hour", "day", "week", "month", "year", "all"]
-TIME_FORMAT = Literal["concise", "locale"]
 
 
 class Api:

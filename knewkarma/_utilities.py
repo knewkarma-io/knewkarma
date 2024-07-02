@@ -364,3 +364,5 @@ def export_dataframe(
 
 
 console = Console(color_system="auto", log_time=False)
+
+TIME_FORMAT = Literal["concise", "locale"]
