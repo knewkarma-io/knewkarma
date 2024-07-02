@@ -12,8 +12,8 @@ class Version:
         release (str): A string representing the release version, combining only the major and minor numbers.
     """
 
-    major: str = "4"
-    minor: str = "2"
-    patch: str = "4"
+    major: str = "5"
+    minor: str = "0"
+    patch: str = "0"
     full: str = f"{major}.{minor}.{patch}"
     release: str = f"{major}.{minor}"

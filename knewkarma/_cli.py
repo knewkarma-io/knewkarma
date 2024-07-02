@@ -9,7 +9,7 @@ from rich.markdown import Markdown
 from rich.tree import Tree
 from rich_argparse import RichHelpFormatter
 
-from ._core import Post, Posts, Subreddit, Subreddits, User, Search
+from ._core import Post, Posts, Subreddit, Subreddits, User, Search, Users
 from ._utilities import (
     console,
     create_dataframe,
@@ -19,12 +19,11 @@ from ._utilities import (
     print_banner,
     show_exported_files,
 )
-from .api import Api, TIMEFRAME, SORT_CRITERION, LISTING
+from .api import TIMEFRAME, SORT_CRITERION, Api
 from .help import Help
-from .version import Version
 
 
-def create_parser() -> argparse.ArgumentParser:
+def args_parser() -> argparse.ArgumentParser:
     """
     Creates and configures an argument parser for the command line arguments.
 
@@ -81,7 +80,7 @@ def create_parser() -> argparse.ArgumentParser:
     main_parser.add_argument(
         "-v",
         "--version",
-        version=Markdown(f"Knew Karma {Version.release} {Help.copyright}"),
+        version=Markdown(f"Knew Karma {Help.copyright}"),
         action="version",
     )
 
@@ -113,23 +112,40 @@ def create_parser() -> argparse.ArgumentParser:
         formatter_class=RichHelpFormatter,
     )
     posts_parser.add_argument(
+        "-b",
+        "--best",
+        help="get posts from the [italic]best[/] listing",
+        action="store_true",
+    )
+    posts_parser.add_argument(
+        "-c",
+        "--controversial",
+        help="get posts from the [italic]controversial[/] listing",
+        action="store_true",
+    )
+    posts_parser.add_argument(
+        "-f",
+        "--front-page",
+        help="get posts from the reddit [italic]front-page[/]",
+        action="store_true",
+    )
+    posts_parser.add_argument(
         "-n",
         "--new",
         help="get new posts",
         action="store_true",
     )
     posts_parser.add_argument(
-        "-f",
-        "--front-page",
-        help="get posts from the reddit front-page",
+        "-p",
+        "--popular",
+        help="get posts from the [italic]popular[/] listing",
         action="store_true",
     )
     posts_parser.add_argument(
-        "-l",
-        "--listing",
-        default="all",
-        help="get posts from a specified listing",
-        choices=list(get_args(LISTING)),
+        "-r",
+        "--rising",
+        help="get posts from the [italic]rising[/] listing",
+        action="store_true",
     )
 
     search_parser = subparsers.add_parser(
@@ -144,13 +160,13 @@ def create_parser() -> argparse.ArgumentParser:
     )
     search_parser.add_argument("query", help="search query")
     search_parser.add_argument(
-        "-u", "--users", help="search users", action="store_true"
-    )
-    search_parser.add_argument(
         "-p", "--posts", help="search posts", action="store_true"
     )
     search_parser.add_argument(
         "-s", "--subreddits", help="search subreddits", action="store_true"
+    )
+    search_parser.add_argument(
+        "-u", "--users", help="search users", action="store_true"
     )
 
     subreddit_parser = subparsers.add_parser(
@@ -174,17 +190,18 @@ def create_parser() -> argparse.ArgumentParser:
         action="store_true",
     )
     subreddit_parser.add_argument(
-        "-s",
-        "--search",
-        help="get a subreddit's posts that contain the specified keyword",
-        type=str,
-    )
-    subreddit_parser.add_argument(
         "-pp",
         "--posts",
         help="get a subreddit's posts",
         action="store_true",
     )
+    subreddit_parser.add_argument(
+        "-s",
+        "--search",
+        help="get a subreddit's posts that contain the specified keyword",
+        type=str,
+    )
+
     subreddit_parser.add_argument(
         "-wp",
         "--wiki-page",
@@ -246,18 +263,18 @@ def create_parser() -> argparse.ArgumentParser:
     )
     user_parser.add_argument("username", help="username")
     user_parser.add_argument(
-        "-p",
-        "--profile",
-        help="get a user's profile",
-        action="store_true",
-    )
-    user_parser.add_argument(
         "-c",
         "--comments",
         help="get a user's comments",
         action="store_true",
     )
-
+    user_parser.add_argument(
+        "-mc",
+        "--moderated-subreddits",
+        dest="moderated_subreddits",
+        help="get subreddits moderated by the user",
+        action="store_true",
+    )
     user_parser.add_argument(
         "-o",
         "--overview",
@@ -269,6 +286,12 @@ def create_parser() -> argparse.ArgumentParser:
         "--posts",
         action="store_true",
         help="get a user's posts",
+    )
+    user_parser.add_argument(
+        "-p",
+        "--profile",
+        help="get a user's profile",
+        action="store_true",
     )
     user_parser.add_argument(
         "-sp",
@@ -284,13 +307,7 @@ def create_parser() -> argparse.ArgumentParser:
         help="get a user's comments that contain the specified keyword",
         type=str,
     )
-    user_parser.add_argument(
-        "-mc",
-        "--moderated-subreddits",
-        dest="moderated_subreddits",
-        help="get subreddits moderated by the user",
-        action="store_true",
-    )
+
     user_parser.add_argument(
         "-tc",
         "--top-subreddits",
@@ -300,85 +317,115 @@ def create_parser() -> argparse.ArgumentParser:
         help="get a user's top n subreddits based on subreddit frequency in n posts",
     )
 
+    users_parser = subparsers.add_parser(
+        "users",
+        help="users module ([bold][green]bulk[/][/])",
+        description=Markdown(
+            "**Users**: *Pull users from various sources.*",
+            style="argparse.text",
+        ),
+        epilog=Markdown(Help.examples["users"]),
+        formatter_class=RichHelpFormatter,
+    )
+    users_parser.add_argument(
+        "-a",
+        "--all",
+        help="get all users",
+        action="store_true",
+    )
+    users_parser.add_argument(
+        "-n",
+        "--new",
+        help="get new users",
+        action="store_true",
+    )
+    users_parser.add_argument(
+        "-p",
+        "--popular",
+        help="get popular users",
+        action="store_true",
+    )
+
     return main_parser
 
 
-async def call_functions(args: argparse.Namespace, function_mapping: dict):
+async def function_caller(args: argparse.Namespace, function_map: dict):
     """
     Calls command-line arguments' functions based on user-input.
 
     :param args: Argparse namespace object  containing parsed command-line arguments.
     :type args: argparse.Namespace
-    :param function_mapping: Mapping of command-line commands to their respective functions
-    :type function_mapping: dict
+    :param function_map: Mapping of command-line commands to their respective functions
+    :type function_map: dict
     """
 
     async with aiohttp.ClientSession() as session:
-        if args.updates:
-            await Api().get_updates(session=session)
-        if args.module:
 
-            mode_action = function_mapping.get(args.module)
-            directory: str = ""
-            for action, function in mode_action:
-                arg_is_present: bool = False
-                if getattr(args, action, False):
-                    arg_is_present = True
+        if args.updates:
+            await Api().update_checker(session=session)
+            return
+
+        mode_action = function_map.get(args.module)
+        directory: str = ""
+        for action, function in mode_action:
+            arg_is_present: bool = False
+            if getattr(args, action, False):
+                arg_is_present = True
+
+                if args.export:
+                    output_dir: str = os.path.expanduser(
+                        os.path.join("~", "knewkarma-output")
+                    )
+                    # Create path to main directory in which target data files will be exported
+                    directory = os.path.join(output_dir, args.module, action)
+
+                    # Create file directories for supported data file types
+                    pathfinder(
+                        directories=[
+                            os.path.join(directory, "csv"),
+                            os.path.join(directory, "html"),
+                            os.path.join(directory, "json"),
+                            os.path.join(directory, "xml"),
+                        ]
+                    )
+
+                function_data = await function(session=session)
+                if function_data:
+                    dataframe = create_dataframe(data=function_data)
+
+                    # Print the DataFrame, excluding the 'raw_data' column if it exists
+                    console.log(dataframe)
 
                     if args.export:
-                        output_dir: str = os.path.expanduser(
-                            os.path.join("~", "knewkarma-output")
-                        )
-                        # Create path to main directory in which target data files will be exported
-                        directory = os.path.join(output_dir, args.module, action)
-
-                        # Create file directories for supported data file types
-                        pathfinder(
-                            directories=[
-                                os.path.join(directory, "csv"),
-                                os.path.join(directory, "html"),
-                                os.path.join(directory, "json"),
-                                os.path.join(directory, "xml"),
-                            ]
+                        export_dataframe(
+                            dataframe=dataframe,
+                            filename=filename_timestamp(),
+                            directory=directory,
+                            formats=args.export.split(","),
                         )
 
-                    function_data = await function(session=session)
-                    if function_data:
-                        dataframe = create_dataframe(data=function_data)
+                        # Show exported files
+                        tree = Tree(
+                            f":open_file_folder: [bold]{directory}[/]",
+                            guide_style="bold bright_blue",
+                        )
+                        show_exported_files(tree=tree, directory=directory)
+                        console.log(tree)
 
-                        # Print the DataFrame, excluding the 'raw_data' column if it exists
-                        console.log(dataframe)
+                break
 
-                        if args.export:
-                            export_dataframe(
-                                dataframe=dataframe,
-                                filename=filename_timestamp(),
-                                directory=directory,
-                                formats=args.export.split(","),
-                            )
-
-                            # Show exported files
-                            tree = Tree(
-                                f":open_file_folder: [bold]{directory}[/]",
-                                guide_style="bold bright_blue",
-                            )
-                            show_exported_files(tree=tree, directory=directory)
-                            console.log(tree)
-
-                    break
-
-            if not arg_is_present:
-                console.log(
-                    f"knewkarma [underline]{args.module}[/]: missing one or more expected argument(s)"
-                )
+        if not arg_is_present:
+            console.log(
+                f"knewkarma [underline]{args.module}[/]: missing one or more expected argument(s)"
+            )
 
 
-def start_cli():
+def start():
     """
     Main entrypoint for the Knew Karma command-line interface.
     """
-    parser = create_parser()
-    args: argparse = parser.parse_args()
+    parser = args_parser()
+    args = parser.parse_args()
 
     start_time: datetime = datetime.now()
 
@@ -393,7 +440,8 @@ def start_cli():
         username=args.username if hasattr(args, "username") else None,
         time_format=time_format,
     )
-    search = Search(time_format=time_format)
+    users = Users(time_format=time_format)
+    search = Search(query=search_query, time_format=time_format)
     subreddit = Subreddit(
         subreddit=args.subreddit if hasattr(args, "subreddit") else None,
         time_format=time_format,
@@ -406,7 +454,7 @@ def start_cli():
     )
     posts = Posts(time_format=time_format)
 
-    function_mapping: dict = {
+    function_map: dict = {
         "user": [
             ("profile", lambda session: user.profile(session=session)),
             (
@@ -457,6 +505,14 @@ def start_cli():
                     timeframe=timeframe,
                     session=session,
                 ),
+            ),
+        ],
+        "users": [
+            ("all", lambda session: users.all(limit=limit, session=session)),
+            ("new", lambda session: users.new(limit=limit, session=session)),
+            (
+                "popular",
+                lambda session: users.popular(limit=limit, session=session),
             ),
         ],
         "subreddit": [
@@ -510,55 +566,72 @@ def start_cli():
             ),
         ],
         "posts": [
-            ("new", lambda session: posts.new(limit=limit, sort=sort, session=session)),
             (
-                "front_page",
-                lambda session: posts.front_page(
-                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                "best",
+                lambda session: posts.best(
+                    limit=limit,
+                    session=session,
                 ),
             ),
             (
-                "listing",
-                lambda session: posts.listing(
-                    listings_name=args.listing,
+                "controversial",
+                lambda session: posts.controversial(
                     limit=limit,
-                    sort=sort,
-                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+            (
+                "front_page",
+                lambda session: posts.front_page(
+                    limit=limit, sort=sort, session=session
+                ),
+            ),
+            ("new", lambda session: posts.new(limit=limit, session=session)),
+            (
+                "popular",
+                lambda session: posts.popular(
+                    limit=limit,
+                    session=session,
+                ),
+            ),
+            (
+                "rising",
+                lambda session: posts.rising(
+                    limit=limit,
                     session=session,
                 ),
             ),
         ],
         "search": [
             (
-                "users",
-                lambda session: search.users(
-                    query=search_query, limit=limit, session=session
+                "posts",
+                lambda session: search.posts(
+                    timeframe=timeframe,
+                    sort=sort,
+                    limit=limit,
+                    session=session,
                 ),
             ),
             (
                 "subreddits",
                 lambda session: search.subreddits(
-                    query=search_query, limit=limit, session=session
+                    timeframe=timeframe, sort=sort, limit=limit, session=session
                 ),
             ),
             (
-                "posts",
-                lambda session: search.posts(
-                    query=search_query,
-                    limit=limit,
-                    sort=sort,
-                    timeframe=timeframe,
-                    session=session,
+                "users",
+                lambda session: search.users(
+                    timeframe=timeframe, sort=sort, limit=limit, session=session
                 ),
             ),
         ],
     }
 
-    if args:
+    if args.module or args.updates:
         print_banner()
         try:
             start_time: datetime = datetime.now()
-            asyncio.run(call_functions(args=args, function_mapping=function_mapping))
+            asyncio.run(function_caller(args=args, function_map=function_map))
         except KeyboardInterrupt:
             console.log("[yellow]✘[/] User interruption detected ([yellow]Ctrl+C[/])")
         finally:

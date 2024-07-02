@@ -3,11 +3,11 @@ icon: snap/gui/icon.png
 title: Knew Karma
 summary: A Reddit Data Analysis Toolkit
 description: |
-  **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
-  functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** snap package, 
-  an **Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical User Interface (GUI)** for Windows machines, 
-  making it adaptable for various user preferences. Refer to the wiki (https://knewkarma.readthedocs.io) for the usage guide.
-version: 4.2.4
+  **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit Data Analysis Toolkit** designed to provide an extensive range of
+  functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** (*Snap/PyPI
+  Package*), and an
+  **Application Programming Interface (API)** (*PyPI Package*) to enable an easy integration in other Python Projects. Refer to the documentation (https://knewkarma.readthedocs.io) for the **usage** and **integration** guide.
+version: 5.0.0
 license: MIT
 base: core22
 confinement: strict

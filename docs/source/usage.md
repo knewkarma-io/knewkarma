@@ -1,6 +1,4 @@
-# Usage
-
-## CLI (and Docker Container) Usage
+# CLI Usage
 
 After installation, the *cli* instance can be called with the `knewkarma` command (or `docker run -it [container-name]`
 for Docker Containers)
@@ -47,12 +45,10 @@ Options:
   -u, --updates         check for updates on run
   -v, --version         show program's version number and exit
 
-Knew Karma (/nuː ‘kɑːrmə/) is a Reddit Data Analysis Toolkit designed to
-provide an extensive range of functionalities for exploring and analysing
-Reddit data. It includes a Command-Line Interface (CLI), an Application
-Programming Interface (API) to enable an easy integration in other Python
-Projects and a Graphical User Interface (GUI) for Windows machines, making it
-adaptable for various user preferences.
+Knew Karma (/nuː ‘kɑːrmə/) is a Reddit Data Analysis Toolkit designed to provide an extensive range of
+functionalities for exploring and analysing Reddit data. It includes a Command-Line Interface (CLI) (Snap/PyPI
+Package), and an
+Application Programming Interface (API) (PyPI Package) to enable an easy integration in other Python Projects.
 ```
 
 You can further view individual operation mode usages by calling `knewkarma` with an operation mode name and

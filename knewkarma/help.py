@@ -1,13 +1,13 @@
-from datetime import date
+from knewkarma.version import Version
 
 
 class Help:
     """
-    Container for documentation-related data for Knew Karma.
+    Container for help-related data for Knew Karma.
 
     Attributes:
           author (str): A markdown-formatted string of author name and url.
-          copyright (str): Copyright notice for the current year, including the author's details.
+          copyright (str): Copyright notice for license and the author's details.
           summary (str): A brief description of Knew Karma as a tool for Reddit data analysis.
           description (str): A full description of Knew Karma as a CLI, Library,
                 and GUI program for Reddit data analysis.
@@ -15,17 +15,16 @@ class Help:
     """
 
     author: str = "[Richard Mwewa](https://rly0nheart.github.io)"
-    copyright: str = (
-        f"© Copyright 2023-{date.today().year} {author}. All rights reserved."
-    )
+    copyright: str = f"© MIT License {author}. All rights reserved."
 
-    summary: str = f"**Knew Karma**: *A Reddit Data Analysis Toolkit* — by {author}"
+    summary: str = (
+        f"**Knew Karma** {Version.release}: *A Reddit Data Analysis Toolkit* — by {author}"
+    )
     description: str = """
 **Knew Karma** (/nuː ‘kɑːrmə/) is a **Reddit** Data Analysis Toolkit designed to provide an extensive range of
-functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, an
-**Application Programming Interface (API)** to enable an easy integration in other Python Projects and a **Graphical
-User
-Interface (GUI)** for Windows machines, making it adaptable for various user preferences.
+functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** (*Snap/PyPI
+Package*), and an
+**Application Programming Interface (API)** (*PyPI Package*) to enable an easy integration in other Python Projects.
 """
 
     examples: dict = {
@@ -72,6 +71,25 @@ knewkarma user TheRealKSi --moderated-subreddits
 ## Get user's top n subreddits based on subreddit frequency in n posts
 ```
 knewkarma --limit 500 user TheRealKSi --top-subreddits 10
+```
+""",
+        "users": """
+The **Users** module is used to pull users from various sources such as new, all or popular.
+
+# Examples
+## Get all users
+```
+knewkarma users --all
+```
+
+## Get new users
+```
+knewkarma users --new
+```
+
+## Get popular users
+```
+knewkarma users --popular
 ```
 """,
         "subreddit": """
@@ -147,9 +165,14 @@ knewkarma post 12csg48 OSINT --comments
 The **Posts** is used to pull posts from sources like the front page, a listing, or new posts.
 
 # Examples
-## Get new posts
+## Get posts from *best* listing
 ```
-knewkarma posts --new
+knewkarma posts --best
+```
+
+## Get posts from *controversial* listing
+```
+knewkarma posts --controversial
 ```
 
 ## Get posts from Reddit Front-Page
@@ -157,18 +180,33 @@ knewkarma posts --new
 knewkarma posts --front-page
 ```
 
-## Get posts from specified listing
+## Get new posts
 ```
-knewkarma posts --listing best
+knewkarma posts --new
+```
+
+## Get posts from *popular* listing
+```
+knewkarma posts --popular
+```
+
+## Get posts from *rising* listing
+```
+knewkarma posts --rising
 ```
     """,
         "search": """
 The **Search** module is used for search/discovery of targets in users, subreddits, and posts.
 
 # Examples
-## Search users
+## Search comments
 ```
-knewkarma search john --users
+knewkarma search "this is automated" --comments
+```
+
+## Search posts
+```
+knewkarma search coronavirus --posts
 ```
 
 ## Search subreddits
@@ -176,9 +214,9 @@ knewkarma search john --users
 knewkarma search ask --subreddits
 ```
 
-## Search posts
+## Search users
 ```
-knewkarma search covid-19 --posts
+knewkarma search john --users
 ```
     """,
     }
