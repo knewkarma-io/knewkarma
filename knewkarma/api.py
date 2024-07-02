@@ -17,7 +17,7 @@ SORT_CRITERION = Literal[
     "rising",
 ]
 
-LISTING = Literal["best", "controversial", "popular", "rising"]
+
 TIMEFRAME = Literal["hour", "day", "week", "month", "year", "all"]
 TIME_FORMAT = Literal["concise", "locale"]
 
@@ -222,6 +222,8 @@ class Api:
                 response = await self.get_data(
                     session=session, endpoint=paginated_endpoint
                 )
+
+                # TODO: find a cleaner way to do this
                 items = response.get("data", {}).get("children", [])
 
                 if not items:
@@ -252,9 +254,12 @@ class Api:
         session: aiohttp.ClientSession,
         limit: int,
         posts_type: Literal[
-            "new_posts",
-            "front_page_posts",
-            "listing_posts",
+            "best",
+            "controversial",
+            "front_page",
+            "new",
+            "popular",
+            "rising",
             "subreddit_posts",
             "user_posts",
             "user_overview",
@@ -284,9 +289,12 @@ class Api:
         :rtype: list[dict]
         """
         source_map = {
-            "new_posts": f"{self.base_reddit_endpoint}/new.json",
-            "front_page_posts": f"{self.base_reddit_endpoint}/.json",
-            "listing_posts": f"{self.subreddit_data_endpoint}/{posts_source}.json?",
+            "best": f"{self.base_reddit_endpoint}/r/best.json",
+            "controversial": f"{self.base_reddit_endpoint}/r/controversial.json",
+            "front_page": f"{self.base_reddit_endpoint}/.json",
+            "new": f"{self.base_reddit_endpoint}/new.json",
+            "popular": f"{self.base_reddit_endpoint}/r/popular.json",
+            "rising": f"{self.base_reddit_endpoint}/r/rising.json",
             "subreddit_posts": f"{self.subreddit_data_endpoint}/{posts_source}.json",
             "user_posts": f"{self._user_data_endpoint}/{posts_source}/submitted.json",
             "user_overview": f"{self._user_data_endpoint}/{posts_source}/overview.json",
@@ -331,13 +339,13 @@ class Api:
         :type timeframe: str
         """
         search_mapping: dict = {
-            "users": f"{self._users_data_endpoint}/search.json",
-            "subreddits": f"{self._subreddits_data_endpoint}/search.json",
-            "posts": f"{self.base_reddit_endpoint}/search.json",
+            "posts": self.base_reddit_endpoint,
+            "subreddits": self._subreddits_data_endpoint,
+            "users": self._users_data_endpoint,
         }
 
         endpoint = search_mapping.get(search_type, "")
-        endpoint += f"?q={query}&limit={limit}&sort={sort}&t={timeframe}"
+        endpoint += f"/search.json?q={query}&limit={limit}&sort={sort}&t={timeframe}"
 
         search_results: list[dict] = await self._paginate(
             session=session,
