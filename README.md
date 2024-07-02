@@ -45,7 +45,7 @@ complete overview of the features available:
 
 # Documentation
 
-[Refer to the Docs](https://knewkarma.readthedocs.io) for the **Installation**, **Usage** and **integration** guide.
+[Refer to the Docs](https://knewkarma.readthedocs.io) for the **Installation**, **Usage** and **Integration** guide.
 
 ## Important Note on Data Fetching
 
