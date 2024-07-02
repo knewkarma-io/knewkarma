@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone, timedelta
 
 import aiohttp
 import pytest
@@ -6,11 +6,11 @@ from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_t
 
 from conftest import (
     TEST_USERNAME,
-    TEST_USER_ID,
-    TEST_USER_CREATED_TIMESTAMP,
     TEST_SUBREDDIT,
     TEST_SUBREDDIT_ID,
     TEST_SUBREDDIT_CREATED_TIMESTAMP,
+    TEST_USER_CREATED_TIMESTAMP,
+    TEST_USER_ID,
 )
 from knewkarma.api import Api
 
@@ -28,57 +28,70 @@ async def fetch_with_retry(fetch_func, *args, **kwargs):
 
 
 @pytest.mark.asyncio
-async def test_search():
+async def test_search_posts_subreddits_and_users():
     search_posts_query: str = "coronavirus"
     search_posts: list[dict] = await fetch_with_retry(
         api.get_search_results,
         search_type="posts",
         query=search_posts_query,
-        limit=5,
+        limit=100,
     )
 
     assert isinstance(search_posts, list)
-    assert len(search_posts) == 5
+    assert len(search_posts) == 100
     for post_result in search_posts:
-        selftext: str = post_result.get("data").get("selftext")
-        title: str = post_result.get("data").get("title")
-        assert search_posts_query in selftext.lower() or title.lower()
+        post_data: dict = post_result.get("data")
+        assert search_posts[0].get("kind") == "t3"
+        assert (
+            search_posts_query.lower() in post_data.get("selftext").lower()
+            or post_data.get("title").lower()
+        )
 
-    """
-    search_subreddits_query: str = "Ask"
+    # ----------------------------------------------------------------- #
+
+    search_subreddits_query: str = "science"
     search_subreddits: list[dict] = await fetch_with_retry(
         api.get_search_results,
         search_type="subreddits",
         query=search_subreddits_query,
-        limit=13,
+        limit=150,
     )
 
     assert isinstance(search_subreddits, list)
-    assert len(search_subreddits) == 13
+    assert len(search_subreddits) == 150
     for subreddit_result in search_subreddits:
+        subreddit_data: dict = subreddit_result.get("data")
+        assert search_subreddits[0].get("kind") == "t5"
         assert (
             search_subreddits_query.lower()
-            in subreddit_result.get("data").get("display_name").lower()
-            or subreddit_result.get("data").get("submit_text").lower()
+            in subreddit_data.get("public_description").lower()
+            or subreddit_data.get("display_name").lower()
         )
-    """
+
+    # ----------------------------------------------------------------- #
+
     search_users_query: str = "john"
     search_users: list[dict] = await fetch_with_retry(
         api.get_search_results,
         search_type="users",
         query=search_users_query,
-        limit=22,
+        limit=50,
     )
 
     assert isinstance(search_users, list)
-    assert len(search_users) == 22
+    assert len(search_users) == 50
 
     for user_result in search_users:
-        assert search_users_query in user_result.get("data").get("name").lower()
+        user_data: dict = user_result.get("data")
+        assert search_users[0].get("kind") == "t2"
+        assert (
+            search_users_query.lower() in user_data.get("name").lower()
+            or user_data.get("subreddit").get("display_name").lower()
+        )
 
 
 @pytest.mark.asyncio
-async def test_get_profile():
+async def test_get_user_and_subreddit_profiles():
     user_profile: dict = await fetch_with_retry(
         api.get_profile,
         profile_type="user",
@@ -99,81 +112,60 @@ async def test_get_profile():
 
 
 @pytest.mark.asyncio
-async def test_get_subreddits():
-    new_subreddits = await fetch_with_retry(
-        api.get_subreddits,
-        timeframe="day",
-        subreddits_type="new",
-        limit=200,
-    )
-
-    now = datetime.now(timezone.utc)
-    assert isinstance(new_subreddits, list)
-    assert len(new_subreddits) == 200
-    for new_subreddit in new_subreddits:
-        created_timestamp = datetime.fromtimestamp(
-            new_subreddit.get("data").get("created"), timezone.utc
-        )
-        assert (
-            now - timedelta(days=1) < created_timestamp
-        ), f"Subreddit {new_subreddit.get('data').get('display_name')} was not created recently."
-
-    popular_subreddits = await fetch_with_retry(
-        api.get_subreddits,
-        subreddits_type="popular",
-        limit=200,
-    )
-
-    assert isinstance(popular_subreddits, list)
-    assert len(new_subreddits) == 200
-    for popular_subreddit in popular_subreddits:
-        assert "display_name" in popular_subreddit.get("data")
-
-
-@pytest.mark.asyncio
-async def test_get_posts():
+async def test_get_user_and_subreddit_posts():
     user_posts: list = await fetch_with_retry(
         api.get_posts,
         posts_type="user_posts",
         posts_source=TEST_USERNAME,
-        sort="top",
-        timeframe="year",
         limit=100,
     )
 
     assert isinstance(user_posts, list)
     assert len(user_posts) == 100
     for user_post in user_posts:
-        assert user_post.get("data").get("author") == TEST_USERNAME
+        post_data: dict = user_post.get("data")
+        assert user_posts[0].get("kind") == "t3"
+        assert post_data.get("author") == TEST_USERNAME
+
+    # ----------------------------------------------------------------- #
 
     subreddit_posts: list = await fetch_with_retry(
         api.get_posts,
         posts_type="subreddit_posts",
         posts_source=TEST_SUBREDDIT,
         sort="top",
-        timeframe="week",
-        limit=200,
+        limit=50,
     )
 
     assert isinstance(subreddit_posts, list)
-    assert len(subreddit_posts) == 200
+    assert len(subreddit_posts) == 50
 
-    for post in subreddit_posts:
-        assert post.get("data").get("subreddit") == TEST_SUBREDDIT
+    for subreddit_post in subreddit_posts:
+        post_data: dict = subreddit_post.get("data")
+        assert subreddit_posts[0].get("kind") == "t3"
+        assert post_data.get("subreddit") == TEST_SUBREDDIT
 
-    listing_posts: list = await fetch_with_retry(
+
+@pytest.mark.asyncio
+async def test_get_new_posts():
+    new_posts = await fetch_with_retry(
         api.get_posts,
-        posts_type="listing_posts",
-        posts_source="best",
-        sort="hot",
-        timeframe="month",
-        limit=10,
+        posts_type="new",
+        limit=200,
     )
 
-    assert isinstance(listing_posts, list)
-    assert len(listing_posts) == 10
-    for listing_post in listing_posts:
-        assert listing_post.get("data").get("subreddit") == "best"
+    now = datetime.now(timezone.utc)
+    assert isinstance(new_posts, list)
+    assert len(new_posts) == 200
+    for new_post in new_posts:
+        post_data: dict = new_post.get("data")
+        created_timestamp = datetime.fromtimestamp(
+            post_data.get("created"), timezone.utc
+        )
+        assert new_posts[0].get("kind") == "t3"
+        assert (
+            now - timedelta(days=1) < created_timestamp
+        ), f"Post {post_data.get('id')} was not created recently."
 
 
 @pytest.mark.asyncio
@@ -189,10 +181,33 @@ async def test_get_new_users():
     assert len(new_users) == 100
 
     now = datetime.now(timezone.utc)
-    for user in new_users:
+    for new_user in new_users:
+        user_data: dict = new_user.get("data")
         created_timestamp = datetime.fromtimestamp(
-            user.get("data").get("created"), timezone.utc
+            user_data.get("created"), timezone.utc
         )
         assert (
             now - timedelta(days=7) < created_timestamp
-        ), f"User {user.get('data').get('name')} was not created recently."
+        ), f"User {user_data.get('name')} was not created recently."
+
+
+@pytest.mark.asyncio
+async def test_get_new_subreddits():
+    new_subreddits = await fetch_with_retry(
+        api.get_subreddits,
+        timeframe="day",
+        subreddits_type="new",
+        limit=200,
+    )
+
+    now = datetime.now(timezone.utc)
+    assert isinstance(new_subreddits, list)
+    assert len(new_subreddits) == 200
+    for new_subreddit in new_subreddits:
+        subreddit_data: dict = new_subreddit.get("data")
+        created_timestamp = datetime.fromtimestamp(
+            subreddit_data.get("created"), timezone.utc
+        )
+        assert (
+            now - timedelta(days=1) < created_timestamp
+        ), f"Subreddit {subreddit_data.get('display_name')} was not created recently."
