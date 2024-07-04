@@ -64,7 +64,7 @@ async def test_search_posts_in_a_subreddit():
     assert len(search_results) == 50
     for search_result in search_results:
         post_data: dict = search_result.get("data")
-        assert post_data.get("subreddit").lower() == posts_subreddit, lower()
+        assert post_data.get("subreddit").lower() == posts_subreddit.lower()
         assert (
             search_query.lower() in post_data.get("title").lower()
             or post_data.get("selftext").lower()
