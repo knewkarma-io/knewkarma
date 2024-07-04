@@ -295,6 +295,9 @@ def create_dataframe(
     # Create a DataFrame from the processed data
     dataframe = pd.DataFrame(data)
 
+    # Drop columns with None values
+    dataframe = dataframe.dropna(axis=1, how="all")
+
     return dataframe
 
 

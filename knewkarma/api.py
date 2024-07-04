@@ -147,15 +147,13 @@ class Api:
 
     async def get_profile(
         self,
-        profile_source: str,
-        profile_type: Literal["user", "subreddit"],
+        profile_type: Literal["post", "subreddit", "user"],
         session: aiohttp.ClientSession,
+        **kwargs,
     ) -> dict:
         """
         Asynchronously fetches a profile from the specified source.
 
-        :param profile_source: Source to get profile data from.
-        :type profile_source: str
         :param profile_type: The type of profile that is to be fetched.
         :type profile_type: str
         :param session: aiohttp session to use for the request.
@@ -163,12 +161,13 @@ class Api:
         :rtype: dict
         """
         with get_status(
-            status_message=f"Initialising [underline]single data[/] retrieval process..."
+            status_message=f"Initialising [underline]single data[/] retrieval job..."
         ):
             # Use a dictionary for direct mapping
             profile_mapping: dict = {
-                "user": f"{self._user_data_endpoint}/{profile_source}/about.json",
-                "subreddit": f"{self.subreddit_data_endpoint}/{profile_source}/about.json",
+                "post": f"{self.subreddit_data_endpoint}/{kwargs.get("post_subreddit")}/comments/{kwargs.get("post_id")}.json",
+                "user": f"{self._user_data_endpoint}/{kwargs.get("username")}/about.json",
+                "subreddit": f"{self.subreddit_data_endpoint}/{kwargs.get("subreddit")}/about.json",
             }
 
             # Get the endpoint directly from the dictionary
@@ -207,7 +206,7 @@ class Api:
         all_items = []
         last_item_id = None
         with get_status(
-            status_message="Initialising [underline]bulk data[/] retrieval process..."
+            status_message="Initialising [underline]bulk data[/] retrieval job..."
         ) as status:
             while len(all_items) < limit:
                 paginated_endpoint = (
@@ -248,8 +247,8 @@ class Api:
 
     async def get_posts(
         self,
-        session: aiohttp.ClientSession,
         limit: int,
+        session: aiohttp.ClientSession,
         posts_type: Literal[
             "best",
             "controversial",
@@ -258,13 +257,15 @@ class Api:
             "popular",
             "rising",
             "subreddit_posts",
+            "search_subreddit_posts",
             "user_posts",
             "user_overview",
             "user_comments",
+            "post_comments",
         ],
         timeframe: TIMEFRAME = "all",
-        posts_source: str = None,
         sort: SORT_CRITERION = "all",
+        **kwargs,
     ) -> list[dict]:
         """
         Asynchronously gets a specified number of posts, with a specified sorting criterion, from the specified source.
@@ -275,8 +276,6 @@ class Api:
         :type limit: int
         :param posts_type: Type of posts to be fetched.
         :type posts_type: str
-        :param posts_source: Source from where posts will be fetched.
-        :type posts_source: str
         :param sort: Posts' sort criterion.
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
@@ -292,10 +291,14 @@ class Api:
             "new": f"{self.base_reddit_endpoint}/new.json",
             "popular": f"{self.base_reddit_endpoint}/r/{posts_type}.json",
             "rising": f"{self.base_reddit_endpoint}/r/{posts_type}.json",
-            "subreddit_posts": f"{self.subreddit_data_endpoint}/{posts_source}.json",
-            "user_posts": f"{self._user_data_endpoint}/{posts_source}/submitted.json",
-            "user_overview": f"{self._user_data_endpoint}/{posts_source}/overview.json",
-            "user_comments": f"{self._user_data_endpoint}/{posts_source}/comments.json",
+            "subreddit_posts": f"{self.subreddit_data_endpoint}/{kwargs.get("subreddit")}.json",
+            "user_posts": f"{self._user_data_endpoint}/{kwargs.get("username")}/submitted.json",
+            "user_overview": f"{self._user_data_endpoint}/{kwargs.get("username")}/overview.json",
+            "user_comments": f"{self._user_data_endpoint}/{kwargs.get("username")}/comments.json",
+            "post_comments": f"{self.subreddit_data_endpoint}/{kwargs.get("post_subreddit")}"
+            f"/comments/{kwargs.get("post_id")}.json",
+            "search_subreddit_posts": f"{self.subreddit_data_endpoint}/{kwargs["subreddit"]}"
+            f"/search.json?q={kwargs["query"]}&restrict_sr=1",
         }
 
         endpoint = source_map.get(posts_type, "")
