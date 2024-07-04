@@ -49,6 +49,29 @@ async def test_search_posts():
 
 
 @pytest.mark.asyncio
+async def test_search_posts_in_a_subreddit():
+    search_query: str = "Rick and Morty"
+    posts_subreddit: str = "AdultSwim"
+    search_results = await fetch_with_retry(
+        api.get_posts,
+        posts_type="search_subreddit_posts",
+        query=search_query,
+        subreddit=posts_subreddit,
+        limit=50,
+    )
+
+    assert isinstance(search_results, list)
+    assert len(search_results) == 50
+    for search_result in search_results:
+        post_data: dict = search_result.get("data")
+        assert post_data.get("subreddit").lower() == posts_subreddit, lower()
+        assert (
+            search_query.lower() in post_data.get("title").lower()
+            or post_data.get("selftext").lower()
+        )
+
+
+@pytest.mark.asyncio
 async def test_search_subreddits():
     search_subreddits_query: str = "science"
     search_subreddits: list[dict] = await fetch_with_retry(
@@ -93,29 +116,6 @@ async def test_search_users():
 
 
 @pytest.mark.asyncio
-async def test_search_posts_in_a_subreddit():
-    search_query: str = "Rick and Morty"
-    posts_subreddit: str = "AdultSwim"
-    search_results = await fetch_with_retry(
-        api.get_posts,
-        posts_type="search_subreddit_posts",
-        query=search_query,
-        subreddit=posts_subreddit,
-        limit=50,
-    )
-
-    assert isinstance(search_results, list)
-    assert len(search_results) == 50
-    for search_result in search_results:
-        post_data: dict = search_result.get("data")
-        assert post_data.get("subreddit") == posts_subreddit
-        assert (
-            search_query.lower() in post_data.get("title").lower()
-            or post_data.get("selftext").lower()
-        )
-
-
-@pytest.mark.asyncio
 async def test_get_user_and_subreddit_profiles():
     user_profile: dict = await fetch_with_retry(
         api.get_profile,
@@ -137,23 +137,7 @@ async def test_get_user_and_subreddit_profiles():
 
 
 @pytest.mark.asyncio
-async def test_get_user_and_subreddit_posts():
-    user_posts: list = await fetch_with_retry(
-        api.get_posts,
-        posts_type="user_posts",
-        posts_source=TEST_USERNAME,
-        limit=100,
-    )
-
-    assert isinstance(user_posts, list)
-    assert len(user_posts) == 100
-    for user_post in user_posts:
-        post_data: dict = user_post.get("data")
-        assert user_posts[0].get("kind") == "t3"
-        assert post_data.get("author") == TEST_USERNAME
-
-    # ----------------------------------------------------------------- #
-
+async def test_get_subreddit_posts():
     subreddit_posts: list = await fetch_with_retry(
         api.get_posts,
         posts_type="subreddit_posts",
@@ -169,6 +153,23 @@ async def test_get_user_and_subreddit_posts():
         post_data: dict = subreddit_post.get("data")
         assert subreddit_posts[0].get("kind") == "t3"
         assert post_data.get("subreddit") == TEST_SUBREDDIT
+
+
+@pytest.mark.asyncio
+async def test_get_user_posts():
+    user_posts: list = await fetch_with_retry(
+        api.get_posts,
+        posts_type="user_posts",
+        posts_source=TEST_USERNAME,
+        limit=100,
+    )
+
+    assert isinstance(user_posts, list)
+    assert len(user_posts) == 100
+    for user_post in user_posts:
+        post_data: dict = user_post.get("data")
+        assert user_posts[0].get("kind") == "t3"
+        assert post_data.get("author") == TEST_USERNAME
 
 
 @pytest.mark.asyncio
