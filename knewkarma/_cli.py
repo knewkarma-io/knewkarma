@@ -198,7 +198,7 @@ def args_parser() -> argparse.ArgumentParser:
     subreddit_parser.add_argument(
         "-s",
         "--search",
-        help="get a subreddit's posts that contain the specified keyword",
+        help="search posts in a subreddit",
         type=str,
     )
 
@@ -449,113 +449,14 @@ def start():
     subreddits = Subreddits(time_format=time_format)
     post = Post(
         post_id=args.id if hasattr(args, "id") else None,
-        subreddit=args.subreddit if hasattr(args, "subreddit") else None,
+        post_subreddit=args.subreddit if hasattr(args, "subreddit") else None,
         time_format=time_format,
     )
     posts = Posts(time_format=time_format)
 
     function_map: dict = {
-        "user": [
-            ("profile", lambda session: user.profile(session=session)),
-            (
-                "posts",
-                lambda session: user.posts(
-                    limit=limit, sort=sort, timeframe=timeframe, session=session
-                ),
-            ),
-            (
-                "comments",
-                lambda session: user.comments(
-                    limit=limit, sort=sort, timeframe=timeframe, session=session
-                ),
-            ),
-            ("overview", lambda session: user.overview(limit=limit, session=session)),
-            (
-                "moderated_subreddits",
-                lambda session: user.moderated_subreddits(session=session),
-            ),
-            (
-                "search_posts",
-                lambda session: user.search_posts(
-                    keyword=args.search_posts,
-                    limit=limit,
-                    sort=sort,
-                    timeframe=timeframe,
-                    session=session,
-                ),
-            ),
-            (
-                "search_comments",
-                lambda session: user.search_comments(
-                    keyword=args.search_comments,
-                    limit=limit,
-                    sort=sort,
-                    timeframe=timeframe,
-                    session=session,
-                ),
-            ),
-            (
-                "top_subreddits",
-                lambda session: user.top_subreddits(
-                    top_n=(
-                        args.top_subreddits if hasattr(args, "top_subreddits") else None
-                    ),
-                    limit=limit,
-                    sort=sort,
-                    timeframe=timeframe,
-                    session=session,
-                ),
-            ),
-        ],
-        "users": [
-            ("all", lambda session: users.all(limit=limit, session=session)),
-            ("new", lambda session: users.new(limit=limit, session=session)),
-            (
-                "popular",
-                lambda session: users.popular(limit=limit, session=session),
-            ),
-        ],
-        "subreddit": [
-            ("profile", lambda session: subreddit.profile(session=session)),
-            (
-                "posts",
-                lambda session: subreddit.posts(
-                    limit=limit, sort=sort, timeframe=timeframe, session=session
-                ),
-            ),
-            (
-                "search",
-                lambda session: subreddit.search(
-                    keyword=args.search,
-                    limit=limit,
-                    sort=sort,
-                    timeframe=timeframe,
-                    session=session,
-                ),
-            ),
-            ("wiki_pages", lambda session: subreddit.wiki_pages(session=session)),
-            (
-                "wiki_page",
-                lambda session: subreddit.wiki_page(
-                    page=args.wiki_page if hasattr(args, "wiki_page") else None,
-                    session=session,
-                ),
-            ),
-        ],
-        "subreddits": [
-            ("all", lambda session: subreddits.all(limit=limit, session=session)),
-            (
-                "default",
-                lambda session: subreddits.default(limit=limit, session=session),
-            ),
-            ("new", lambda session: subreddits.new(limit=limit, session=session)),
-            (
-                "popular",
-                lambda session: subreddits.popular(limit=limit, session=session),
-            ),
-        ],
         "post": [
-            ("profile", lambda session: post.profile(session=session)),
+            ("data", lambda session: post.data(session=session)),
             (
                 "comments",
                 lambda session: post.comments(
@@ -625,6 +526,105 @@ def start():
                 ),
             ),
         ],
+        "subreddit": [
+            ("profile", lambda session: subreddit.profile(session=session)),
+            (
+                "posts",
+                lambda session: subreddit.posts(
+                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                ),
+            ),
+            (
+                "search",
+                lambda session: subreddit.search(
+                    query=args.search,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+            ("wiki_pages", lambda session: subreddit.wiki_pages(session=session)),
+            (
+                "wiki_page",
+                lambda session: subreddit.wiki_page(
+                    page=args.wiki_page if hasattr(args, "wiki_page") else None,
+                    session=session,
+                ),
+            ),
+        ],
+        "subreddits": [
+            ("all", lambda session: subreddits.all(limit=limit, session=session)),
+            (
+                "default",
+                lambda session: subreddits.default(limit=limit, session=session),
+            ),
+            ("new", lambda session: subreddits.new(limit=limit, session=session)),
+            (
+                "popular",
+                lambda session: subreddits.popular(limit=limit, session=session),
+            ),
+        ],
+        "user": [
+            ("profile", lambda session: user.profile(session=session)),
+            (
+                "posts",
+                lambda session: user.posts(
+                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                ),
+            ),
+            (
+                "comments",
+                lambda session: user.comments(
+                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                ),
+            ),
+            ("overview", lambda session: user.overview(limit=limit, session=session)),
+            (
+                "moderated_subreddits",
+                lambda session: user.moderated_subreddits(session=session),
+            ),
+            (
+                "search_posts",
+                lambda session: user.search_posts(
+                    keyword=args.search_posts,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+            (
+                "search_comments",
+                lambda session: user.search_comments(
+                    keyword=args.search_comments,
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+            (
+                "top_subreddits",
+                lambda session: user.top_subreddits(
+                    top_n=(
+                        args.top_subreddits if hasattr(args, "top_subreddits") else None
+                    ),
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    session=session,
+                ),
+            ),
+        ],
+        "users": [
+            ("all", lambda session: users.all(limit=limit, session=session)),
+            ("new", lambda session: users.new(limit=limit, session=session)),
+            (
+                "popular",
+                lambda session: users.popular(limit=limit, session=session),
+            ),
+        ],
     }
 
     if args.module or args.updates:
@@ -637,7 +637,7 @@ def start():
         finally:
             elapsed_time = datetime.now() - start_time
             console.log(
-                f"[green]✔[/] Done! {elapsed_time.total_seconds():.2f} seconds elapsed."
+                f"[green]✔[/] DONE. {elapsed_time.total_seconds():.2f} seconds elapsed."
             )
     else:
         parser.print_usage()

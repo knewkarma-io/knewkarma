@@ -4,13 +4,12 @@ from datetime import date
 
 # -- Project information
 
-project = "Knew Karma Wiki"
+project = "Knew Karma"
 author = "Richard Mwewa"
 copyright = f"{date.today().year}, {author}"
 
-
-release = "5.0"
-version = "5.0.0"
+release = "5.1"
+version = "5.1.0"
 
 # -- General configuration
 
