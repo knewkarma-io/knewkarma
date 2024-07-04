@@ -28,7 +28,7 @@ async def fetch_with_retry(fetch_func, *args, **kwargs):
 
 
 @pytest.mark.asyncio
-async def test_search_posts_subreddits_and_users():
+async def test_search_posts():
     search_posts_query: str = "coronavirus"
     search_posts: list[dict] = await fetch_with_retry(
         api.get_search_results,
@@ -47,8 +47,9 @@ async def test_search_posts_subreddits_and_users():
             or post_data.get("title").lower()
         )
 
-    # ----------------------------------------------------------------- #
 
+@pytest.mark.asyncio
+async def test_search_subreddits():
     search_subreddits_query: str = "science"
     search_subreddits: list[dict] = await fetch_with_retry(
         api.get_search_results,
@@ -68,8 +69,9 @@ async def test_search_posts_subreddits_and_users():
             or subreddit_data.get("display_name").lower()
         )
 
-    # ----------------------------------------------------------------- #
 
+@pytest.mark.asyncio
+async def test_search_users():
     search_users_query: str = "john"
     search_users: list[dict] = await fetch_with_retry(
         api.get_search_results,
