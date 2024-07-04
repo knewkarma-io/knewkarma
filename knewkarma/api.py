@@ -300,7 +300,7 @@ class Api:
             "post_comments": f"{self.subreddit_data_endpoint}/{kwargs.get("post_subreddit")}"
             f"/comments/{kwargs.get("post_id")}.json",
             "search_subreddit_posts": f"{self.subreddit_data_endpoint}/{kwargs.get("subreddit")}"
-            f"/search.json?q={kwargs["query"]}&restrict_sr=1",
+            f"/search.json?q={kwargs.get("query")}&restrict_sr=1",
         }
 
         endpoint = source_map.get(posts_type, "")
