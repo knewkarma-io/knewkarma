@@ -1,5 +1,4 @@
 from random import randint
-from sys import version as python_version
 from typing import Union, Literal
 
 import aiohttp
@@ -46,6 +45,8 @@ class Api:
         :return: Returns JSON data as a dictionary or list. Returns an empty dict if fetching fails.
         :rtype: Union[dict, list]
         """
+        from sys import version as python_version
+
         try:
             async with session.get(
                 endpoint,
@@ -165,7 +166,8 @@ class Api:
         ):
             # Use a dictionary for direct mapping
             profile_mapping: dict = {
-                "post": f"{self.subreddit_data_endpoint}/{kwargs.get("post_subreddit")}/comments/{kwargs.get("post_id")}.json",
+                "post": f"{self.subreddit_data_endpoint}/{kwargs.get("post_subreddit")}"
+                f"/comments/{kwargs.get("post_id")}.json",
                 "user": f"{self._user_data_endpoint}/{kwargs.get("username")}/about.json",
                 "subreddit": f"{self.subreddit_data_endpoint}/{kwargs.get("subreddit")}/about.json",
             }
