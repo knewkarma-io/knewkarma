@@ -1,20 +1,16 @@
-from datetime import datetime, timezone, timedelta
+from datetime import timezone, datetime, timedelta
 
 import aiohttp
 import pytest
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
-from conftest import (
-    TEST_USERNAME,
-    TEST_SUBREDDIT,
-    TEST_SUBREDDIT_ID,
-    TEST_SUBREDDIT_CREATED_TIMESTAMP,
-    TEST_USER_CREATED_TIMESTAMP,
-    TEST_USER_ID,
-)
 from knewkarma.api import Api
 
 api = Api()
+
+TEST_USERNAME: str = "AutoModerator"
+TEST_SUBREDDIT_1: str = "AskScience"
+TEST_SUBREDDIT_2: str = "AskReddit"
 
 
 @retry(
@@ -123,17 +119,17 @@ async def test_get_user_and_subreddit_profiles():
         profile_source=TEST_USERNAME,
     )
 
-    assert user_profile.get("id") == TEST_USER_ID
-    assert user_profile.get("created") == TEST_USER_CREATED_TIMESTAMP
+    assert user_profile.get("id") == "6l4z3"
+    assert user_profile.get("created") == 1325741068
 
     subreddit_profile: dict = await fetch_with_retry(
         api.get_profile,
         profile_type="subreddit",
-        profile_source=TEST_SUBREDDIT,
+        profile_source=TEST_SUBREDDIT_2,
     )
 
-    assert subreddit_profile.get("id") == TEST_SUBREDDIT_ID
-    assert subreddit_profile.get("created") == TEST_SUBREDDIT_CREATED_TIMESTAMP
+    assert subreddit_profile.get("id") == "2qh1i"
+    assert subreddit_profile.get("created") == 1201233135
 
 
 @pytest.mark.asyncio
@@ -141,8 +137,7 @@ async def test_get_subreddit_posts():
     subreddit_posts: list = await fetch_with_retry(
         api.get_posts,
         posts_type="subreddit_posts",
-        posts_source=TEST_SUBREDDIT,
-        sort="top",
+        subreddit=TEST_SUBREDDIT_1,
         limit=50,
     )
 
@@ -151,16 +146,18 @@ async def test_get_subreddit_posts():
 
     for subreddit_post in subreddit_posts:
         post_data: dict = subreddit_post.get("data")
+        print(post_data)
         assert subreddit_posts[0].get("kind") == "t3"
-        assert post_data.get("subreddit") == TEST_SUBREDDIT
+        assert post_data.get("subreddit").lower() == TEST_SUBREDDIT_1.lower()
 
 
 @pytest.mark.asyncio
 async def test_get_user_posts():
+    username: str = "AutoModerator"
     user_posts: list = await fetch_with_retry(
         api.get_posts,
         posts_type="user_posts",
-        posts_source=TEST_USERNAME,
+        posts_source=username,
         limit=100,
     )
 
@@ -169,7 +166,7 @@ async def test_get_user_posts():
     for user_post in user_posts:
         post_data: dict = user_post.get("data")
         assert user_posts[0].get("kind") == "t3"
-        assert post_data.get("author") == TEST_USERNAME
+        assert post_data.get("author").lower() == username.lower()
 
 
 @pytest.mark.asyncio
