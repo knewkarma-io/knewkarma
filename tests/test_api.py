@@ -91,6 +91,29 @@ async def test_search_posts_subreddits_and_users():
 
 
 @pytest.mark.asyncio
+async def test_search_posts_in_a_subreddit():
+    search_query: str = "Rick and Morty"
+    posts_subreddit: str = "AdultSwim"
+    search_results = await fetch_with_retry(
+        api.get_posts,
+        posts_type="search_subreddit_posts",
+        query=search_query,
+        subreddit=posts_subreddit,
+        limit=50,
+    )
+
+    assert isinstance(search_results, list)
+    assert len(search_results) == 50
+    for search_result in search_results:
+        post_data: dict = search_result.get("data")
+        assert post_data.get("subreddit") == posts_subreddit
+        assert (
+            search_query.lower() in post_data.get("title").lower()
+            or post_data.get("selftext").lower()
+        )
+
+
+@pytest.mark.asyncio
 async def test_get_user_and_subreddit_profiles():
     user_profile: dict = await fetch_with_retry(
         api.get_profile,
