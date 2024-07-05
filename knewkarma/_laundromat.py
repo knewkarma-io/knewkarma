@@ -349,15 +349,15 @@ def clean_subreddit_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict
     :rtype: dict
     """
     if "revision_id" in wiki_page:
-        page_data: dict = wiki_page.get("data")
-        user: dict = page_data.get("revision_by").get("data")
+        print("yeoppppppppp")
+        user: dict = wiki_page.get("revision_by").get("data")
 
         return {
-            "revision_id": page_data.get("revision_id"),
+            "revision_id": wiki_page.get("revision_id"),
             "revision_date": timestamp_to_readable(
-                timestamp=page_data.get("revision_date"), time_format=time_format
+                timestamp=wiki_page.get("revision_date"), time_format=time_format
             ),
-            "content_markdown": page_data.get("content_md"),
+            "content_markdown": wiki_page.get("content_md"),
             "revised_by": {
                 "name": user.get("name"),
                 "id": user.get("id"),
@@ -375,12 +375,12 @@ def clean_subreddit_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict
                 "awardee_karma": user.get("awardee_karma"),
                 "total_karma": user.get("total_karma"),
                 "subreddit": user.get("subreddit"),
-                "created": timestamp_to_readable(
-                    timestamp=user.get("created"), time_format=time_format
-                ),
             },
-            "kind": page_data.get("kind"),
-            "may_revise": page_data.get("may_revise"),
-            "reason": page_data.get("reason"),
-            "content_html": page_data.get("content_html"),
+            "kind": wiki_page.get("kind"),
+            "may_revise": wiki_page.get("may_revise"),
+            "reason": wiki_page.get("reason"),
+            "content_html": wiki_page.get("content_html"),
+            "created": timestamp_to_readable(
+                timestamp=user.get("created"), time_format=time_format
+            ),
         }
