@@ -28,6 +28,133 @@ Package*), and an
 """
 
     examples: dict = {
+        "post": """
+The **Post** module is used to pull an individual post's data including its comments, 
+provided the post's **id** and source **subreddit** are provided.
+
+# Examples
+### Get a post's data
+```
+knewkarma post 12csg48 OSINT --data
+```
+
+### Get a post's comments
+```
+knewkarma post 12csg48 OSINT --comments
+```
+""",
+        "posts": """
+The **Posts** is used to pull posts from sources like the front page, a listing, or new posts.
+
+# Examples
+## Get posts from *best* listing
+```
+knewkarma posts --best
+```
+
+## Get posts from *controversial* listing
+```
+knewkarma posts --controversial
+```
+
+## Get posts from Reddit Front-Page
+```
+knewkarma posts --front-page
+```
+
+## Get new posts
+```
+knewkarma posts --new
+```
+
+## Get posts from *popular* listing
+```
+knewkarma posts --popular
+```
+
+## Get posts from *rising* listing
+```
+knewkarma posts --rising
+```
+""",
+        "search": """
+The **Search** module is used for search/discovery of targets in users, subreddits, and posts.
+
+# Examples
+## Search comments
+```
+knewkarma search "this is automated" --comments
+```
+
+## Search posts
+```
+knewkarma search coronavirus --posts
+```
+
+## Search subreddits
+```
+knewkarma search ask --subreddits
+```
+
+## Search users
+```
+knewkarma search john --users
+```
+""",
+        "subreddit": """
+The **Subreddit** module is used to pull a specified subreddit's data including profile, posts, wiki pages,
+or even searching posts that have the specified keyword.
+
+# Examples
+## Get subreddit profile
+```
+knewkarma subreddit MachineLearning --profile
+```
+
+## Get subreddit posts
+```
+knewkarma subreddit MachineLearning --posts
+```
+
+## Search a subreddit for posts that contain a specified keyword
+```
+knewkarma subreddit MachineLearning --search "artificial intelligence"
+```
+
+## Get subreddit's wiki pages
+```
+knewkarma subreddit MachineLearning --wiki-pages
+```
+
+## Get subreddit's specified wiki page data
+```
+knewkarma subreddit MachineLearning --wiki-page config/description
+```
+""",
+        "subreddits": """
+The **Subreddits** module is used to pull subreddits from various sources such as new, default, or popular.
+
+# Examples
+## Get all subreddits
+```
+knewkarma subreddits --all
+```
+
+## Get default subreddits
+```
+knewkarma subreddits --default
+```
+
+## Get new subreddits
+```
+knewkarma subreddits --new
+```
+
+## Get popular subreddits
+```
+knewkarma subreddits --popular
+```
+""",
         "user": """
 The **User** module is used to pull a specified user's data including profile, comments, posts, 
 searching posts that contain the specified keyword, or even searching comments that contain the specified keyword.
@@ -92,131 +219,4 @@ knewkarma users --new
 knewkarma users --popular
 ```
 """,
-        "subreddit": """
-The **Subreddit** module is used to pull a specified subreddit's data including profile, posts, wiki pages,
- or even searching posts that have the specified keyword.
-
-# Examples
-## Get subreddit profile
-```
-knewkarma subreddit MachineLearning --profile
-```
-
-## Get subreddit posts
-```
-knewkarma subreddit MachineLearning --posts
-```
-
-## Search a subreddit for posts that contain a specified keyword
-```
-knewkarma subreddit MachineLearning --search "artificial intelligence"
-```
-
-## Get subreddit's wiki pages
-```
-knewkarma subreddit MachineLearning --wiki-pages
-```
-
-## Get subreddit's specified wiki page data
-```
-knewkarma subreddit MachineLearning --wiki-page config/description
-```
-    """,
-        "subreddits": """
-The **Subreddits** module is used to pull subreddits from various sources such as new, default, or popular.
-
-# Examples
-## Get all subreddits
-```
-knewkarma subreddits --all
-```
-
-## Get default subreddits
-```
-knewkarma subreddits --default
-```
-
-## Get new subreddits
-```
-knewkarma subreddits --new
-```
-
-## Get popular subreddits
-```
-knewkarma subreddits --popular
-```
-    """,
-        "post": """
-The **Post** module is used to pull an individual post's data including its comments, 
-provided the post's **id** and source **subreddit** are provided.
-
-# Examples
-### Get a post's data
-```
-knewkarma post 12csg48 OSINT --data
-```
-
-### Get a post's comments
-```
-knewkarma post 12csg48 OSINT --comments
-```
-""",
-        "posts": """
-The **Posts** is used to pull posts from sources like the front page, a listing, or new posts.
-
-# Examples
-## Get posts from *best* listing
-```
-knewkarma posts --best
-```
-
-## Get posts from *controversial* listing
-```
-knewkarma posts --controversial
-```
-
-## Get posts from Reddit Front-Page
-```
-knewkarma posts --front-page
-```
-
-## Get new posts
-```
-knewkarma posts --new
-```
-
-## Get posts from *popular* listing
-```
-knewkarma posts --popular
-```
-
-## Get posts from *rising* listing
-```
-knewkarma posts --rising
-```
-    """,
-        "search": """
-The **Search** module is used for search/discovery of targets in users, subreddits, and posts.
-
-# Examples
-## Search comments
-```
-knewkarma search "this is automated" --comments
-```
-
-## Search posts
-```
-knewkarma search coronavirus --posts
-```
-
-## Search subreddits
-```
-knewkarma search ask --subreddits
-```
-
-## Search users
-```
-knewkarma search john --users
-```
-    """,
     }
