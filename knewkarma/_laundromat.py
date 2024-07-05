@@ -349,7 +349,6 @@ def clean_subreddit_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict
     :rtype: dict
     """
     if "revision_id" in wiki_page:
-        print("yeoppppppppp")
         user: dict = wiki_page.get("revision_by").get("data")
 
         return {
