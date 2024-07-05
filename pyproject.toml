@@ -27,7 +27,7 @@ classifiers = [
 "Bug Tracker" = "https://github.com/bellingcat/knewkarma/issues"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 aiohttp = "^3.8.4"
 pandas = "^2.1.4"
 psutil = "^5.9.4"
