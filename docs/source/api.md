@@ -14,112 +14,6 @@ Key Classes
 
 The API exposes six primary classes, each tailored for different types of data retrieval:
 
-## User
-
-**User**: Represents a Reddit user and provides methods for getting data from the specified user.
-
-Initialisation:
-
-```python
-User(username: str, time_format: Literal["concise", "locale"])
-```
-
-Initialises a **User** instance for getting profile, posts, and comments data from the specified user.
-
-* `username`: Username of the user to get data from.
-* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
-  or "locale"
-  for a
-  localized datetime string. Defaults to "locale".
-
-### Methods
-
-* *profile(session: aiohttp.ClientSession) -> dict*: Returns a user's profile data.
-* *posts(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
-  list[dict]*: Returns a user's posts.
-* *comments(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
-  list[dict]*: Returns a user's comments.
-* *overview(limit: int, session: aiohttp.ClientSession) -> list[dict]*: Returns a user's most recent comments.
-* *search_posts(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
-  TIMEFRAME = "all") -> list[dict]*: Returns a user's posts that contain the specified keywords.
-* *search_comments(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
-  TIMEFRAME = "all") -> list[dict]*: Returns a user's comments that contain the specified keyword.
-* *moderated_subreddits(session: aiohttp.ClientSession) -> list[dict]*: Returns subreddits moderated by the user.
-* *top_subreddits(session: aiohttp.ClientSession, top_n: int, limit: int, sort: SORT_CRITERION = "all", timeframe:
-  TIMEFRAME = "all") -> list[tuple]*: Returns a user's top n subreddits based on subreddit frequency in n posts.
-
-## Users
-
-**Users**: Represents Reddit users and provides methods for getting related data.
-
-Initialisation:
-
-```python
-Users(time_format: Literal["concise", "locale"])
-```
-
-Initialises an instance for getting data from multiple users.
-
-* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
-  or "locale" for a localized datetime string. Defaults to "locale".
-
-### Methods:
-
-* *all(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns all users.
-* *new(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns new users.
-* *popular(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns popular users.
-
-## Subreddit
-
-**Subreddit**: Represents a Reddit subreddit and provides methods for getting data from it.
-
-Initialisation:
-
-```python
-Subreddit(subreddit: str, time_format: Literal["concise", "locale"])
-```
-
-Initialises a RedditCommunity instance for getting profile and posts from the specified subreddit.
-
-* `subreddit`: Name of the subreddit to get data from.
-* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
-  or "locale" for a localized datetime string. Defaults to "locale".
-
-### Methods
-
-* *profile(session: aiohttp.ClientSession) -> dict**: Returns a subreddit's profile data.
-* *wiki_pages(session: aiohttp.ClientSession) -> list[str)*: Returns a subreddit's wiki pages.
-* *wiki_page(page: str, session: aiohttp.ClientSession) -> dict**: Returns a subreddit's specified wiki page data.
-* *posts(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
-  list[dict)*: Returns a subreddit's posts.
-* *search(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
-  TIMEFRAME = "all") -> list[dict)*: Returns posts that contain a specified keyword from a subreddit.
-
-## Subreddits
-
-**Subreddits**: Represents subreddits and provides methods for getting related data.
-
-Initialisation:
-
-```python
-Subreddits(time_format: Literal["concise", "locale"])
-```
-
-Initialises an instance for getting data from multiple subreddits.
-
-* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
-  or "locale" for a localized datetime string. Defaults to "locale".
-
-### Methods:
-
-* *all(limit: int, timeframe: TIMEFRAME = "all", session: aiohttp.ClientSession) -> list[dict)*: Returns all
-  subreddits.
-* *default(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns default subreddits.
-* *new(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict)*: Returns new
-  subreddits.
-* *popular(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict)*: Returns popular
-  subreddits.
-
 ## Post
 
 **Post**: Represents a Reddit post and provides method(s) for getting data from the specified post.
@@ -127,7 +21,7 @@ Initialises an instance for getting data from multiple subreddits.
 Initialisation:
 
 ```python
-Post(post_id: str, subreddit: str, time_format: Literal["concise", "locale"])
+Post(post_id: str, post_subreddit: str, time_format: Literal["concise", "locale"])
 ```
 
 Initialises an instance for getting data from a specified post.
@@ -139,7 +33,7 @@ Initialises an instance for getting data from a specified post.
 
 ### Methods
 
-* *profile(session: aiohttp.ClientSession) -> dict**: Returns a post's data.
+* *data(session: aiohttp.ClientSession) -> dict**: Returns a post's data.
 * *comments(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all") -> list[dict)*: Returns a post's
   comments.
 
@@ -202,6 +96,112 @@ Initialises an instance for performing searches across Reddit.
 * *users(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession) -> list[dict)*:
   Search users.
 
+## Subreddit
+
+**Subreddit**: Represents a Reddit subreddit and provides methods for getting data from it.
+
+Initialisation:
+
+```python
+Subreddit(subreddit: str, time_format: Literal["concise", "locale"])
+```
+
+Initialises a RedditCommunity instance for getting profile and posts from the specified subreddit.
+
+* `subreddit`: Name of the subreddit to get data from.
+* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
+  or "locale" for a localized datetime string. Defaults to "locale".
+
+### Methods
+
+* *profile(session: aiohttp.ClientSession) -> dict**: Returns a subreddit's profile data.
+* *wiki_pages(session: aiohttp.ClientSession) -> list[str)*: Returns a subreddit's wiki pages.
+* *wiki_page(page: str, session: aiohttp.ClientSession) -> dict**: Returns a subreddit's specified wiki page data.
+* *posts(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
+  list[dict)*: Returns a subreddit's posts.
+* *search(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
+  TIMEFRAME = "all") -> list[dict)*: Returns posts that contain a specified keyword from a subreddit.
+
+## Subreddits
+
+**Subreddits**: Represents subreddits and provides methods for getting related data.
+
+Initialisation:
+
+```python
+Subreddits(time_format: Literal["concise", "locale"])
+```
+
+Initialises an instance for getting data from multiple subreddits.
+
+* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
+  or "locale" for a localized datetime string. Defaults to "locale".
+
+### Methods:
+
+* *all(limit: int, timeframe: TIMEFRAME = "all", session: aiohttp.ClientSession) -> list[dict)*: Returns all
+  subreddits.
+* *default(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns default subreddits.
+* *new(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict)*: Returns new
+  subreddits.
+* *popular(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict)*: Returns popular
+  subreddits.
+
+## User
+
+**User**: Represents a Reddit user and provides methods for getting data from the specified user.
+
+Initialisation:
+
+```python
+User(username: str, time_format: Literal["concise", "locale"])
+```
+
+Initialises a **User** instance for getting profile, posts, and comments data from the specified user.
+
+* `username`: Username of the user to get data from.
+* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
+  or "locale"
+  for a
+  localized datetime string. Defaults to "locale".
+
+### Methods
+
+* *profile(session: aiohttp.ClientSession) -> dict*: Returns a user's profile data.
+* *posts(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
+  list[dict]*: Returns a user's posts.
+* *comments(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
+  list[dict]*: Returns a user's comments.
+* *overview(limit: int, session: aiohttp.ClientSession) -> list[dict]*: Returns a user's most recent comments.
+* *search_posts(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
+  TIMEFRAME = "all") -> list[dict]*: Returns a user's posts that contain the specified keywords.
+* *search_comments(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
+  TIMEFRAME = "all") -> list[dict]*: Returns a user's comments that contain the specified keyword.
+* *moderated_subreddits(session: aiohttp.ClientSession) -> list[dict]*: Returns subreddits moderated by the user.
+* *top_subreddits(session: aiohttp.ClientSession, top_n: int, limit: int, sort: SORT_CRITERION = "all", timeframe:
+  TIMEFRAME = "all") -> list[tuple]*: Returns a user's top n subreddits based on subreddit frequency in n posts.
+
+## Users
+
+**Users**: Represents Reddit users and provides methods for getting related data.
+
+Initialisation:
+
+```python
+Users(time_format: Literal["concise", "locale"])
+```
+
+Initialises an instance for getting data from multiple users.
+
+* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
+  or "locale" for a localized datetime string. Defaults to "locale".
+
+### Methods:
+
+* *all(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns all users.
+* *new(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns new users.
+* *popular(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns popular users.
+
 ## Timeframes and Sorting
 
 When fetching posts or comments, you can specify timeframes ("`hour`", "`day`", "`month`", "`year`") and sorting
@@ -242,3 +242,5 @@ e.g., "*5 minutes ago*") or "`locale`" for locale-based formatting. Here's how t
 ```python
 posts = await user.posts(limit=5, time_format="concise", session=session)
 ```
+
+
