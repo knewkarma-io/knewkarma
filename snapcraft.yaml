@@ -23,7 +23,6 @@ contact:
 parts:
   knewkarma:
     plugin: python
-    python-version: python3
     source: .
 
 type: app
