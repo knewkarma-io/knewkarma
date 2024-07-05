@@ -24,7 +24,7 @@ async def fetch_with_retry(fetch_func, *args, **kwargs):
 
 
 @pytest.mark.asyncio
-async def test_search_posts():
+async def test_search_for_posts():
     search_posts_query: str = "coronavirus"
     search_posts: list[dict] = await fetch_with_retry(
         api.get_search_results,
@@ -45,7 +45,7 @@ async def test_search_posts():
 
 
 @pytest.mark.asyncio
-async def test_search_posts_in_a_subreddit():
+async def test_search_for_posts_in_a_subreddit():
     search_query: str = "Rick and Morty"
     posts_subreddit: str = "AdultSwim"
     search_results = await fetch_with_retry(
@@ -68,7 +68,7 @@ async def test_search_posts_in_a_subreddit():
 
 
 @pytest.mark.asyncio
-async def test_search_subreddits():
+async def test_search_for_subreddits():
     search_subreddits_query: str = "science"
     search_subreddits: list[dict] = await fetch_with_retry(
         api.get_search_results,
@@ -90,7 +90,7 @@ async def test_search_subreddits():
 
 
 @pytest.mark.asyncio
-async def test_search_users():
+async def test_search_for_users():
     search_users_query: str = "john"
     search_users: list[dict] = await fetch_with_retry(
         api.get_search_results,
@@ -116,7 +116,7 @@ async def test_get_user_and_subreddit_profiles():
     user_profile: dict = await fetch_with_retry(
         api.get_profile,
         profile_type="user",
-        profile_source=TEST_USERNAME,
+        username=TEST_USERNAME,
     )
 
     assert user_profile.get("id") == "6l4z3"
@@ -125,7 +125,7 @@ async def test_get_user_and_subreddit_profiles():
     subreddit_profile: dict = await fetch_with_retry(
         api.get_profile,
         profile_type="subreddit",
-        profile_source=TEST_SUBREDDIT_2,
+        subreddit=TEST_SUBREDDIT_2,
     )
 
     assert subreddit_profile.get("id") == "2qh1i"
@@ -133,7 +133,7 @@ async def test_get_user_and_subreddit_profiles():
 
 
 @pytest.mark.asyncio
-async def test_get_subreddit_posts():
+async def test_get_posts_from_a_subreddit():
     subreddit_posts: list = await fetch_with_retry(
         api.get_posts,
         posts_type="subreddit_posts",
@@ -152,12 +152,12 @@ async def test_get_subreddit_posts():
 
 
 @pytest.mark.asyncio
-async def test_get_user_posts():
+async def test_get_posts_from_a_user():
     username: str = "AutoModerator"
     user_posts: list = await fetch_with_retry(
         api.get_posts,
         posts_type="user_posts",
-        posts_source=username,
+        username=username,
         limit=100,
     )
 
