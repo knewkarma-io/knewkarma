@@ -394,7 +394,7 @@ class Subreddit:
 
         if wiki_page:
             return clean_subreddit_wiki_page(
-                wiki_page=wiki_page, time_format=self._time_format
+                wiki_page=wiki_page.get("data"), time_format=self._time_format
             )
 
     async def posts(
