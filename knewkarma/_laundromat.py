@@ -43,6 +43,11 @@ def clean_users(
             "awardee_karma": user.get("awardee_karma"),
             "total_karma": user.get("total_karma"),
             "subreddit": user.get("subreddit"),
+            "is_friend": user.get("is_friend"),
+            "snoovatar_img": user.get("snoovatar_img"),
+            "awarder_karma": user.get("awarder_karma"),
+            "pref_show_snoovatar": user.get("pref_show_snoovatar"),
+            "has_subscribed": user.get("has_subscribed"),
             "created": (
                 timestamp_to_readable(
                     timestamp=user.get("created"), time_format=time_format
@@ -93,11 +98,13 @@ def clean_posts(
             "subreddit": post.get("subreddit"),
             "subreddit_id": post.get("subreddit_id"),
             "subreddit_type": post.get("subreddit_type"),
+            "subreddit_subscribers": post.get("subreddit_subscribers"),
             "upvotes": post.get("ups"),
             "upvote_ratio": post.get("upvote_ratio"),
             "downvotes": post.get("downs"),
             "thumbnail": post.get("thumbnail"),
             "gilded": post.get("gilded"),
+            "is_video": post.get("is_video"),
             "is_nsfw": post.get("over_18"),
             "is_shareable": post.get("is_reddit_media_domain"),
             "is_robot_indexable": post.get("is_robot_indexable"),
@@ -106,13 +113,6 @@ def clean_posts(
             "is_archived": post.get("archived"),
             "domain": post.get("domain"),
             "score": post.get("score"),
-            "edited": (
-                timestamp_to_readable(
-                    timestamp=post.get("edited"), time_format=time_format
-                )
-                if post.get("edited")
-                else False
-            ),
             "comments": post.get("num_comments"),
             "created": (
                 timestamp_to_readable(
@@ -121,6 +121,40 @@ def clean_posts(
                 if post.get("created")
                 else "NaN"
             ),
+            "saved": post.get("saved"),
+            "clicked": post.get("clicked"),
+            "hidden": post.get("hidden"),
+            "pwls": post.get("pwls"),
+            "hide_score": post.get("hide_score"),
+            "num_crossposts": post.get("num_crossposts"),
+            "parent_whitelist_status": post.get("parent_whitelist_status"),
+            "name": post.get("name"),
+            "quarantine": post.get("quarantine"),
+            "link_flair_text_color": post.get("link_flair_text_color"),
+            "is_original_content": post.get("is_original_content"),
+            "can_mod_post": post.get("can_mod_post"),
+            "is_created_from_ads_ui": post.get("is_created_from_ads_ui"),
+            "author_premium": post.get("author_premium"),
+            "is_self": post.get("is_self"),
+            "link_flair_type": post.get("link_flair_type"),
+            "wls": post.get("wls"),
+            "author_flair_type": post.get("author_flair_type"),
+            "allow_live_comments": post.get("allow_live_comments"),
+            "no_follow": post.get("no_follow"),
+            "is_crosspostable": post.get("is_crosspostable"),
+            "pinned": post.get("pinned"),
+            "author_is_blocked": post.get("author_is_blocked"),
+            "link_flair_background_color": post.get("link_flair_background_color"),
+            "author_fullname": post.get("author_fullname"),
+            "whitelist_status": post.get("whitelist_status"),
+            "edited": (
+                timestamp_to_readable(
+                    timestamp=post.get("edited"), time_format=time_format
+                )
+                if post.get("edited")
+                else False
+            ),
+            "url": post.get("url"),
         }
 
     if isinstance(data, dict):
@@ -165,11 +199,30 @@ def clean_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
                     "is_stickied": comment_data.get("stickied"),
                     "is_locked": comment_data.get("locked"),
                     "is_archived": comment_data.get("archived"),
+                    "subreddit_id": comment_data.get("subreddit_id"),
+                    "author_is_blocked": comment_data.get("author_is_blocked"),
+                    "link_author": comment_data.get("link_author"),
+                    "replies": comment_data.get("replies"),
+                    "saved": comment_data.get("saved"),
+                    "can_mod_post": comment_data.get("can_mod_post"),
+                    "send_replies": comment_data.get("send_replies"),
+                    "parent_id": comment_data.get("parent_id"),
+                    "author_fullname": comment_data.get("author_fullname"),
+                    "controversiality": comment_data.get("controversiality"),
+                    "body_html": comment_data.get("body_html"),
+                    "link_permalink": comment_data.get("link_permalink"),
+                    "name": comment_data.get("name"),
+                    "treatment_tags": comment_data.get("treatment_tags"),
+                    "awarders": comment_data.get("awarders"),
+                    "all_awardings": comment_data.get("all_awardings"),
+                    "quarantine": comment_data.get("quarantine"),
+                    "link_url": comment_data.get("link_url"),
                     "created": (
                         timestamp_to_readable(
-                            timestamp=comment.get("created"), time_format=time_format
+                            timestamp=comment_data.get("created"),
+                            time_format=time_format,
                         )
-                        if comment.get("created")
+                        if comment_data.get("created")
                         else "NaN"
                     ),
                 }
@@ -178,9 +231,7 @@ def clean_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
         return comments_list
 
 
-def clean_subreddits(
-    data: Union[list, dict], time_format, is_preview: bool = False
-) -> Union[list[dict], dict]:
+def clean_subreddits(data: Union[list, dict], time_format) -> Union[list[dict], dict]:
     """
     Cleans a list/single object of raw subreddits data.
 
@@ -188,8 +239,6 @@ def clean_subreddits(
     :type data: list[dict]
     :param time_format: TIme format for the parsed data.
     :type time_format: Literal[locale, concise]
-    :param is_preview: A boolean value to determine whether a subreddit is a preview,
-        i.e. Its object contains fewer data.
     :return: A list of parsed dict objects, each containing subreddits data Or a dict object containing subreddit data.
     :rtype: Union[list[dict], dict]
     """
@@ -205,45 +254,78 @@ def clean_subreddits(
         :return: A dict object containing parsed subreddit data.
         :rtype: dict
         """
-        if is_preview:
-            subreddit_obj = {
-                "name": subreddit.get("display_name"),
-                "id": subreddit.get("id"),
-                "type": subreddit.get("subreddit_type"),
-                "icon": subreddit.get("subreddit_icon", "").split("?")[0],
-                "subscribers": subreddit.get("subscribers"),
-                "whitelist_status": subreddit.get("whitelist_status"),
-                "url": subreddit.get("url"),
-                "created": timestamp_to_readable(
+        return {
+            "title": subreddit.get("title"),
+            "display_name": subreddit.get("display_name"),
+            "id": subreddit.get("id"),
+            "description": subreddit.get("public_description"),
+            "submit_text": subreddit.get("submit_text"),
+            "submit_text_html": subreddit.get("submit_text_html"),
+            "icon": (
+                subreddit.get("icon_img").split("?")[0]
+                if subreddit.get("icon_img")
+                else ""
+            ),
+            "type": subreddit.get("subreddit_type"),
+            "subscribers": subreddit.get("subscribers"),
+            "current_active_users": subreddit.get("accounts_active"),
+            "is_nsfw": subreddit.get("over18"),
+            "language": subreddit.get("lang"),
+            "whitelist_status": subreddit.get("whitelist_status"),
+            "url": subreddit.get("url"),
+            "user_flair_position": subreddit.get("user_flair_position"),
+            "spoilers_enabled": subreddit.get("spoilers_enabled"),
+            "allow_galleries": subreddit.get("allow_galleries"),
+            "show_media_preview": subreddit.get("show_media_preview"),
+            "allow_videogifs": subreddit.get("allow_videogifs"),
+            "allow_videos": subreddit.get("allow_videos"),
+            "allow_images": subreddit.get("allow_images"),
+            "allow_polls": subreddit.get("allow_polls"),
+            "public_traffic": subreddit.get("public_traffic"),
+            "description_html": subreddit.get("description_html"),
+            "emojis_enabled": subreddit.get("emojis_enabled"),
+            "primary_color": subreddit.get("primary_color"),
+            "key_color": subreddit.get("key_color"),
+            "banner_background_color": subreddit.get("banner_background_color"),
+            "icon_size": subreddit.get("icon_size"),
+            "header_size": subreddit.get("header_size"),
+            "banner_size": subreddit.get("banner_size"),
+            "link_flair_enabled": subreddit.get("link_flair_enabled"),
+            "restrict_posting": subreddit.get("restrict_posting"),
+            "restrict_commenting": subreddit.get("restrict_commenting"),
+            "submission_type": subreddit.get("submission_type"),
+            "free_form_reports": subreddit.get("free_form_reports"),
+            "wiki_enabled": subreddit.get("wiki_enabled"),
+            "community_icon": (
+                subreddit.get("community_icon").split("?")[0]
+                if subreddit.get("community_icon")
+                else ""
+            ),
+            "banner_background_image": subreddit.get("banner_background_image"),
+            "mobile_banner_image": subreddit.get("mobile_banner_image"),
+            "allow_discovery": subreddit.get("allow_discovery"),
+            "is_crosspostable_subreddit": subreddit.get("is_crosspostable_subreddit"),
+            "notification_level": subreddit.get("notification_level"),
+            "suggested_comment_sort": subreddit.get("suggested_comment_sort"),
+            "disable_contributor_requests": subreddit.get(
+                "disable_contributor_requests"
+            ),
+            "community_reviewed": subreddit.get("community_reviewed"),
+            "original_content_tag_enabled": subreddit.get(
+                "original_content_tag_enabled"
+            ),
+            "has_menu_widget": subreddit.get("has_menu_widget"),
+            "videostream_links_count": subreddit.get("videostream_links_count"),
+            "created": (
+                timestamp_to_readable(
                     timestamp=subreddit.get("created"), time_format=time_format
-                ),
-            }
-        else:
-            subreddit_obj = {
-                "name": subreddit.get("display_name"),
-                "id": subreddit.get("id"),
-                "description": subreddit.get("public_description"),
-                "submit_text": subreddit.get("submit_text"),
-                "icon": subreddit.get("subreddit_icon", "").split("?")[0],
-                "type": subreddit.get("subreddit_type"),
-                "subscribers": subreddit.get("subscribers"),
-                "current_active_users": subreddit.get("accounts_active"),
-                "is_nsfw": subreddit.get("over18"),
-                "language": subreddit.get("lang"),
-                "whitelist_status": subreddit.get("whitelist_status"),
-                "url": subreddit.get("url"),
-                "created": (
-                    timestamp_to_readable(
-                        timestamp=subreddit.get("created"), time_format=time_format
-                    )
-                    if subreddit.get("created")
-                    else "NaN"
-                ),
-            }
+                )
+                if subreddit.get("created")
+                else "NaN"
+            ),
+        }
 
-        return subreddit_obj
-
-    subreddit_data = None
+    subreddit_data = {}
     if isinstance(data, list) and len(data) != 0:
         subreddit_data = [
             build_subreddit(subreddit=subreddit.get("data")) for subreddit in data
@@ -273,7 +355,7 @@ def clean_subreddit_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict
         return {
             "revision_id": page_data.get("revision_id"),
             "revision_date": timestamp_to_readable(
-                timestamp=page_data.get("revision_date")
+                timestamp=page_data.get("revision_date"), time_format=time_format
             ),
             "content_markdown": page_data.get("content_md"),
             "revised_by": {
@@ -297,4 +379,8 @@ def clean_subreddit_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict
                     timestamp=user.get("created"), time_format=time_format
                 ),
             },
+            "kind": page_data.get("kind"),
+            "may_revise": page_data.get("may_revise"),
+            "reason": page_data.get("reason"),
+            "content_html": page_data.get("content_html"),
         }

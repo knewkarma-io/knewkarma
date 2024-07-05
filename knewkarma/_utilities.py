@@ -295,10 +295,7 @@ def create_dataframe(
     # Create a DataFrame from the processed data
     dataframe = pd.DataFrame(data)
 
-    # Drop columns with None values
-    dataframe = dataframe.dropna(axis=1, how="all")
-
-    return dataframe
+    return dataframe.dropna(axis=1, how="all")
 
 
 def show_exported_files(tree: Tree, directory: str, base_path: str = ""):

@@ -3,7 +3,7 @@ from collections import Counter
 
 import aiohttp
 
-from ._data_cleaners import (
+from ._laundromat import (
     clean_comments,
     clean_subreddits,
     clean_subreddit_wiki_page,
@@ -42,11 +42,14 @@ class Post:
             session=session,
         )
 
-        raw_post: dict = (
-            post_data[0].get("data", {}).get("children", [])[0].get("data", {})
-        )
-        if raw_post:
-            return clean_posts(data=raw_post, time_format=self._time_format)
+        if post_data:
+            return clean_posts(
+                data=post_data[0]
+                .get("data", {})
+                .get("children", [])[0]
+                .get("data", {}),
+                time_format=self._time_format,
+            )
 
     async def comments(
         self,
@@ -65,7 +68,7 @@ class Post:
         :return: A list of dictionaries, each containing information about a comment.
         :rtype: list[dict]
         """
-        post_data: list = await api.get_posts(
+        comments_data: list = await api.get_posts(
             posts_type="post_comments",
             post_id=self._post_id,
             post_subreddit=self._post_subreddit,
@@ -74,10 +77,11 @@ class Post:
             session=session,
         )
 
-        raw_comments: list = post_data[1].get("data", {}).get("children", [])
-
-        if raw_comments:
-            return clean_comments(comments=raw_comments, time_format=self._time_format)
+        if comments_data:
+            return clean_comments(
+                comments=comments_data[1].get("data", {}).get("children", []),
+                time_format=self._time_format,
+            )
 
 
 class Posts:
@@ -243,7 +247,7 @@ class Search:
         :return: A list of dictionaries, each containing data about a post.
         :rtype: list[dict]
         """
-        search_posts: list = await api.get_search_results(
+        posts_results: list = await api.get_search_results(
             query=self._query,
             search_type="posts",
             timeframe=timeframe,
@@ -251,11 +255,8 @@ class Search:
             limit=limit,
             session=session,
         )
-        posts_results: list[dict] = clean_posts(
-            search_posts, time_format=self._time_format
-        )
-
-        return posts_results
+        if posts_results:
+            return clean_posts(data=posts_results, time_format=self._time_format)
 
     async def subreddits(
         self,
@@ -349,16 +350,15 @@ class Subreddit:
         :return: A dictionary containing subreddit profile data.
         :rtype: Community
         """
-        raw_subreddit: dict = await api.get_profile(
+        subreddit_profile: dict = await api.get_profile(
             profile_type="subreddit",
-            profile_source=self._subreddit,
+            subreddit=self._subreddit,
             session=session,
         )
-        subreddit_profile: dict = clean_subreddits(
-            raw_subreddit, time_format=self._time_format
-        )
-
-        return subreddit_profile
+        if subreddit_profile:
+            return clean_subreddits(
+                data=subreddit_profile, time_format=self._time_format
+            )
 
     async def wiki_pages(self, session: aiohttp.ClientSession) -> list[str]:
         """
@@ -387,15 +387,15 @@ class Subreddit:
         :return: A list of strings, each representing a wiki page.
         :rtype: list[str]
         """
-        raw_page: dict = await api.get_data(
+        wiki_page: dict = await api.get_data(
             endpoint=f"{api.subreddit_data_endpoint}/{self._subreddit}/wiki/{page}.json",
             session=session,
         )
-        wiki_page: dict = clean_subreddit_wiki_page(
-            wiki_page=raw_page, time_format=self._time_format
-        )
 
-        return wiki_page
+        if wiki_page:
+            return clean_subreddit_wiki_page(
+                wiki_page=wiki_page, time_format=self._time_format
+            )
 
     async def posts(
         self,
@@ -418,19 +418,17 @@ class Subreddit:
         :return: A list of dictionaries, each containing data about a post.
         :rtype: list[dict]
         """
-        raw_posts: list = await api.get_posts(
+        subreddit_posts: list = await api.get_posts(
             posts_type="subreddit_posts",
-            posts_source=self._subreddit,
+            subreddit=self._subreddit,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
             session=session,
         )
-        subreddit_posts: list[dict] = clean_posts(
-            raw_posts, time_format=self._time_format
-        )
 
-        return subreddit_posts
+        if subreddit_posts:
+            return clean_posts(data=subreddit_posts, time_format=self._time_format)
 
     async def search(
         self,
@@ -495,12 +493,11 @@ class Subreddits:
         ----
             *in Morphius' voice* "the only limitation you have at this point is the matrix's rate-limit."
         """
-        raw_subreddits: list = await api.get_subreddits(
+        all_subreddits: list = await api.get_subreddits(
             subreddits_type="all", limit=limit, timeframe=timeframe, session=session
         )
-        all_subreddits: list[dict] = clean_subreddits(
-            raw_subreddits, is_preview=True, time_format=self._time_format
-        )
+        if all_subreddits:
+            return clean_subreddits(data=all_subreddits, time_format=self._time_format)
 
         return all_subreddits
 
@@ -515,14 +512,11 @@ class Subreddits:
         :return: A list of dictionaries, each containing data about a subreddit.
         :rtype: list[dict]
         """
-        raw_subreddits: list = await api.get_subreddits(
+        default_subreddits: list = await api.get_subreddits(
             subreddits_type="default", limit=limit, session=session
         )
-        default_subreddits: list[dict] = clean_subreddits(
-            raw_subreddits, is_preview=True, time_format=self._time_format
-        )
-
-        return default_subreddits
+        if default_subreddits:
+            return clean_subreddits(default_subreddits, time_format=self._time_format)
 
     async def new(
         self, limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all"
@@ -539,14 +533,11 @@ class Subreddits:
         :return: A list of dictionaries, each containing data about a subreddit.
         :rtype: list[dict]
         """
-        raw_subreddits: list = await api.get_subreddits(
+        new_subreddits: list = await api.get_subreddits(
             subreddits_type="new", limit=limit, timeframe=timeframe, session=session
         )
-        new_subreddits: list[dict] = clean_subreddits(
-            raw_subreddits, is_preview=True, time_format=self._time_format
-        )
-
-        return new_subreddits
+        if new_subreddits:
+            return clean_subreddits(new_subreddits, time_format=self._time_format)
 
     async def popular(
         self, limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all"
@@ -563,14 +554,11 @@ class Subreddits:
         :return: A list of dictionaries, each containing data about a subreddit.
         :rtype: list[dict]
         """
-        raw_subreddits: list = await api.get_subreddits(
+        popular_subreddits: list = await api.get_subreddits(
             subreddits_type="popular", limit=limit, timeframe=timeframe, session=session
         )
-        popular_subreddits: list[dict] = clean_subreddits(
-            raw_subreddits, is_preview=True, time_format=self._time_format
-        )
-
-        return popular_subreddits
+        if popular_subreddits:
+            return clean_subreddits(popular_subreddits, time_format=self._time_format)
 
 
 class User:
@@ -610,7 +598,7 @@ class User:
         :return: A list of dictionaries, each containing data about a comment.
         :rtype: list[dict]
         """
-        raw_comments: list = await api.get_posts(
+        user_comments: list = await api.get_posts(
             username=self._username,
             posts_type="user_comments",
             limit=limit,
@@ -618,11 +606,9 @@ class User:
             timeframe=timeframe,
             session=session,
         )
-        user_comments: list[dict] = clean_comments(
-            raw_comments, time_format=self._time_format
-        )
 
-        return user_comments
+        if user_comments:
+            return clean_comments(comments=user_comments, time_format=self._time_format)
 
     async def moderated_subreddits(self, session: aiohttp.ClientSession) -> list[dict]:
         """
@@ -633,17 +619,15 @@ class User:
         :return: A list of dictionaries, each containing preview data of a Community.
         :rtype: list[dict]
         """
-        raw_preview_subreddits: dict = await api.get_data(
+        subreddits: dict = await api.get_data(
             endpoint=f"{api.base_reddit_endpoint}/user/{self._username}/moderated_subreddits.json",
             session=session,
         )
-        preview_subreddits: list[dict] = clean_subreddits(
-            raw_preview_subreddits.get("data"),
-            is_preview=True,
-            time_format=self._time_format,
-        )
-
-        return preview_subreddits
+        if subreddits:
+            return clean_subreddits(
+                subreddits.get("data"),
+                time_format=self._time_format,
+            )
 
     async def overview(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
         """
@@ -656,17 +640,14 @@ class User:
         :return: A list of dictionaries, each containing data about a recent comment.
         :rtype: list[dict]
         """
-        raw_comments: list = await api.get_posts(
+        user_overview: list = await api.get_posts(
             username=self._username,
             posts_type="user_overview",
             limit=limit,
             session=session,
         )
-        user_overview: list[dict] = clean_comments(
-            raw_comments, time_format=self._time_format
-        )
-
-        return user_overview
+        if user_overview:
+            return clean_comments(user_overview, time_format=self._time_format)
 
     async def posts(
         self,
@@ -689,7 +670,7 @@ class User:
         :return: A list of dictionaries, each containing data about a post.
         :rtype: list[dict]
         """
-        raw_posts: list = await api.get_posts(
+        user_posts: list = await api.get_posts(
             username=self._username,
             posts_type="user_posts",
             limit=limit,
@@ -697,9 +678,8 @@ class User:
             timeframe=timeframe,
             session=session,
         )
-        user_posts: list[dict] = clean_posts(raw_posts, time_format=self._time_format)
-
-        return user_posts
+        if user_posts:
+            return clean_posts(user_posts, time_format=self._time_format)
 
     async def profile(self, session: aiohttp.ClientSession) -> dict:
         """
@@ -710,12 +690,11 @@ class User:
         :return: A dictionary containing user profile data.
         :rtype: dict
         """
-        raw_user: dict = await api.get_profile(
-            profile_source=self._username, profile_type="user", session=session
+        user_profile: dict = await api.get_profile(
+            username=self._username, profile_type="user", session=session
         )
-        user_profile: dict = clean_users(raw_user, time_format=self._time_format)
-
-        return user_profile
+        if user_profile:
+            return clean_users(data=user_profile, time_format=self._time_format)
 
     async def search_posts(
         self,
@@ -757,8 +736,8 @@ class User:
                 post_data.get("selftext")
             ):
                 found_posts.append(post)
-
-        return clean_posts(found_posts, time_format=self._time_format)
+        if found_posts:
+            return clean_posts(found_posts, time_format=self._time_format)
 
     async def search_comments(
         self,
@@ -798,7 +777,8 @@ class User:
             if pattern.search(comment.get("data").get("body")):
                 found_comments.append(comment)
 
-        return clean_comments(found_comments, time_format=self._time_format)
+        if found_comments:
+            return clean_comments(found_comments, time_format=self._time_format)
 
     async def top_subreddits(
         self,
@@ -866,12 +846,11 @@ class Users:
         :return: A list of dictionaries, each containing a user's data.
         :rtype: list[dict]
         """
-        raw_users: list = await api.get_users(
+        new_users: list = await api.get_users(
             users_type="new", limit=limit, timeframe=timeframe, session=session
         )
-        new_users: list[dict] = clean_users(raw_users, time_format=self._time_format)
-
-        return new_users
+        if new_users:
+            return clean_users(new_users, time_format=self._time_format)
 
     async def popular(
         self, limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all"
@@ -888,17 +867,14 @@ class Users:
         :return: A list of dictionaries, each containing a user's data.
         :rtype: list[dict]
         """
-        raw_users: list = await api.get_users(
+        popular_users: list = await api.get_users(
             users_type="popular",
             limit=limit,
             timeframe=timeframe,
             session=session,
         )
-        popular_users: list[dict] = clean_users(
-            raw_users, time_format=self._time_format
-        )
-
-        return popular_users
+        if popular_users:
+            return clean_users(popular_users, time_format=self._time_format)
 
     async def all(
         self, limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all"
@@ -915,9 +891,8 @@ class Users:
         :return: A list of dictionaries, each containing a user's data.
         :rtype: list[dict]
         """
-        raw_users: list = await api.get_users(
+        all_users: list = await api.get_users(
             users_type="all", limit=limit, timeframe=timeframe, session=session
         )
-        all_users: list[dict] = clean_users(raw_users, time_format=self._time_format)
-
-        return all_users
+        if all_users:
+            return clean_users(all_users, time_format=self._time_format)
