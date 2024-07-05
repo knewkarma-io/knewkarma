@@ -10,7 +10,7 @@ from ._laundromat import (
     clean_posts,
     clean_users,
 )
-from ._utilities import TIME_FORMAT
+from ._utilities import TIME_FORMAT, get_status
 from .api import Api, TIMEFRAME, SORT_CRITERION
 
 api = Api()
@@ -369,12 +369,15 @@ class Subreddit:
         :return: A list of strings, each representing a wiki page.
         :rtype: list[str]
         """
-        pages: dict = await api.get_data(
-            endpoint=f"{api.subreddit_data_endpoint}/{self._subreddit}/wiki/pages.json",
-            session=session,
-        )
+        with get_status(
+            status_message=f"Initialising [underline]single data[/] retrieval job..."
+        ):
+            pages: dict = await api.get_data(
+                endpoint=f"{api.subreddit_data_endpoint}/{self._subreddit}/wiki/pages.json",
+                session=session,
+            )
 
-        return pages.get("data")
+            return pages.get("data")
 
     async def wiki_page(self, page: str, session: aiohttp.ClientSession) -> dict:
         """
@@ -387,15 +390,18 @@ class Subreddit:
         :return: A list of strings, each representing a wiki page.
         :rtype: list[str]
         """
-        wiki_page: dict = await api.get_data(
-            endpoint=f"{api.subreddit_data_endpoint}/{self._subreddit}/wiki/{page}.json",
-            session=session,
-        )
-
-        if wiki_page:
-            return clean_subreddit_wiki_page(
-                wiki_page=wiki_page.get("data"), time_format=self._time_format
+        with get_status(
+            status_message=f"Initialising [underline]single data[/] retrieval job..."
+        ):
+            wiki_page: dict = await api.get_data(
+                endpoint=f"{api.subreddit_data_endpoint}/{self._subreddit}/wiki/{page}.json",
+                session=session,
             )
+
+            if wiki_page:
+                return clean_subreddit_wiki_page(
+                    wiki_page=wiki_page.get("data"), time_format=self._time_format
+                )
 
     async def posts(
         self,
