@@ -160,7 +160,7 @@ class Api:
         all_items = []
         last_item_id = None
         with get_status(
-            status_message="Initialising [underline]bulk data[/] retrieval job..."
+            status_message="Starting [underline]bulk data[/] retrieval process..."
         ) as status:
             while len(all_items) < limit:
                 paginated_endpoint = (
@@ -212,7 +212,7 @@ class Api:
         :rtype: dict
         """
         with get_status(
-            status_message=f"Initialising [underline]single data[/] retrieval job..."
+            status_message=f"Starting [underline]single data[/] retrieval process..."
         ):
             # Use a dictionary for direct mapping
             entity_mapping: dict = {

@@ -525,7 +525,7 @@ class Subreddit:
         :rtype: list[str]
         """
         with get_status(
-            status_message=f"Initialising [underline]single data[/] retrieval job..."
+            status_message=f"Starting [underline]single data[/] retrieval process..."
         ):
             pages: dict = await api.send_request(
                 endpoint=f"{api.subreddit_endpoint}/{self._subreddit}/wiki/pages.json",
