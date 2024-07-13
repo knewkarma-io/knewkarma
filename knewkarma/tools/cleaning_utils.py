@@ -1,6 +1,7 @@
 from typing import Union
 
-from ._utilities import timestamp_to_readable, TIME_FORMAT
+from .general_utils import TIME_FORMAT
+from .time_utils import timestamp_to_readable
 
 
 def clean_users(
@@ -114,13 +115,6 @@ def clean_posts(
             "domain": post.get("domain"),
             "score": post.get("score"),
             "comments": post.get("num_comments"),
-            "created": (
-                timestamp_to_readable(
-                    timestamp=post.get("created"), time_format=time_format
-                )
-                if post.get("created")
-                else "NaN"
-            ),
             "saved": post.get("saved"),
             "clicked": post.get("clicked"),
             "hidden": post.get("hidden"),
@@ -155,6 +149,13 @@ def clean_posts(
                 else False
             ),
             "url": post.get("url"),
+            "created": (
+                timestamp_to_readable(
+                    timestamp=post.get("created"), time_format=time_format
+                )
+                if post.get("created")
+                else "NaN"
+            ),
         }
 
     if isinstance(data, dict):
@@ -170,7 +171,7 @@ def clean_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
 
     :param comments: A list of dict objects, each containing raw comment data.
     :type comments: list[dict]
-    :param time_format: TIme format for the parsed data.
+    :param time_format: Time format for the parsed data.
     :type time_format: Literal[locale, concise]
     :return: A list of parsed dict objects, each containing comments data.
     :rtype: list[dict]

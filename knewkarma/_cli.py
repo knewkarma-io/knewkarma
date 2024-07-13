@@ -9,18 +9,16 @@ from rich.markdown import Markdown
 from rich.tree import Tree
 from rich_argparse import RichHelpFormatter
 
-from ._core import Post, Posts, Subreddit, Subreddits, User, Search, Users
-from ._utilities import (
-    console,
-    create_dataframe,
-    export_dataframe,
-    filename_timestamp,
-    pathfinder,
-    print_banner,
-    show_exported_files,
-)
+from . import Post, Posts, Search, Subreddit, Subreddits, User, Users
 from .api import TIMEFRAME, SORT_CRITERION, Api
 from .help import Help
+from .tools.data_utils import create_dataframe, export_dataframe, show_exported_files
+from .tools.general_utils import (
+    console,
+    pathfinder,
+    print_banner,
+)
+from .tools.time_utils import filename_timestamp
 
 
 def args_parser() -> argparse.ArgumentParser:
@@ -470,6 +468,7 @@ def start():
             (
                 "best",
                 lambda session: posts.best(
+                    timeframe=timeframe,
                     limit=limit,
                     session=session,
                 ),
@@ -477,6 +476,7 @@ def start():
             (
                 "controversial",
                 lambda session: posts.controversial(
+                    timeframe=timeframe,
                     limit=limit,
                     session=session,
                 ),
@@ -487,10 +487,11 @@ def start():
                     limit=limit, sort=sort, session=session
                 ),
             ),
-            ("new", lambda session: posts.new(limit=limit, session=session)),
+            ("new", lambda session: posts.new(limit=limit, sort=sort, session=session)),
             (
                 "popular",
                 lambda session: posts.popular(
+                    timeframe=timeframe,
                     limit=limit,
                     session=session,
                 ),
@@ -507,7 +508,6 @@ def start():
             (
                 "posts",
                 lambda session: search.posts(
-                    timeframe=timeframe,
                     sort=sort,
                     limit=limit,
                     session=session,
@@ -516,14 +516,12 @@ def start():
             (
                 "subreddits",
                 lambda session: search.subreddits(
-                    timeframe=timeframe, sort=sort, limit=limit, session=session
+                    sort=sort, limit=limit, session=session
                 ),
             ),
             (
                 "users",
-                lambda session: search.users(
-                    timeframe=timeframe, sort=sort, limit=limit, session=session
-                ),
+                lambda session: search.users(sort=sort, limit=limit, session=session),
             ),
         ],
         "subreddit": [
@@ -548,7 +546,7 @@ def start():
             (
                 "wiki_page",
                 lambda session: subreddit.wiki_page(
-                    page=args.wiki_page if hasattr(args, "wiki_page") else None,
+                    page_name=args.wiki_page if hasattr(args, "wiki_page") else None,
                     session=session,
                 ),
             ),
@@ -611,7 +609,6 @@ def start():
                         args.top_subreddits if hasattr(args, "top_subreddits") else None
                     ),
                     limit=limit,
-                    sort=sort,
                     timeframe=timeframe,
                     session=session,
                 ),
