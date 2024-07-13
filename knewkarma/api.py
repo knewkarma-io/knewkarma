@@ -4,17 +4,11 @@ from typing import Union, Literal
 import aiohttp
 from rich.markdown import Markdown
 
-from ._utilities import console, countdown_timer, get_status
+from .tools.general_utils import console, get_status
+from .tools.time_utils import countdown_timer
 from .version import Version
 
-SORT_CRITERION = Literal[
-    "controversial",
-    "new",
-    "top",
-    "best",
-    "hot",
-    "rising",
-]
+SORT_CRITERION = Literal["controversial", "new", "top", "best", "hot", "rising", "all"]
 TIMEFRAME = Literal["hour", "day", "week", "month", "year", "all"]
 
 
@@ -22,27 +16,28 @@ class Api:
     """Represents the Knew Karma API and provides methods for getting various data from the Reddit API."""
 
     def __init__(self):
-        self.base_reddit_endpoint: str = "https://www.reddit.com"
-        self._user_data_endpoint: str = f"{self.base_reddit_endpoint}/u"
-        self._users_data_endpoint: str = f"{self.base_reddit_endpoint}/users"
-        self.subreddit_data_endpoint: str = f"{self.base_reddit_endpoint}/r"
-        self._subreddits_data_endpoint: str = f"{self.base_reddit_endpoint}/subreddits"
+        self.base_endpoint: str = "https://www.reddit.com"
+        self._user_endpoint: str = f"{self.base_endpoint}/u"
+        self._users_endpoint: str = f"{self.base_endpoint}/users"
+        self.subreddit_endpoint: str = f"{self.base_endpoint}/r"
+        self._subreddits_endpoint: str = f"{self.base_endpoint}/subreddits"
         self._github_release_endpoint: str = (
             "https://api.github.com/repos/bellingcat/knewkarma/releases/latest"
         )
 
     @staticmethod
-    async def get_data(
-        session: aiohttp.ClientSession, endpoint: str
+    async def send_request(
+        endpoint: str,
+        session: aiohttp.ClientSession,
     ) -> Union[dict, list]:
         """
-        Asynchronously fetches JSON data from a given API endpoint.
+        Asynchronously sends a request to the specified endpoint and returns JSON or list response.
 
-        :param session: aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
         :param endpoint: The API endpoint to fetch data from.
         :type endpoint: str
-        :return: Returns JSON data as a dictionary or list. Returns an empty dict if fetching fails.
+        :param session: aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession
+        :return: JSON data as a dictionary or list. Returns an empty dict if fetching fails.
         :rtype: Union[dict, list]
         """
         from sys import version as python_version
@@ -113,7 +108,7 @@ class Api:
         """
         with get_status(status_message="Checking for updates..."):
             # Make a GET request to PyPI to get the project's latest release.
-            response: dict = await self.get_data(
+            response: dict = await self.send_request(
                 endpoint=self._github_release_endpoint, session=session
             )
             release: dict = self._process_response(
@@ -146,47 +141,8 @@ class Api:
                     console.log(update_message)
                     console.log(markdown_release_notes)
 
-    async def get_profile(
-        self,
-        profile_type: Literal["post", "subreddit", "user"],
-        session: aiohttp.ClientSession,
-        **kwargs,
-    ) -> dict:
-        """
-        Asynchronously fetches a profile from the specified source.
-
-        :param profile_type: The type of profile that is to be fetched.
-        :type profile_type: str
-        :param session: aiohttp session to use for the request.
-        :return: A dictionary object containing profile data from the specified source.
-        :rtype: dict
-        """
-        with get_status(
-            status_message=f"Initialising [underline]single data[/] retrieval job..."
-        ):
-            # Use a dictionary for direct mapping
-            profile_mapping: dict = {
-                "post": f"{self.subreddit_data_endpoint}/{kwargs.get('post_subreddit')}"
-                f"/comments/{kwargs.get('post_id')}.json",
-                "user": f"{self._user_data_endpoint}/{kwargs.get('username')}/about.json",
-                "subreddit": f"{self.subreddit_data_endpoint}/{kwargs.get('subreddit')}/about.json",
-            }
-
-            # Get the endpoint directly from the dictionary
-            endpoint: str = profile_mapping.get(profile_type, "")
-
-            profile_data = await self.get_data(endpoint=endpoint, session=session)
-
-        return self._process_response(
-            response_data=profile_data.get("data", {}), valid_key="created_utc"
-        )
-
     async def _paginate(
-        self,
-        session: aiohttp.ClientSession,
-        endpoint: str,
-        data_processor: callable,
-        limit: int,
+        self, limit: int, session: aiohttp.ClientSession, **kwargs
     ) -> list[dict]:
         """
         Asynchronously fetches and processes data in a paginated manner
@@ -194,14 +150,10 @@ class Api:
         of items is reached or there are no more items to fetch. It uses a specified processing function
         to handle the data from each request, ensuring no duplicates are returned.
 
-        :param session: An Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
-        :param endpoint: Endpoint to get paginated data from.
-        :type endpoint: str
-        :param data_processor: A callable function for processing response data.
-        :type data_processor: callable
         :param limit: Maximum number of results to return.
         :type limit: int
+        :param session: An Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession
         :return: A list of dict objects, each containing paginated data.
         :rtype: list[dict]
         """
@@ -212,22 +164,21 @@ class Api:
         ) as status:
             while len(all_items) < limit:
                 paginated_endpoint = (
-                    f"{endpoint}&after={last_item_id}&count={len(all_items)}"
+                    f"{kwargs.get('endpoint')}&after={last_item_id}&count={len(all_items)}"
                     if last_item_id
-                    else endpoint
+                    else kwargs.get("endpoint")
                 )
 
-                response = await self.get_data(
+                response = await self.send_request(
                     session=session, endpoint=paginated_endpoint
                 )
 
-                # TODO: find a cleaner way to do this
                 items = response.get("data", {}).get("children", [])
 
                 if not items:
                     break
 
-                processed_items = data_processor(response_data=items)
+                processed_items = kwargs.get("data_processor")(response_data=items)
                 items_to_limit = limit - len(all_items)
                 all_items.extend(processed_items[:items_to_limit])
 
@@ -236,21 +187,53 @@ class Api:
                 if len(all_items) == limit:
                     break
 
-                sleep_delay: int = randint(1, 10)
-
                 await countdown_timer(
                     status=status,
-                    duration=sleep_delay,
+                    duration=randint(1, 10),
                     current_count=len(all_items),
                     limit=limit,
                 )
 
         return all_items
 
+    async def get_entity(
+        self,
+        entity_type: Literal["post", "subreddit", "user", "wiki_page"],
+        session: aiohttp.ClientSession,
+        **kwargs,
+    ) -> dict:
+        """
+        Asynchronously fetches a data from the specified entity.
+
+        :param entity_type: The type of entity to get data from
+        :type entity_type: str
+        :param session: aiohttp session to use for the request.
+        :return: A dictionary containing a specified entity's data.
+        :rtype: dict
+        """
+        with get_status(
+            status_message=f"Initialising [underline]single data[/] retrieval job..."
+        ):
+            # Use a dictionary for direct mapping
+            entity_mapping: dict = {
+                "post": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
+                f"/comments/{kwargs.get('post_id')}.json",
+                "user": f"{self._user_endpoint}/{kwargs.get('username')}/about.json",
+                "subreddit": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/about.json",
+                "wiki_page": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/wiki/{kwargs.get('page_name')}.json",
+            }
+
+            # Get the endpoint directly from the dictionary
+            endpoint: str = entity_mapping.get(entity_type, "")
+
+            entity_data = await self.send_request(endpoint=endpoint, session=session)
+
+        return self._process_response(
+            response_data=entity_data.get("data", {}), valid_key="created_utc"
+        )
+
     async def get_posts(
         self,
-        limit: int,
-        session: aiohttp.ClientSession,
         posts_type: Literal[
             "best",
             "controversial",
@@ -265,6 +248,8 @@ class Api:
             "user_comments",
             "post_comments",
         ],
+        limit: int,
+        session: aiohttp.ClientSession,
         timeframe: TIMEFRAME = "all",
         sort: SORT_CRITERION = "all",
         **kwargs,
@@ -282,24 +267,23 @@ class Api:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: Literal
-
-        :return: A list of dictionaries, each containing data of a post.
+        :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
         """
         source_map = {
-            "best": f"{self.base_reddit_endpoint}/r/{posts_type}.json",
-            "controversial": f"{self.base_reddit_endpoint}/r/{posts_type}.json",
-            "front_page": f"{self.base_reddit_endpoint}/.json",
-            "new": f"{self.base_reddit_endpoint}/new.json",
-            "popular": f"{self.base_reddit_endpoint}/r/{posts_type}.json",
-            "rising": f"{self.base_reddit_endpoint}/r/{posts_type}.json",
-            "subreddit_posts": f"{self.subreddit_data_endpoint}/{kwargs.get('subreddit')}.json",
-            "user_posts": f"{self._user_data_endpoint}/{kwargs.get('username')}/submitted.json",
-            "user_overview": f"{self._user_data_endpoint}/{kwargs.get('username')}/overview.json",
-            "user_comments": f"{self._user_data_endpoint}/{kwargs.get('username')}/comments.json",
-            "post_comments": f"{self.subreddit_data_endpoint}/{kwargs.get('post_subreddit')}"
+            "best": f"{self.base_endpoint}/r/{posts_type}.json",
+            "controversial": f"{self.base_endpoint}/r/{posts_type}.json",
+            "front_page": f"{self.base_endpoint}/.json",
+            "new": f"{self.base_endpoint}/new.json",
+            "popular": f"{self.base_endpoint}/r/{posts_type}.json",
+            "rising": f"{self.base_endpoint}/r/{posts_type}.json",
+            "subreddit_posts": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}.json",
+            "user_posts": f"{self._user_endpoint}/{kwargs.get('username')}/submitted.json",
+            "user_overview": f"{self._user_endpoint}/{kwargs.get('username')}/overview.json",
+            "user_comments": f"{self._user_endpoint}/{kwargs.get('username')}/comments.json",
+            "post_comments": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
             f"/comments/{kwargs.get('post_id')}.json",
-            "search_subreddit_posts": f"{self.subreddit_data_endpoint}/{kwargs.get('subreddit')}"
+            "search_subreddit_posts": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}"
             f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
         }
 
@@ -307,64 +291,22 @@ class Api:
         endpoint += f"?limit={limit}&sort={sort}&t={timeframe}&raw_json=1"
 
         posts: list[dict] = await self._paginate(
+            limit=limit,
             session=session,
             endpoint=endpoint,
             data_processor=self._process_response,
-            limit=limit,
         )
 
         return posts
 
-    async def get_search_results(
-        self,
-        session: aiohttp.ClientSession,
-        search_type: Literal["users", "subreddits", "posts"],
-        query: str,
-        limit: int,
-        sort: SORT_CRITERION = "all",
-        timeframe: TIMEFRAME = "all",
-    ) -> list[dict]:
-        """
-        Asynchronously searches from a specified results type that match the specified query.
-
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
-        :param search_type: Type of results to get.
-        :type search_type: str
-        :param query: Search query.
-        :type query: str
-        :param limit: Maximum number of results to get.
-        :type limit: int
-        :param sort: Posts' sort criterion.
-        :type sort: str
-        :param timeframe: Timeframe from which to get posts.
-        :type timeframe: str
-        """
-        search_mapping: dict = {
-            "posts": self.base_reddit_endpoint,
-            "subreddits": self._subreddits_data_endpoint,
-            "users": self._users_data_endpoint,
-        }
-
-        endpoint = search_mapping.get(search_type, "")
-        endpoint += f"/search.json?q={query}&limit={limit}&sort={sort}&t={timeframe}"
-
-        search_results: list[dict] = await self._paginate(
-            session=session,
-            endpoint=endpoint,
-            data_processor=self._process_response,
-            limit=limit,
-        )
-
-        return search_results
-
     async def get_subreddits(
         self,
-        subreddits_type: Literal["all", "default", "new", "popular"],
-        limit: int,
         session: aiohttp.ClientSession,
+        subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
+        limit: int,
         timeframe: TIMEFRAME = "all",
-    ) -> list[dict]:
+        **kwargs,
+    ) -> Union[list[dict], dict]:
         """
         Asynchronously gets the specified type of subreddits.
 
@@ -376,31 +318,41 @@ class Api:
         :type timeframe: Literal
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :return: A list of dictionaries, each containing subreddit data,
+            or a single dictionary containing subreddit data.
+        :rtype: Union[list[dict], dict]
         """
         subreddits_mapping: dict = {
-            "all": f"{self._subreddits_data_endpoint}.json",
-            "default": f"{self._subreddits_data_endpoint}/default.json",
-            "new": f"{self._subreddits_data_endpoint}/new.json",
-            "popular": f"{self._subreddits_data_endpoint}/popular.json",
+            "all": f"{self._subreddits_endpoint}.json",
+            "default": f"{self._subreddits_endpoint}/default.json",
+            "new": f"{self._subreddits_endpoint}/new.json",
+            "popular": f"{self._subreddits_endpoint}/popular.json",
+            "user_moderated": f"{self._user_endpoint}/{kwargs.get('username')}/moderated_subreddits.json",
         }
 
         endpoint = subreddits_mapping.get(subreddits_type, "")
-        endpoint += f"?limit={limit}&t={timeframe}"
+        if subreddits_type == "user_moderated":
+            subreddits: dict = await self.send_request(
+                endpoint=endpoint,
+                session=session,
+            )
+        else:
+            endpoint += f"?limit={limit}&t={timeframe}"
 
-        subreddits: list[dict] = await self._paginate(
-            session=session,
-            endpoint=endpoint,
-            data_processor=self._process_response,
-            limit=limit,
-        )
+            subreddits: list[dict] = await self._paginate(
+                limit=limit,
+                session=session,
+                endpoint=endpoint,
+                data_processor=self._process_response,
+            )
 
         return subreddits
 
     async def get_users(
         self,
+        session: aiohttp.ClientSession,
         users_type: Literal["all", "popular", "new"],
         limit: int,
-        session: aiohttp.ClientSession,
         timeframe: TIMEFRAME = "all",
     ) -> list[dict]:
         """
@@ -414,20 +366,64 @@ class Api:
         :type timeframe: Literal
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :return: A list of dictionaries, each containing user data.
+        :rtype: list[dict]
         """
         users_mapping: dict = {
-            "all": f"{self._users_data_endpoint}.json",
-            "new": f"{self._users_data_endpoint}/new.json",
-            "popular": f"{self._users_data_endpoint}/popular.json",
+            "all": f"{self._users_endpoint}.json",
+            "new": f"{self._users_endpoint}/new.json",
+            "popular": f"{self._users_endpoint}/popular.json",
         }
 
         endpoint = users_mapping.get(users_type, "")
         endpoint += f"?limit={limit}&t={timeframe}"
         users: list[dict] = await self._paginate(
+            limit=limit,
             session=session,
             endpoint=endpoint,
             data_processor=self._process_response,
-            limit=limit,
         )
 
         return users
+
+    async def search_entities(
+        self,
+        session: aiohttp.ClientSession,
+        entity_type: Literal["users", "subreddits", "posts"],
+        query: str,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+    ) -> list[dict]:
+        """
+        Asynchronously searches from a specified results type that match the specified query.
+
+        :param session: Aiohttp session to use for the request.
+        :type session: aiohttp.ClientSession
+        :param entity_type: Type of entity to search for.
+        :type entity_type: Literal[str]
+        :param query: Search query.
+        :type query: str
+        :param limit: Maximum number of results to get.
+        :type limit: int
+        :param sort: Posts' sort criterion.
+        :type sort: str
+        :return: A list of dictionaries, each containing search result data.
+        :rtype: list[dict]
+        """
+        search_mapping: dict = {
+            "posts": self.base_endpoint,
+            "subreddits": self._subreddits_endpoint,
+            "users": self._users_endpoint,
+        }
+
+        endpoint = search_mapping.get(entity_type, "")
+        endpoint += f"/search.json?q={query}&limit={limit}&sort={sort}"
+
+        search_results: list[dict] = await self._paginate(
+            limit=limit,
+            session=session,
+            endpoint=endpoint,
+            data_processor=self._process_response,
+        )
+
+        return search_results

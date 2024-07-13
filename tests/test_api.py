@@ -27,8 +27,8 @@ async def fetch_with_retry(fetch_func, *args, **kwargs):
 async def test_search_for_posts():
     search_posts_query: str = "coronavirus"
     search_posts: list[dict] = await fetch_with_retry(
-        api.get_search_results,
-        search_type="posts",
+        api.search_entities,
+        entity_type="posts",
         query=search_posts_query,
         limit=100,
     )
@@ -71,8 +71,8 @@ async def test_search_for_posts_in_a_subreddit():
 async def test_search_for_subreddits():
     search_subreddits_query: str = "science"
     search_subreddits: list[dict] = await fetch_with_retry(
-        api.get_search_results,
-        search_type="subreddits",
+        api.search_entities,
+        entity_type="subreddits",
         query=search_subreddits_query,
         limit=150,
     )
@@ -93,8 +93,8 @@ async def test_search_for_subreddits():
 async def test_search_for_users():
     search_users_query: str = "john"
     search_users: list[dict] = await fetch_with_retry(
-        api.get_search_results,
-        search_type="users",
+        api.search_entities,
+        entity_type="users",
         query=search_users_query,
         limit=50,
     )
@@ -114,8 +114,8 @@ async def test_search_for_users():
 @pytest.mark.asyncio
 async def test_get_user_and_subreddit_profiles():
     user_profile: dict = await fetch_with_retry(
-        api.get_profile,
-        profile_type="user",
+        api.get_entity,
+        entity_type="user",
         username=TEST_USERNAME,
     )
 
@@ -123,8 +123,8 @@ async def test_get_user_and_subreddit_profiles():
     assert user_profile.get("created") == 1325741068
 
     subreddit_profile: dict = await fetch_with_retry(
-        api.get_profile,
-        profile_type="subreddit",
+        api.get_entity,
+        entity_type="subreddit",
         subreddit=TEST_SUBREDDIT_2,
     )
 
