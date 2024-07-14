@@ -338,7 +338,7 @@ def clean_subreddits(data: Union[list, dict], time_format) -> Union[list[dict], 
     return subreddit_data
 
 
-def clean_subreddit_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
+def clean_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
     """
     Cleans raw subreddit wiki page data to get only the needed data.
 
