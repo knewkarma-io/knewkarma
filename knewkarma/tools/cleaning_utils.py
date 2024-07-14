@@ -8,7 +8,7 @@ def clean_users(
     data: Union[list[dict], dict], time_format: TIME_FORMAT
 ) -> Union[list[dict], dict]:
     """
-    Cleans a list/single object of raw user data.
+    Cleans a list of/a single object of raw user data.
 
     :param data: A list of dict objects, each containing raw user data.
     :type data: list[dict]
@@ -16,6 +16,22 @@ def clean_users(
     :type time_format: Literal[locale, concise]
     :return: A list of parsed dict objects, each containing user data Or a dict object containing user data.
     :rtype: Union[list[dict], dict]
+
+    Usage::
+
+        >>> from knewkarma.tools import cleaning_utils
+
+        >>> # The raw user data could also be a list of object containing user data in the same format.
+        >>> raw_user = {
+        >>>                 "kind": "t2",
+        >>>                 "data": {
+        >>>                             "is_employee": False,
+        >>>                             "is_friend": False,
+        >>>                             "subreddit": {
+        >>>                                             "default_set": True, ...
+        >>> ...}
+
+        >>> cleaned_user = cleaning_utils.clean_user(data=raw_user, time_format = "locale")
     """
 
     def build_user(user: dict) -> dict:
@@ -80,6 +96,22 @@ def clean_posts(
     :type time_format: Literal[locale, concise]
     :return: A list of parsed dict objects, each containing post data Or a dict object containing post data.
     :rtype: Union[list[dict], dict]
+
+    Usage::
+
+        >>> from knewkarma.tools import cleaning_utils
+
+        >>> # The raw post data could also be a list of object containing post data in the same format.
+        >>> raw_post = {
+        >>>                 "kind": "t3",
+        >>>                 "data": {
+        >>>                             "approved_at_utc": None,
+        >>>                             "subreddit": "OnePiece",
+        >>>                             "selftext": "**Chapter 1120** is out on...",
+        >>>                             "author_fullname": "t2_6l4z3", ...
+        >>> ...}
+
+        >>> cleaned_post = cleaning_utils.clean_posts(data=raw_post, time_format = "locale")
     """
 
     def build_post(post: dict) -> dict:
@@ -175,6 +207,22 @@ def clean_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
     :type time_format: Literal[locale, concise]
     :return: A list of parsed dict objects, each containing comments data.
     :rtype: list[dict]
+
+    Usage::
+
+        >>> from knewkarma.tools import cleaning_utils
+
+        >>> # The raw comment data could also be a list of object containing comment data in the same format.
+        >>> raw_comment = {
+        >>>                 "kind": "t1",
+        >>>                 "data": {
+        >>>                             "subreddit_id": "t5_2ybb3",
+        >>>                             "approved_at_utc": None,
+        >>>                             "author_is_blocked": False,
+        >>>                             "comment_type": None, ...
+        >>> ...}
+
+        >>> cleaned_comment = cleaning_utils.clean_comments(data=raw_comment, time_format = "locale")
     """
     if len(comments) != 0:
         comments_list: list = []
@@ -242,6 +290,22 @@ def clean_subreddits(data: Union[list, dict], time_format) -> Union[list[dict], 
     :type time_format: Literal[locale, concise]
     :return: A list of parsed dict objects, each containing subreddits data Or a dict object containing subreddit data.
     :rtype: Union[list[dict], dict]
+
+    Usage::
+
+        >>> from knewkarma.tools import cleaning_utils
+
+        >>> # The raw subreddit data could also be a list of object containing subreddit data in the same format.
+        >>> raw_subreddit = {
+        >>>                 "kind": "t5",
+        >>>                 "data": {
+        >>>                             "user_flair_background_color": None,
+        >>>                             "submit_text_html": "&lt;...strong&gt;BEFORE YOU SUBMIT, &lt;a...",
+        >>>                             "restrict_posting": True,
+        >>>                             "free_form_reports": True, ...
+        >>> ...}
+
+        >>> cleaned_subreddit = cleaning_utils.clean_subreddits(data=raw_subreddit, time_format = "locale")
     """
 
     def build_subreddit(
@@ -344,10 +408,25 @@ def clean_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
 
     :param wiki_page: Raw wiki page data.
     :type wiki_page: dict
-    :param time_format: TIme format for the parsed data.
+    :param time_format: Time format for the parsed data.
     :type time_format: Literal[locale, concise]
     :return: A dict object of parsed wiki page data.
     :rtype: dict
+
+    Usage::
+
+        >>> from knewkarma.tools import cleaning_utils
+
+        >>> raw_wiki_page = {
+        >>>                 "kind": "wikipage",
+        >>>                 "data": {
+        >>>                             "content_md": "[\u21e6 Index](https://www.reddit.com/r/OnePiece/wiki/index)...",
+        >>>                             "revision_date": 1671478514,
+        >>>                             "revision_by": {"kind": "t2", "data":...,
+        >>>                             "revision_id": "42ab00c4-7fd4-11ed-9528-a6b541c5c78b", ...
+        >>> ...}
+
+        >>> cleaned_wiki_page = cleaning_utils.clean_wiki_page(data=raw_wiki_page, time_format = "locale")
     """
     if "revision_id" in wiki_page:
         user: dict = wiki_page.get("revision_by").get("data")
