@@ -7,9 +7,9 @@ from .api import Api, TIMEFRAME, SORT_CRITERION
 from .tools.cleaning_utils import (
     clean_comments,
     clean_subreddits,
-    clean_subreddit_wiki_page,
     clean_posts,
     clean_users,
+    clean_wiki_page,
 )
 from .tools.general_utils import TIME_FORMAT, get_status
 
@@ -166,14 +166,14 @@ class Posts:
             >>> from knewkarma import Posts
 
 
-            >>> async def async_best_posts(posts_timeframe, posts_limit):
+            >>> async def async_best_posts(posts_limit):
             >>>    posts = Posts()
             >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        best = await posts.best(timeframe=posts_timeframe, limit=posts_limit, session=request_session)
+            >>>        best = await posts.best(limit=posts_limit, session=request_session)
             >>>        print(best)
 
 
-            >>> asyncio.run(async_best_posts(posts_timeframe="all", posts_limit=120))
+            >>> asyncio.run(async_best_posts(posts_limit=120))
         """
         best_posts: list = await api.get_posts(
             posts_type="best",
@@ -210,15 +210,13 @@ class Posts:
             >>> from knewkarma import Posts
 
 
-            >>> async def async_controversial_posts(posts_timeframe, posts_limit):
+            >>> async def async_controversial_posts(posts_limit):
             >>>    posts = Posts()
             >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        controversial = await posts.controversial(timeframe=posts_timeframe, limit=posts_limit,
-            >>>                                                                       session=request_session)
+            >>>        controversial = await posts.controversial(limit=posts_limit, session=request_session)
             >>>        print(controversial)
 
-
-            >>> asyncio.run(async_controversial_posts(posts_timeframe="year", posts_limit=50))
+            >>> asyncio.run(async_controversial_posts(posts_limit=50))
         """
         controversial_posts: list = await api.get_posts(
             posts_type="controversial",
@@ -255,14 +253,14 @@ class Posts:
             >>> from knewkarma import Posts
 
 
-            >>> async def async_frontpage_posts(posts_sort, posts_limit):
+            >>> async def async_frontpage_posts(posts_limit):
             >>>    posts = Posts()
             >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        frontpage = await posts.front_page(sort=posts_sort, limit=posts_limit, session=request_session)
+            >>>        frontpage = await posts.front_page(limit=posts_limit, session=request_session)
             >>>        print(frontpage)
 
 
-            >>> asyncio.run(async_frontpage_posts(posts_sort="hot", posts_limit=10))
+            >>> asyncio.run(async_frontpage_posts(posts_limit=10))
         """
         front_page_posts: list = await api.get_posts(
             posts_type="front_page",
@@ -299,14 +297,14 @@ class Posts:
             >>> from knewkarma import Posts
 
 
-            >>> async def async_new_posts(posts_sort, posts_limit):
+            >>> async def async_new_posts(posts_limit):
             >>>    posts = Posts()
             >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        new = await posts.new(sort=posts_sort, limit=posts_limit, session=request_session)
+            >>>        new = await posts.new(limit=posts_limit, session=request_session)
             >>>        print(new)
 
 
-            >>> asyncio.run(async_new_posts(posts_sort="hot", posts_limit=10))
+            >>> asyncio.run(async_new_posts(posts_limit=10))
         """
         new_posts: list = await api.get_posts(
             posts_type="new",
@@ -332,6 +330,22 @@ class Posts:
         :type timeframe: Literal[str]
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Posts
+
+
+            >>> async def async_popular_posts(posts_limit):
+            >>>    posts = Posts()
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        popular = await posts.popular(limit=posts_limit, session=request_session)
+            >>>        print(popular)
+
+
+            >>> asyncio.run(async_popular_posts(posts_limit=50))
         """
         popular_posts: list = await api.get_posts(
             posts_type="popular",
@@ -357,6 +371,22 @@ class Posts:
         :type timeframe: Literal[str]
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Posts
+
+
+            >>> async def async_rising_posts(posts_limit):
+            >>>    posts = Posts()
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        rising = await posts.rising(limit=posts_limit, session=request_session)
+            >>>        print(rising)
+
+
+            >>> asyncio.run(async_rising_posts(posts_limit=100))
         """
         rising_posts: list = await api.get_posts(
             posts_type="rising",
@@ -405,6 +435,22 @@ class Search:
         :type sort: Literal[str]
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Search
+
+
+            >>> async def async_search_posts(query, results_limit):
+            >>>    search = Search(query=query)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        posts = await search.posts(limit=results_limit, session=request_session)
+            >>>        print(posts)
+
+
+            >>> asyncio.run(async_search_posts(query="something in data science", results_limit=200))
         """
         posts_results: list = await api.search_entities(
             query=self._query,
@@ -433,6 +479,22 @@ class Search:
         :type sort: Literal[str]
         :return: A list of dictionaries, each containing subreddit data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Search
+
+
+            >>> async def async_search_subreddits(query, results_limit):
+            >>>    search = Search(query=query)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        subreddits = await search.subreddits(limit=results_limit, session=request_session)
+            >>>        print(subreddits)
+
+
+            >>> asyncio.run(async_search_subreddits(query="questions", results_limit=200))
         """
         search_subreddits: list = await api.search_entities(
             query=self._query,
@@ -464,6 +526,22 @@ class Search:
         :type limit: int
         :return: A list of dictionaries, each containing user data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Search
+
+
+            >>> async def async_search_users(query, results_limit):
+            >>>    search = Search(query=query)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        users = await search.users(limit=results_limit, session=request_session)
+            >>>        print(users)
+
+
+            >>> asyncio.run(async_search_users(query="john", results_limit=200))
         """
         search_users: list = await api.search_entities(
             query=self._query,
@@ -504,6 +582,22 @@ class Subreddit:
         :type session: aiohttp.ClientSession
         :return: A dictionary containing subreddit profile data.
         :rtype: dict
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Subreddit
+
+
+            >>> async def async_subreddit_profile(subreddit):
+            >>>    subreddit = Subreddit(subreddit=subreddit)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        profile = await subreddit.profile(session=request_session)
+            >>>        print(profile)
+
+
+            >>> asyncio.run(async_subreddit_profile(subreddit="MachineLearning"))
         """
         subreddit_profile: dict = await api.get_entity(
             entity_type="subreddit",
@@ -517,12 +611,28 @@ class Subreddit:
 
     async def wiki_pages(self, session: aiohttp.ClientSession) -> list[str]:
         """
-        Return a subreddit's wiki pages.
+        Get a subreddit's wiki pages.
 
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         :return: A list of strings, each representing a wiki page.
         :rtype: list[str]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Subreddit
+
+
+            >>> async def async_subreddit_wiki_pages(subreddit):
+            >>>    subreddit = Subreddit(subreddit=subreddit)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        wiki_pages = await subreddit.wiki_pages(session=request_session)
+            >>>        print(wiki_pages)
+
+
+            >>> asyncio.run(async_subreddit_wiki_pages(subreddit="MachineLearning"))
         """
         with get_status(
             status_message=f"Starting [underline]single data[/] retrieval process..."
@@ -536,7 +646,7 @@ class Subreddit:
 
     async def wiki_page(self, page_name: str, session: aiohttp.ClientSession) -> dict:
         """
-        Return a subreddit's specified wiki page data.
+        Get a subreddit's specified wiki page data.
 
         :param page_name: Wiki page to get data from.
         :type page_name: str
@@ -544,6 +654,22 @@ class Subreddit:
         :type session: aiohttp.ClientSession
         :return: A list of strings, each representing a wiki page.
         :rtype: list[str]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Subreddit
+
+
+            >>> async def async_subreddit_wiki_page(page, subreddit):
+            >>>    subreddit = Subreddit(subreddit=subreddit)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        wiki_page_data = await subreddit.wiki_page(page_name=page, session=request_session)
+            >>>        print(wiki_page_data)
+
+
+            >>> asyncio.run(async_subreddit_wiki_page(page="rules", subreddit="MachineLearning"))
         """
         wiki_page: dict = await api.get_entity(
             entity_type="wiki_page",
@@ -553,9 +679,7 @@ class Subreddit:
         )
 
         if wiki_page:
-            return clean_subreddit_wiki_page(
-                wiki_page=wiki_page, time_format=self._time_format
-            )
+            return clean_wiki_page(wiki_page=wiki_page, time_format=self._time_format)
 
     async def posts(
         self,
@@ -577,6 +701,22 @@ class Subreddit:
         :type timeframe: Literal
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Subreddit
+
+
+            >>> async def async_subreddit_posts(subreddit, posts_limit):
+            >>>    subreddit = Subreddit(subreddit=subreddit)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        posts = await subreddit.posts(limit=posts_limit, session=request_session)
+            >>>        print(posts)
+
+
+            >>> asyncio.run(async_subreddit_posts(limit=500, subreddit="MachineLearning"))
         """
         subreddit_posts: list = await api.get_posts(
             posts_type="subreddit_posts",
@@ -613,6 +753,22 @@ class Subreddit:
         :type timeframe: Literal
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Subreddit
+
+
+            >>> async def async_search_subreddit_posts(search_query, subreddit, posts_limit):
+            >>>    subreddit = Subreddit(subreddit=subreddit)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        posts = await subreddit.search(query=search_query, limit=posts_limit, session=request_session)
+            >>>        print(posts)
+
+
+            >>> asyncio.run(async_search_subreddit_posts(query="ML jobs", limit=100, subreddit="MachineLearning"))
         """
         found_posts: list = await api.get_posts(
             posts_type="search_subreddit_posts",
@@ -645,7 +801,7 @@ class Subreddits:
         self, session: aiohttp.ClientSession, limit: int, timeframe: TIMEFRAME = "all"
     ) -> list[dict]:
         """
-        Return all subreddits.
+        Get all subreddits.
 
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
@@ -657,7 +813,23 @@ class Subreddits:
         :rtype: list[dict]
 
         Note:
-            *in Morphius' voice* "the only limitation you have at this point is the matrix's rate-limit."
+            -*imitating Morphius' voice*- "the only limitation you have at this point is the matrix's rate-limit."
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Subreddits
+
+
+            >>> async def async_all_subreddits(subreddits_limit):
+            >>>    subreddits = Subreddits()
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        all_subs = await subreddits.all(limit=subreddits_limit, session=request_session)
+            >>>        print(all_subs)
+
+
+            >>> asyncio.run(async_all_subreddits(limit=500))
         """
         all_subreddits: list = await api.get_subreddits(
             subreddits_type="all", limit=limit, timeframe=timeframe, session=session
@@ -667,7 +839,7 @@ class Subreddits:
 
     async def default(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
         """
-        Return default subreddits.
+        Get default subreddits.
 
         :param limit: Maximum number of subreddits to return.
         :type limit: int
@@ -675,6 +847,22 @@ class Subreddits:
         :type session: aiohttp.ClientSession
         :return: A list of dictionaries, each containing subreddit data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Subreddits
+
+
+            >>> async def async_default_subreddits(subreddits_limit):
+            >>>    subreddits = Subreddits()
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        default_subs = await subreddits.default(limit=subreddits_limit, session=request_session)
+            >>>        print(default_subs)
+
+
+            >>> asyncio.run(async_default_subreddits(limit=20))
         """
         default_subreddits: list = await api.get_subreddits(
             subreddits_type="default", timeframe="all", limit=limit, session=session
@@ -686,7 +874,7 @@ class Subreddits:
         self, session: aiohttp.ClientSession, limit: int, timeframe: TIMEFRAME = "all"
     ) -> list[dict]:
         """
-        Return new subreddits.
+        Get new subreddits.
 
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
@@ -696,6 +884,22 @@ class Subreddits:
         :type timeframe: Literal
         :return: A list of dictionaries, each containing subreddit data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Subreddits
+
+
+            >>> async def async_new_subreddits(subreddits_limit):
+            >>>    subreddits = Subreddits()
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        new_subs = await subreddits.new(limit=subreddits_limit, session=request_session)
+            >>>        print(new_subs)
+
+
+            >>> asyncio.run(async_new_subreddits(limit=50))
         """
         new_subreddits: list = await api.get_subreddits(
             subreddits_type="new", limit=limit, timeframe=timeframe, session=session
@@ -707,7 +911,7 @@ class Subreddits:
         self, session: aiohttp.ClientSession, limit: int, timeframe: TIMEFRAME = "all"
     ) -> list[dict]:
         """
-        Return popular subreddits.
+        Get popular subreddits.
 
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
@@ -717,6 +921,22 @@ class Subreddits:
         :type timeframe: Literal
         :return: A list of dictionaries, each containing subreddit data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Subreddits
+
+
+            >>> async def async_popular_subreddits(subreddits_limit):
+            >>>    subreddits = Subreddits()
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        popular_subs = await subreddits.popular(limit=subreddits_limit, session=request_session)
+            >>>        print(popular_subs)
+
+
+            >>> asyncio.run(async_popular_subreddits(limit=100))
         """
         popular_subreddits: list = await api.get_subreddits(
             subreddits_type="popular", limit=limit, timeframe=timeframe, session=session
@@ -761,6 +981,22 @@ class User:
         :type timeframe: Literal
         :return: A list of dictionaries, each containing comment data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import User
+
+
+            >>> async def async_user_comments(username, comments_limit):
+            >>>    user = User(username=username)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        comments = await user.comments(limit=comments_limit, session=request_session)
+            >>>        print(comments)
+
+
+            >>> asyncio.run(async_user_comments(username="AutoModerator", limit=100))
         """
         user_comments: list = await api.get_posts(
             username=self._username,
@@ -782,6 +1018,22 @@ class User:
         :type session: aiohttp.ClientSession
         :return: A list of dictionaries, each containing subreddit data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import User
+
+
+            >>> async def async_user_moderated_subreddits(username):
+            >>>    user = User(username=username)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        moderated_subs = await user.moderated_subreddits(session=request_session)
+            >>>        print(moderated_subs)
+
+
+            >>> asyncio.run(async_user_moderated_subreddits(username="TheRealKSI", limit=100))
         """
         subreddits: dict = await api.get_subreddits(
             subreddits_type="user_moderated",
@@ -805,6 +1057,22 @@ class User:
         :type session: aiohttp.ClientSession
         :return: A list of dictionaries, each containing data about a recent comment.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import User
+
+
+            >>> async def async_user_overview(username, comments_limit):
+            >>>    user = User(username=username)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        comments = await user.overview(limit=comments_limit, session=request_session)
+            >>>        print(comments)
+
+
+            >>> asyncio.run(async_user_overview(username="AutoModerator", limit=100))
         """
         user_overview: list = await api.get_posts(
             username=self._username,
@@ -835,6 +1103,22 @@ class User:
         :type timeframe: Literal
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import User
+
+
+            >>> async def async_user_posts(username, posts_limit):
+            >>>    user = User(username=username)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        posts = await user.posts(limit=posts_limit, session=request_session)
+            >>>        print(posts)
+
+
+            >>> asyncio.run(async_user_posts(username="AutoModerator", limit=100))
         """
         user_posts: list = await api.get_posts(
             username=self._username,
@@ -855,6 +1139,22 @@ class User:
         :type session: aiohttp.ClientSession
         :return: A dictionary containing user profile data.
         :rtype: dict
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import User
+
+
+            >>> async def async_user_profile(username):
+            >>>    user = User(username=username)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        profile = await user.profile(session=request_session)
+            >>>        print(profile)
+
+
+            >>> asyncio.run(async_user_profile(username="AutoModerator"))
         """
         user_profile: dict = await api.get_entity(
             username=self._username, entity_type="user", session=session
@@ -885,6 +1185,24 @@ class User:
         :type timeframe: Literal
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import User
+
+
+            >>> async def async_search_user_posts(username, search_keyword, posts_limit):
+            >>>    user = User(username=username)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        posts = await user.search_posts(keyword=search_keyword,
+            >>>                                limit=posts_limit, session=request_session)
+            >>>        print(posts)
+
+
+            >>> asyncio.run(async_search_user_posts(username="AutoModerator",
+            >>>                             search_keyword="hello", posts_limit=100))
         """
         user_posts: list = await api.get_posts(
             posts_type="user_posts",
@@ -928,6 +1246,24 @@ class User:
         :type timeframe: Literal
         :return: A list of dictionaries, each containing comment data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import User
+
+
+            >>> async def async_search_user_comments(username, search_keyword, comments_limit):
+            >>>    user = User(username=username)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        comments = await user.search_comments(keyword=search_keyword,
+            >>>                                limit=comments_limit, session=request_session)
+            >>>        print(comments)
+
+
+            >>> asyncio.run(async_search_user_comments(username="AutoModerator",
+            >>>                            search_keyword="automated", posts_limit=100))
         """
         user_comments: list = await api.get_posts(
             username=self._username,
@@ -966,6 +1302,24 @@ class User:
         :type timeframe: Literal
         :return: Dictionary of top n subreddits and their ratio.
         :rtype: dict
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import User
+
+
+            >>> async def async_user_top_subreddits(username, top_number, subreddits_limit):
+            >>>    user = User(username=username)
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        top_subs = await user.top_subreddits(top_n=top_number,
+            >>>                             limit=subreddits_limit, session=request_session)
+            >>>        print(top_subs)
+
+
+            >>> asyncio.run(async_user_top_subreddits(username="TheRealKSI",
+            >>>                                     top_number=10, subreddits_limit=100))
         """
         posts = await api.get_posts(
             posts_type="user_posts",
@@ -1012,6 +1366,22 @@ class Users:
         :type timeframe: Literal
         :return: A list of dictionaries, each containing a user's data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Users
+
+
+            >>> async def async_new_users(users_limit):
+            >>>    users = Users()
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        new = await users.new(limit=users_limit, session=request_session)
+            >>>        print(new)
+
+
+            >>> asyncio.run(async_new_users(users_limit=500))
         """
         new_users: list = await api.get_users(
             users_type="new", limit=limit, timeframe=timeframe, session=session
@@ -1033,6 +1403,22 @@ class Users:
         :type timeframe: Literal
         :return: A list of dictionaries, each containing a user's data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Users
+
+
+            >>> async def async_popular_users(users_limit):
+            >>>    users = Users()
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        popular = await users.popular(limit=users_limit, session=request_session)
+            >>>        print(popular)
+
+
+            >>> asyncio.run(async_popular_users(users_limit=100))
         """
         popular_users: list = await api.get_users(
             users_type="popular",
@@ -1057,6 +1443,22 @@ class Users:
         :type timeframe: Literal
         :return: A list of dictionaries, each containing a user's data.
         :rtype: list[dict]
+
+        Usage::
+
+            >>> import aiohttp
+            >>> import asyncio
+            >>> from knewkarma import Users
+
+
+            >>> async def async_all_users(users_limit):
+            >>>    users = Users()
+            >>>    async with aiohttp.ClientSession() as request_session:
+            >>>        all_users_data = await users.all(limit=users_limit, session=request_session)
+            >>>        print(all_users_data)
+
+
+            >>> asyncio.run(async_all_users(users_limit=1000))
         """
         all_users: list = await api.get_users(
             users_type="all", limit=limit, timeframe=timeframe, session=session

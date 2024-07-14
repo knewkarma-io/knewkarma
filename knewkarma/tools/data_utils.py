@@ -4,6 +4,8 @@ from typing import Union, Literal
 import pandas as pd
 from rich.tree import Tree
 
+from .general_utils import console
+
 
 def create_dataframe(
     data: Union[dict, list[dict], list[tuple]],

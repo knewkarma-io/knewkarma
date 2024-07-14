@@ -229,7 +229,8 @@ class Api:
             entity_data = await self.send_request(endpoint=endpoint, session=session)
 
         return self._process_response(
-            response_data=entity_data.get("data", {}), valid_key="created_utc"
+            response_data=entity_data.get("data", {}),
+            valid_key="content_md" if entity_type == "wiki_page" else "created_utc",
         )
 
     async def get_posts(
