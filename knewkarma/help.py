@@ -1,4 +1,4 @@
-from knewkarma.version import Version
+from .version import Version
 
 
 class Help:
@@ -35,12 +35,12 @@ provided the post's **id** and source **subreddit** are provided.
 # Examples
 ### Get a post's data
 ```
-knewkarma post 12csg48 OSINT --data
+knewkarma post 13ptwzd AskReddit --data
 ```
 
 ### Get a post's comments
 ```
-knewkarma post 12csg48 OSINT --comments
+knewkarma post 13ptwzd AskReddit --comments
 ```
 """,
         "posts": """

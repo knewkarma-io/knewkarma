@@ -7,9 +7,10 @@ description: |
   functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** (*Snap/PyPI
   Package*), and an
   **Application Programming Interface (API)** (*PyPI Package*) to enable an easy integration in other Python Projects. Refer to the documentation (https://knewkarma.readthedocs.io) for the **usage** and **integration** guide.
-version: 5.1.1
+version: 5.2.0
 license: MIT
 base: core22
+grade: stable
 confinement: strict
 
 source-code: https://github.com/bellingcat/knewkarma
@@ -29,4 +30,5 @@ type: app
 apps:
   knewkarma:
     command: bin/knewkarma
+    desktop: snap/gui/knewkarma.desktop
     plugs: [ network, network-bind, home ]

@@ -236,7 +236,8 @@ limit parameter to control the amount of data retrieved.
 
 ## Utilising `time_format` Parameter
 
-The `time_format` parameter affects how timestamps are displayed in your results. Use "`concise`" for relative times (
+The `time_format` parameter (or `--time-format` in the CLI) affects how timestamps are displayed in your results.
+Use "`concise`" for relative times (
 e.g., "*5 minutes ago*") or "`locale`" for locale-based formatting. Here's how to apply it:
 
 ```python
