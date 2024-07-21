@@ -1,6 +1,7 @@
 import os
 from typing import Literal
 
+import rich.table
 from rich.console import Console
 from rich.status import Status
 from rich.table import Table
@@ -9,6 +10,12 @@ from rich.table import Table
 def print_banner():
     """
     Prints the projects banner and system information.
+
+    Usage::
+
+        >>> from knewkarma.tools.general_utils import print_banner
+
+        >>> print_banner()
     """
     console.log(
         f"""
@@ -16,12 +23,22 @@ def print_banner():
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
 ┛┗┛┛┗┗ ┗┻┛  ┛┗┛┗┻┛ ┛┗┗┗┻"""
     )
-    system_info()
+    console.print(get_system_info())
 
 
-def system_info():
+def get_system_info() -> Table:
     """
-    Displays system information in a table format.
+    Gets system information
+
+    :return: A table containing system information.
+    :rtype: rich.table.Table
+
+    Usage::
+
+        >>> from knewkarma.tools.general_utils import get_system_info
+        >>> from rich import print as xprint
+
+        >>> xprint(get_system_info())
     """
     import getpass
     import platform
@@ -67,9 +84,9 @@ def system_info():
             timestamp=int(psutil.boot_time()), suffix="since boot"
         )
 
+    table.add_row("Username", getpass.getuser())
     table.add_row("Knew Karma", Version.full)
     table.add_row("Python", sys.version)
-    table.add_row("Username", getpass.getuser())
     table.add_row("System", f"{platform.system()} {platform.version()}")
     table.add_row(
         "CPU", f"{psutil.cpu_count(logical=True)} cores, {platform.processor()}"
@@ -89,7 +106,8 @@ def system_info():
         "Uptime",
         system_uptime,
     )
-    console.print(table)
+
+    return table
 
 
 def get_status(status_message: str) -> Status:

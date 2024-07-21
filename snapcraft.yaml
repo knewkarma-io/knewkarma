@@ -10,6 +10,7 @@ description: |
 version: 5.2.0
 license: MIT
 base: core22
+grade: stable
 confinement: strict
 
 source-code: https://github.com/bellingcat/knewkarma
@@ -29,4 +30,5 @@ type: app
 apps:
   knewkarma:
     command: bin/knewkarma
+    desktop: snap/gui/knewkarma.desktop
     plugs: [ network, network-bind, home ]
