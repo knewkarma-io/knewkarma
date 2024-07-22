@@ -2,7 +2,6 @@ import os
 
 import rich.table
 from rich.console import Console
-from rich.table import Table
 
 
 def print_banner():
