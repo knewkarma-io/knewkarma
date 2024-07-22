@@ -3,7 +3,7 @@ from collections import Counter
 
 import aiohttp
 
-from .api import Api, TIMEFRAME, SORT_CRITERION
+from .api import Api, TIME_FORMAT, SORT_CRITERION, TIMEFRAME
 from .tools.cleaning_utils import (
     clean_comments,
     clean_subreddits,
@@ -11,7 +11,7 @@ from .tools.cleaning_utils import (
     clean_users,
     clean_wiki_page,
 )
-from .tools.general_utils import TIME_FORMAT, get_status
+from .tools.general_utils import console
 
 api = Api()
 
@@ -37,12 +37,16 @@ class Post:
         self._post_subreddit = post_subreddit
         self._time_format = time_format
 
-    async def data(self, session: aiohttp.ClientSession) -> dict:
+    async def data(
+        self, session: aiohttp.ClientSession, status: console.status = None
+    ) -> dict:
         """
         Get a post's data (without comments)
 
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A dictionary containing a post's data.
         :rtype: dict
 
@@ -66,6 +70,7 @@ class Post:
             post_id=self._post_id,
             post_subreddit=self._post_subreddit,
             entity_type="post",
+            status=status,
             session=session,
         )
 
@@ -83,6 +88,7 @@ class Post:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get a post's comments.
@@ -92,6 +98,8 @@ class Post:
         :param limit: Maximum number of comments to return.
         :type limit: int
         :param sort: Sort criterion for the comments.
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing comment data.
         :rtype: list[dict]
 
@@ -117,6 +125,7 @@ class Post:
             post_subreddit=self._post_subreddit,
             limit=limit,
             sort=sort,
+            status=status,
             session=session,
         )
 
@@ -146,6 +155,7 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get best posts.
@@ -156,6 +166,8 @@ class Posts:
         :type limit: int
         :param timeframe: Timeframe from which to get best posts.
         :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
 
@@ -179,6 +191,7 @@ class Posts:
             posts_type="best",
             timeframe=timeframe,
             limit=limit,
+            status=status,
             session=session,
         )
 
@@ -190,6 +203,7 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get controversial posts.
@@ -200,6 +214,8 @@ class Posts:
         :type limit: int
         :param timeframe: Timeframe from which to get controversial posts.
         :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
 
@@ -222,6 +238,7 @@ class Posts:
             posts_type="controversial",
             timeframe=timeframe,
             limit=limit,
+            status=status,
             session=session,
         )
 
@@ -233,6 +250,7 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get posts from the Reddit front-page.
@@ -243,6 +261,8 @@ class Posts:
         :type limit: int
         :param sort: Sort criterion for the posts.
         :type sort: str
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
 
@@ -266,6 +286,7 @@ class Posts:
             posts_type="front_page",
             limit=limit,
             sort=sort,
+            status=status,
             session=session,
         )
 
@@ -277,6 +298,7 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get new posts.
@@ -287,6 +309,8 @@ class Posts:
         :type limit: int
         :param sort: Sort criterion for the posts.
         :type sort: str
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
 
@@ -310,6 +334,7 @@ class Posts:
             posts_type="new",
             limit=limit,
             sort=sort,
+            status=status,
             session=session,
         )
 
@@ -317,7 +342,11 @@ class Posts:
             return clean_posts(data=new_posts, time_format=self._time_format)
 
     async def popular(
-        self, session: aiohttp.ClientSession, limit: int, timeframe: TIMEFRAME = "all"
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get popular posts.
@@ -328,6 +357,8 @@ class Posts:
         :type limit: int
         :param timeframe: Timeframe from which to get popular posts.
         :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
 
@@ -351,6 +382,7 @@ class Posts:
             posts_type="popular",
             timeframe=timeframe,
             limit=limit,
+            status=status,
             session=session,
         )
 
@@ -358,7 +390,11 @@ class Posts:
             return clean_posts(data=popular_posts, time_format=self._time_format)
 
     async def rising(
-        self, session: aiohttp.ClientSession, limit: int, timeframe: TIMEFRAME = "all"
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get rising posts.
@@ -369,6 +405,8 @@ class Posts:
         :type limit: int
         :param timeframe: Timeframe from which to get rising posts.
         :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
 
@@ -392,6 +430,7 @@ class Posts:
             posts_type="rising",
             timeframe=timeframe,
             limit=limit,
+            status=status,
             session=session,
         )
 
@@ -423,6 +462,7 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Search posts.
@@ -433,6 +473,8 @@ class Search:
         :type limit: int
         :param sort: Sort criterion for the results.
         :type sort: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
 
@@ -457,6 +499,7 @@ class Search:
             entity_type="posts",
             sort=sort,
             limit=limit,
+            status=status,
             session=session,
         )
         if posts_results:
@@ -467,6 +510,7 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Search subreddits.
@@ -477,6 +521,8 @@ class Search:
         :type limit: int
         :param sort: Sort criterion for the results.
         :type sort: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
         :rtype: list[dict]
 
@@ -501,6 +547,7 @@ class Search:
             entity_type="subreddits",
             sort=sort,
             limit=limit,
+            status=status,
             session=session,
         )
         subreddits_results: list[dict] = clean_subreddits(
@@ -514,6 +561,7 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Search users.
@@ -524,6 +572,8 @@ class Search:
         :type sort: Literal[str]
         :param limit: Maximum number of search results to return.
         :type limit: int
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing user data.
         :rtype: list[dict]
 
@@ -548,6 +598,7 @@ class Search:
             entity_type="users",
             sort=sort,
             limit=limit,
+            status=status,
             session=session,
         )
         users_results: list[dict] = clean_users(
@@ -574,12 +625,18 @@ class Subreddit:
         self._subreddit = subreddit
         self._time_format = time_format
 
-    async def profile(self, session: aiohttp.ClientSession) -> dict:
+    async def profile(
+        self,
+        session: aiohttp.ClientSession,
+        status: console.status = None,
+    ) -> dict:
         """
         Get a subreddit's profile data.
 
         :param session: aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A dictionary containing subreddit profile data.
         :rtype: dict
 
@@ -602,6 +659,7 @@ class Subreddit:
         subreddit_profile: dict = await api.get_entity(
             entity_type="subreddit",
             subreddit=self._subreddit,
+            status=status,
             session=session,
         )
         if subreddit_profile:
@@ -609,12 +667,18 @@ class Subreddit:
                 data=subreddit_profile, time_format=self._time_format
             )
 
-    async def wiki_pages(self, session: aiohttp.ClientSession) -> list[str]:
+    async def wiki_pages(
+        self,
+        session: aiohttp.ClientSession,
+        status: console.status = None,
+    ) -> list[str]:
         """
         Get a subreddit's wiki pages.
 
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of strings, each representing a wiki page.
         :rtype: list[str]
 
@@ -634,17 +698,22 @@ class Subreddit:
 
             >>> asyncio.run(async_subreddit_wiki_pages(subreddit="MachineLearning"))
         """
-        with get_status(
-            status_message=f"Starting [underline]single data[/] retrieval process..."
-        ):
-            pages: dict = await api.send_request(
-                endpoint=f"{api.subreddit_endpoint}/{self._subreddit}/wiki/pages.json",
-                session=session,
-            )
+        if status:
+            status.update(f"Starting [underline]single data[/] retrieval process...")
 
-            return pages.get("data")
+        pages: dict = await api.make_request(
+            endpoint=f"{api.subreddit_endpoint}/{self._subreddit}/wiki/pages.json",
+            session=session,
+        )
 
-    async def wiki_page(self, page_name: str, session: aiohttp.ClientSession) -> dict:
+        return pages.get("data")
+
+    async def wiki_page(
+        self,
+        page_name: str,
+        session: aiohttp.ClientSession,
+        status: console.status = None,
+    ) -> dict:
         """
         Get a subreddit's specified wiki page data.
 
@@ -652,6 +721,8 @@ class Subreddit:
         :type page_name: str
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of strings, each representing a wiki page.
         :rtype: list[str]
 
@@ -675,6 +746,7 @@ class Subreddit:
             entity_type="wiki_page",
             page_name=page_name,
             subreddit=self._subreddit,
+            status=status,
             session=session,
         )
 
@@ -687,6 +759,7 @@ class Subreddit:
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get a subreddit's posts.
@@ -698,7 +771,9 @@ class Subreddit:
         :param sort: Sort criterion for the posts.
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
 
@@ -724,6 +799,7 @@ class Subreddit:
             limit=limit,
             sort=sort,
             timeframe=timeframe,
+            status=status,
             session=session,
         )
 
@@ -737,6 +813,7 @@ class Subreddit:
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get posts that contain a specified keyword from a subreddit.
@@ -750,7 +827,9 @@ class Subreddit:
         :param sort: Sort criterion for the posts.
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
 
@@ -777,6 +856,7 @@ class Subreddit:
             limit=limit,
             sort=sort,
             timeframe=timeframe,
+            status=status,
             session=session,
         )
 
@@ -798,7 +878,11 @@ class Subreddits:
         self._time_format = time_format
 
     async def all(
-        self, session: aiohttp.ClientSession, limit: int, timeframe: TIMEFRAME = "all"
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get all subreddits.
@@ -808,7 +892,9 @@ class Subreddits:
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get all subreddits.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
         :rtype: list[dict]
 
@@ -832,12 +918,21 @@ class Subreddits:
             >>> asyncio.run(async_all_subreddits(limit=500))
         """
         all_subreddits: list = await api.get_subreddits(
-            subreddits_type="all", limit=limit, timeframe=timeframe, session=session
+            subreddits_type="all",
+            limit=limit,
+            timeframe=timeframe,
+            status=status,
+            session=session,
         )
         if all_subreddits:
             return clean_subreddits(data=all_subreddits, time_format=self._time_format)
 
-    async def default(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
+    async def default(
+        self,
+        limit: int,
+        session: aiohttp.ClientSession,
+        status: console.status = None,
+    ) -> list[dict]:
         """
         Get default subreddits.
 
@@ -845,6 +940,8 @@ class Subreddits:
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
         :rtype: list[dict]
 
@@ -865,13 +962,21 @@ class Subreddits:
             >>> asyncio.run(async_default_subreddits(limit=20))
         """
         default_subreddits: list = await api.get_subreddits(
-            subreddits_type="default", timeframe="all", limit=limit, session=session
+            subreddits_type="default",
+            timeframe="all",
+            limit=limit,
+            status=status,
+            session=session,
         )
         if default_subreddits:
             return clean_subreddits(default_subreddits, time_format=self._time_format)
 
     async def new(
-        self, session: aiohttp.ClientSession, limit: int, timeframe: TIMEFRAME = "all"
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get new subreddits.
@@ -881,7 +986,9 @@ class Subreddits:
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new subreddits.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
         :rtype: list[dict]
 
@@ -902,13 +1009,21 @@ class Subreddits:
             >>> asyncio.run(async_new_subreddits(limit=50))
         """
         new_subreddits: list = await api.get_subreddits(
-            subreddits_type="new", limit=limit, timeframe=timeframe, session=session
+            subreddits_type="new",
+            limit=limit,
+            timeframe=timeframe,
+            status=status,
+            session=session,
         )
         if new_subreddits:
             return clean_subreddits(new_subreddits, time_format=self._time_format)
 
     async def popular(
-        self, session: aiohttp.ClientSession, limit: int, timeframe: TIMEFRAME = "all"
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get popular subreddits.
@@ -918,7 +1033,9 @@ class Subreddits:
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular subreddits.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
         :rtype: list[dict]
 
@@ -939,7 +1056,11 @@ class Subreddits:
             >>> asyncio.run(async_popular_subreddits(limit=100))
         """
         popular_subreddits: list = await api.get_subreddits(
-            subreddits_type="popular", limit=limit, timeframe=timeframe, session=session
+            subreddits_type="popular",
+            limit=limit,
+            timeframe=timeframe,
+            status=status,
+            session=session,
         )
         if popular_subreddits:
             return clean_subreddits(popular_subreddits, time_format=self._time_format)
@@ -967,6 +1088,7 @@ class User:
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get a user's comments.
@@ -978,7 +1100,9 @@ class User:
         :param sort: Sort criterion for the comments.
         :type sort: str
         :param timeframe: Timeframe from which tyo get comments.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing comment data.
         :rtype: list[dict]
 
@@ -1004,18 +1128,25 @@ class User:
             limit=limit,
             sort=sort,
             timeframe=timeframe,
+            status=status,
             session=session,
         )
 
         if user_comments:
             return clean_comments(comments=user_comments, time_format=self._time_format)
 
-    async def moderated_subreddits(self, session: aiohttp.ClientSession) -> list[dict]:
+    async def moderated_subreddits(
+        self,
+        session: aiohttp.ClientSession,
+        status: console.status = None,
+    ) -> list[dict]:
         """
         Get subreddits moderated by user.
 
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
         :rtype: list[dict]
 
@@ -1038,8 +1169,9 @@ class User:
         subreddits: dict = await api.get_subreddits(
             subreddits_type="user_moderated",
             username=self._username,
-            session=session,
             limit=0,
+            status=status,
+            session=session,
         )
         if subreddits:
             return clean_subreddits(
@@ -1047,7 +1179,12 @@ class User:
                 time_format=self._time_format,
             )
 
-    async def overview(self, limit: int, session: aiohttp.ClientSession) -> list[dict]:
+    async def overview(
+        self,
+        limit: int,
+        session: aiohttp.ClientSession,
+        status: console.status = None,
+    ) -> list[dict]:
         """
         Get a user's most recent comments.
 
@@ -1055,6 +1192,8 @@ class User:
         :type limit: int
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing data about a recent comment.
         :rtype: list[dict]
 
@@ -1078,6 +1217,7 @@ class User:
             username=self._username,
             posts_type="user_overview",
             limit=limit,
+            status=status,
             session=session,
         )
         if user_overview:
@@ -1089,6 +1229,7 @@ class User:
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get a user's posts.
@@ -1100,7 +1241,9 @@ class User:
         :param sort: Sort criterion for the posts.
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
 
@@ -1126,17 +1269,24 @@ class User:
             limit=limit,
             sort=sort,
             timeframe=timeframe,
+            status=status,
             session=session,
         )
         if user_posts:
             return clean_posts(user_posts, time_format=self._time_format)
 
-    async def profile(self, session: aiohttp.ClientSession) -> dict:
+    async def profile(
+        self,
+        session: aiohttp.ClientSession,
+        status: console.status = None,
+    ) -> dict:
         """
         Get a user's profile data.
 
         :param session: aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A dictionary containing user profile data.
         :rtype: dict
 
@@ -1157,7 +1307,7 @@ class User:
             >>> asyncio.run(async_user_profile(username="AutoModerator"))
         """
         user_profile: dict = await api.get_entity(
-            username=self._username, entity_type="user", session=session
+            username=self._username, entity_type="user", status=status, session=session
         )
         if user_profile:
             return clean_users(data=user_profile, time_format=self._time_format)
@@ -1169,6 +1319,7 @@ class User:
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get a user's posts that contain the specified keywords.
@@ -1182,7 +1333,9 @@ class User:
         :param sort: Sort criterion for the posts.
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
         :rtype: list[dict]
 
@@ -1210,6 +1363,7 @@ class User:
             limit=limit,
             sort=sort,
             timeframe=timeframe,
+            status=status,
             session=session,
         )
         found_posts: list = []
@@ -1230,6 +1384,7 @@ class User:
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get a user's comments that contain the specified keyword.
@@ -1243,7 +1398,9 @@ class User:
         :param sort: Sort criterion for the comments.
         :type sort: str
         :param timeframe: Timeframe from which to get comments.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing comment data.
         :rtype: list[dict]
 
@@ -1271,6 +1428,7 @@ class User:
             limit=limit,
             sort=sort,
             timeframe=timeframe,
+            status=status,
             session=session,
         )
         found_comments: list = []
@@ -1288,6 +1446,7 @@ class User:
         top_n: int,
         limit: int,
         timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[tuple]:
         """
         Get a user's top n subreddits based on subreddit frequency in n posts.
@@ -1299,7 +1458,9 @@ class User:
         :param limit: Maximum number of posts to scrape.
         :type limit: int
         :param timeframe: Timeframe from which to get posts.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: Dictionary of top n subreddits and their ratio.
         :rtype: dict
 
@@ -1326,6 +1487,7 @@ class User:
             username=self._username,
             limit=limit,
             timeframe=timeframe,
+            status=status,
             session=session,
         )
 
@@ -1353,7 +1515,11 @@ class Users:
         self._time_format = time_format
 
     async def new(
-        self, session: aiohttp.ClientSession, limit: int, timeframe: TIMEFRAME = "all"
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get new users.
@@ -1363,7 +1529,9 @@ class Users:
         :param limit: Maximum number of new users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new posts.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing a user's data.
         :rtype: list[dict]
 
@@ -1384,13 +1552,21 @@ class Users:
             >>> asyncio.run(async_new_users(users_limit=500))
         """
         new_users: list = await api.get_users(
-            users_type="new", limit=limit, timeframe=timeframe, session=session
+            users_type="new",
+            limit=limit,
+            timeframe=timeframe,
+            status=status,
+            session=session,
         )
         if new_users:
             return clean_users(new_users, time_format=self._time_format)
 
     async def popular(
-        self, session: aiohttp.ClientSession, limit: int, timeframe: TIMEFRAME = "all"
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get popular users.
@@ -1400,7 +1576,9 @@ class Users:
         :param limit: Maximum number of popular users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular posts.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing a user's data.
         :rtype: list[dict]
 
@@ -1424,13 +1602,18 @@ class Users:
             users_type="popular",
             limit=limit,
             timeframe=timeframe,
+            status=status,
             session=session,
         )
         if popular_users:
             return clean_users(popular_users, time_format=self._time_format)
 
     async def all(
-        self, session: aiohttp.ClientSession, limit: int, timeframe: TIMEFRAME = "all"
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Get all users.
@@ -1440,7 +1623,9 @@ class Users:
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         :param timeframe: Timeframe from which to get all posts.
-        :type timeframe: Literal
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
         :return: A list of dictionaries, each containing a user's data.
         :rtype: list[dict]
 
@@ -1461,7 +1646,11 @@ class Users:
             >>> asyncio.run(async_all_users(users_limit=1000))
         """
         all_users: list = await api.get_users(
-            users_type="all", limit=limit, timeframe=timeframe, session=session
+            users_type="all",
+            limit=limit,
+            timeframe=timeframe,
+            status=status,
+            session=session,
         )
         if all_users:
             return clean_users(all_users, time_format=self._time_format)
