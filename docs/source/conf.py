@@ -8,8 +8,8 @@ project = "Knew Karma"
 author = "Richard Mwewa"
 copyright = f"{date.today().year}, {author}"
 
-release = "5.3.2"
-version = "5.3.2"
+release = "5.3.3"
+version = "5.3.3"
 
 # -- General configuration
 
