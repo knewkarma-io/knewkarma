@@ -10,7 +10,7 @@ from rich.tree import Tree
 from rich_argparse import RichHelpFormatter
 
 from . import Post, Posts, Search, Subreddit, Subreddits, User, Users
-from .api import TIMEFRAME, SORT_CRITERION, Api
+from .api import Api, SORT_CRITERION, TIMEFRAME
 from .help import Help
 from .tools.data_utils import create_dataframe, export_dataframe, show_exported_files
 from .tools.general_utils import (
@@ -68,12 +68,6 @@ def args_parser() -> argparse.ArgumentParser:
         "--export",
         type=str,
         help="a comma-separated list of file types to export the output to (supported: [green]csv,html,json,xml[/])",
-    )
-    main_parser.add_argument(
-        "-u",
-        "--updates",
-        help="check for updates",
-        action="store_true",
     )
     main_parser.add_argument(
         "-v",
@@ -357,65 +351,66 @@ async def function_caller(args: argparse.Namespace, function_map: dict):
     :type function_map: dict
     """
 
-    async with aiohttp.ClientSession() as session:
+    with console.status(
+        "Establishing connection /w new session...", spinner="dots2"
+    ) as status:
+        async with aiohttp.ClientSession() as session:
 
-        if args.updates:
             await Api().update_checker(session=session)
-            return
 
-        mode_action = function_map.get(args.module)
-        directory: str = ""
-        for action, function in mode_action:
-            arg_is_present: bool = False
-            if getattr(args, action, False):
-                arg_is_present = True
-
-                if args.export:
-                    output_dir: str = os.path.expanduser(
-                        os.path.join("~", "knewkarma-output")
-                    )
-                    # Create path to main directory in which target data files will be exported
-                    directory = os.path.join(output_dir, args.module, action)
-
-                    # Create file directories for supported data file types
-                    pathfinder(
-                        directories=[
-                            os.path.join(directory, "csv"),
-                            os.path.join(directory, "html"),
-                            os.path.join(directory, "json"),
-                            os.path.join(directory, "xml"),
-                        ]
-                    )
-
-                function_data = await function(session=session)
-                if function_data:
-                    dataframe = create_dataframe(data=function_data)
-
-                    # Print the DataFrame, excluding the 'raw_data' column if it exists
-                    console.log(dataframe)
+            mode_action = function_map.get(args.module)
+            directory: str = ""
+            for action, function in mode_action:
+                arg_is_present: bool = False
+                if getattr(args, action, False):
+                    arg_is_present = True
 
                     if args.export:
-                        export_dataframe(
-                            dataframe=dataframe,
-                            filename=filename_timestamp(),
-                            directory=directory,
-                            formats=args.export.split(","),
+                        output_dir: str = os.path.expanduser(
+                            os.path.join("~", "knewkarma-output")
+                        )
+                        # Create path to main directory in which target data files will be exported
+                        directory = os.path.join(output_dir, args.module, action)
+
+                        # Create file directories for supported data file types
+                        pathfinder(
+                            directories=[
+                                os.path.join(directory, "csv"),
+                                os.path.join(directory, "html"),
+                                os.path.join(directory, "json"),
+                                os.path.join(directory, "xml"),
+                            ]
                         )
 
-                        # Show exported files
-                        tree = Tree(
-                            f":open_file_folder: [bold]{directory}[/]",
-                            guide_style="bold bright_blue",
-                        )
-                        show_exported_files(tree=tree, directory=directory)
-                        console.log(tree)
+                    function_data = await function(status=status, session=session)
+                    if function_data:
+                        dataframe = create_dataframe(data=function_data)
 
-                break
+                        # Print the DataFrame, excluding the 'raw_data' column if it exists
+                        console.log(dataframe)
 
-        if not arg_is_present:
-            console.log(
-                f"knewkarma [underline]{args.module}[/]: missing one or more expected argument(s)"
-            )
+                        if args.export:
+                            export_dataframe(
+                                dataframe=dataframe,
+                                filename=filename_timestamp(),
+                                directory=directory,
+                                formats=args.export.split(","),
+                            )
+
+                            # Show exported files
+                            tree = Tree(
+                                f":open_file_folder: [bold]{directory}[/]",
+                                guide_style="bold bright_blue",
+                            )
+                            show_exported_files(tree=tree, directory=directory)
+                            console.log(tree)
+
+                    break
+
+            if not arg_is_present:
+                console.log(
+                    f"knewkarma [underline]{args.module}[/]: missing one or more expected argument(s)"
+                )
 
 
 def start():
@@ -454,12 +449,13 @@ def start():
 
     function_map: dict = {
         "post": [
-            ("data", lambda session: post.data(session=session)),
+            ("data", lambda session, status=None: post.data(session=session)),
             (
                 "comments",
-                lambda session: post.comments(
+                lambda session, status=None: post.comments(
                     limit=limit,
                     sort=sort,
+                    status=status,
                     session=session,
                 ),
             ),
@@ -467,39 +463,48 @@ def start():
         "posts": [
             (
                 "best",
-                lambda session: posts.best(
+                lambda session, status=None: posts.best(
                     timeframe=timeframe,
                     limit=limit,
+                    status=status,
                     session=session,
                 ),
             ),
             (
                 "controversial",
-                lambda session: posts.controversial(
+                lambda session, status=None: posts.controversial(
                     timeframe=timeframe,
                     limit=limit,
+                    status=status,
                     session=session,
                 ),
             ),
             (
                 "front_page",
-                lambda session: posts.front_page(
-                    limit=limit, sort=sort, session=session
+                lambda session, status=None: posts.front_page(
+                    limit=limit, sort=sort, status=status, session=session
                 ),
             ),
-            ("new", lambda session: posts.new(limit=limit, sort=sort, session=session)),
+            (
+                "new",
+                lambda session, status=None: posts.new(
+                    limit=limit, sort=sort, status=status, session=session
+                ),
+            ),
             (
                 "popular",
-                lambda session: posts.popular(
+                lambda session, status=None: posts.popular(
                     timeframe=timeframe,
                     limit=limit,
+                    status=status,
                     session=session,
                 ),
             ),
             (
                 "rising",
-                lambda session: posts.rising(
+                lambda session, status=None: posts.rising(
                     limit=limit,
+                    status=status,
                     session=session,
                 ),
             ),
@@ -507,119 +512,187 @@ def start():
         "search": [
             (
                 "posts",
-                lambda session: search.posts(
+                lambda session, status=None: search.posts(
                     sort=sort,
                     limit=limit,
+                    status=status,
                     session=session,
                 ),
             ),
             (
                 "subreddits",
-                lambda session: search.subreddits(
+                lambda session, status=None: search.subreddits(
                     sort=sort, limit=limit, session=session
                 ),
             ),
             (
                 "users",
-                lambda session: search.users(sort=sort, limit=limit, session=session),
+                lambda session, status=None: search.users(
+                    sort=sort, limit=limit, status=status, session=session
+                ),
             ),
         ],
         "subreddit": [
-            ("profile", lambda session: subreddit.profile(session=session)),
+            (
+                "profile",
+                lambda session, status=None: subreddit.profile(
+                    status=status, session=session
+                ),
+            ),
             (
                 "posts",
-                lambda session: subreddit.posts(
-                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                lambda session, status=None: subreddit.posts(
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    status=status,
+                    session=session,
                 ),
             ),
             (
                 "search",
-                lambda session: subreddit.search(
+                lambda session, status=None: subreddit.search(
                     query=args.search,
                     limit=limit,
                     sort=sort,
                     timeframe=timeframe,
+                    status=status,
                     session=session,
                 ),
             ),
-            ("wiki_pages", lambda session: subreddit.wiki_pages(session=session)),
+            (
+                "wiki_pages",
+                lambda session, status=None: subreddit.wiki_pages(
+                    status=status, session=session
+                ),
+            ),
             (
                 "wiki_page",
-                lambda session: subreddit.wiki_page(
+                lambda session, status=None: subreddit.wiki_page(
                     page_name=args.wiki_page if hasattr(args, "wiki_page") else None,
+                    status=status,
                     session=session,
                 ),
             ),
         ],
         "subreddits": [
-            ("all", lambda session: subreddits.all(limit=limit, session=session)),
+            (
+                "all",
+                lambda session, status=None: subreddits.all(
+                    limit=limit, status=status, session=session
+                ),
+            ),
             (
                 "default",
-                lambda session: subreddits.default(limit=limit, session=session),
+                lambda session, status=None: subreddits.default(
+                    limit=limit, status=status, session=session
+                ),
             ),
-            ("new", lambda session: subreddits.new(limit=limit, session=session)),
+            (
+                "new",
+                lambda session, status=None: subreddits.new(
+                    limit=limit, status=status, session=session
+                ),
+            ),
             (
                 "popular",
-                lambda session: subreddits.popular(limit=limit, session=session),
+                lambda session, status=None: subreddits.popular(
+                    limit=limit, status=status, session=session
+                ),
             ),
         ],
         "user": [
-            ("profile", lambda session: user.profile(session=session)),
+            (
+                "profile",
+                lambda session, status=None: user.profile(
+                    status=status, session=session
+                ),
+            ),
             (
                 "posts",
-                lambda session: user.posts(
-                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                lambda session, status=None: user.posts(
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    status=status,
+                    session=session,
                 ),
             ),
             (
                 "comments",
-                lambda session: user.comments(
-                    limit=limit, sort=sort, timeframe=timeframe, session=session
+                lambda session, status=None: user.comments(
+                    limit=limit,
+                    sort=sort,
+                    timeframe=timeframe,
+                    status=status,
+                    session=session,
                 ),
             ),
-            ("overview", lambda session: user.overview(limit=limit, session=session)),
+            (
+                "overview",
+                lambda session, status=None: user.overview(
+                    limit=limit, status=status, session=session
+                ),
+            ),
             (
                 "moderated_subreddits",
-                lambda session: user.moderated_subreddits(session=session),
+                lambda session, status=None: user.moderated_subreddits(
+                    status=status, session=session
+                ),
             ),
             (
                 "search_posts",
-                lambda session: user.search_posts(
+                lambda session, status=None: user.search_posts(
                     keyword=args.search_posts,
                     limit=limit,
                     sort=sort,
                     timeframe=timeframe,
+                    status=status,
                     session=session,
                 ),
             ),
             (
                 "search_comments",
-                lambda session: user.search_comments(
+                lambda session, status=None: user.search_comments(
                     keyword=args.search_comments,
                     limit=limit,
                     sort=sort,
                     timeframe=timeframe,
+                    status=status,
                     session=session,
                 ),
             ),
             (
                 "top_subreddits",
-                lambda session: user.top_subreddits(
+                lambda session, status=None: user.top_subreddits(
                     top_n=(
                         args.top_subreddits if hasattr(args, "top_subreddits") else None
                     ),
                     limit=limit,
                     timeframe=timeframe,
+                    status=status,
                     session=session,
                 ),
             ),
         ],
         "users": [
-            ("all", lambda session: users.all(limit=limit, session=session)),
-            ("new", lambda session: users.new(limit=limit, session=session)),
+            (
+                "all",
+                lambda session, status=None: users.all(
+                    limit=limit, status=status, session=session
+                ),
+            ),
+            (
+                "new",
+                lambda session, status=None: users.new(
+                    limit=limit, status=status, session=session
+                ),
+            ),
             (
                 "popular",
-                lambda session: users.popular(limit=limit, session=session),
+                lambda session, status=None: users.popular(
+                    limit=limit, status=status, session=session
+                ),
             ),
         ],
     }
