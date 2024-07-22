@@ -19,6 +19,7 @@ from .tools.general_utils import (
     print_banner,
 )
 from .tools.time_utils import filename_timestamp
+from .version import Version
 
 
 def args_parser() -> argparse.ArgumentParser:
@@ -72,7 +73,7 @@ def args_parser() -> argparse.ArgumentParser:
     main_parser.add_argument(
         "-v",
         "--version",
-        version=Markdown(f"Knew Karma {Help.copyright}"),
+        version=Markdown(f"Knew Karma {Version.release} {Help.copyright}"),
         action="version",
     )
 
