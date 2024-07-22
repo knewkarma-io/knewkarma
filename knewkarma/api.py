@@ -1,15 +1,17 @@
+import asyncio
 from random import randint
 from typing import Union, Literal
 
 import aiohttp
 from rich.markdown import Markdown
 
-from .tools.general_utils import console, get_status
+from .tools.general_utils import console
 from .tools.time_utils import countdown_timer
 from .version import Version
 
 SORT_CRITERION = Literal["controversial", "new", "top", "best", "hot", "rising", "all"]
 TIMEFRAME = Literal["hour", "day", "week", "month", "year", "all"]
+TIME_FORMAT = Literal["concise", "locale"]
 
 
 class Api:
@@ -21,12 +23,9 @@ class Api:
         self._users_endpoint: str = f"{self.base_endpoint}/users"
         self.subreddit_endpoint: str = f"{self.base_endpoint}/r"
         self._subreddits_endpoint: str = f"{self.base_endpoint}/subreddits"
-        self._github_release_endpoint: str = (
-            "https://api.github.com/repos/bellingcat/knewkarma/releases/latest"
-        )
 
     @staticmethod
-    async def send_request(
+    async def make_request(
         endpoint: str,
         session: aiohttp.ClientSession,
     ) -> Union[dict, list]:
@@ -106,43 +105,55 @@ class Api:
         :param session: aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
         """
-        with get_status(status_message="Checking for updates..."):
-            # Make a GET request to PyPI to get the project's latest release.
-            response: dict = await self.send_request(
-                endpoint=self._github_release_endpoint, session=session
-            )
-            release: dict = self._process_response(
-                response_data=response, valid_key="tag_name"
-            )
+        # Make a GET request to PyPI to get the project's latest release.
+        response: dict = await self.make_request(
+            endpoint="https://api.github.com/repos/bellingcat/knewkarma/releases/latest",
+            session=session,
+        )
+        release: dict = self._process_response(
+            response_data=response, valid_key="tag_name"
+        )
 
-            if release:
-                remote_version: str = release.get("tag_name")
-                markup_release_notes: str = release.get("body")
-                markdown_release_notes = Markdown(markup=markup_release_notes)
+        if release:
+            remote_version: str = release.get("tag_name")
+            markup_release_notes: str = release.get("body")
+            markdown_release_notes = Markdown(markup=markup_release_notes)
 
-                # Splitting the version strings into components
-                remote_parts: list = remote_version.split(".")
+            # Splitting the version strings into components
+            remote_parts: list = remote_version.split(".")
 
-                update_message: str = (
-                    f"[underline]%s[/] update ([underline]{remote_version}[/]) available"
+            update_level: str = ""
+
+            # Check for differences in version parts
+            if remote_parts[0] != Version.major:
+                update_level = "MAJOR"
+
+            elif remote_parts[1] != Version.minor:
+                update_level = "MINOR"
+
+            elif remote_parts[2] != Version.patch:
+                update_level = "PATCH"
+
+            if update_level:
+                upgrade_instructions = Markdown(
+                    markup=f"""
+## How To Upgrade
+* **Snap Package**: *`sudo snap refresh knewkarma`*
+* **PyPI Package**: *`pip install --upgrade knewkarma`*
+"""
                 )
-
-                # Check for differences in version parts
-                if remote_parts[0] != Version.major:
-                    update_message = update_message % "MAJOR"
-
-                elif remote_parts[1] != Version.minor:
-                    update_message = update_message % "MINOR"
-
-                elif remote_parts[2] != Version.patch:
-                    update_message = update_message % "PATCH"
-
-                if update_message:
-                    console.log(update_message)
-                    console.log(markdown_release_notes)
+                console.log(
+                    f"\n[bold]{update_level}[/] update available: [underline]{remote_version}[/]",
+                    justify="center",
+                )
+                console.log(markdown_release_notes)
+                console.log(upgrade_instructions, "\n")
 
     async def _paginate(
-        self, limit: int, session: aiohttp.ClientSession, **kwargs
+        self,
+        limit: int,
+        session: aiohttp.ClientSession,
+        **kwargs,
     ) -> list[dict]:
         """
         Asynchronously fetches and processes data in a paginated manner
@@ -159,40 +170,47 @@ class Api:
         """
         all_items = []
         last_item_id = None
-        with get_status(
-            status_message="Starting [underline]bulk data[/] retrieval process..."
-        ) as status:
-            while len(all_items) < limit:
-                paginated_endpoint = (
-                    f"{kwargs.get('endpoint')}&after={last_item_id}&count={len(all_items)}"
-                    if last_item_id
-                    else kwargs.get("endpoint")
-                )
+        status: console.status = kwargs.get("status")
 
-                response = await self.send_request(
-                    session=session, endpoint=paginated_endpoint
-                )
+        if status:
+            status.update("Initialising [bold]bulk[/] data retrieval process...")
 
-                items = response.get("data", {}).get("children", [])
+        while len(all_items) < limit:
+            paginated_endpoint = (
+                f"{kwargs.get('endpoint')}&after={last_item_id}&count={len(all_items)}"
+                if last_item_id
+                else kwargs.get("endpoint")
+            )
 
-                if not items:
-                    break
+            response = await self.make_request(
+                session=session, endpoint=paginated_endpoint
+            )
 
-                processed_items = kwargs.get("data_processor")(response_data=items)
-                items_to_limit = limit - len(all_items)
-                all_items.extend(processed_items[:items_to_limit])
+            items = response.get("data", {}).get("children", [])
 
-                last_item_id = response.get("data").get("after")
+            if not items:
+                break
 
-                if len(all_items) == limit:
-                    break
+            processed_items = kwargs.get("data_processor")(response_data=items)
+            items_to_limit = limit - len(all_items)
+            all_items.extend(processed_items[:items_to_limit])
 
+            last_item_id = response.get("data").get("after")
+
+            if len(all_items) == limit:
+                break
+
+            sleep_duration: int = randint(1, 10)
+
+            if status:
                 await countdown_timer(
                     status=status,
-                    duration=randint(1, 10),
+                    duration=sleep_duration,
                     current_count=len(all_items),
                     limit=limit,
                 )
+            else:
+                await asyncio.sleep(sleep_duration)
 
         return all_items
 
@@ -211,22 +229,23 @@ class Api:
         :return: A dictionary containing a specified entity's data.
         :rtype: dict
         """
-        with get_status(
-            status_message=f"Starting [underline]single data[/] retrieval process..."
-        ):
-            # Use a dictionary for direct mapping
-            entity_mapping: dict = {
-                "post": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-                f"/comments/{kwargs.get('post_id')}.json",
-                "user": f"{self._user_endpoint}/{kwargs.get('username')}/about.json",
-                "subreddit": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/about.json",
-                "wiki_page": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/wiki/{kwargs.get('page_name')}.json",
-            }
+        status: console.status = kwargs.get("status")
+        if status:
+            status.update("Initialising [bulk]single[/] data retrieval process...")
 
-            # Get the endpoint directly from the dictionary
-            endpoint: str = entity_mapping.get(entity_type, "")
+        # Use a dictionary for direct mapping
+        entity_mapping: dict = {
+            "post": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
+            f"/comments/{kwargs.get('post_id')}.json",
+            "user": f"{self._user_endpoint}/{kwargs.get('username')}/about.json",
+            "subreddit": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/about.json",
+            "wiki_page": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/wiki/{kwargs.get('page_name')}.json",
+        }
 
-            entity_data = await self.send_request(endpoint=endpoint, session=session)
+        # Get the endpoint directly from the dictionary
+        endpoint: str = entity_mapping.get(entity_type, "")
+
+        entity_data = await self.make_request(endpoint=endpoint, session=session)
 
         return self._process_response(
             response_data=entity_data.get("data", {}),
@@ -294,6 +313,7 @@ class Api:
         posts: list[dict] = await self._paginate(
             limit=limit,
             session=session,
+            status=kwargs.get("status"),
             endpoint=endpoint,
             data_processor=self._process_response,
         )
@@ -333,7 +353,7 @@ class Api:
 
         endpoint = subreddits_mapping.get(subreddits_type, "")
         if subreddits_type == "user_moderated":
-            subreddits: dict = await self.send_request(
+            subreddits: dict = await self.make_request(
                 endpoint=endpoint,
                 session=session,
             )
@@ -343,6 +363,7 @@ class Api:
             subreddits: list[dict] = await self._paginate(
                 limit=limit,
                 session=session,
+                status=kwargs.get("status"),
                 endpoint=endpoint,
                 data_processor=self._process_response,
             )
@@ -355,6 +376,7 @@ class Api:
         users_type: Literal["all", "popular", "new"],
         limit: int,
         timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -367,6 +389,7 @@ class Api:
         :type timeframe: Literal
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
+        :param status: An instance of `console.status` used to display animated status messages.
         :return: A list of dictionaries, each containing user data.
         :rtype: list[dict]
         """
@@ -381,6 +404,7 @@ class Api:
         users: list[dict] = await self._paginate(
             limit=limit,
             session=session,
+            status=status,
             endpoint=endpoint,
             data_processor=self._process_response,
         )
@@ -394,6 +418,7 @@ class Api:
         query: str,
         limit: int,
         sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Asynchronously searches from a specified results type that match the specified query.
@@ -408,6 +433,7 @@ class Api:
         :type limit: int
         :param sort: Posts' sort criterion.
         :type sort: str
+        :param status: An instance of `console.status` used to display animated status messages.
         :return: A list of dictionaries, each containing search result data.
         :rtype: list[dict]
         """
@@ -423,6 +449,7 @@ class Api:
         search_results: list[dict] = await self._paginate(
             limit=limit,
             session=session,
+            status=status,
             endpoint=endpoint,
             data_processor=self._process_response,
         )

@@ -1,9 +1,7 @@
 import os
-from typing import Literal
 
 import rich.table
 from rich.console import Console
-from rich.status import Status
 from rich.table import Table
 
 
@@ -110,19 +108,6 @@ def get_system_info() -> Table:
     return table
 
 
-def get_status(status_message: str) -> Status:
-    """
-    Creates and returns a Status object initialized with a specific status message.
-
-    :param status_message: A message to initialise the Status with.
-    :type status_message: str
-    :return: A configured rich.status.Status object ready to be used in a context manager.
-    :rtype: rich.status.Status
-    """
-    with Status(status=status_message, spinner="dots2", console=console) as status:
-        return status
-
-
 def pathfinder(directories: list[str]):
     """
     Creates directories in knewkarma-output directory of the user's home folder.
@@ -135,5 +120,3 @@ def pathfinder(directories: list[str]):
 
 
 console = Console(color_system="auto", log_time=False)
-
-TIME_FORMAT = Literal["concise", "locale"]
