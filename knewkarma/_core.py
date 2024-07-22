@@ -699,7 +699,7 @@ class Subreddit:
             >>> asyncio.run(async_subreddit_wiki_pages(subreddit="MachineLearning"))
         """
         if status:
-            status.update(f"Starting [underline]single data[/] retrieval process...")
+            status.update(f"Initialising single data retrieval process...")
 
         pages: dict = await api.make_request(
             endpoint=f"{api.subreddit_endpoint}/{self._subreddit}/wiki/pages.json",
