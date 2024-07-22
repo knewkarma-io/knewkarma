@@ -698,7 +698,7 @@ def start():
         ],
     }
 
-    if args.module or args.updates:
+    if args.module:
         print_banner()
         try:
             start_time: datetime = datetime.now()
