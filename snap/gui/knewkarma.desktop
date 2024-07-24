@@ -2,7 +2,7 @@
 Name=Knew Karma
 Comment=A Reddit Data Analysis Toolkit
 Icon=${SNAP}/snap/gui/icon.png
-Exec=${SNAP}/bin/knewkarma
+Exec=sh -c "-h"
 Terminal=true
 Type=Application
 Categories=Utility;Development;
