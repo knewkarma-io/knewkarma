@@ -3,19 +3,20 @@
 Get started with Knew Karma through the simple installation process, whether you prefer using a CLI, Python library,
 Docker, or GUI for Windows. Follow these steps to get up and running.
 
-## PyPI Package
+## PyPI
 
-Ensure you have Python 3.10 or later on your system to use Knew Karma. You can install the CLI and Python library
-directly from PyPI.
+You'll need to have Python 3.10 or later installed on your system in order to install Knew Karma from PyPI. You can
+install it by running the following command:
 
 ```commandline
 pip install knewkarma
 ```
 
-## Snap Package
+## Snap Store
 
-If you prefer installing the snap package instead, you can either run `snap install knewkarma`, or Open the Ubuntu
-Software desktop app (assuming snap is already installed), and search for "Knew Karma", and proceed to install the
+If you prefer installing Knew Karma from the Snap Store instead, you can either run `snap install knewkarma`, or Open
+the Ubuntu
+Software desktop app (assuming snap is already installed), and search for "Knew Karma", then proceed to install the
 package.
 
 ## Building a Docker Image
