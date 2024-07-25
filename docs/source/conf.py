@@ -8,8 +8,8 @@ project = "Knew Karma"
 author = "Richard Mwewa"
 copyright = f"{date.today().year}, {author}"
 
-release = "5.3.4"
-version = "5.3.4"
+release = "5.3"
+version = "5.3.5"
 
 # -- General configuration
 
@@ -40,7 +40,7 @@ templates_path = ["_templates"]
 html_theme = "alabaster"
 html_static_path = ["_static"]
 html_favicon = "_static/favicon.ico"
-html_logo = "_static/header.png"
+html_logo = "_static/logo.png"
 html_show_sphinx = False
 html_theme_options = {
     "show_powered_by": False,
