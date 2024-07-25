@@ -4,14 +4,14 @@ from collections import Counter
 import aiohttp
 
 from .api import Api, TIME_FORMAT, SORT_CRITERION, TIMEFRAME
-from .tools.cleaning_utils import (
-    clean_comments,
-    clean_subreddits,
-    clean_posts,
-    clean_users,
-    clean_wiki_page,
-)
 from .tools.general_utils import console
+from .tools.parsing_utils import (
+    parse_comments,
+    parse_subreddits,
+    parse_posts,
+    parse_users,
+    parse_wiki_page,
+)
 
 api = Api()
 
@@ -75,7 +75,7 @@ class Post:
         )
 
         if post_data:
-            return clean_posts(
+            return parse_posts(
                 data=post_data[0]
                 .get("data", {})
                 .get("children", [])[0]
@@ -130,7 +130,7 @@ class Post:
         )
 
         if comments_data:
-            return clean_comments(
+            return parse_comments(
                 comments=comments_data[1].get("data", {}).get("children", []),
                 time_format=self._time_format,
             )
@@ -196,7 +196,7 @@ class Posts:
         )
 
         if best_posts:
-            return clean_posts(data=best_posts, time_format=self._time_format)
+            return parse_posts(data=best_posts, time_format=self._time_format)
 
     async def controversial(
         self,
@@ -243,7 +243,7 @@ class Posts:
         )
 
         if controversial_posts:
-            return clean_posts(data=controversial_posts, time_format=self._time_format)
+            return parse_posts(data=controversial_posts, time_format=self._time_format)
 
     async def front_page(
         self,
@@ -291,7 +291,7 @@ class Posts:
         )
 
         if front_page_posts:
-            return clean_posts(data=front_page_posts, time_format=self._time_format)
+            return parse_posts(data=front_page_posts, time_format=self._time_format)
 
     async def new(
         self,
@@ -339,7 +339,7 @@ class Posts:
         )
 
         if new_posts:
-            return clean_posts(data=new_posts, time_format=self._time_format)
+            return parse_posts(data=new_posts, time_format=self._time_format)
 
     async def popular(
         self,
@@ -387,7 +387,7 @@ class Posts:
         )
 
         if popular_posts:
-            return clean_posts(data=popular_posts, time_format=self._time_format)
+            return parse_posts(data=popular_posts, time_format=self._time_format)
 
     async def rising(
         self,
@@ -435,7 +435,7 @@ class Posts:
         )
 
         if rising_posts:
-            return clean_posts(data=rising_posts, time_format=self._time_format)
+            return parse_posts(data=rising_posts, time_format=self._time_format)
 
 
 class Search:
@@ -503,7 +503,7 @@ class Search:
             session=session,
         )
         if posts_results:
-            return clean_posts(data=posts_results, time_format=self._time_format)
+            return parse_posts(data=posts_results, time_format=self._time_format)
 
     async def subreddits(
         self,
@@ -550,7 +550,7 @@ class Search:
             status=status,
             session=session,
         )
-        subreddits_results: list[dict] = clean_subreddits(
+        subreddits_results: list[dict] = parse_subreddits(
             search_subreddits, time_format=self._time_format
         )
 
@@ -601,7 +601,7 @@ class Search:
             status=status,
             session=session,
         )
-        users_results: list[dict] = clean_users(
+        users_results: list[dict] = parse_users(
             search_users, time_format=self._time_format
         )
 
@@ -663,7 +663,7 @@ class Subreddit:
             session=session,
         )
         if subreddit_profile:
-            return clean_subreddits(
+            return parse_subreddits(
                 data=subreddit_profile, time_format=self._time_format
             )
 
@@ -751,7 +751,7 @@ class Subreddit:
         )
 
         if wiki_page:
-            return clean_wiki_page(wiki_page=wiki_page, time_format=self._time_format)
+            return parse_wiki_page(wiki_page=wiki_page, time_format=self._time_format)
 
     async def posts(
         self,
@@ -804,7 +804,7 @@ class Subreddit:
         )
 
         if subreddit_posts:
-            return clean_posts(data=subreddit_posts, time_format=self._time_format)
+            return parse_posts(data=subreddit_posts, time_format=self._time_format)
 
     async def search(
         self,
@@ -861,7 +861,7 @@ class Subreddit:
         )
 
         if found_posts:
-            return clean_posts(data=found_posts, time_format=self._time_format)
+            return parse_posts(data=found_posts, time_format=self._time_format)
 
 
 class Subreddits:
@@ -925,7 +925,7 @@ class Subreddits:
             session=session,
         )
         if all_subreddits:
-            return clean_subreddits(data=all_subreddits, time_format=self._time_format)
+            return parse_subreddits(data=all_subreddits, time_format=self._time_format)
 
     async def default(
         self,
@@ -969,7 +969,7 @@ class Subreddits:
             session=session,
         )
         if default_subreddits:
-            return clean_subreddits(default_subreddits, time_format=self._time_format)
+            return parse_subreddits(default_subreddits, time_format=self._time_format)
 
     async def new(
         self,
@@ -1016,7 +1016,7 @@ class Subreddits:
             session=session,
         )
         if new_subreddits:
-            return clean_subreddits(new_subreddits, time_format=self._time_format)
+            return parse_subreddits(new_subreddits, time_format=self._time_format)
 
     async def popular(
         self,
@@ -1063,7 +1063,7 @@ class Subreddits:
             session=session,
         )
         if popular_subreddits:
-            return clean_subreddits(popular_subreddits, time_format=self._time_format)
+            return parse_subreddits(popular_subreddits, time_format=self._time_format)
 
 
 class User:
@@ -1133,7 +1133,7 @@ class User:
         )
 
         if user_comments:
-            return clean_comments(comments=user_comments, time_format=self._time_format)
+            return parse_comments(comments=user_comments, time_format=self._time_format)
 
     async def moderated_subreddits(
         self,
@@ -1174,7 +1174,7 @@ class User:
             session=session,
         )
         if subreddits:
-            return clean_subreddits(
+            return parse_subreddits(
                 subreddits.get("data"),
                 time_format=self._time_format,
             )
@@ -1221,7 +1221,7 @@ class User:
             session=session,
         )
         if user_overview:
-            return clean_comments(user_overview, time_format=self._time_format)
+            return parse_comments(user_overview, time_format=self._time_format)
 
     async def posts(
         self,
@@ -1273,7 +1273,7 @@ class User:
             session=session,
         )
         if user_posts:
-            return clean_posts(user_posts, time_format=self._time_format)
+            return parse_posts(user_posts, time_format=self._time_format)
 
     async def profile(
         self,
@@ -1310,7 +1310,7 @@ class User:
             username=self._username, entity_type="user", status=status, session=session
         )
         if user_profile:
-            return clean_users(data=user_profile, time_format=self._time_format)
+            return parse_users(data=user_profile, time_format=self._time_format)
 
     async def search_posts(
         self,
@@ -1375,7 +1375,7 @@ class User:
             ):
                 found_posts.append(post)
         if found_posts:
-            return clean_posts(found_posts, time_format=self._time_format)
+            return parse_posts(found_posts, time_format=self._time_format)
 
     async def search_comments(
         self,
@@ -1438,7 +1438,7 @@ class User:
                 found_comments.append(comment)
 
         if found_comments:
-            return clean_comments(found_comments, time_format=self._time_format)
+            return parse_comments(found_comments, time_format=self._time_format)
 
     async def top_subreddits(
         self,
@@ -1559,7 +1559,7 @@ class Users:
             session=session,
         )
         if new_users:
-            return clean_users(new_users, time_format=self._time_format)
+            return parse_users(new_users, time_format=self._time_format)
 
     async def popular(
         self,
@@ -1606,7 +1606,7 @@ class Users:
             session=session,
         )
         if popular_users:
-            return clean_users(popular_users, time_format=self._time_format)
+            return parse_users(popular_users, time_format=self._time_format)
 
     async def all(
         self,
@@ -1653,4 +1653,4 @@ class Users:
             session=session,
         )
         if all_users:
-            return clean_users(all_users, time_format=self._time_format)
+            return parse_users(all_users, time_format=self._time_format)
