@@ -4,7 +4,7 @@ from datetime import date
 
 # -- Project information
 
-project = "Knew Karma"
+project = ""
 author = "Richard Mwewa"
 copyright = f"{date.today().year}, {author}"
 
