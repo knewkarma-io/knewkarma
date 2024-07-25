@@ -17,9 +17,8 @@ class Help:
     summary: str = f"**Knew Karma**: *A Reddit Data Analysis Toolkit* — by {author}"
     description: str = """
 **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
-functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)** (*Snap/PyPI
-Package*), and an
-**Application Programming Interface (API)** (*PyPI Package*) to enable an easy integration in other Python Projects.
+functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
+**Application Programming Interface (API)** to enable an easy integration in other Python Projects.
 """
 
     examples: dict = {
