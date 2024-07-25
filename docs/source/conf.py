@@ -38,12 +38,14 @@ templates_path = ["_templates"]
 # -- Options for HTML output
 
 html_theme = "alabaster"
-html_favicon = "images/favicon.ico"
+html_static_path = ["_static"]
+html_favicon = "_static/favicon.ico"
+html_logo = "_static/header.png"
 html_show_sphinx = False
 html_theme_options = {
     "show_powered_by": False,
-    "github_user": "requests",
-    "github_repo": "requests",
+    "github_user": "bellingcat",
+    "github_repo": "knewkarma",
     "github_banner": True,
     "show_related": False,
     "note_bg": "#FFF59C",
