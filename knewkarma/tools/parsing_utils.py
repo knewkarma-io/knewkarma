@@ -4,11 +4,11 @@ from .time_utils import timestamp_to_readable
 from ..api import TIME_FORMAT
 
 
-def clean_users(
+def parse_users(
     data: Union[list[dict], dict], time_format: TIME_FORMAT
 ) -> Union[list[dict], dict]:
     """
-    Cleans a list of/a single object of raw user data.
+    Parses a list of/a single object of raw user data.
 
     :param data: A list of dict objects, each containing raw user data.
     :type data: list[dict]
@@ -19,7 +19,7 @@ def clean_users(
 
     Usage::
 
-        >>> from knewkarma.tools import cleaning_utils
+        >>> from knewkarma.tools import parsing_utils
 
         >>> # The raw user data could also be a list of object containing user data in the same format.
         >>> raw_user = {
@@ -31,12 +31,12 @@ def clean_users(
         >>>                                             "default_set": True, ...
         >>> ...}
 
-        >>> cleaned_user = cleaning_utils.clean_user(data=raw_user, time_format = "locale")
+        >>> cleaned_user = parsing_utils.parse_users(data=raw_user, time_format = "locale")
     """
 
     def build_user(user: dict) -> dict:
         """
-        Cleans raw user data to get only the needed data.
+        Parses raw user data to get only the needed data.
 
         :param user: Raw user data.
         :type user: dict
@@ -84,11 +84,11 @@ def clean_users(
     return converted_data
 
 
-def clean_posts(
+def parse_posts(
     data: Union[dict, list], time_format: TIME_FORMAT
 ) -> Union[list[dict], dict]:
     """
-    Cleans a list/single object of raw post data.
+    Parses a list/single object of raw post data.
 
     :param data: A list of dict objects, each containing raw post data.
     :type data: list[dict]
@@ -99,7 +99,7 @@ def clean_posts(
 
     Usage::
 
-        >>> from knewkarma.tools import cleaning_utils
+        >>> from knewkarma.tools import parsing_utils
 
         >>> # The raw post data could also be a list of object containing post data in the same format.
         >>> raw_post = {
@@ -111,12 +111,12 @@ def clean_posts(
         >>>                             "author_fullname": "t2_6l4z3", ...
         >>> ...}
 
-        >>> cleaned_post = cleaning_utils.clean_posts(data=raw_post, time_format = "locale")
+        >>> cleaned_post = parsing_utils.parse_posts(data=raw_post, time_format = "locale")
     """
 
     def build_post(post: dict) -> dict:
         """
-        Cleans raw post data to get only the needed data.
+        Parses raw post data to get only the needed data.
 
         :param post: Raw post data.
         :type post: dict
@@ -197,9 +197,9 @@ def clean_posts(
         return [build_post(post.get("data")) for post in data if post.get("data")]
 
 
-def clean_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]:
+def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]:
     """
-    Cleans a list of raw comments data to get only the needed data in each item.
+    Parses a list of raw comments data to get only the needed data in each item.
 
     :param comments: A list of dict objects, each containing raw comment data.
     :type comments: list[dict]
@@ -210,7 +210,7 @@ def clean_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
 
     Usage::
 
-        >>> from knewkarma.tools import cleaning_utils
+        >>> from knewkarma.tools import parsing_utils
 
         >>> # The raw comment data could also be a list of object containing comment data in the same format.
         >>> raw_comment = {
@@ -222,7 +222,7 @@ def clean_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
         >>>                             "comment_type": None, ...
         >>> ...}
 
-        >>> cleaned_comment = cleaning_utils.clean_comments(data=raw_comment, time_format = "locale")
+        >>> cleaned_comment = parsing_utils.parse_comments(data=raw_comment, time_format = "locale")
     """
     if len(comments) != 0:
         comments_list: list = []
@@ -280,9 +280,9 @@ def clean_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
         return comments_list
 
 
-def clean_subreddits(data: Union[list, dict], time_format) -> Union[list[dict], dict]:
+def parse_subreddits(data: Union[list, dict], time_format) -> Union[list[dict], dict]:
     """
-    Cleans a list/single object of raw subreddits data.
+    Parses a list/single object of raw subreddits data.
 
     :param data: A list of dict objects, each containing raw subreddit data.
     :type data: list[dict]
@@ -293,7 +293,7 @@ def clean_subreddits(data: Union[list, dict], time_format) -> Union[list[dict], 
 
     Usage::
 
-        >>> from knewkarma.tools import cleaning_utils
+        >>> from knewkarma.tools import parsing_utils
 
         >>> # The raw subreddit data could also be a list of object containing subreddit data in the same format.
         >>> raw_subreddit = {
@@ -305,14 +305,14 @@ def clean_subreddits(data: Union[list, dict], time_format) -> Union[list[dict], 
         >>>                             "free_form_reports": True, ...
         >>> ...}
 
-        >>> cleaned_subreddit = cleaning_utils.clean_subreddits(data=raw_subreddit, time_format = "locale")
+        >>> cleaned_subreddit = parsing_utils.parse_subreddits(data=raw_subreddit, time_format = "locale")
     """
 
     def build_subreddit(
         subreddit: dict,
     ) -> dict:
         """
-        Cleans raw subreddit data to get only the needed data.
+        Parses raw subreddit data to get only the needed data.
 
         :param subreddit: Raw subreddit data.
         :type subreddit: dict
@@ -402,9 +402,9 @@ def clean_subreddits(data: Union[list, dict], time_format) -> Union[list[dict], 
     return subreddit_data
 
 
-def clean_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
+def parse_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
     """
-    Cleans raw subreddit wiki page data to get only the needed data.
+    Parses raw subreddit wiki page data to get only the needed data.
 
     :param wiki_page: Raw wiki page data.
     :type wiki_page: dict
@@ -415,7 +415,7 @@ def clean_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
 
     Usage::
 
-        >>> from knewkarma.tools import cleaning_utils
+        >>> from knewkarma.tools import parsing_utils
 
         >>> raw_wiki_page = {
         >>>                 "kind": "wikipage",
@@ -426,7 +426,7 @@ def clean_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
         >>>                             "revision_id": "42ab00c4-7fd4-11ed-9528-a6b541c5c78b", ...
         >>> ...}
 
-        >>> cleaned_wiki_page = cleaning_utils.clean_wiki_page(data=raw_wiki_page, time_format = "locale")
+        >>> cleaned_wiki_page = parsing_utils.parse_wiki_page(data=raw_wiki_page, time_format = "locale")
     """
     if "revision_id" in wiki_page:
         user: dict = wiki_page.get("revision_by").get("data")
