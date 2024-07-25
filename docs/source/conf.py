@@ -40,6 +40,14 @@ templates_path = ["_templates"]
 html_theme = "alabaster"
 html_favicon = "images/favicon.ico"
 html_show_sphinx = False
+html_theme_options = {
+    "show_powered_by": False,
+    "github_user": "requests",
+    "github_repo": "requests",
+    "github_banner": True,
+    "show_related": False,
+    "note_bg": "#FFF59C",
+}
 
 # -- Options for EPUB output
 epub_show_urls = "footnote"
