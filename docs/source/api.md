@@ -244,4 +244,10 @@ e.g., "*5 minutes ago*") or "`locale`" for locale-based formatting. Here's how t
 posts = await user.posts(limit=5, time_format="concise", session=session)
 ```
 
+## Random Cool-Down for Bulk Results
+
+To avoid hitting rate limits, Knew Karma includes a random cool-down or sleep timer ranging from 1 to 10 seconds for
+bulk results that exceed 100. This feature ensures smooth and uninterrupted data retrieval while adhering to Reddit's
+API usage.
+
 
