@@ -6,45 +6,12 @@
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
 **Application Programming Interface (API)** to enable an easy integration in other Python Projects.
 
-## Feature Overview
+## Documentation
 
-Knew Karma provides detailed access to Reddit data across various categories. Refer to the table below for a
-complete overview of the features available:
+[Read the Docs](https://knewkarma.readthedocs.io) for the *Feature Overview*, *Installation*, *Integration* and
+*Usage* instructions.
 
-| Category       | Feature                | Description                                                     |
-|----------------|------------------------|-----------------------------------------------------------------|
-| **Post**       | `Data`                 | Retrieves an individual post's data.                            |
-|                | `Comments`             | Retrieves an individual post's comments.                        |
-| **Posts**      | `New`                  | Retrieves new posts.                                            |
-|                | `Reddit Front-Page`    | Retrieves front-page posts.                                     |
-|                | `Listing`              | Retrieves posts from specified Reddit listings.                 |
-| **Search**     | `Users`                | Searches for users.                                             |
-|                | `Subreddits`           | Searches for subreddits.                                        |
-|                | `Posts`                | Searches for posts.                                             |
-| **Subreddit**  | `Profile`              | Retrieves subreddit profile information.                        |
-|                | `Posts`                | Retrieves posts from a specified subreddit.                     |
-|                | `Search Posts`         | Returns a subreddit's posts that contain the specified keyword. |
-|                | `Wiki Pages`           | Lists wiki pages in a subreddit.                                |
-|                | `Wiki Page`            | Retrieves content from specific wiki pages.                     |
-| **Subreddits** | `All`                  | Retrieves all subreddits.                                       |
-|                | `Default`              | Retrieves default subreddits.                                   |
-|                | `New`                  | Retrieves new subreddits.                                       |
-|                | `Popular`              | Retrieves popular subreddits.                                   |
-| **User**       | `Profile`              | Retrieves user profile information.                             |
-|                | `Posts`                | Retrieves user posts.                                           |
-|                | `Comments`             | Retrieves user comments.                                        |
-|                | `Overview`             | Retrieves user's most recent comment activity.                  |
-|                | `Search Posts`         | Returns a user's posts that contain the specified keyword.      |
-|                | `Search Comments`      | Returns a user's comments that contain the specified keyword.   |
-|                | `Top n Subreddits`     | Identifies top subreddits based on user activity.               |
-|                | `Moderated Subreddits` | Lists subreddits moderated by the user.                         |
-| **Users**      | `All`                  | Retrieves all users.                                            |
-|                | `New`                  | Retrieves new users.                                            |
-|                | `Popular`              | Retrieves popular users.                                        |
-
-# Documentation
-
-[Refer to the Docs](https://knewkarma.readthedocs.io) for the **Installation**, **Integration** and **Usage** guide.
+![screenshot-rocks](https://github.com/user-attachments/assets/4a1263f4-a8f2-4c46-8ab3-d7ce2dbae1c8)
 
 ## Important Note on Data Fetching
 
