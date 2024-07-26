@@ -11,10 +11,10 @@ class Help:
           examples (dict): Usage examples for different operations within Knew Karma.
     """
 
-    author: str = "[Richard Mwewa](https://rly0nheart.github.io)"
+    author: str = "[Richard Mwewa](https://gravatar.com/rly0nheart)"
     copyright: str = f"© MIT License {author}. All rights reserved."
 
-    summary: str = f"**Knew Karma**: *A Reddit Data Analysis Toolkit* — by {author}"
+    summary: str = f"**Knew Karma**: *A Reddit data analysis toolkit* — by {author}"
     description: str = """
 **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
