@@ -14,7 +14,7 @@ class Help:
     author: str = "[Richard Mwewa](https://gravatar.com/rly0nheart)"
     copyright: str = f"© MIT License {author}. All rights reserved."
 
-    summary: str = f"**Knew Karma**: *A Reddit Data Analysis Toolkit* — by {author}"
+    summary: str = f"**Knew Karma**: *A Reddit data analysis toolkit* — by {author}"
     description: str = """
 **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
