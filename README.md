@@ -35,5 +35,5 @@ other Reddit activity.
 
 ## License
 
-MIT License © [Richard Mwewa](https://rly0nheart.github.io)
+MIT License © [Richard Mwewa](https://gravatar.com/rly0nheart)
 
