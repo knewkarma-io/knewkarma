@@ -11,7 +11,7 @@ class Help:
           examples (dict): Usage examples for different operations within Knew Karma.
     """
 
-    author: str = "[Richard Mwewa](https://rly0nheart.github.io)"
+    author: str = "[Richard Mwewa](https://gravatar.com/rly0nheart)"
     copyright: str = f"© MIT License {author}. All rights reserved."
 
     summary: str = f"**Knew Karma**: *A Reddit Data Analysis Toolkit* — by {author}"
