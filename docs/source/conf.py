@@ -9,7 +9,7 @@ author = "Richard Mwewa"
 copyright = f"{date.today().year}, {author}"
 
 release = "5.3"
-version = "5.3.6"
+version = "5.3.7"
 
 # -- General configuration
 
