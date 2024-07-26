@@ -14,9 +14,7 @@ repository = "https://github.com/bellingcat/knewkarma"
 keywords = ["reddit", "reddit-api", "reddit-data-analysis"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
-    "Programming Language :: Visual Basic",
     "Programming Language :: Python :: 3",
-    "Intended Audience :: End Users/Desktop",
     "Intended Audience :: Information Technology",
     "Operating System :: OS Independent",
     "License :: OSI Approved :: MIT License",
