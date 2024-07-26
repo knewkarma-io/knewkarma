@@ -40,7 +40,6 @@ templates_path = ["_templates"]
 html_theme = "alabaster"
 html_static_path = ["_static"]
 html_favicon = "_static/favicon.ico"
-html_logo = "_static/logo.png"
 html_show_sphinx = False
 html_theme_options = {
     "show_powered_by": False,
