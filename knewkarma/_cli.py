@@ -359,9 +359,9 @@ async def function_caller(args: argparse.Namespace, function_map: dict):
 
             await Api().update_checker(session=session)
 
-            mode_action = function_map.get(args.module)
+            module_action = function_map.get(args.module)
             directory: str = ""
-            for action, function in mode_action:
+            for action, function in module_action:
                 arg_is_present: bool = False
                 if getattr(args, action, False):
                     arg_is_present = True
