@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "knewkarma"
-version = "5.3.7"
+version = "5.3.8"
 description = "A Reddit data analysis toolkit"
 authors = ["Richard Mwewa <rly0nheart@duck.com>"]
 readme = "README.md"
@@ -14,9 +14,7 @@ repository = "https://github.com/bellingcat/knewkarma"
 keywords = ["reddit", "reddit-api", "reddit-data-analysis"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
-    "Programming Language :: Visual Basic",
     "Programming Language :: Python :: 3",
-    "Intended Audience :: End Users/Desktop",
     "Intended Audience :: Information Technology",
     "Operating System :: OS Independent",
     "License :: OSI Approved :: MIT License",
