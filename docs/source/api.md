@@ -33,8 +33,8 @@ Initialises an instance for getting data from a specified post.
 
 ### Methods
 
-* *data(session: aiohttp.ClientSession) -> dict**: Returns a post's data.
-* *comments(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all") -> list[dict)*: Returns a post's
+* `data(session: aiohttp.ClientSession) -> dict`: Returns a post's data.
+* `comments(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all") -> list[dict)`: Returns a post's
   comments.
 
 ## Posts
@@ -54,19 +54,19 @@ Initialises an instance for getting data from multiple posts.
 
 ### Methods
 
-* *best(limit: int, session: aiohttp.ClientSession) -> list[dict]*: Returns posts from the best
+* `best(limit: int, session: aiohttp.ClientSession) -> list[dict]`: Returns posts from the best
   listing.
-* *controversial(limit: int, session: aiohttp.ClientSession) -> list[dict]*: Returns posts from
+* `controversial(limit: int, session: aiohttp.ClientSession) -> list[dict]`: Returns posts from
   the controversial
   listing.
-* *front_page(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all") ->
-  list[dict]*: Returns posts from the Reddit front-page.
-* *new(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = str) ->
-  list[dict]*: Returns new posts.
-* *popular(limit: int, session: aiohttp.ClientSession) -> list[dict]*: Returns posts from the
+* `front_page(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all") ->
+  list[dict]`: Returns posts from the Reddit front-page.
+* `new(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = str) ->
+  list[dict]`: Returns new posts.
+* `popular(limit: int, session: aiohttp.ClientSession) -> list[dict]`: Returns posts from the
   popular
   listing.
-* *rising(limit: int, session: aiohttp.ClientSession) -> list[dict]*: Returns posts from the
+* `rising(limit: int, session: aiohttp.ClientSession) -> list[dict]`: Returns posts from the
   rising
   listing.
 
@@ -89,11 +89,11 @@ Initialises an instance for performing searches across Reddit.
 
 ### Methods:
 
-* *posts(timeframe: Literal[str], sort: Literal[str],limit: int, session: aiohttp.ClientSession) -> list[dict)*:
+* `posts(timeframe: Literal[str], sort: Literal[str],limit: int, session: aiohttp.ClientSession) -> list[dict]`:
   Returns posts matching the search query.
-* *subreddits(timeframe: Literal[str], sort: Literal[str],limit: int, session: aiohttp.ClientSession) -> list[dict)*:
+* `subreddits(timeframe: Literal[str], sort: Literal[str],limit: int, session: aiohttp.ClientSession) -> list[dict]`:
   Search subreddits.
-* *users(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession) -> list[dict)*:
+* `users(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession) -> list[dict]`:
   Search users.
 
 ## Subreddit
@@ -114,13 +114,13 @@ Initialises a RedditCommunity instance for getting profile and posts from the sp
 
 ### Methods
 
-* *profile(session: aiohttp.ClientSession) -> dict**: Returns a subreddit's profile data.
-* *wiki_pages(session: aiohttp.ClientSession) -> list[str)*: Returns a subreddit's wiki pages.
-* *wiki_page(page: str, session: aiohttp.ClientSession) -> dict**: Returns a subreddit's specified wiki page data.
-* *posts(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
-  list[dict)*: Returns a subreddit's posts.
-* *search(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
-  TIMEFRAME = "all") -> list[dict)*: Returns posts that contain a specified keyword from a subreddit.
+* `profile(session: aiohttp.ClientSession) -> dict`: Returns a subreddit's profile data.
+* `wiki_pages(session: aiohttp.ClientSession) -> list[str]`: Returns a subreddit's wiki pages.
+* `wiki_page(page: str, session: aiohttp.ClientSession) -> dict`: Returns a subreddit's specified wiki page data.
+* `posts(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
+  list[dict]`: Returns a subreddit's posts.
+* `search(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
+  TIMEFRAME = "all") -> list[dict]`: Returns posts that contain a specified keyword from a subreddit.
 
 ## Subreddits
 
@@ -139,12 +139,12 @@ Initialises an instance for getting data from multiple subreddits.
 
 ### Methods:
 
-* *all(limit: int, timeframe: TIMEFRAME = "all", session: aiohttp.ClientSession) -> list[dict)*: Returns all
+* `all(limit: int, timeframe: TIMEFRAME = "all", session: aiohttp.ClientSession) -> list[dict]`: Returns all
   subreddits.
-* *default(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns default subreddits.
-* *new(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict)*: Returns new
+* `default(limit: int, session: aiohttp.ClientSession) -> list[dict]`: Returns default subreddits.
+* `new(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict]`: Returns new
   subreddits.
-* *popular(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict)*: Returns popular
+* `popular(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict]`: Returns popular
   subreddits.
 
 ## User
@@ -167,19 +167,19 @@ Initialises a **User** instance for getting profile, posts, and comments data fr
 
 ### Methods
 
-* *profile(session: aiohttp.ClientSession) -> dict*: Returns a user's profile data.
-* *posts(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
-  list[dict]*: Returns a user's posts.
-* *comments(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
-  list[dict]*: Returns a user's comments.
-* *overview(limit: int, session: aiohttp.ClientSession) -> list[dict]*: Returns a user's most recent comments.
-* *search_posts(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
-  TIMEFRAME = "all") -> list[dict]*: Returns a user's posts that contain the specified keywords.
-* *search_comments(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
-  TIMEFRAME = "all") -> list[dict]*: Returns a user's comments that contain the specified keyword.
-* *moderated_subreddits(session: aiohttp.ClientSession) -> list[dict]*: Returns subreddits moderated by the user.
-* *top_subreddits(session: aiohttp.ClientSession, top_n: int, limit: int, sort: SORT_CRITERION = "all", timeframe:
-  TIMEFRAME = "all") -> list[tuple]*: Returns a user's top n subreddits based on subreddit frequency in n posts.
+* `profile(session: aiohttp.ClientSession) -> dict*: Returns a user's profile data.
+* `posts(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
+  list[dict]`: Returns a user's posts.
+* `comments(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
+  list[dict]`: Returns a user's comments.
+* `overview(limit: int, session: aiohttp.ClientSession) -> list[dict]`: Returns a user's most recent comments.
+* `search_posts(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
+  TIMEFRAME = "all") -> list[dict]`: Returns a user's posts that contain the specified keywords.
+* `search_comments(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe:
+  TIMEFRAME = "all") -> list[dict]`: Returns a user's comments that contain the specified keyword.
+* `moderated_subreddits(session: aiohttp.ClientSession) -> list[dict]`: Returns subreddits moderated by the user.
+* `top_subreddits(session: aiohttp.ClientSession, top_n: int, limit: int, sort: SORT_CRITERION = "all", timeframe:
+  TIMEFRAME = "all") -> list[tuple]`: Returns a user's top n subreddits based on subreddit frequency in n posts.
 
 ## Users
 
@@ -198,9 +198,9 @@ Initialises an instance for getting data from multiple users.
 
 ### Methods:
 
-* *all(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns all users.
-* *new(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns new users.
-* *popular(limit: int, session: aiohttp.ClientSession) -> list[dict)*: Returns popular users.
+* `all(limit: int, session: aiohttp.ClientSession) -> list[dict]`: Returns all users.
+* `new(limit: int, session: aiohttp.ClientSession) -> list[dict]`: Returns new users.
+* `popular(limit: int, session: aiohttp.ClientSession) -> list[dict]`: Returns popular users.
 
 ## Timeframes and Sorting
 
