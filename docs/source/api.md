@@ -167,7 +167,7 @@ Initialises a **User** instance for getting profile, posts, and comments data fr
 
 ### Methods
 
-* `profile(session: aiohttp.ClientSession) -> dict*: Returns a user's profile data.
+* `profile(session: aiohttp.ClientSession) -> dict`: Returns a user's profile data.
 * `posts(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
   list[dict]`: Returns a user's posts.
 * `comments(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") ->
