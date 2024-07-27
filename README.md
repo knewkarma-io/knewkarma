@@ -1,4 +1,4 @@
-[![logo](https://github.com/user-attachments/assets/8d661d07-453a-4ff8-89e8-153472565b33)](https://knewkarma.readthedocs.io)
+ <img src="https://github.com/user-attachments/assets/8d661d07-453a-4ff8-89e8-153472565b33" alt="Paris" style="display: block; margin-left: auto; margin-right: auto;"> 
 
 **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
