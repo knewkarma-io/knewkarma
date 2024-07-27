@@ -8,13 +8,13 @@ A Reddit Data Analysis Toolkit
     :target: https://pypi.org/project/knewkarma/
     :alt: Python Version Support Badge
 
-.. image:: https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A
-    :target: https://snapcraft.io/knewkarma
-    :alt: Snap Store Badge
-
 .. image:: https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma
     :target: https://pypi.org/project/knewkarma
     :alt: PyPI Badge
+
+.. image:: https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A
+    :target: https://snapcraft.io/knewkarma
+    :alt: Snap Store Badge
 
 .. image:: https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black
     :target: https://buymeacoffee.com/rly0nheart
