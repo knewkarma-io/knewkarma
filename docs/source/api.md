@@ -250,4 +250,14 @@ To avoid hitting rate limits, Knew Karma includes a random cool-down or sleep ti
 bulk results that exceed 100. This feature ensures smooth and uninterrupted data retrieval while adhering to Reddit's
 API usage.
 
+## Important Note on Data Fetching
+
+Knew Karma is designed to fetch recent data from Reddit. It directly interacts with the Reddit API to access up-to-date
+information, including the latest posts, comments, and user activity.
+
+If you need to access historical Reddit data, I recommend using the [Pushshift API](https://api.pushshift.io/docs),
+which is
+specifically designed for retrieving large volumes of historical data, including posts, comments, and
+other Reddit activity.
+
 
