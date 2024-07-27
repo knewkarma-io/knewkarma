@@ -2,6 +2,9 @@
 
 FROM python:latest
 
+LABEL maintainer="Richard Mwewa <rly0nheart@duck.com>"
+LABEL description="A Reddit data analysis toolkit."
+
 WORKDIR /app
 
 COPY . .
