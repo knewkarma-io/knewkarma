@@ -1,0 +1,16 @@
+.italic {
+    font-style: italic;
+}
+
+.faint {
+    color: #888888;
+}
+
+.class-name {
+    font-size: 1.5em;
+}
+
+.method-name {
+    font-size: 1.2em;
+}
+
