@@ -14,7 +14,7 @@ def print_banner():
 
         >>> print_banner()
     """
-    console.log(
+    console.print(
         f"""
 ┓┏┓         ┓┏┓
 ┃┫ ┏┓┏┓┓┏┏  ┃┫ ┏┓┏┓┏┳┓┏┓
