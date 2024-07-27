@@ -1,0 +1,171 @@
+<p>
+    <iframe src="https://ghbtns.com/github-btn.html?user=bellingcat&repo=knewkarma&type=watch&count=true&size=large"
+            allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+<p>
+    A Reddit data analysis toolkit designed to provide an extensive range of
+    functionalities for exploring and analysing Reddit data.
+</p>
+
+<h3>Useful Links</h3>
+<ul>
+    <li><a href="{{ pathto('installation') }}">Installation</a></li>
+    <li><a href="{{ pathto('usage') }}">Usage</a></li>
+    <li><a href="{{ pathto('api') }}">API Reference</a></li>
+
+    <p></p>
+
+    <li><a href="https://github.com/bellingcat/knewkarma">GitHub</a></li>
+    <li><a href="https://pypi.org/project/knewkarma/">PyPI</a></li>
+    <li><a href="https://snapcraft.io/knewkarma">Snap Store</a></li>
+    <li><a href="https://github.com/bellingcat/knewkarma/issues">Bug Tracker</a></li>
+</ul>
+
+{% if pagename == "api" %}
+<h3>Table of Contents</h3>
+<ul class="current">
+    <li>
+        <a href="api.html">API Reference</a>
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#knewkarma-post">knewkarma.Post</a>
+                <ul>
+                    <li><a style="font-weight: bold; font-size: 90%;" href="#data-session-aiohttp-clientsession-dict">Post.data</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#comments-session-aiohttp-clientsession-limit-int-sort-sort_criterion-all-list-dict">Post.comments</a>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#knewkarma-posts">knewkarma.Posts</a>
+                <ul>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#best-limit-int-session-aiohttp-clientsession-list-dict">Posts.best</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#controversial-limit-int-session-aiohttp-clientsession-list-dict">Posts.controversial</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#front_page-session-aiohttp-clientsession-limit-int-sort-sort_criterion-all-list-dict">Posts.front_page</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#new-session-aiohttp-clientsession-limit-int-sort-sort_criterion-all-timeframe-timeframe-str-list-dict">Posts.new</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#popular-limit-int-session-aiohttp-clientsession-list-dict">Posts.popular</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#rising-limit-int-session-aiohttp-clientsession-list-dict">Posts.rising</a>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#knewkarma-search">knewkarma.Search</a>
+                <ul>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#posts-timeframe-literal-str-sort-literal-str-limit-int-session-aiohttp-clientsession-list-dict">Search.posts</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#subreddits-timeframe-literal-str-sort-literal-str-limit-int-session-aiohttp-clientsession-list-dict">Search.subreddits</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#users-timeframe-literal-str-sort-literal-str-limit-int-session-aiohttp-clientsession-list-dict">Search.users</a>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#knewkarma-subreddit">knewkarma.Subreddit</a>
+                <ul>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#profile-session-aiohttp-clientsession-dict">Subreddit.profile</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#wiki_pages-session-aiohttp-clientsession-list-str">Subreddit.wiki_pages</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#wiki_page-page-str-session-aiohttp-clientsession-dict">Subreddit.wiki_page</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#posts-session-aiohttp-clientsession-limit-int-sort-sort_criterion-all-timeframe-timeframe-all-list-dict">Subreddit.posts</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#search-session-aiohttp-clientsession-keyword-str-limit-int-sort-sort_criterion-all-timeframe-timeframe-all-list-dict">Subreddit.search</a>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#knewkarma-subreddits">knewkarma.Subreddits</a>
+                <ul>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#all-limit-int-timeframe-timeframe-all-session-aiohttp-clientsession-list-dict">Subreddits.all</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#default-limit-int-session-aiohttp-clientsession-list-dict">Subreddits.default</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#new-limit-int-session-aiohttp-clientsession-timeframe-timeframe-all-list-dict">Subreddits.new</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#popular-limit-int-session-aiohttp-clientsession-timeframe-timeframe-all-list-dict">Subreddits.popular</a>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#knewkarma-user">knewkarma.User</a>
+                <ul>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#profile-session-aiohttp-clientsession-dict">User.profile</a></li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#posts-session-aiohttp-clientsession-limit-int-sort-sort_criterion-all-timeframe-timeframe-all-list-dict">User.posts</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#comments-session-aiohttp-clientsession-limit-int-sort-sort_criterion-all-timeframe-timeframe-all-list-dict">User.comments</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#overview-limit-int-session-aiohttp-clientsession-list-dict">User.overview</a></li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#search_posts-session-aiohttp-clientsession-keyword-str-limit-int-sort-sort_criterion-all-timeframe-timeframe-all-list-dict">User.search_posts</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#search_comments-session-aiohttp-clientsession-keyword-str-limit-int-sort-sort_criterion-all-timeframe-timeframe-all-list-dict">User.search_comments</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#moderated_subreddits-session-aiohttp-clientsession-list-dict">User.moderated_subreddits</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#top_subreddits-session-aiohttp-clientsession-top_n-int-limit-int-sort-sort_criterion-all-timeframe-timeframe-all-list-tuple">User.top_subreddits</a>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#knewkarma-users">knewkarma.Users</a>
+                <ul>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#all-limit-int-session-aiohttp-clientsession-list-dict">Users.all</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#new-limit-int-session-aiohttp-clientsession-list-dict">Users.new</a>
+                    </li>
+                    <li><a style="font-weight: bold; font-size: 90%;"
+                           href="#popular-limit-int-session-aiohttp-clientsession-list-dict">Users.popular</a>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#timeframes-and-sorting">Timeframes and Sorting</a></li>
+            <li><a href="#code-example-fetching-user-data">Code Example: Fetching User Data</a></li>
+            <li><a href="#utilising-time_format-parameter">Utilising `time_format` Parameter</a></li>
+            <li><a href="#random-cool-down-for-bulk-results">Random Cool-Down for Bulk Results</a></li>
+            <li><a href="#important-note-on-data-fetching">Important Note on Data Fetching</a></li>
+        </ul>
+    </li>
+</ul>
+{% elif pagename == "installation" %}
+<h3>Table of Contents</h3>
+<ul class="current">
+    <li>
+        <a href="installation.html">Installation</a>
+        <ul>
+            <li><a href="#pypi">PyPI</a></li>
+            <li><a href="#snap-store">Snap Store</a></li>
+            <li><a href="#building-a-docker-image">Building a Docker Image</a></li>
+        </ul>
+    </li>
+</ul>
+
+{% endif %}

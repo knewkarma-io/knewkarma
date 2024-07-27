@@ -1,6 +1,23 @@
-Knew Karma: A Reddit Data Analysis Toolkit
-==========================================
+A Reddit Data Analysis Toolkit
+==============================
+.. image:: https://static.pepy.tech/badge/knewkarma/month
+    :target: https://pepy.tech/project/knewkarma
+    :alt: Requests Downloads Per Month Badge
 
+.. image:: https://img.shields.io/pypi/pyversions/knewkarma.svg
+    :target: https://pypi.org/project/knewkarma/
+    :alt: Python Version Support Badge
+
+.. image:: https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma
+    :target: https://pypi.org/project/knewkarma
+    :alt: PyPI Badge
+
+.. image:: https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A
+    :target: https://snapcraft.io/knewkarma
+    :alt: Snap Store Badge
+
+.. image:: https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black
+    :target: https://buymeacoffee.com/rly0nheart
 
 **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an **Application Programming Interface (API)** to enable an easy integration in other Python Projects.
 
@@ -96,11 +113,4 @@ Knew Karma: A Reddit Data Analysis Toolkit
      - ``Popular``
      - Retrieves popular users.
 
-Contents
---------
 
-.. toctree::
-
-   installation
-   usage
-   api

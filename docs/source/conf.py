@@ -1,15 +1,21 @@
 from datetime import date
 
+from knewkarma.version import Version
+
 # Configuration file for the Sphinx documentation builder.
 
 # -- Project information
 
-project = ""
+project = "Knew Karma"
 author = "Richard Mwewa"
-copyright = f"{date.today().year}, {author}"
+copyright = (
+    f" {date.today().year} MIT License, "
+    f'<a href="https://gravatar.com/rly0nheart">{author}</a>'
+)
 
-release = "5.3"
-version = "5.3.11"
+
+release = Version.release
+version = Version.full
 
 # -- General configuration
 
@@ -36,17 +42,25 @@ intersphinx_disabled_domains = ["std"]
 templates_path = ["_templates"]
 
 # -- Options for HTML output
-
+master_doc = "index"
 html_theme = "alabaster"
 html_static_path = ["_static"]
 html_favicon = "_static/favicon.ico"
 html_logo = "_static/logo.png"
 html_show_sphinx = False
+html_show_sourcelink = False
+html_sidebars = {
+    "**": [
+        "sidebar.html",  # Add your custom sidebar logo template here
+        "searchbox.html",
+    ]
+}
 html_theme_options = {
     "show_powered_by": False,
     "github_user": "bellingcat",
     "github_repo": "knewkarma",
     "github_banner": True,
+    "sidebar_collapse": True,
     "show_related": False,
     "note_bg": "#FFF59C",
 }
