@@ -25,16 +25,6 @@ functionalities for exploring and analysing Reddit data. It includes a **Command
  </picture>
 </a>
 
-## Important Note on Data Fetching
-
-Knew Karma is designed to fetch recent data from Reddit. It directly interacts with the Reddit API to access up-to-date
-information, including the latest posts, comments, and user activity.
-
-If you need to access historical Reddit data, I recommend using the [Pushshift API](https://api.pushshift.io/docs),
-which is
-specifically designed for retrieving large volumes of historical data, including posts, comments, and
-other Reddit activity.
-
 ## License
 
 MIT License © [Richard Mwewa](https://gravatar.com/rly0nheart)
