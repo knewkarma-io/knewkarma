@@ -13,7 +13,7 @@ functionalities for exploring and analysing Reddit data. It includes a **Command
 [Read the Docs](https://knewkarma.readthedocs.io) for the *Feature Overview*, *Installation*, *Integration* and
 *Usage* instructions.
 
-![readthedocs](https://github.com/user-attachments/assets/f599349f-75ce-4074-8115-b36fefd532dc)
+![readthedocs](https://github.com/user-attachments/assets/41e82e05-f523-4fe3-bb31-fc295ae2ae70)
 
 ## Important Note on Data Fetching
 
