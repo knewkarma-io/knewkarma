@@ -1,10 +1,10 @@
-# Knew Karma
-
-[![Read the Docs](https://img.shields.io/readthedocs/knewkarma?logo=readthedocs)](https://knewkarma.readthedocs.io) [![CodeQL](https://github.com/bellingcat/knewkarma/actions/workflows/codeql.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/codeql.yml) [![Upload PyPI Package](https://github.com/bellingcat/knewkarma/actions/workflows/python-publish.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/python-publish.yml) [![PyPI - Version](https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma)](https://pypi.org/project/knewkarma) [![Release Snap Package](https://github.com/bellingcat/knewkarma/actions/workflows/snapstore-publish.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/snapstore-publish.yml) [![Snap version](https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A)](https://snapcraft.io/knewkarma) [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/rly0nheart)
+[![logo](https://github.com/user-attachments/assets/8d661d07-453a-4ff8-89e8-153472565b33)](https://knewkarma.readthedocs.io)
 
 **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
 **Application Programming Interface (API)** to enable an easy integration in other Python Projects.
+
+[![Read the Docs](https://img.shields.io/readthedocs/knewkarma?logo=readthedocs)](https://knewkarma.readthedocs.io) [![CodeQL](https://github.com/bellingcat/knewkarma/actions/workflows/codeql.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/codeql.yml) [![Upload PyPI Package](https://github.com/bellingcat/knewkarma/actions/workflows/python-publish.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/python-publish.yml) [![PyPI - Version](https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma)](https://pypi.org/project/knewkarma) [![Release Snap Package](https://github.com/bellingcat/knewkarma/actions/workflows/snapstore-publish.yml/badge.svg)](https://github.com/bellingcat/knewkarma/actions/workflows/snapstore-publish.yml) [![Snap version](https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A)](https://snapcraft.io/knewkarma) [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/rly0nheart)
 
 ## Documentation
 
