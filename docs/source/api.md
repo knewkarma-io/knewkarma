@@ -13,9 +13,9 @@ API features effectively.
 
 The API exposes 7 primary classes, each tailored for different types of data retrieval:
 
-## knewkarma.Post
+#### <span class="class-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Post</strong></span>
 
-**Post**: Represents a Reddit post and provides method(s) for getting data from the specified post.
+Represents a Reddit post and provides method(s) for getting data from the specified post.
 
 ### Initialisation
 
@@ -32,18 +32,18 @@ Initialises an instance for getting data from a specified post.
 
 ### Methods
 
-#### data(session: aiohttp.ClientSession) -> dict
+##### <span class="method-name"><span class="italic">Post.</span><strong>data</strong>(session: aiohttp.ClientSession) -> dict</span>
 
 Returns a post's data. This method fetches the detailed data of a specified Reddit post.
 
-#### comments(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all") -> list[dict]
+##### <span class="method-name"><span class="italic">Post.</span><strong>comments</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all") -> list[dict]</span>
 
 Returns a post's comments. This method retrieves comments from the specified post. You can limit the number of comments
 returned and sort them based on a specified criterion.
 
-## knewkarma.Posts
+#### <span class="class-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Posts</strong></span>
 
-**Posts**: Represents Reddit posts and provides methods for getting posts from various sources.
+Represents Reddit posts and provides methods for getting posts from various sources.
 
 ### Initialisation
 
@@ -58,38 +58,38 @@ Initialises an instance for getting data from multiple posts.
 
 ### Methods
 
-#### best(limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Posts.</span><strong>best</strong>(limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
 Returns posts from the best listing. This method retrieves the best posts according to Reddit's algorithm. You can limit
 the number of posts returned.
 
-#### controversial(limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Posts.</span><strong>controversial</strong>(limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
 Returns posts from the controversial listing. This method fetches posts that are considered controversial based on
 Reddit's algorithm. You can limit the number of posts returned.
 
-#### front_page(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all") -> list[dict]
+##### <span class="method-name"><span class="italic">Posts.</span><strong>front_page</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all") -> list[dict]</span>
 
 Returns posts from the Reddit front-page. This method retrieves posts from Reddit's front page. You can limit the number
 of posts returned and sort them based on a specified criterion.
 
-#### new(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = str) -> list[dict]
+##### <span class="method-name"><span class="italic">Posts.</span><strong>new</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all") -> list[dict]</span>
 
 Returns new posts. This method fetches new posts. You can limit the number of posts returned, sort them based on a
 specified criterion, and filter them by a timeframe.
 
-#### popular(limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Posts.</span><strong>popular</strong>(limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
 Returns posts from the popular listing. This method retrieves popular posts. You can limit the number of posts returned.
 
-#### rising(limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Posts.</span><strong>rising</strong>(limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
 Returns posts from the rising listing. This method fetches rising posts. You can limit the number of posts returned.
 
-## knewkarma.Search
+#### <span class="class-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Search</strong></span>
 
-**Search**: Represents Reddit search functionality and provides methods for getting search results from different
-entities.
+Represents Reddit search functionality and provides methods for getting search results from
+different entities.
 
 ### Initialisation
 
@@ -105,24 +105,24 @@ Initialises an instance for performing searches across Reddit.
 
 ### Methods
 
-#### posts(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Search.</span><strong>posts</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
 Returns posts matching the search query. This method retrieves posts that match the search query. You can limit the
 number of posts returned, sort them based on a specified criterion, and filter them by a timeframe.
 
-#### subreddits(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Search.</span><strong>subreddits</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
 Search subreddits. This method searches for subreddits that match the query. You can limit the number of subreddits
 returned, sort them based on a specified criterion, and filter them by a timeframe.
 
-#### users(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Search.</span><strong>users</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
 Search users. This method searches for users that match the query. You can limit the number of users returned, sort them
 based on a specified criterion, and filter them by a timeframe.
 
-## knewkarma.Subreddit
+#### <span class="class-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Subreddit</strong></span>
 
-**Subreddit**: Represents a Reddit subreddit and provides methods for getting data from it.
+Represents a Reddit subreddit and provides methods for getting data from it.
 
 ### Initialisation
 
@@ -130,7 +130,7 @@ based on a specified criterion, and filter them by a timeframe.
 Subreddit(subreddit: str, time_format: Literal["concise", "locale"])
 ```
 
-Initialises a RedditCommunity instance for getting profile and posts from the specified subreddit.
+Initialises a Subreddit instance for getting profile and posts from the specified subreddit.
 
 * `subreddit`: Name of the subreddit to get data from.
 * `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
@@ -138,32 +138,32 @@ Initialises a RedditCommunity instance for getting profile and posts from the sp
 
 ### Methods
 
-#### profile(session: aiohttp.ClientSession) -> dict
+##### <span class="method-name"><span class="italic">Subreddit.</span><strong>profile</strong>(session: aiohttp.ClientSession) -> dict</span>
 
 Returns a subreddit's profile data. This method fetches the profile data of a specified subreddit.
 
-#### wiki_pages(session: aiohttp.ClientSession) -> list[str]
+##### <span class="method-name"><span class="italic">Subreddit.</span><strong>wiki_pages</strong>(session: aiohttp.ClientSession) -> list[str]</span>
 
 Returns a subreddit's wiki pages. This method retrieves the wiki pages of a specified subreddit.
 
-#### wiki_page(page: str, session: aiohttp.ClientSession) -> dict
+##### <span class="method-name"><span class="italic">Subreddit.</span><strong>wiki_page</strong>(page: str, session: aiohttp.ClientSession) -> dict</span>
 
 Returns a subreddit's specified wiki page data. This method fetches the data of a specified wiki page from a subreddit.
 
-#### posts(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") -> list[dict]
+##### <span class="method-name"><span class="italic">Subreddit.</span><strong>posts</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all") -> list[dict]</span>
 
 Returns a subreddit's posts. This method retrieves posts from a specified subreddit. You can limit the number of posts
 returned, sort them based on a specified criterion, and filter them by a timeframe.
 
-#### search(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") -> list[dict]
+##### <span class="method-name"><span class="italic">Subreddit.</span><strong>search</strong>(session: aiohttp.ClientSession, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all") -> list[dict]</span>
 
 Returns posts that contain a specified keyword from a subreddit. This method searches for posts in a subreddit that
 contain the specified keyword. You can limit the number of posts returned, sort them based on a specified criterion, and
 filter them by a timeframe.
 
-## knewkarma.Subreddits
+#### <span class="method-name"> <span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Subreddits</strong></span>
 
-**Subreddits**: Represents subreddits and provides methods for getting related data.
+Represents subreddits and provides methods for getting related data.
 
 ### Initialisation
 
@@ -178,28 +178,28 @@ Initialises an instance for getting data from multiple subreddits.
 
 ### Methods
 
-#### all(limit: int, timeframe: TIMEFRAME = "all", session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Subreddits.</span><strong>all</strong>(limit: int, timeframe: Literal[str] = "all", session: aiohttp.ClientSession) -> list[dict]</span>
 
 Returns all subreddits. This method retrieves all subreddits. You can limit the number of subreddits returned and filter
 them by a timeframe.
 
-#### default(limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Subreddits.</span><strong>default</strong>(limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
 Returns default subreddits. This method fetches the default subreddits. You can limit the number of subreddits returned.
 
-#### new(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict]
+##### <span class="method-name"><span class="italic">Subreddits.</span><strong>new</strong>(limit: int, session: aiohttp.ClientSession, timeframe: Literal[str] = "all") -> list[dict]</span>
 
 Returns new subreddits. This method retrieves new subreddits. You can limit the number of subreddits returned and filter
 them by a timeframe.
 
-#### popular(limit: int, session: aiohttp.ClientSession, timeframe: TIMEFRAME = "all") -> list[dict]
+##### <span class="method-name"><span class="italic">Subreddits.</span><strong>popular</strong>(limit: int, session: aiohttp.ClientSession, timeframe: Literal[str] = "all") -> list[dict]</span>
 
 Returns popular subreddits. This method fetches popular subreddits. You can limit the number of subreddits returned and
 filter them by a timeframe.
 
-## knewkarma.User
+#### <span class="method-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>User</strong></span>
 
-**User**: Represents a Reddit user and provides methods for getting data from the specified user.
+Represents a Reddit user and provides methods for getting data from the specified user.
 
 ### Initialisation
 
@@ -207,7 +207,7 @@ filter them by a timeframe.
 User(username: str, time_format: Literal["concise", "locale"])
 ```
 
-Initialises a **User** instance for getting profile, posts, and comments data from the specified user.
+Initialises a User instance for getting profile, posts, and comments data from the specified user.
 
 * `username`: Username of the user to get data from.
 * `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
@@ -215,50 +215,51 @@ Initialises a **User** instance for getting profile, posts, and comments data fr
 
 ### Methods
 
-#### profile(session: aiohttp.ClientSession) -> dict
+##### <span class="method-name"><span class="italic">User.</span><strong>profile</strong>(session: aiohttp.ClientSession) -> dict</span>
 
-Returns a user's profile data. This method fetches the profile data of a specified user.
+Returns a user's profile data. This method fetches the profile data of a specified user. It requires
+an `aiohttp.ClientSession` to make the asynchronous HTTP request.
 
-#### posts(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") -> list[dict]
+##### <span class="method-name"><span class="italic">User.</span><strong>posts</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all") -> list[dict]</span>
 
 Returns a user's posts. This method retrieves posts from a specified user. You can limit the number of posts returned,
 sort them based on a specified criterion, and filter them by a timeframe.
 
-#### comments(session: aiohttp.ClientSession, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") -> list[dict]
+##### <span class="method-name"><span class="italic">User.</span><strong>comments</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all") -> list[dict]</span>
 
 Returns a user's comments. This method retrieves comments from a specified user. You can limit the number of comments
 returned, sort them based on a specified criterion, and filter them by a timeframe.
 
-#### overview(limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">User.</span><strong>overview</strong>(limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
 Returns a user's most recent comments. This method retrieves the most recent comments of a specified user. You can limit
 the number of comments returned.
 
-#### search_posts(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") -> list[dict]
+##### <span class="method-name"><span class="italic">User.</span><strong>search_posts</strong>(session: aiohttp.ClientSession, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all") -> list[dict]</span>
 
 Returns a user's posts that contain the specified keywords. This method searches for posts from a specified user that
 contain the specified keywords. You can limit the number of posts returned, sort them based on a specified criterion,
 and filter them by a timeframe.
 
-#### search_comments(session: aiohttp.ClientSession, keyword: str, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") -> list[dict]
+##### <span class="method-name"><span class="italic">User.</span><strong>search_comments</strong>(session: aiohttp.ClientSession, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all") -> list[dict]</span>
 
 Returns a user's comments that contain the specified keyword. This method searches for comments from a specified user
 that contain the specified keyword. You can limit the number of comments returned, sort them based on a specified
 criterion, and filter them by a timeframe.
 
-#### moderated_subreddits(session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">User.</span><strong>moderated_subreddits</strong>(session: aiohttp.ClientSession) -> list[dict]</span>
 
 Returns subreddits moderated by the user. This method fetches the subreddits moderated by a specified user.
 
-#### top_subreddits(session: aiohttp.ClientSession, top_n: int, limit: int, sort: SORT_CRITERION = "all", timeframe: TIMEFRAME = "all") -> list[tuple]
+##### <span class="method-name"><span class="italic">User.</span><strong>top_subreddits</strong>(session: aiohttp.ClientSession, top_n: int, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all") -> list[tuple]</span>
 
 Returns a user's top n subreddits based on subreddit frequency in n posts. This method retrieves the top n subreddits
 that a specified user is most active in. You can limit the number of posts considered, sort them based on a specified
 criterion, and filter them by a timeframe.
 
-## knewkarma.Users
+#### <span class="method-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Users</strong></span>
 
-**Users**: Represents Reddit users and provides methods for getting related data.
+Represents Reddit users and provides methods for getting related data.
 
 ### Initialisation
 
@@ -273,15 +274,15 @@ Initialises an instance for getting data from multiple users.
 
 ### Methods
 
-#### all(limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Users.</span><strong>all</strong>(limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
 Returns all users. This method retrieves all users. You can limit the number of users returned.
 
-#### new(limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Users.</span><strong>new</strong>(limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
-Returns new users. This method fetches new users. You can limit the number of users returned.
+Returns new users. This method retrieves new users. You can limit the number of users returned.
 
-#### popular(limit: int, session: aiohttp.ClientSession) -> list[dict]
+##### <span class="method-name"><span class="italic">Users.</span><strong>popular</strong>(limit: int, session: aiohttp.ClientSession) -> list[dict]</span>
 
 Returns popular users. This method retrieves popular users. You can limit the number of users returned.
 
@@ -320,6 +321,7 @@ limit parameter to control the amount of data retrieved.
 The `time_format` parameter (or `--time-format` in the CLI) affects how timestamps are displayed in your results.
 Use "`concise`" for relative times (e.g., "*5 minutes ago*") or "`locale`" for locale-based formatting. Here's how to
 apply it:
+R
 
 ```python
 posts = await user.posts(limit=5, time_format="concise", session=session)
