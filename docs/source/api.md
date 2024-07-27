@@ -10,7 +10,6 @@ asynchronous programming.
 
 To help you get started, I've included detailed examples showcasing how to utilise various
 API features effectively.
-Key Classes
 
 The API exposes 7 primary classes, each tailored for different types of data retrieval:
 
