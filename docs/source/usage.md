@@ -1,6 +1,7 @@
-# CLI Usage
+# Usage
 
-After installation, the *cli* instance can be called with the `knewkarma` command (or `docker run -it [container-name]`
+After installation, the *command-line interface* instance can be called with the `knewkarma` command (
+or `docker run -it [container-name]`
 for Docker Containers)
 
 ```commandline
@@ -50,11 +51,17 @@ functionalities for exploring and analysing Reddit data. It includes a Command-L
 Application Programming Interface (API) to enable an easy integration in other Python Projects.
 ```
 
-You can further view individual operation mode usages by calling `knewkarma` with an operation mode name and
-the `-h/--help` flag.
+You can further view individual module usages by calling `knewkarma` with a module name and
+the `-h/--help` flag [see table below]:
 
-
-> E.g., you can run `knewkarma subreddit --help` to see the `subreddit` module's help message.
->> Or, run `knewkarma user --help` to see the `user` module's help message**, e.t.c.
+| Command                        |                      Description                      |
+|--------------------------------|:-----------------------------------------------------:|
+| `knewkarma post --help`        |      Print help message for post data retrieval       |
+| `knewkarma posts --help`       |     Print help message for posts' data retrieval      |
+| `knewkarma search -- help`     | Print help message for search results' data retrieval |
+| `knewkarma subreddit -- help`  |    Print help message for subreddit data retrieval    |
+| `knewkarma subreddits -- help` |   Print help message for subreddits' data retrieval   |
+| `knewkarma user -- help`       |      Print help message for user data retrieval       |
+| `knewkarma users -- help`      |     Print help message for users' data retrieval      |
 
 
