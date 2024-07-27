@@ -22,7 +22,7 @@ from .tools.time_utils import filename_timestamp
 from .version import Version
 
 
-def args_parser() -> argparse.ArgumentParser:
+def parse_cli_args() -> argparse.ArgumentParser:
     """
     Creates and configures an argument parser for the command line arguments.
 
@@ -339,29 +339,29 @@ def args_parser() -> argparse.ArgumentParser:
         action="store_true",
     )
 
-    return main_parser
+    return main_parser.parse_args()
 
 
-async def function_caller(args: argparse.Namespace, function_map: dict):
+async def method_caller(args: argparse.Namespace, method_map: dict):
     """
-    Calls command-line arguments' functions based on user-input.
+    Calls command-line arguments' methods based on user-input.
 
     :param args: Argparse namespace object  containing parsed command-line arguments.
     :type args: argparse.Namespace
-    :param function_map: Mapping of command-line commands to their respective functions
-    :type function_map: dict
+    :param method_map: Mapping of command-line commands to their respective methods
+    :type method_map: dict
     """
 
     with console.status(
-        "Establishing connection /w new session...", spinner="dots2"
+        "Establishing connection /w new session[yellow]...[/]", spinner="dots2"
     ) as status:
         async with aiohttp.ClientSession() as session:
 
             await Api().update_checker(session=session)
 
-            module_action = function_map.get(args.module)
+            module_action = method_map.get(args.module)
             directory: str = ""
-            for action, function in module_action:
+            for action, method in module_action:
                 arg_is_present: bool = False
                 if getattr(args, action, False):
                     arg_is_present = True
@@ -383,12 +383,10 @@ async def function_caller(args: argparse.Namespace, function_map: dict):
                             ]
                         )
 
-                    function_data = await function(status=status, session=session)
-                    if function_data:
-                        dataframe = create_dataframe(data=function_data)
-
-                        # Print the DataFrame, excluding the 'raw_data' column if it exists
-                        console.log(dataframe)
+                    method_data = await method(status=status, session=session)
+                    if method_data:
+                        dataframe = create_dataframe(data=method_data)
+                        console.print(dataframe)
 
                         if args.export:
                             export_dataframe(
@@ -418,37 +416,35 @@ def start():
     """
     Main entrypoint for the Knew Karma command-line interface.
     """
-    parser = args_parser()
-    args = parser.parse_args()
+    args = parse_cli_args()
 
     start_time: datetime = datetime.now()
 
     limit: int = args.limit
-    sort = args.sort
-    timeframe = args.timeframe
-    time_format = args.time_format
+    sort: Literal[str] = args.sort
+    timeframe: Literal[str] = args.timeframe
+    time_format: Literal[str] = args.time_format
+    search_query: str = args.query if hasattr(args, "query") else None
 
-    search_query = args.query if hasattr(args, "query") else None
-
-    user = User(
+    user: User = User(
         username=args.username if hasattr(args, "username") else None,
         time_format=time_format,
     )
-    users = Users(time_format=time_format)
-    search = Search(query=search_query, time_format=time_format)
-    subreddit = Subreddit(
+    users: Users = Users(time_format=time_format)
+    search: Search = Search(query=search_query, time_format=time_format)
+    subreddit: Subreddit = Subreddit(
         subreddit=args.subreddit if hasattr(args, "subreddit") else None,
         time_format=time_format,
     )
-    subreddits = Subreddits(time_format=time_format)
-    post = Post(
+    subreddits: Subreddits = Subreddits(time_format=time_format)
+    post: Post = Post(
         post_id=args.id if hasattr(args, "id") else None,
         post_subreddit=args.subreddit if hasattr(args, "subreddit") else None,
         time_format=time_format,
     )
-    posts = Posts(time_format=time_format)
+    posts: Posts = Posts(time_format=time_format)
 
-    function_map: dict = {
+    method_map: dict = {
         "post": [
             ("data", lambda session, status=None: post.data(session=session)),
             (
@@ -699,15 +695,16 @@ def start():
     }
 
     if args.module:
+        console.clear(home=False)
         print_banner()
         try:
             start_time: datetime = datetime.now()
-            asyncio.run(function_caller(args=args, function_map=function_map))
+            asyncio.run(method_caller(args=args, method_map=method_map))
         except KeyboardInterrupt:
             console.log("[yellow]✘[/] User interruption detected ([yellow]Ctrl+C[/])")
         finally:
             elapsed_time = datetime.now() - start_time
-            console.log(
+            console.print(
                 f"[green]✔[/] DONE. {elapsed_time.total_seconds():.2f} seconds elapsed."
             )
     else:

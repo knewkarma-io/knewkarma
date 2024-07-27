@@ -173,7 +173,7 @@ class Api:
         status: console.status = kwargs.get("status")
 
         if status:
-            status.update("Initialising bulk data retrieval process...")
+            status.update("Initialising bulk data retrieval job...")
 
         while len(all_items) < limit:
             paginated_endpoint = (
@@ -231,7 +231,7 @@ class Api:
         """
         status: console.status = kwargs.get("status")
         if status:
-            status.update("Initialising single data retrieval process...")
+            status.update("Initialising single data retrieval job...")
 
         # Use a dictionary for direct mapping
         entity_mapping: dict = {
