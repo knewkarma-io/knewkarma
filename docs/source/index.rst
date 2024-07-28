@@ -112,11 +112,3 @@ A Reddit Data Analysis Toolkit
    * -
      - ``Popular``
      - Retrieves popular users.
-
-.. toctree::
-   :maxdepth: 2
-
-   api
-   usage
-   installation
-
