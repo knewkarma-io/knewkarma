@@ -10,7 +10,7 @@ project = "Knew Karma"
 author = "Richard Mwewa"
 copyright = (
     f" {date.today().year} MIT License, "
-    f'<a href="https://gravatar.com/rly0nheart">{author}</a>'
+    f'<a href="https://gravatar.com/rly0nheart" target="_blank">{author}</a>'
 )
 
 
