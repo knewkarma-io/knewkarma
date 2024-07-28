@@ -13,7 +13,7 @@ API features effectively.
 
 The API exposes 7 primary classes, each tailored for different types of data retrieval:
 
-#### <span class="class-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Post</strong></span>
+#### <span style="font-size: 131%;"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Post</strong></span>
 
 Represents a Reddit post and provides method(s) for getting data from the specified post.
 
@@ -161,7 +161,7 @@ Returns posts that contain a specified keyword from a subreddit. This method sea
 contain the specified keyword. You can limit the number of posts returned, sort them based on a specified criterion, and
 filter them by a timeframe.
 
-#### <span class="method-name"> <span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Subreddits</strong></span>
+#### <span class="class-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Subreddits</strong></span>
 
 Represents subreddits and provides methods for getting related data.
 
@@ -197,7 +197,7 @@ them by a timeframe.
 Returns popular subreddits. This method fetches popular subreddits. You can limit the number of subreddits returned and
 filter them by a timeframe.
 
-#### <span class="method-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>User</strong></span>
+#### <span class="class-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>User</strong></span>
 
 Represents a Reddit user and provides methods for getting data from the specified user.
 
@@ -257,7 +257,7 @@ Returns a user's top n subreddits based on subreddit frequency in n posts. This 
 that a specified user is most active in. You can limit the number of posts considered, sort them based on a specified
 criterion, and filter them by a timeframe.
 
-#### <span class="method-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Users</strong></span>
+#### <span class="class-name"><span class="italic">class</span> <span class="faint">knewkarma.</span><strong>Users</strong></span>
 
 Represents Reddit users and provides methods for getting related data.
 
