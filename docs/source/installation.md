@@ -8,7 +8,7 @@ or Docker. Follow these steps to get up and running.
 You'll need to have Python 3.10 or later installed on your system in order to install Knew Karma from PyPI. You can
 install it by running the following command:
 
-```commandline
+```shell
 pip install knewkarma
 ```
 
