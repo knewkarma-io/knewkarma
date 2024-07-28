@@ -14,7 +14,7 @@ copyright = (
 )
 
 
-release = ""
+release = Version.release
 version = Version.full
 
 # -- General configuration
