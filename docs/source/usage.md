@@ -4,15 +4,15 @@ After installation, the *command-line interface* instance can be called with the
 or `docker run -it [container-name]`
 for Docker Containers)
 
-```commandline
+```shell
 knewkarma --help
 ```
 
-```commandline
+```shell
 docker run -t my-knewkarma-container --help
 ```
 
-```commandline
+```text
 Usage: knewkarma [-h] [-t {hour,day,week,month,year}]
                  [-s {controversial,new,top,best,hot,rising}] [-l LIMIT]
                  [--time-format {concise,datetime}] [-e EXPORT] [-u] [-v]
