@@ -1,0 +1,24 @@
+.italic {
+    font-style: italic;
+}
+
+.faint {
+    color: #888888;
+}
+
+.class-name {
+    font-size: 1.5em;
+}
+
+.method-name {
+    font-size: 1.2em;
+}
+
+ul.toc-list li ul li a.method-link {
+    font-weight: bold;
+    font-size: 90%;
+}
+
+ul.toc-list li ul li a.method-link:hover {
+    text-decoration: underline;
+}
