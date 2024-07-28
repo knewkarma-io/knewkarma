@@ -699,7 +699,7 @@ class Subreddit:
             >>> asyncio.run(async_subreddit_wiki_pages(subreddit="MachineLearning"))
         """
         if status:
-            status.update(f"Initialising single data retrieval process...")
+            status.update(f"Initialising single data retrieval job...")
 
         pages: dict = await api.make_request(
             endpoint=f"{api.subreddit_endpoint}/{self._subreddit}/wiki/pages.json",
@@ -791,7 +791,7 @@ class Subreddit:
             >>>        print(posts)
 
 
-            >>> asyncio.run(async_subreddit_posts(limit=500, subreddit="MachineLearning"))
+            >>> asyncio.run(async_subreddit_posts(posts_limit=500, subreddit="MachineLearning"))
         """
         subreddit_posts: list = await api.get_posts(
             posts_type="subreddit_posts",
@@ -847,7 +847,7 @@ class Subreddit:
             >>>        print(posts)
 
 
-            >>> asyncio.run(async_search_subreddit_posts(query="ML jobs", limit=100, subreddit="MachineLearning"))
+            >>> asyncio.run(async_search_subreddit_posts(search_query="ML jobs", posts_limit=100, subreddit="MachineLearning"))
         """
         found_posts: list = await api.get_posts(
             posts_type="search_subreddit_posts",
@@ -915,7 +915,7 @@ class Subreddits:
             >>>        print(all_subs)
 
 
-            >>> asyncio.run(async_all_subreddits(limit=500))
+            >>> asyncio.run(async_all_subreddits(subreddits_limit=500))
         """
         all_subreddits: list = await api.get_subreddits(
             subreddits_type="all",
@@ -959,7 +959,7 @@ class Subreddits:
             >>>        print(default_subs)
 
 
-            >>> asyncio.run(async_default_subreddits(limit=20))
+            >>> asyncio.run(async_default_subreddits(subreddits_limit=20))
         """
         default_subreddits: list = await api.get_subreddits(
             subreddits_type="default",
@@ -1006,7 +1006,7 @@ class Subreddits:
             >>>        print(new_subs)
 
 
-            >>> asyncio.run(async_new_subreddits(limit=50))
+            >>> asyncio.run(async_new_subreddits(subreddits_limit=50))
         """
         new_subreddits: list = await api.get_subreddits(
             subreddits_type="new",
@@ -1053,7 +1053,7 @@ class Subreddits:
             >>>        print(popular_subs)
 
 
-            >>> asyncio.run(async_popular_subreddits(limit=100))
+            >>> asyncio.run(async_popular_subreddits(subreddits_limit=100))
         """
         popular_subreddits: list = await api.get_subreddits(
             subreddits_type="popular",
@@ -1120,7 +1120,7 @@ class User:
             >>>        print(comments)
 
 
-            >>> asyncio.run(async_user_comments(username="AutoModerator", limit=100))
+            >>> asyncio.run(async_user_comments(username="AutoModerator", comments_limit=100))
         """
         user_comments: list = await api.get_posts(
             username=self._username,
@@ -1164,7 +1164,7 @@ class User:
             >>>        print(moderated_subs)
 
 
-            >>> asyncio.run(async_user_moderated_subreddits(username="TheRealKSI", limit=100))
+            >>> asyncio.run(async_user_moderated_subreddits(username="TheRealKSI"))
         """
         subreddits: dict = await api.get_subreddits(
             subreddits_type="user_moderated",
@@ -1211,7 +1211,7 @@ class User:
             >>>        print(comments)
 
 
-            >>> asyncio.run(async_user_overview(username="AutoModerator", limit=100))
+            >>> asyncio.run(async_user_overview(username="AutoModerator", comments_limit=100))
         """
         user_overview: list = await api.get_posts(
             username=self._username,
@@ -1261,7 +1261,7 @@ class User:
             >>>        print(posts)
 
 
-            >>> asyncio.run(async_user_posts(username="AutoModerator", limit=100))
+            >>> asyncio.run(async_user_posts(username="AutoModerator", posts_limit=100))
         """
         user_posts: list = await api.get_posts(
             username=self._username,
@@ -1420,7 +1420,7 @@ class User:
 
 
             >>> asyncio.run(async_search_user_comments(username="AutoModerator",
-            >>>                            search_keyword="automated", posts_limit=100))
+            >>>                            search_keyword="automated", comments_limit=100))
         """
         user_comments: list = await api.get_posts(
             username=self._username,
