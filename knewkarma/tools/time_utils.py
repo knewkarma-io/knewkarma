@@ -1,10 +1,19 @@
 import asyncio
 import locale
 import os
+import time
 from datetime import datetime, timezone
-from typing import Literal
+from typing import Literal, Union
 
 from rich.status import Status
+
+__all__ = [
+    "countdown_timer",
+    "timestamp_to_readable",
+    "timestamp_to_concise",
+    "timestamp_to_locale",
+    "filename_timestamp",
+]
 
 
 async def countdown_timer(
@@ -31,7 +40,7 @@ async def countdown_timer(
         await asyncio.sleep(1)  # Sleep for one second as part of countdown
 
 
-def _timestamp_to_locale(timestamp: float) -> str:
+def timestamp_to_locale(timestamp: float) -> str:
     """
     Converts a unix timestamp to a localized datetime string based on the system's locale.
 
@@ -39,6 +48,17 @@ def _timestamp_to_locale(timestamp: float) -> str:
     :type timestamp: float
     :return: A localized datetime string from the converted timestamp.
     :rtype: str
+
+    Usage::
+
+        >>> from knewkarma.tools.time_utils import timestamp_to_locale
+
+        >>> coffee_time = 1722277062
+        >>> difference = timestamp_to_locale(timestamp=coffee_time)
+        >>> print(f"Coffee time was at {difference}")
+
+        # As of writing :)
+        Coffee time was at 29/07/24, 20:17:42
     """
     # Set the locale to the user's system default
     locale.setlocale(locale.LC_TIME, "")
@@ -52,16 +72,26 @@ def _timestamp_to_locale(timestamp: float) -> str:
     return local_object.strftime("%x, %X")
 
 
-def _time_since(timestamp: int, suffix: str = "ago") -> str:
+def timestamp_to_concise(timestamp: int) -> str:
     """
-    Convert a Unix timestamp into a human-readable time difference.
+    Convert a Unix timestamp into a human-readable concise time difference.
 
     :param timestamp: A Unix timestamp.
     :type timestamp: int
     :return: A string representing the time difference from now.
     :rtype: str
+
+    Usage::
+
+        >>> from knewkarma.tools.time_utils import timestamp_to_concise
+
+        >>> coffee_time = 1722277062
+        >>> difference = timestamp_to_concise(timestamp=coffee_time)
+        >>> print(f"Coffee time was {difference} ago")
+
+        # As of writing :)
+        Coffee time was 10 minutes ago
     """
-    import time
 
     # Convert the current time to a Unix timestamp
     now = int(time.time())
@@ -100,12 +130,12 @@ def _time_since(timestamp: int, suffix: str = "ago") -> str:
         count = diff // year
         label = "years" if int(count) > 1 else "year"
 
-    return "just now" if int(count) == 0 else f"{int(count)} {label} {suffix}"
+    return "just now" if int(count) == 0 else f"{int(count)} {label}"
 
 
 def timestamp_to_readable(
     timestamp: float, time_format: Literal["concise", "locale"] = "locale"
-) -> str:
+) -> Union[str, None]:
     """
     Converts a Unix timestamp into a more readable format based on the specified `time_format`.
     The function supports converting the timestamp into either a localized datetime string or a concise
@@ -119,15 +149,30 @@ def timestamp_to_readable(
     :return: A string representing the formatted time. The format is determined by the `time_format` parameter.
     :rtype: str
     :raises ValueError: If `time_format` is not one of the expected values ("concise" or "locale").
+
+    Usage::
+
+        >>> from knewkarma.tools.time_utils import timestamp_to_readable
+
+        >>> coffee_time = 1722277062
+        >>> difference = timestamp_to_readable(timestamp=coffee_time, time_format="concise")
+        >>> print(f"Coffee time was {difference} ago")
+
+        # As of writing :)
+        Coffee time was 10 minutes ago
     """
-    if time_format == "concise":
-        return _time_since(timestamp=int(timestamp))
-    elif time_format == "locale":
-        return _timestamp_to_locale(timestamp=timestamp)
+    if timestamp and isinstance(timestamp, float):
+        if time_format == "concise":
+            concise_time: str = timestamp_to_concise(timestamp=int(timestamp))
+            return f"{concise_time} ago"
+        elif time_format == "locale":
+            return timestamp_to_locale(timestamp=timestamp)
+        else:
+            raise ValueError(
+                f"Unknown time format {time_format}. Expected `concise` or `locale`."
+            )
     else:
-        raise ValueError(
-            f"Unknown time format {time_format}. Expected `concise` or `locale`."
-        )
+        return None
 
 
 def filename_timestamp() -> str:

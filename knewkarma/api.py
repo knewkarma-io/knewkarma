@@ -1,13 +1,17 @@
 import asyncio
 from random import randint
+from sys import version as python_version
 from typing import Union, Literal
 
 import aiohttp
 from rich.markdown import Markdown
 
+from .help import Help
 from .tools.general_utils import console
 from .tools.time_utils import countdown_timer
 from .version import Version
+
+__all__ = ["Api", "python_version", "SORT_CRITERION", "TIMEFRAME", "TIME_FORMAT"]
 
 SORT_CRITERION = Literal["controversial", "new", "top", "best", "hot", "rising", "all"]
 TIMEFRAME = Literal["hour", "day", "week", "month", "year", "all"]
@@ -39,14 +43,12 @@ class Api:
         :return: JSON data as a dictionary or list. Returns an empty dict if fetching fails.
         :rtype: Union[dict, list]
         """
-        from sys import version as python_version
-
         try:
             async with session.get(
                 endpoint,
                 headers={
                     "User-Agent": f"Knew-Karma/{Version.release} "
-                    f"(Python {python_version}; +https://knewkarma.readthedocs.io)"
+                    f"(Python {python_version}; +{Help.documentation})"
                 },
             ) as response:
                 if response.status == 200:
@@ -92,8 +94,8 @@ class Api:
         elif isinstance(response_data, list):
             return response_data if response_data else []
         else:
-            console.log(
-                f"[yellow]✘[/] Unknown data type ({response_data}: {type(response_data)}), expected a list or dict."
+            raise ValueError(
+                f"Unknown data type ({response_data}: {type(response_data)}), expected a List[Dict] or Dict."
             )
 
     async def update_checker(self, session: aiohttp.ClientSession):

@@ -3,6 +3,14 @@ from typing import Union
 from .time_utils import timestamp_to_readable
 from ..api import TIME_FORMAT
 
+__all__ = [
+    "parse_users",
+    "parse_posts",
+    "parse_subreddits",
+    "parse_comments",
+    "parse_wiki_page",
+]
+
 
 def parse_users(
     data: Union[list[dict], dict], time_format: TIME_FORMAT
@@ -65,21 +73,20 @@ def parse_users(
             "awarder_karma": user.get("awarder_karma"),
             "pref_show_snoovatar": user.get("pref_show_snoovatar"),
             "has_subscribed": user.get("has_subscribed"),
-            "created": (
-                timestamp_to_readable(
-                    timestamp=user.get("created"), time_format=time_format
-                )
-                if user.get("created")
-                else "NaN"
+            "created": timestamp_to_readable(
+                timestamp=user.get("created"), time_format=time_format
             ),
         }
 
-    converted_data = None
     if isinstance(data, list) and len(data) != 0:
         converted_data = [build_user(user.get("data")) for user in data]
 
     elif isinstance(data, dict) and "is_employee" in data:
         converted_data = build_user(data)
+    else:
+        raise ValueError(
+            f"Unknown data type ({data}: {type(data)}), expected a List[Dict] or Dict."
+        )
 
     return converted_data
 
@@ -173,28 +180,21 @@ def parse_posts(
             "link_flair_background_color": post.get("link_flair_background_color"),
             "author_fullname": post.get("author_fullname"),
             "whitelist_status": post.get("whitelist_status"),
-            "edited": (
-                timestamp_to_readable(
-                    timestamp=post.get("edited"), time_format=time_format
-                )
-                if post.get("edited")
-                else False
+            "edited": timestamp_to_readable(
+                timestamp=post.get("edited"), time_format=time_format
             ),
             "url": post.get("url"),
-            "created": (
-                timestamp_to_readable(
-                    timestamp=post.get("created"), time_format=time_format
-                )
-                if post.get("created")
-                else "NaN"
+            "created": timestamp_to_readable(
+                timestamp=post.get("created"), time_format=time_format
             ),
         }
 
     if isinstance(data, dict):
         return build_post(post=data)
-
     elif isinstance(data, list):
         return [build_post(post.get("data")) for post in data if post.get("data")]
+    else:
+        raise ValueError(f"Unknown data type ({data}: {type(data)}), expected a Dict.")
 
 
 def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]:
@@ -224,8 +224,10 @@ def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
 
         >>> cleaned_comment = parsing_utils.parse_comments(data=raw_comment, time_format = "locale")
     """
-    if len(comments) != 0:
-        comments_list: list = []
+    comments_list: list = []
+    if isinstance(comments, list) and all(
+        isinstance(comment, dict) for comment in comments
+    ):
         for comment in comments:
             comment_data: dict = comment.get("data")
             comments_list.append(
@@ -266,18 +268,18 @@ def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
                     "all_awardings": comment_data.get("all_awardings"),
                     "quarantine": comment_data.get("quarantine"),
                     "link_url": comment_data.get("link_url"),
-                    "created": (
-                        timestamp_to_readable(
-                            timestamp=comment_data.get("created"),
-                            time_format=time_format,
-                        )
-                        if comment_data.get("created")
-                        else "NaN"
+                    "created": timestamp_to_readable(
+                        timestamp=comment_data.get("created"),
+                        time_format=time_format,
                     ),
                 }
             )
 
         return comments_list
+    else:
+        raise ValueError(
+            f"Unknown data type ({comments}: {type(comments)}), expected a List[Dict]."
+        )
 
 
 def parse_subreddits(data: Union[list, dict], time_format) -> Union[list[dict], dict]:
@@ -381,23 +383,21 @@ def parse_subreddits(data: Union[list, dict], time_format) -> Union[list[dict], 
             ),
             "has_menu_widget": subreddit.get("has_menu_widget"),
             "videostream_links_count": subreddit.get("videostream_links_count"),
-            "created": (
-                timestamp_to_readable(
-                    timestamp=subreddit.get("created"), time_format=time_format
-                )
-                if subreddit.get("created")
-                else "NaN"
+            "created": timestamp_to_readable(
+                timestamp=subreddit.get("created"), time_format=time_format
             ),
         }
 
-    subreddit_data = {}
     if isinstance(data, list) and len(data) != 0:
         subreddit_data = [
             build_subreddit(subreddit=subreddit.get("data")) for subreddit in data
         ]
-
     elif isinstance(data, dict) and "subreddit_type" in data:
         subreddit_data = build_subreddit(subreddit=data)
+    else:
+        raise ValueError(
+            f"Unknown data type ({data}: {type(data)}), expected a List[Dict] or Dict."
+        )
 
     return subreddit_data
 
@@ -428,7 +428,7 @@ def parse_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
 
         >>> cleaned_wiki_page = parsing_utils.parse_wiki_page(data=raw_wiki_page, time_format = "locale")
     """
-    if "revision_id" in wiki_page:
+    if isinstance(wiki_page, dict) and "revision_id" in wiki_page:
         user: dict = wiki_page.get("revision_by").get("data")
 
         return {
@@ -463,3 +463,7 @@ def parse_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
                 timestamp=user.get("created"), time_format=time_format
             ),
         }
+    else:
+        raise ValueError(
+            f"Unknown data type ({wiki_page}: {type(wiki_page)}), expected a Dict."
+        )

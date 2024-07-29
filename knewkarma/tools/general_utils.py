@@ -1,7 +1,16 @@
+import getpass
 import os
+import platform
 
+import psutil
 from rich.console import Console
 from rich.table import Table
+
+from .time_utils import timestamp_to_concise
+from ..api import python_version
+from ..version import Version
+
+__all__ = ["print_banner", "get_system_info", "console", "pathfinder"]
 
 
 def print_banner():
@@ -32,19 +41,10 @@ def get_system_info() -> Table:
 
     Usage::
 
-        >>> from knewkarma.tools.general_utils import get_system_info
-        >>> from rich import print as xprint
+        >>> from knewkarma.tools.general_utils import console, get_system_info
 
-        >>> xprint(get_system_info())
+        >>> console.print(get_system_info())
     """
-    import getpass
-    import platform
-    import sys
-
-    import psutil
-
-    from .time_utils import _time_since
-    from ..version import Version
 
     table = Table(show_header=False, show_edge=False, highlight=True)
     table.add_column("header", style="dim")
@@ -74,16 +74,14 @@ def get_system_info() -> Table:
         system_uptime = (
             "just now"
             if days == hours == minutes == seconds == 0
-            else f"{days} days, {hours:02} hours, {minutes:02} minutes, and {seconds:02} seconds since boot"
+            else f"{days} days, {hours:02} hours, {minutes:02} minutes, and {seconds:02} seconds"
         )
     else:
-        system_uptime = _time_since(
-            timestamp=int(psutil.boot_time()), suffix="since boot"
-        )
+        system_uptime = timestamp_to_concise(timestamp=int(psutil.boot_time()))
 
     table.add_row("Username", getpass.getuser())
     table.add_row("Knew Karma", Version.full)
-    table.add_row("Python", sys.version)
+    table.add_row("Python", python_version)
     table.add_row("System", f"{platform.system()} {platform.version()}")
     table.add_row(
         "CPU", f"{psutil.cpu_count(logical=True)} cores, {platform.processor()}"

@@ -1,8 +1,11 @@
 A Reddit Data Analysis Toolkit
 ==============================
-.. image:: https://static.pepy.tech/badge/knewkarma/month
+
+**Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an **Application Programming Interface (API)** to enable an easy integration in other Python Projects.
+
+.. image:: https://static.pepy.tech/badge/knewkarma
     :target: https://pepy.tech/project/knewkarma
-    :alt: Requests Downloads Per Month Badge
+    :alt: Requests Downloads
 
 .. image:: https://img.shields.io/pypi/pyversions/knewkarma.svg
     :target: https://pypi.org/project/knewkarma/
@@ -18,8 +21,6 @@ A Reddit Data Analysis Toolkit
 
 .. image:: https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black
     :target: https://buymeacoffee.com/rly0nheart
-
-**Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an **Application Programming Interface (API)** to enable an easy integration in other Python Projects.
 
 .. list-table:: Knew Karma provides detailed access to Reddit data across various categories [see table below]:
    :widths: 25 25 50
