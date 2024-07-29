@@ -6,7 +6,7 @@
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
 **Application Programming Interface (API)** to enable an easy integration in other Python Projects.
 
-[![Downloads](https://static.pepy.tech/badge/knewkarma/month)](https://pepy.tech/project/knewkarma) ![Python Versions](https://img.shields.io/pypi/pyversions/knewkarma.svg)  [![PyPI - Version](https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma)](https://pypi.org/project/knewkarma) [![Snap version](https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A)](https://snapcraft.io/knewkarma) [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/rly0nheart)
+[![Downloads](https://static.pepy.tech/badge/knewkarma)](https://pepy.tech/project/knewkarma) ![Python Versions](https://img.shields.io/pypi/pyversions/knewkarma.svg)  [![PyPI - Version](https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma)](https://pypi.org/project/knewkarma) [![Snap version](https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A)](https://snapcraft.io/knewkarma) [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/rly0nheart)
 
 ## Documentation
 

@@ -18,15 +18,15 @@ TEST_SUBREDDIT_2: str = "AskReddit"
     wait=wait_fixed(15),
     retry=retry_if_exception_type(aiohttp.ClientError),
 )
-async def fetch_with_retry(fetch_func, *args, **kwargs):
+async def get_with_retry(get_function, *args, **kwargs):
     async with aiohttp.ClientSession() as session:
-        return await fetch_func(*args, session=session, **kwargs)
+        return await get_function(*args, session=session, **kwargs)
 
 
 @pytest.mark.asyncio
 async def test_search_for_posts():
     search_posts_query: str = "coronavirus"
-    search_posts: list[dict] = await fetch_with_retry(
+    search_posts: list[dict] = await get_with_retry(
         api.search_entities,
         entity_type="posts",
         query=search_posts_query,
@@ -48,7 +48,7 @@ async def test_search_for_posts():
 async def test_search_for_posts_in_a_subreddit():
     search_query: str = "Rick and Morty"
     posts_subreddit: str = "AdultSwim"
-    search_results = await fetch_with_retry(
+    search_results = await get_with_retry(
         api.get_posts,
         posts_type="search_subreddit_posts",
         query=search_query,
@@ -70,7 +70,7 @@ async def test_search_for_posts_in_a_subreddit():
 @pytest.mark.asyncio
 async def test_search_for_subreddits():
     search_subreddits_query: str = "science"
-    search_subreddits: list[dict] = await fetch_with_retry(
+    search_subreddits: list[dict] = await get_with_retry(
         api.search_entities,
         entity_type="subreddits",
         query=search_subreddits_query,
@@ -92,7 +92,7 @@ async def test_search_for_subreddits():
 @pytest.mark.asyncio
 async def test_search_for_users():
     search_users_query: str = "john"
-    search_users: list[dict] = await fetch_with_retry(
+    search_users: list[dict] = await get_with_retry(
         api.search_entities,
         entity_type="users",
         query=search_users_query,
@@ -113,7 +113,7 @@ async def test_search_for_users():
 
 @pytest.mark.asyncio
 async def test_get_user_and_subreddit_profiles():
-    user_profile: dict = await fetch_with_retry(
+    user_profile: dict = await get_with_retry(
         api.get_entity,
         entity_type="user",
         username=TEST_USERNAME,
@@ -122,7 +122,7 @@ async def test_get_user_and_subreddit_profiles():
     assert user_profile.get("id") == "6l4z3"
     assert user_profile.get("created") == 1325741068
 
-    subreddit_profile: dict = await fetch_with_retry(
+    subreddit_profile: dict = await get_with_retry(
         api.get_entity,
         entity_type="subreddit",
         subreddit=TEST_SUBREDDIT_2,
@@ -134,7 +134,7 @@ async def test_get_user_and_subreddit_profiles():
 
 @pytest.mark.asyncio
 async def test_get_posts_from_a_subreddit():
-    subreddit_posts: list = await fetch_with_retry(
+    subreddit_posts: list = await get_with_retry(
         api.get_posts,
         posts_type="subreddit_posts",
         subreddit=TEST_SUBREDDIT_1,
@@ -154,7 +154,7 @@ async def test_get_posts_from_a_subreddit():
 @pytest.mark.asyncio
 async def test_get_posts_from_a_user():
     username: str = "AutoModerator"
-    user_posts: list = await fetch_with_retry(
+    user_posts: list = await get_with_retry(
         api.get_posts,
         posts_type="user_posts",
         username=username,
@@ -171,7 +171,7 @@ async def test_get_posts_from_a_user():
 
 @pytest.mark.asyncio
 async def test_get_new_posts():
-    new_posts = await fetch_with_retry(
+    new_posts = await get_with_retry(
         api.get_posts,
         posts_type="new",
         limit=200,
@@ -193,7 +193,7 @@ async def test_get_new_posts():
 
 @pytest.mark.asyncio
 async def test_get_new_users():
-    new_users: list[dict] = await fetch_with_retry(
+    new_users: list[dict] = await get_with_retry(
         api.get_users,
         users_type="new",
         timeframe="week",
@@ -216,7 +216,7 @@ async def test_get_new_users():
 
 @pytest.mark.asyncio
 async def test_get_new_subreddits():
-    new_subreddits = await fetch_with_retry(
+    new_subreddits = await get_with_retry(
         api.get_subreddits,
         timeframe="day",
         subreddits_type="new",
