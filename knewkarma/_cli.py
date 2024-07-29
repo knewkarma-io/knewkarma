@@ -10,7 +10,7 @@ from rich.tree import Tree
 from rich_argparse import RichHelpFormatter
 
 from . import Post, Posts, Search, Subreddit, Subreddits, User, Users
-from .api import Api, SORT_CRITERION, TIMEFRAME
+from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .help import Help
 from .tools.data_utils import create_dataframe, export_dataframe, show_exported_files
 from .tools.general_utils import (
@@ -22,7 +22,9 @@ from .tools.time_utils import filename_timestamp
 from .version import Version
 
 
-def parse_cli_args() -> argparse.ArgumentParser:
+def parse_arguments() -> (
+    tuple[argparse.ArgumentParser, argparse.ArgumentParser.parse_args]
+):
     """
     Creates and configures an argument parser for the command line arguments.
 
@@ -339,15 +341,15 @@ def parse_cli_args() -> argparse.ArgumentParser:
         action="store_true",
     )
 
-    return main_parser.parse_args()
+    return main_parser, main_parser.parse_args()
 
 
-async def method_caller(args: argparse.Namespace, method_map: dict):
+async def method_caller(arguments: argparse.Namespace, method_map: dict):
     """
     Calls command-line arguments' methods based on user-input.
 
-    :param args: Argparse namespace object  containing parsed command-line arguments.
-    :type args: argparse.Namespace
+    :param arguments: Argparse namespace object  containing parsed command-line arguments.
+    :type arguments: argparse.Namespace
     :param method_map: Mapping of command-line commands to their respective methods
     :type method_map: dict
     """
@@ -359,19 +361,19 @@ async def method_caller(args: argparse.Namespace, method_map: dict):
 
             await Api().update_checker(session=session)
 
-            module_action = method_map.get(args.module)
+            module_action = method_map.get(arguments.module)
             directory: str = ""
             for action, method in module_action:
                 arg_is_present: bool = False
-                if getattr(args, action, False):
+                if getattr(arguments, action, False):
                     arg_is_present = True
 
-                    if args.export:
+                    if arguments.export:
                         output_dir: str = os.path.expanduser(
                             os.path.join("~", "knewkarma-output")
                         )
                         # Create path to main directory in which target data files will be exported
-                        directory = os.path.join(output_dir, args.module, action)
+                        directory = os.path.join(output_dir, arguments.module, action)
 
                         # Create file directories for supported data file types
                         pathfinder(
@@ -388,12 +390,12 @@ async def method_caller(args: argparse.Namespace, method_map: dict):
                         dataframe = create_dataframe(data=method_data)
                         console.print(dataframe)
 
-                        if args.export:
+                        if arguments.export:
                             export_dataframe(
                                 dataframe=dataframe,
                                 filename=filename_timestamp(),
                                 directory=directory,
-                                formats=args.export.split(","),
+                                formats=arguments.export.split(","),
                             )
 
                             # Show exported files
@@ -408,7 +410,7 @@ async def method_caller(args: argparse.Namespace, method_map: dict):
 
             if not arg_is_present:
                 console.log(
-                    f"knewkarma [underline]{args.module}[/]: missing one or more expected argument(s)"
+                    f"knewkarma [underline]{arguments.module}[/]: missing one or more expected argument(s)"
                 )
 
 
@@ -416,30 +418,30 @@ def start():
     """
     Main entrypoint for the Knew Karma command-line interface.
     """
-    args = parse_cli_args()
+    parser, arguments = parse_arguments()
 
     start_time: datetime = datetime.now()
 
-    limit: int = args.limit
-    sort: Literal[str] = args.sort
-    timeframe: Literal[str] = args.timeframe
-    time_format: Literal[str] = args.time_format
-    search_query: str = args.query if hasattr(args, "query") else None
+    limit: int = arguments.limit
+    sort: SORT_CRITERION = arguments.sort
+    timeframe: TIMEFRAME = arguments.timeframe
+    time_format: TIME_FORMAT = arguments.time_format
+    search_query: str = arguments.query if hasattr(arguments, "query") else None
 
     user: User = User(
-        username=args.username if hasattr(args, "username") else None,
+        username=arguments.username if hasattr(arguments, "username") else None,
         time_format=time_format,
     )
     users: Users = Users(time_format=time_format)
     search: Search = Search(query=search_query, time_format=time_format)
     subreddit: Subreddit = Subreddit(
-        subreddit=args.subreddit if hasattr(args, "subreddit") else None,
+        subreddit=arguments.subreddit if hasattr(arguments, "subreddit") else None,
         time_format=time_format,
     )
     subreddits: Subreddits = Subreddits(time_format=time_format)
     post: Post = Post(
-        post_id=args.id if hasattr(args, "id") else None,
-        post_subreddit=args.subreddit if hasattr(args, "subreddit") else None,
+        post_id=arguments.id if hasattr(arguments, "id") else None,
+        post_subreddit=arguments.subreddit if hasattr(arguments, "subreddit") else None,
         time_format=time_format,
     )
     posts: Posts = Posts(time_format=time_format)
@@ -549,7 +551,7 @@ def start():
             (
                 "search",
                 lambda session, status=None: subreddit.search(
-                    query=args.search,
+                    query=arguments.search,
                     limit=limit,
                     sort=sort,
                     timeframe=timeframe,
@@ -566,7 +568,9 @@ def start():
             (
                 "wiki_page",
                 lambda session, status=None: subreddit.wiki_page(
-                    page_name=args.wiki_page if hasattr(args, "wiki_page") else None,
+                    page_name=(
+                        arguments.wiki_page if hasattr(arguments, "wiki_page") else None
+                    ),
                     status=status,
                     session=session,
                 ),
@@ -640,7 +644,7 @@ def start():
             (
                 "search_posts",
                 lambda session, status=None: user.search_posts(
-                    keyword=args.search_posts,
+                    keyword=arguments.search_posts,
                     limit=limit,
                     sort=sort,
                     timeframe=timeframe,
@@ -651,7 +655,7 @@ def start():
             (
                 "search_comments",
                 lambda session, status=None: user.search_comments(
-                    keyword=args.search_comments,
+                    keyword=arguments.search_comments,
                     limit=limit,
                     sort=sort,
                     timeframe=timeframe,
@@ -663,7 +667,9 @@ def start():
                 "top_subreddits",
                 lambda session, status=None: user.top_subreddits(
                     top_n=(
-                        args.top_subreddits if hasattr(args, "top_subreddits") else None
+                        arguments.top_subreddits
+                        if hasattr(arguments, "top_subreddits")
+                        else None
                     ),
                     limit=limit,
                     timeframe=timeframe,
@@ -694,12 +700,12 @@ def start():
         ],
     }
 
-    if args.module:
+    if arguments.module:
         console.clear(home=False)
         print_banner()
         try:
             start_time: datetime = datetime.now()
-            asyncio.run(method_caller(args=args, method_map=method_map))
+            asyncio.run(method_caller(arguments=arguments, method_map=method_map))
         except KeyboardInterrupt:
             console.log("[yellow]✘[/] User interruption detected ([yellow]Ctrl+C[/])")
         finally:

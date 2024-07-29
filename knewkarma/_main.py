@@ -3,7 +3,7 @@ from collections import Counter
 
 import aiohttp
 
-from .api import Api, TIME_FORMAT, SORT_CRITERION, TIMEFRAME
+from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .tools.general_utils import console
 from .tools.parsing_utils import (
     parse_comments,
@@ -847,7 +847,12 @@ class Subreddit:
             >>>        print(posts)
 
 
-            >>> asyncio.run(async_search_subreddit_posts(search_query="ML jobs", posts_limit=100, subreddit="MachineLearning"))
+            >>> asyncio.run(async_search_subreddit_posts(
+            >>>     search_query="ML jobs",
+            >>>     posts_limit=100,
+            >>>     subreddit="MachineLearning"
+            >>>   )
+            >>> )
         """
         found_posts: list = await api.get_posts(
             posts_type="search_subreddit_posts",
