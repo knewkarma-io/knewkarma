@@ -13,12 +13,15 @@ class Help:
 
     author: str = "[Richard Mwewa](https://gravatar.com/rly0nheart)"
     copyright: str = f"© MIT License {author}. All rights reserved."
+    documentation: str = "https://knewkarma.readthedocs.io"
 
     summary: str = f"**Knew Karma**: *A Reddit data analysis toolkit* — by {author}"
-    description: str = """
+    description: str = f"""
 **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
 **Application Programming Interface (API)** to enable an easy integration in other Python Projects.
+
+Refer to the [documentation]({documentation}) for *usage* and *integration* guide.
 """
 
     examples: dict = {
