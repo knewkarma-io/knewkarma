@@ -25,6 +25,7 @@ async def get_with_retry(get_function, *args, **kwargs):
 
 @pytest.mark.asyncio
 async def test_search_for_posts():
+    """Tests searching for posts that contain a query string from all over Reddit."""
     search_posts_query: str = "coronavirus"
     search_posts: list[dict] = await get_with_retry(
         api.search_entities,
@@ -46,6 +47,7 @@ async def test_search_for_posts():
 
 @pytest.mark.asyncio
 async def test_search_for_posts_in_a_subreddit():
+    """Tests searching for posts that match the search query from a subreddit."""
     search_query: str = "Rick and Morty"
     posts_subreddit: str = "AdultSwim"
     search_results = await get_with_retry(
@@ -69,6 +71,7 @@ async def test_search_for_posts_in_a_subreddit():
 
 @pytest.mark.asyncio
 async def test_search_for_subreddits():
+    """Tests searching for subreddits."""
     search_subreddits_query: str = "science"
     search_subreddits: list[dict] = await get_with_retry(
         api.search_entities,
@@ -91,6 +94,7 @@ async def test_search_for_subreddits():
 
 @pytest.mark.asyncio
 async def test_search_for_users():
+    """Tests searching for users."""
     search_users_query: str = "john"
     search_users: list[dict] = await get_with_retry(
         api.search_entities,
@@ -113,6 +117,7 @@ async def test_search_for_users():
 
 @pytest.mark.asyncio
 async def test_get_user_and_subreddit_profiles():
+    """Tests getting user and subreddit profiles."""
     user_profile: dict = await get_with_retry(
         api.get_entity,
         entity_type="user",
@@ -134,6 +139,7 @@ async def test_get_user_and_subreddit_profiles():
 
 @pytest.mark.asyncio
 async def test_get_posts_from_a_subreddit():
+    """Tests getting posts from a subreddit."""
     subreddit_posts: list = await get_with_retry(
         api.get_posts,
         posts_type="subreddit_posts",
@@ -153,6 +159,7 @@ async def test_get_posts_from_a_subreddit():
 
 @pytest.mark.asyncio
 async def test_get_posts_from_a_user():
+    """Tests getting posts from a user."""
     username: str = "AutoModerator"
     user_posts: list = await get_with_retry(
         api.get_posts,
@@ -171,6 +178,7 @@ async def test_get_posts_from_a_user():
 
 @pytest.mark.asyncio
 async def test_get_new_posts():
+    """Tests getting new posts."""
     new_posts = await get_with_retry(
         api.get_posts,
         posts_type="new",
@@ -193,6 +201,7 @@ async def test_get_new_posts():
 
 @pytest.mark.asyncio
 async def test_get_new_users():
+    """Tests getting new users."""
     new_users: list[dict] = await get_with_retry(
         api.get_users,
         users_type="new",
@@ -216,6 +225,7 @@ async def test_get_new_users():
 
 @pytest.mark.asyncio
 async def test_get_new_subreddits():
+    """Tests getting new subreddits."""
     new_subreddits = await get_with_retry(
         api.get_subreddits,
         timeframe="day",
