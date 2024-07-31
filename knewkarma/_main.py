@@ -614,7 +614,7 @@ class Subreddit:
     def __init__(self, subreddit: str, time_format: TIME_FORMAT = "locale"):
         """
         Initialises a `Subreddit()` instance for getting a subreddit's `profile`, `wiki pages`,
-        `wiki page`, and `posts` data, as well as `searching for posts that contain a specified keyword`.
+        `wiki page`, and `posts` data, as well as `searching for posts that contain a specified query`.
 
         :param subreddit: Name of the subreddit to get data from.
         :type subreddit: str
@@ -816,7 +816,7 @@ class Subreddit:
         status: console.status = None,
     ) -> list[dict]:
         """
-        Get posts that contain a specified keyword from a subreddit.
+        Get posts that match the specified query from a subreddit.
 
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession.
@@ -1087,6 +1087,25 @@ class User:
         self._username = username
         self._time_format = time_format
 
+    @staticmethod
+    def _build_regex_pattern(text: str) -> re.Pattern:
+        """
+        Builds a regex pattern for word boundaries and OR conditions from a given text.
+        Each word in the text will be matched as a whole word in a case-insensitive manner.
+
+        :param text: The input text to create a regex pattern from.
+        :type text: str
+        :return: A compiled regex pattern that matches any of the words in the input text.
+        :rtype: re.Pattern
+        """
+        words = text.split()
+
+        # Create a regex pattern for word boundaries and OR conditions
+        word_patterns = [f"\\b{re.escape(word)}\\b" for word in words]
+        regex_pattern = "|".join(word_patterns)
+
+        return re.compile(regex_pattern, re.IGNORECASE)
+
     async def comments(
         self,
         session: aiohttp.ClientSession,
@@ -1319,20 +1338,20 @@ class User:
 
     async def search_posts(
         self,
-        session: aiohttp.ClientSession,
-        keyword: str,
+        query: str,
         limit: int,
+        session: aiohttp.ClientSession,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
     ) -> list[dict]:
         """
-        Get a user's posts that contain the specified keywords.
+        Get a user's posts that match with the specified search query.
 
+        :param query: Search query.
+        :type query: str
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession.
-        :param keyword: Keyword to search for in posts.
-        :type keyword: str
         :param limit: Maximum number of posts to search from.
         :type limit: int
         :param sort: Sort criterion for the posts.
@@ -1351,16 +1370,16 @@ class User:
             >>> from knewkarma import User
 
 
-            >>> async def async_search_user_posts(username, search_keyword, posts_limit):
+            >>> async def async_search_user_posts(username, search_query, posts_limit):
             >>>    user = User(username=username)
             >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        posts = await user.search_posts(keyword=search_keyword,
+            >>>        posts = await user.search_posts(query=search_query,
             >>>                                limit=posts_limit, session=request_session)
             >>>        print(posts)
 
 
             >>> asyncio.run(async_search_user_posts(username="AutoModerator",
-            >>>                             search_keyword="hello", posts_limit=100))
+            >>>                             search_query="user has been banned", posts_limit=100))
         """
         user_posts: list = await api.get_posts(
             posts_type="user_posts",
@@ -1372,31 +1391,37 @@ class User:
             session=session,
         )
         found_posts: list = []
-        pattern = re.compile(re.escape(keyword), re.IGNORECASE)
+        regex_pattern: re.Pattern = self._build_regex_pattern(text=query)
+
         for post in user_posts:
             post_data: dict = post.get("data")
-            if pattern.search(post_data.get("title")) or pattern.search(
-                post_data.get("selftext")
-            ):
+
+            match = regex_pattern.search(
+                post_data.get("title")
+            ) or regex_pattern.search(post_data.get("selftext"))
+
+            if match:
                 found_posts.append(post)
+
         if found_posts:
             return parse_posts(found_posts, time_format=self._time_format)
 
     async def search_comments(
         self,
-        session: aiohttp.ClientSession,
-        keyword: str,
+        query: str,
         limit: int,
+        session: aiohttp.ClientSession,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
     ) -> list[dict]:
         """
-        Get a user's comments that contain the specified keyword.
+        Get a user's comments that contain the specified search query.
 
+        :param query: Search query.
+        :type query: str
         :param session: Aiohttp session to use for the request.
-        :param keyword: Keyword to search for in comments.
-        :type keyword: str
+        :type session: aiohttp.ClientSession
         :type session: aiohttp.ClientSession.
         :param limit: Maximum number of comments to search from.
         :type limit: int
@@ -1416,16 +1441,16 @@ class User:
             >>> from knewkarma import User
 
 
-            >>> async def async_search_user_comments(username, search_keyword, comments_limit):
+            >>> async def async_search_user_comments(username, search_query, comments_limit):
             >>>    user = User(username=username)
             >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        comments = await user.search_comments(keyword=search_keyword,
+            >>>        comments = await user.search_comments(query=search_query,
             >>>                                limit=comments_limit, session=request_session)
             >>>        print(comments)
 
 
             >>> asyncio.run(async_search_user_comments(username="AutoModerator",
-            >>>                            search_keyword="automated", comments_limit=100))
+            >>>                            search_query="this action is automated", comments_limit=100))
         """
         user_comments: list = await api.get_posts(
             username=self._username,
@@ -1437,9 +1462,11 @@ class User:
             session=session,
         )
         found_comments: list = []
-        pattern = re.compile(re.escape(keyword), re.IGNORECASE)
+        regex_pattern = self._build_regex_pattern(text=query)
+
         for comment in user_comments:
-            if pattern.search(comment.get("data").get("body")):
+            match = regex_pattern.search(comment.get("data").get("body"))
+            if match:
                 found_comments.append(comment)
 
         if found_comments:

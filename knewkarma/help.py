@@ -179,12 +179,12 @@ knewkarma user AutoModerator --overview
 
 ## Get a user's posts that contain the specified keyword
 ```
-knewkarma user AutoModerator --search-posts rules
+knewkarma user AutoModerator --search-posts "banned"
 ```
 
 ## Get a user's comment that contain the specified keyword
 ```
-knewkarma user AutoModerator --search-comments banned
+knewkarma user AutoModerator --search-comments "this is an automated action"
 ```
 
 ## Get subreddits moderated by user

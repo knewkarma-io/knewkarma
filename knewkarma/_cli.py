@@ -292,14 +292,14 @@ def parse_arguments() -> (
         "-sp",
         "--search-posts",
         dest="search_posts",
-        help="get a user's posts that contain the specified keyword",
+        help="get a user's posts that match with the specified search query",
         type=str,
     )
     user_parser.add_argument(
         "-sc",
         "--search-comments",
         dest="search_comments",
-        help="get a user's comments that contain the specified keyword",
+        help="get a user's comments that match with the specified search query",
         type=str,
     )
 
@@ -644,7 +644,7 @@ def start():
             (
                 "search_posts",
                 lambda session, status=None: user.search_posts(
-                    keyword=arguments.search_posts,
+                    query=arguments.search_posts,
                     limit=limit,
                     sort=sort,
                     timeframe=timeframe,
@@ -655,7 +655,7 @@ def start():
             (
                 "search_comments",
                 lambda session, status=None: user.search_comments(
-                    keyword=arguments.search_comments,
+                    query=arguments.search_comments,
                     limit=limit,
                     sort=sort,
                     timeframe=timeframe,
