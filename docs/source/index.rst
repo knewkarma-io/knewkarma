@@ -94,10 +94,10 @@ A Reddit Data Analysis Toolkit
      - Retrieves user's most recent comment activity.
    * -
      - ``Search Posts``
-     - Returns a user's posts that contain the specified keyword.
+     - Returns a user's posts that match with the specified search query.
    * -
      - ``Search Comments``
-     - Returns a user's comments that contain the specified keyword.
+     - Returns a user's comments that match with the specified search query.
    * -
      - ``Top n Subreddits``
      - Identifies top subreddits based on user activity.
