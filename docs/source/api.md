@@ -729,16 +729,16 @@ import asyncio
 from knewkarma import User
 
 
-async def get_search_user_posts(username, search_keyword, posts_limit):
+async def get_search_user_posts(username, search_query, posts_limit):
     user = User(username=username)
     async with aiohttp.ClientSession() as request_session:
-        posts = await user.search_posts(keyword=search_keyword,
+        posts = await user.search_posts(query=search_query,
                                         limit=posts_limit, session=request_session)
         print(posts)
 
 
 asyncio.run(get_search_user_posts(username="AutoModerator",
-                                  search_keyword="hello", posts_limit=100))
+                                  search_query="banned", posts_limit=100))
 ```
 
 ***
@@ -757,11 +757,11 @@ import asyncio
 from knewkarma import User
 
 
-async def get_search_user_comments(username, search_keyword, comments_limit):
+async def get_search_user_comments(username, search_query, comments_limit):
     user = User(username=username)
     async with aiohttp.ClientSession() as request_session:
         comments = await user.search_comments(
-            keyword=search_keyword,
+            query=search_query,
             limit=comments_limit,
             session=request_session
         )
@@ -770,7 +770,7 @@ async def get_search_user_comments(username, search_keyword, comments_limit):
 
 asyncio.run(get_search_user_comments(
     username="AutoModerator",
-    search_keyword="automated",
+    search_query="this is an automated action",
     comments_limit=100)
 )
 ```
