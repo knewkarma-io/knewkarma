@@ -1,4 +1,3 @@
-import asyncio
 import locale
 import os
 import time
@@ -16,11 +15,9 @@ __all__ = [
 ]
 
 
-async def countdown_timer(
-    status: Status, duration: int, current_count: int, limit: int
-):
+def countdown_timer(status: Status, duration: int, current_count: int, limit: int):
     """
-    Handles the countdown during the asynchronous pagination, updating the status bar with the remaining time.
+    Handles the live countdown during pagination, updating the status bar with the remaining time.
 
     :param status: The rich.status.Status object used to display the countdown.
     :type status: rich.status.Status
@@ -33,11 +30,11 @@ async def countdown_timer(
     """
     for remaining in range(duration, 0, -1):
         status.update(
-            f"[cyan]{current_count}[/] of [cyan]{limit}[/] "
-            f"items fetched (so far). Resuming in [cyan]{remaining}[/]"
+            f"Fetched [cyan]{current_count}[/]/[cyan]{limit}[/] "
+            f"items so far, resuming in [cyan]{remaining}[/]"
             f" {'second' if remaining <= 1 else 'seconds'}[yellow]...[/]"
         )
-        await asyncio.sleep(1)  # Sleep for one second as part of countdown
+        time.sleep(1)  # Sleep for one second as part of countdown
 
 
 def timestamp_to_locale(timestamp: float) -> str:
@@ -195,3 +192,6 @@ def filename_timestamp() -> str:
         if os.name == "nt"
         else now.strftime("%d-%B-%Y-%I:%M:%S%p")
     )
+
+
+# -------------------------------- END ----------------------------------------- #

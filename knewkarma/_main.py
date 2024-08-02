@@ -1,7 +1,8 @@
 import re
 from collections import Counter
+from typing import List, Dict
 
-import aiohttp
+import requests
 
 from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .tools.general_utils import console
@@ -36,15 +37,16 @@ class Post:
         self._post_id = post_id
         self._post_subreddit = post_subreddit
         self._time_format = time_format
+        self._status_template: str = (
+            "Fetching {query_type} from post {post_id} in r/{post_subreddit}..."
+        )
 
-    async def data(
-        self, session: aiohttp.ClientSession, status: console.status = None
-    ) -> dict:
+    def data(self, session: requests.Session, status: console.status = None) -> Dict:
         """
         Get a post's data (without comments)
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A dictionary containing a post's data.
@@ -52,21 +54,23 @@ class Post:
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Post
+            >>> from pprint import pprint
 
-
-            >>> async def async_post_data():
+            >>> def get_post_data():
             >>>    post = Post(post_id="13ptwzd", post_subreddit="AskReddit")
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        data = await post.data(session=request_session)
-            >>>        print(data)
+            >>>    with requests.Session() as request_session:
+            >>>        data = post.data(session=request_session)
+            >>>        pprint(data)
 
 
-            >>> asyncio.run(async_post_data())
+            >>> get_post_data()
         """
-        post_data: dict = await api.get_entity(
+        if status:
+            status.update(self._status_template.format(query_type="data"))
+
+        post_data: dict = api.get_entity(
             post_id=self._post_id,
             post_subreddit=self._post_subreddit,
             entity_type="post",
@@ -83,43 +87,51 @@ class Post:
                 time_format=self._time_format,
             )
 
-    async def comments(
+    def comments(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get a post's comments.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of comments to return.
         :type limit: int
         :param sort: Sort criterion for the comments.
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing comment data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Post
+            >>> from pprint import pprint
 
-
-            >>> async def async_post_comments(comments_limit, comments_sort):
+            >>> def get_post_comments(comments_limit, comments_sort):
             >>>    post = Post(post_id="13ptwzd", post_subreddit="AskReddit")
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        comments = await post.comments(limit=comments_limit, sort=comments_sort, session=request_session)
-            >>>        print(comments)
+            >>>    with requests.Session() as request_session:
+            >>>        comments = post.comments(limit=comments_limit, sort=comments_sort, session=request_session)
+            >>>        pprint(comments)
 
 
-            >>> asyncio.run(async_post_comments(comments_limit=50, comments_sort="top"))
+            >>> get_post_comments(comments_limit=50, comments_sort="top")
         """
-        comments_data: list = await api.get_posts(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type=f"{limit} comments",
+                    post_id=self._post_id,
+                    post_subreddit=self._post_subreddit,
+                )
+            )
+
+        comments_data: List = api.get_posts(
             posts_type="post_comments",
             post_id=self._post_id,
             post_subreddit=self._post_subreddit,
@@ -131,7 +143,7 @@ class Post:
 
         if comments_data:
             return parse_comments(
-                comments=comments_data[1].get("data", {}).get("children", []),
+                comments=comments_data,
                 time_format=self._time_format,
             )
 
@@ -149,19 +161,20 @@ class Posts:
         :type time_format: Literal["concise", "locale"]
         """
         self._time_format = time_format
+        self._status_template: str = "Fetching {limit} {listing} posts..."
 
-    async def best(
+    def best(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get best posts.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param timeframe: Timeframe from which to get best posts.
@@ -169,25 +182,27 @@ class Posts:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Posts
+            >>> from pprint import pprint
 
-
-            >>> async def async_best_posts(posts_limit):
+            >>> def get_best_posts(posts_limit):
             >>>    posts = Posts()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        best = await posts.best(limit=posts_limit, session=request_session)
-            >>>        print(best)
+            >>>    with requests.Session() as request_session:
+            >>>        best = posts.best(limit=posts_limit, session=request_session)
+            >>>        pprint(best)
 
 
-            >>> asyncio.run(async_best_posts(posts_limit=120))
+            >>> get_best_posts(posts_limit=120)
         """
-        best_posts: list = await api.get_posts(
+        if status:
+            status.update(self._status_template.format(listing="best", limit=limit))
+
+        best_posts: List = api.get_posts(
             posts_type="best",
             timeframe=timeframe,
             limit=limit,
@@ -198,18 +213,18 @@ class Posts:
         if best_posts:
             return parse_posts(data=best_posts, time_format=self._time_format)
 
-    async def controversial(
+    def controversial(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get controversial posts.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param timeframe: Timeframe from which to get controversial posts.
@@ -217,24 +232,28 @@ class Posts:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Posts
 
 
-            >>> async def async_controversial_posts(posts_limit):
+            >>> def get_controversial_posts(posts_limit):
             >>>    posts = Posts()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        controversial = await posts.controversial(limit=posts_limit, session=request_session)
+            >>>    with requests.Session() as request_session:
+            >>>        controversial = posts.controversial(limit=posts_limit, session=request_session)
             >>>        print(controversial)
 
-            >>> asyncio.run(async_controversial_posts(posts_limit=50))
+            >>> get_controversial_posts(posts_limit=50)
         """
-        controversial_posts: list = await api.get_posts(
+        if status:
+            status.update(
+                self._status_template.format(listing="controversial", limit=limit)
+            )
+
+        controversial_posts: List = api.get_posts(
             posts_type="controversial",
             timeframe=timeframe,
             limit=limit,
@@ -245,18 +264,18 @@ class Posts:
         if controversial_posts:
             return parse_posts(data=controversial_posts, time_format=self._time_format)
 
-    async def front_page(
+    def front_page(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get posts from the Reddit front-page.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession.
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session.
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param sort: Sort criterion for the posts.
@@ -264,25 +283,29 @@ class Posts:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Posts
+            >>> from pprint import pprint
 
-
-            >>> async def async_frontpage_posts(posts_limit):
+            >>> def get_frontpage_posts(posts_limit):
             >>>    posts = Posts()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        frontpage = await posts.front_page(limit=posts_limit, session=request_session)
+            >>>    with requests.Session() as request_session:
+            >>>        frontpage = posts.front_page(limit=posts_limit, session=request_session)
             >>>        print(frontpage)
 
 
-            >>> asyncio.run(async_frontpage_posts(posts_limit=10))
+            >>> get_frontpage_posts(posts_limit=10)
         """
-        front_page_posts: list = await api.get_posts(
+        if status:
+            status.update(
+                self._status_template.format(listing="front-page", limit=limit)
+            )
+
+        front_page_posts: List = api.get_posts(
             posts_type="front_page",
             limit=limit,
             sort=sort,
@@ -293,18 +316,18 @@ class Posts:
         if front_page_posts:
             return parse_posts(data=front_page_posts, time_format=self._time_format)
 
-    async def new(
+    def new(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get new posts.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession.
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session.
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param sort: Sort criterion for the posts.
@@ -312,25 +335,27 @@ class Posts:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Posts
+            >>> from pprint import pprint
 
-
-            >>> async def async_new_posts(posts_limit):
+            >>> def get_new_posts(posts_limit):
             >>>    posts = Posts()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        new = await posts.new(limit=posts_limit, session=request_session)
+            >>>    with requests.Session() as request_session:
+            >>>        new = posts.new(limit=posts_limit, session=request_session)
             >>>        print(new)
 
 
-            >>> asyncio.run(async_new_posts(posts_limit=10))
+            >>> get_new_posts(posts_limit=10)
         """
-        new_posts: list = await api.get_posts(
+        if status:
+            status.update(self._status_template.format(listing="new", limit=limit))
+
+        new_posts: List = api.get_posts(
             posts_type="new",
             limit=limit,
             sort=sort,
@@ -341,18 +366,18 @@ class Posts:
         if new_posts:
             return parse_posts(data=new_posts, time_format=self._time_format)
 
-    async def popular(
+    def popular(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get popular posts.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular posts.
@@ -360,25 +385,27 @@ class Posts:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Posts
+            >>> from pprint import pprint
 
-
-            >>> async def async_popular_posts(posts_limit):
+            >>> def get_popular_posts(posts_limit):
             >>>    posts = Posts()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        popular = await posts.popular(limit=posts_limit, session=request_session)
-            >>>        print(popular)
+            >>>    with requests.Session() as request_session:
+            >>>        popular = posts.popular(limit=posts_limit, session=request_session)
+            >>>        pprint(popular)
 
 
-            >>> asyncio.run(async_popular_posts(posts_limit=50))
+            >>> get_popular_posts(posts_limit=50)
         """
-        popular_posts: list = await api.get_posts(
+        if status:
+            status.update(self._status_template.format(listing="popular", limit=limit))
+
+        popular_posts: List = api.get_posts(
             posts_type="popular",
             timeframe=timeframe,
             limit=limit,
@@ -389,18 +416,18 @@ class Posts:
         if popular_posts:
             return parse_posts(data=popular_posts, time_format=self._time_format)
 
-    async def rising(
+    def rising(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get rising posts.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param timeframe: Timeframe from which to get rising posts.
@@ -408,25 +435,27 @@ class Posts:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Posts
+            >>> from pprint import pprint
 
-
-            >>> async def async_rising_posts(posts_limit):
+            >>> def get_rising_posts(posts_limit):
             >>>    posts = Posts()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        rising = await posts.rising(limit=posts_limit, session=request_session)
-            >>>        print(rising)
+            >>>    with requests.Session() as request_session:
+            >>>        rising = posts.rising(limit=posts_limit, session=request_session)
+            >>>        pprint(rising)
 
 
-            >>> asyncio.run(async_rising_posts(posts_limit=100))
+            >>> get_rising_posts(posts_limit=100)
         """
-        rising_posts: list = await api.get_posts(
+        if status:
+            status.update(self._status_template.format(listing="rising", limit=limit))
+
+        rising_posts: List = api.get_posts(
             posts_type="rising",
             timeframe=timeframe,
             limit=limit,
@@ -456,19 +485,22 @@ class Search:
         """
         self._query = query
         self._time_format = time_format
+        self._status_template: str = (
+            "Searching for '{query}' in {limit} {query_type}..."
+        )
 
-    async def posts(
+    def posts(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Search posts.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param sort: Sort criterion for the results.
@@ -476,25 +508,31 @@ class Search:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Search
+            >>> from pprint import pprint
 
-
-            >>> async def async_search_posts(query, results_limit):
+            >>> def search_posts(query, results_limit):
             >>>    search = Search(query=query)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        posts = await search.posts(limit=results_limit, session=request_session)
-            >>>        print(posts)
+            >>>    with requests.Session() as request_session:
+            >>>        posts = search.posts(limit=results_limit, session=request_session)
+            >>>        pprint(posts)
 
 
-            >>> asyncio.run(async_search_posts(query="something in data science", results_limit=200))
+            >>> search_posts(query="something in data science", results_limit=200)
         """
-        posts_results: list = await api.search_entities(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type="posts", limit=limit, query=self._query
+                )
+            )
+
+        posts_results: List = api.search_entities(
             query=self._query,
             entity_type="posts",
             sort=sort,
@@ -505,18 +543,18 @@ class Search:
         if posts_results:
             return parse_posts(data=posts_results, time_format=self._time_format)
 
-    async def subreddits(
+    def subreddits(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Search subreddits.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of search results to return.
         :type limit: int
         :param sort: Sort criterion for the results.
@@ -524,25 +562,31 @@ class Search:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Search
+            >>> from pprint import pprint
 
-
-            >>> async def async_search_subreddits(query, results_limit):
+            >>> def search_for_subreddits(query, results_limit):
             >>>    search = Search(query=query)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        subreddits = await search.subreddits(limit=results_limit, session=request_session)
-            >>>        print(subreddits)
+            >>>    with requests.Session() as request_session:
+            >>>        subreddits = search.subreddits(limit=results_limit, session=request_session)
+            >>>        pprint(subreddits)
 
 
-            >>> asyncio.run(async_search_subreddits(query="questions", results_limit=200))
+            >>> search_for_subreddits(query="questions", results_limit=200)
         """
-        search_subreddits: list = await api.search_entities(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type="subreddits", limit=limit, query=self._query
+                )
+            )
+
+        search_subreddits: List = api.search_entities(
             query=self._query,
             entity_type="subreddits",
             sort=sort,
@@ -550,24 +594,24 @@ class Search:
             status=status,
             session=session,
         )
-        subreddits_results: list[dict] = parse_subreddits(
+        subreddits_results: List[Dict] = parse_subreddits(
             search_subreddits, time_format=self._time_format
         )
 
         return subreddits_results
 
-    async def users(
+    def users(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Search users.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param sort: Sort criterion for the results.
         :type sort: Literal[str]
         :param limit: Maximum number of search results to return.
@@ -575,25 +619,31 @@ class Search:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing user data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Search
+            >>> from pprint import pprint
 
-
-            >>> async def async_search_users(query, results_limit):
+            >>> def search_for_users(query, results_limit):
             >>>    search = Search(query=query)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        users = await search.users(limit=results_limit, session=request_session)
-            >>>        print(users)
+            >>>    with requests.Session() as request_session:
+            >>>        users = search.users(limit=results_limit, session=request_session)
+            >>>        pprint(users)
 
 
-            >>> asyncio.run(async_search_users(query="john", results_limit=200))
+            >>> search_for_users(query="john", results_limit=200)
         """
-        search_users: list = await api.search_entities(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type="users", limit=limit, query=self._query
+                )
+            )
+
+        search_users: List = api.search_entities(
             query=self._query,
             entity_type="users",
             sort=sort,
@@ -601,7 +651,7 @@ class Search:
             status=status,
             session=session,
         )
-        users_results: list[dict] = parse_users(
+        users_results: List[Dict] = parse_users(
             search_users, time_format=self._time_format
         )
 
@@ -624,17 +674,20 @@ class Subreddit:
         """
         self._subreddit = subreddit
         self._time_format = time_format
+        self._status_template: str = (
+            "Fetching {query_type} from subreddit r/{subreddit}..."
+        )
 
-    async def profile(
+    def profile(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         status: console.status = None,
-    ) -> dict:
+    ) -> Dict:
         """
         Get a subreddit's profile data.
 
         :param session: aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :type session: requests.Session
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A dictionary containing subreddit profile data.
@@ -642,21 +695,27 @@ class Subreddit:
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Subreddit
+            >>> from pprint import pprint
 
-
-            >>> async def async_subreddit_profile(subreddit):
+            >>> def get_subreddit_profile(subreddit):
             >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        profile = await subreddit.profile(session=request_session)
-            >>>        print(profile)
+            >>>    with requests.Session() as request_session:
+            >>>        profile = subreddit.profile(session=request_session)
+            >>>        pprint(profile)
 
 
-            >>> asyncio.run(async_subreddit_profile(subreddit="MachineLearning"))
+            >>> get_subreddit_profile(subreddit="MachineLearning")
         """
-        subreddit_profile: dict = await api.get_entity(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type="profile data", subreddit=self._subreddit
+                )
+            )
+
+        subreddit_profile: dict = api.get_entity(
             entity_type="subreddit",
             subreddit=self._subreddit,
             status=status,
@@ -667,16 +726,16 @@ class Subreddit:
                 data=subreddit_profile, time_format=self._time_format
             )
 
-    async def wiki_pages(
+    def wiki_pages(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         status: console.status = None,
     ) -> list[str]:
         """
         Get a subreddit's wiki pages.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of strings, each representing a wiki page.
@@ -684,43 +743,46 @@ class Subreddit:
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Subreddit
+            >>> from pprint import pprint
 
-
-            >>> async def async_subreddit_wiki_pages(subreddit):
+            >>> def get_subreddit_wiki_pages(subreddit):
             >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        wiki_pages = await subreddit.wiki_pages(session=request_session)
-            >>>        print(wiki_pages)
+            >>>    with requests.Session() as request_session:
+            >>>        wiki_pages = subreddit.wiki_pages(session=request_session)
+            >>>        pprint(wiki_pages)
 
 
-            >>> asyncio.run(async_subreddit_wiki_pages(subreddit="MachineLearning"))
+            >>> get_subreddit_wiki_pages(subreddit="MachineLearning")
         """
         if status:
-            status.update(f"Initialising single data retrieval job...")
+            status.update(
+                self._status_template.format(
+                    query_type="wiki pages", subreddit=self._subreddit
+                )
+            )
 
-        pages: dict = await api.make_request(
+        pages: dict = api.make_request(
             endpoint=f"{api.subreddit_endpoint}/{self._subreddit}/wiki/pages.json",
             session=session,
         )
 
         return pages.get("data")
 
-    async def wiki_page(
+    def wiki_page(
         self,
         page_name: str,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         status: console.status = None,
-    ) -> dict:
+    ) -> Dict:
         """
         Get a subreddit's specified wiki page data.
 
         :param page_name: Wiki page to get data from.
         :type page_name: str
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of strings, each representing a wiki page.
@@ -728,21 +790,27 @@ class Subreddit:
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Subreddit
+            >>> from pprint import pprint
 
-
-            >>> async def async_subreddit_wiki_page(page, subreddit):
+            >>> def get_subreddit_wiki_page(page, subreddit):
             >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        wiki_page_data = await subreddit.wiki_page(page_name=page, session=request_session)
-            >>>        print(wiki_page_data)
+            >>>    with requests.Session() as request_session:
+            >>>        wiki_page_data = subreddit.wiki_page(page_name=page, session=request_session)
+            >>>        pprint(wiki_page_data)
 
 
-            >>> asyncio.run(async_subreddit_wiki_page(page="rules", subreddit="MachineLearning"))
+            >>> get_subreddit_wiki_page(page="rules", subreddit="MachineLearning")
         """
-        wiki_page: dict = await api.get_entity(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type="wiki page data", subreddit=self._subreddit
+                )
+            )
+
+        wiki_page: dict = api.get_entity(
             entity_type="wiki_page",
             page_name=page_name,
             subreddit=self._subreddit,
@@ -753,19 +821,50 @@ class Subreddit:
         if wiki_page:
             return parse_wiki_page(wiki_page=wiki_page, time_format=self._time_format)
 
-    async def posts(
+    def comments(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
+        posts_limit: int,
+        comments_per_post: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
+    ) -> List[Dict]:
+        posts = self.posts(
+            session=session,
+            limit=posts_limit,
+            sort=sort,
+            timeframe=timeframe,
+            status=status,
+        )
+        all_comments: List = []
+        for post in posts:
+            post = Post(
+                post_id=post.get("id"),
+                post_subreddit=post.get("subreddit"),
+                time_format=self._time_format,
+            )
+            post_comments: List = post.comments(
+                session=session, limit=comments_per_post, sort=sort, status=status
+            )
+
+            all_comments.extend(post_comments)
+
+        return all_comments
+
+    def posts(
+        self,
+        session: requests.Session,
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get a subreddit's posts.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession.
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session.
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param sort: Sort criterion for the posts.
@@ -775,25 +874,31 @@ class Subreddit:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Subreddit
+            >>> from pprint import pprint
 
-
-            >>> async def async_subreddit_posts(subreddit, posts_limit):
+            >>> def get_subreddit_posts(subreddit, posts_limit):
             >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        posts = await subreddit.posts(limit=posts_limit, session=request_session)
+            >>>    with requests.Session() as request_session:
+            >>>        posts = subreddit.posts(limit=posts_limit, session=request_session)
             >>>        print(posts)
 
 
-            >>> asyncio.run(async_subreddit_posts(posts_limit=500, subreddit="MachineLearning"))
+            >>> get_subreddit_posts(posts_limit=500, subreddit="MachineLearning")
         """
-        subreddit_posts: list = await api.get_posts(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type=f"{limit} posts", subreddit=self._subreddit
+                )
+            )
+
+        subreddit_posts: List = api.get_posts(
             posts_type="subreddit_posts",
             subreddit=self._subreddit,
             limit=limit,
@@ -806,20 +911,59 @@ class Subreddit:
         if subreddit_posts:
             return parse_posts(data=subreddit_posts, time_format=self._time_format)
 
-    async def search(
+    def search_comments(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         query: str,
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
+        posts: List = self.posts(
+            session=session,
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
+            status=status,
+        )
+        all_comments: List = []
+        found_comments: List = []
+        for post in posts:
+            if status:
+                status.update(f"Fetching comments from post {post.get('id')}...")
+
+            post = Post(
+                post_id=post.get("id"),
+                post_subreddit=self._subreddit,
+                time_format=self._time_format,
+            )
+
+            comments: List = post.comments(session=session, limit=limit, status=status)
+
+            all_comments.extend(comments)
+
+        for comment in all_comments:
+            if query in comment.get("body"):
+                found_comments.append(comment)
+
+        if found_comments:
+            return found_comments
+
+    def search_posts(
+        self,
+        session: requests.Session,
+        query: str,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
+    ) -> List[Dict]:
         """
         Get posts that match the specified query from a subreddit.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession.
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session.
         :param query: Search query.
         :type query: str
         :param limit: Maximum number of posts to return.
@@ -831,30 +975,37 @@ class Subreddit:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Subreddit
+            >>> from pprint import pprint
 
-
-            >>> async def async_search_subreddit_posts(search_query, subreddit, posts_limit):
+            >>> def get_search_subreddit_posts(search_query, subreddit, posts_limit):
             >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        posts = await subreddit.search(query=search_query, limit=posts_limit, session=request_session)
-            >>>        print(posts)
+            >>>    with requests.Session() as request_session:
+            >>>        posts = subreddit.search(query=search_query, limit=posts_limit, session=request_session)
+            >>>        pprint(posts)
 
 
-            >>> asyncio.run(async_search_subreddit_posts(
+            >>> get_search_subreddit_posts(
             >>>     search_query="ML jobs",
             >>>     posts_limit=100,
             >>>     subreddit="MachineLearning"
             >>>   )
             >>> )
         """
-        found_posts: list = await api.get_posts(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type=f"{limit} posts with '{query}'",
+                    subreddit=self._subreddit,
+                )
+            )
+
+        found_posts: List = api.get_posts(
             posts_type="search_subreddit_posts",
             subreddit=self._subreddit,
             query=query,
@@ -881,19 +1032,20 @@ class Subreddits:
         :type time_format: Literal["concise", "locale"]
         """
         self._time_format = time_format
+        self._status_template: str = "Fetching {limit} {subreddits_type} subreddits..."
 
-    async def all(
+    def all(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get all subreddits.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get all subreddits.
@@ -901,28 +1053,32 @@ class Subreddits:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Note:
             -*imitating Morphius' voice*- "the only limitation you have at this point is the matrix's rate-limit."
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Subreddits
+            >>> from pprint import pprint
 
-
-            >>> async def async_all_subreddits(subreddits_limit):
+            >>> def get_all_subreddits(subreddits_limit):
             >>>    subreddits = Subreddits()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        all_subs = await subreddits.all(limit=subreddits_limit, session=request_session)
-            >>>        print(all_subs)
+            >>>    with requests.Session() as request_session:
+            >>>        all_subs = subreddits.all(limit=subreddits_limit, session=request_session)
+            >>>        pprint(all_subs)
 
 
-            >>> asyncio.run(async_all_subreddits(subreddits_limit=500))
+            >>> get_all_subreddits(subreddits_limit=500)
         """
-        all_subreddits: list = await api.get_subreddits(
+        if status:
+            status.update(
+                self._status_template.format(subreddits_type="all", limit=limit)
+            )
+
+        all_subreddits: List = api.get_subreddits(
             subreddits_type="all",
             limit=limit,
             timeframe=timeframe,
@@ -932,41 +1088,46 @@ class Subreddits:
         if all_subreddits:
             return parse_subreddits(data=all_subreddits, time_format=self._time_format)
 
-    async def default(
+    def default(
         self,
         limit: int,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get default subreddits.
 
         :param limit: Maximum number of subreddits to return.
         :type limit: int
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Subreddits
+            >>> import requests
 
 
-            >>> async def async_default_subreddits(subreddits_limit):
+            >>> def get_default_subreddits(subreddits_limit):
             >>>    subreddits = Subreddits()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        default_subs = await subreddits.default(limit=subreddits_limit, session=request_session)
-            >>>        print(default_subs)
+            >>>    with requests.Session() as request_session:
+            >>>        default_subs = subreddits.default(limit=subreddits_limit, session=request_session)
+            >>>        pprint(default_subs)
 
 
-            >>> asyncio.run(async_default_subreddits(subreddits_limit=20))
+            >>> get_default_subreddits(subreddits_limit=20)
         """
-        default_subreddits: list = await api.get_subreddits(
+        if status:
+            status.update(
+                self._status_template.format(subreddits_type="default", limit=limit)
+            )
+
+        default_subreddits: List = api.get_subreddits(
             subreddits_type="default",
             timeframe="all",
             limit=limit,
@@ -976,18 +1137,18 @@ class Subreddits:
         if default_subreddits:
             return parse_subreddits(default_subreddits, time_format=self._time_format)
 
-    async def new(
+    def new(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get new subreddits.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new subreddits.
@@ -995,25 +1156,30 @@ class Subreddits:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Subreddits
+            >>> import requests
 
 
-            >>> async def async_new_subreddits(subreddits_limit):
+            >>> def get_new_subreddits(subreddits_limit):
             >>>    subreddits = Subreddits()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        new_subs = await subreddits.new(limit=subreddits_limit, session=request_session)
-            >>>        print(new_subs)
+            >>>    with requests.Session() as request_session:
+            >>>        new_subs = subreddits.new(limit=subreddits_limit, session=request_session)
+            >>>        pprint(new_subs)
 
 
-            >>> asyncio.run(async_new_subreddits(subreddits_limit=50))
+            >>> get_new_subreddits(subreddits_limit=50)
         """
-        new_subreddits: list = await api.get_subreddits(
+        if status:
+            status.update(
+                self._status_template.format(subreddits_type="new", limit=limit)
+            )
+
+        new_subreddits: List = api.get_subreddits(
             subreddits_type="new",
             limit=limit,
             timeframe=timeframe,
@@ -1023,18 +1189,18 @@ class Subreddits:
         if new_subreddits:
             return parse_subreddits(new_subreddits, time_format=self._time_format)
 
-    async def popular(
+    def popular(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get popular subreddits.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular subreddits.
@@ -1042,25 +1208,30 @@ class Subreddits:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Subreddits
+            >>> import requests
 
 
-            >>> async def async_popular_subreddits(subreddits_limit):
+            >>> def get_popular_subreddits(subreddits_limit):
             >>>    subreddits = Subreddits()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        popular_subs = await subreddits.popular(limit=subreddits_limit, session=request_session)
-            >>>        print(popular_subs)
+            >>>    with requests.Session() as request_session:
+            >>>        popular_subs = subreddits.popular(limit=subreddits_limit, session=request_session)
+            >>>        pprint(popular_subs)
 
 
-            >>> asyncio.run(async_popular_subreddits(subreddits_limit=100))
+            >>> get_popular_subreddits(subreddits_limit=100)
         """
-        popular_subreddits: list = await api.get_subreddits(
+        if status:
+            status.update(
+                self._status_template.format(subreddits_type="popular", limit=limit)
+            )
+
+        popular_subreddits: List = api.get_subreddits(
             subreddits_type="popular",
             limit=limit,
             timeframe=timeframe,
@@ -1086,6 +1257,7 @@ class User:
         """
         self._username = username
         self._time_format = time_format
+        self._status_template: str = "Fetching {query_type} from user u/{username}..."
 
     @staticmethod
     def _build_regex_pattern(text: str) -> re.Pattern:
@@ -1106,19 +1278,19 @@ class User:
 
         return re.compile(regex_pattern, re.IGNORECASE)
 
-    async def comments(
+    def comments(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get a user's comments.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession.
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session.
         :param limit: Maximum number of comments to return.
         :type limit: int
         :param sort: Sort criterion for the comments.
@@ -1128,25 +1300,32 @@ class User:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing comment data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import User
+            >>> import requests
 
 
-            >>> async def async_user_comments(username, comments_limit):
+            >>> def get_user_comments(username, comments_limit):
             >>>    user = User(username=username)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        comments = await user.comments(limit=comments_limit, session=request_session)
-            >>>        print(comments)
+            >>>    with requests.Session() as request_session:
+            >>>        comments = user.comments(limit=comments_limit, session=request_session)
+            >>>        pprint(comments)
 
 
-            >>> asyncio.run(async_user_comments(username="AutoModerator", comments_limit=100))
+            >>> get_user_comments(username="AutoModerator", comments_limit=100)
         """
-        user_comments: list = await api.get_posts(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type=f"{limit} comments", username=self._username
+                )
+            )
+
+        user_comments: List = api.get_posts(
             username=self._username,
             posts_type="user_comments",
             limit=limit,
@@ -1159,107 +1338,123 @@ class User:
         if user_comments:
             return parse_comments(comments=user_comments, time_format=self._time_format)
 
-    async def moderated_subreddits(
+    def moderated_subreddits(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get subreddits moderated by user.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import User
+            >>> import requests
 
 
-            >>> async def async_user_moderated_subreddits(username):
+            >>> def get_user_moderated_subreddits(username):
             >>>    user = User(username=username)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        moderated_subs = await user.moderated_subreddits(session=request_session)
-            >>>        print(moderated_subs)
+            >>>    with requests.Session() as request_session:
+            >>>        moderated_subs = user.moderated_subreddits(session=request_session)
+            >>>        pprint(moderated_subs)
 
 
-            >>> asyncio.run(async_user_moderated_subreddits(username="TheRealKSI"))
+            >>> get_user_moderated_subreddits(username="TheRealKSI")
         """
-        subreddits: dict = await api.get_subreddits(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type="moderated subreddits", username=self._username
+                )
+            )
+
+        subreddits: dict = api.get_subreddits(
             subreddits_type="user_moderated",
             username=self._username,
             limit=0,
             status=status,
             session=session,
         )
+
         if subreddits:
             return parse_subreddits(
                 subreddits.get("data"),
                 time_format=self._time_format,
             )
 
-    async def overview(
+    def overview(
         self,
         limit: int,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get a user's most recent comments.
 
         :param limit: Maximum number of comments to return.
         :type limit: int
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing data about a recent comment.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import User
+            >>> import requests
 
 
-            >>> async def async_user_overview(username, comments_limit):
+            >>> def get_user_overview(username, comments_limit):
             >>>    user = User(username=username)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        comments = await user.overview(limit=comments_limit, session=request_session)
-            >>>        print(comments)
+            >>>    with requests.Session() as request_session:
+            >>>        comments = user.overview(limit=comments_limit, session=request_session)
+            >>>        pprint(comments)
 
 
-            >>> asyncio.run(async_user_overview(username="AutoModerator", comments_limit=100))
+            >>> get_user_overview(username="AutoModerator", comments_limit=100)
         """
-        user_overview: list = await api.get_posts(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type=f"{limit} recent comments", username=self._username
+                )
+            )
+
+        user_overview: List = api.get_posts(
             username=self._username,
             posts_type="user_overview",
             limit=limit,
             status=status,
             session=session,
         )
+
         if user_overview:
             return parse_comments(user_overview, time_format=self._time_format)
 
-    async def posts(
+    def posts(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get a user's posts.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession.
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session.
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param sort: Sort criterion for the posts.
@@ -1269,25 +1464,32 @@ class User:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import User
+            >>> import requests
 
 
-            >>> async def async_user_posts(username, posts_limit):
+            >>> def get_user_posts(username, posts_limit):
             >>>    user = User(username=username)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        posts = await user.posts(limit=posts_limit, session=request_session)
-            >>>        print(posts)
+            >>>    with requests.Session() as request_session:
+            >>>        posts = user.posts(limit=posts_limit, session=request_session)
+            >>>        pprint(posts)
 
 
-            >>> asyncio.run(async_user_posts(username="AutoModerator", posts_limit=100))
+            >>> get_user_posts(username="AutoModerator", posts_limit=100)
         """
-        user_posts: list = await api.get_posts(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type=f"{limit} posts", username=self._username
+                )
+            )
+
+        user_posts: List = api.get_posts(
             username=self._username,
             posts_type="user_posts",
             limit=limit,
@@ -1296,19 +1498,20 @@ class User:
             status=status,
             session=session,
         )
+
         if user_posts:
             return parse_posts(user_posts, time_format=self._time_format)
 
-    async def profile(
+    def profile(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         status: console.status = None,
-    ) -> dict:
+    ) -> Dict:
         """
         Get a user's profile data.
 
         :param session: aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :type session: requests.Session
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A dictionary containing user profile data.
@@ -1316,42 +1519,50 @@ class User:
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import User
+            >>> import requests
 
 
-            >>> async def async_user_profile(username):
+            >>> def get_user_profile(username):
             >>>    user = User(username=username)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        profile = await user.profile(session=request_session)
-            >>>        print(profile)
+            >>>    with requests.Session() as request_session:
+            >>>        profile = user.profile(session=request_session)
+            >>>        pprint(profile)
 
 
-            >>> asyncio.run(async_user_profile(username="AutoModerator"))
+            >>> get_user_profile(username="AutoModerator")
         """
-        user_profile: dict = await api.get_entity(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type="profile data", username=self._username
+                )
+            )
+
+        user_profile: dict = api.get_entity(
             username=self._username, entity_type="user", status=status, session=session
         )
+
         if user_profile:
             return parse_users(data=user_profile, time_format=self._time_format)
 
-    async def search_posts(
+    def search_posts(
         self,
         query: str,
         limit: int,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get a user's posts that match with the specified search query.
 
         :param query: Search query.
         :type query: str
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession.
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session.
         :param limit: Maximum number of posts to search from.
         :type limit: int
         :param sort: Sort criterion for the posts.
@@ -1361,27 +1572,34 @@ class User:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import User
+            >>> import requests
 
 
-            >>> async def async_search_user_posts(username, search_query, posts_limit):
+            >>> def search_user_posts(username, search_query, posts_limit):
             >>>    user = User(username=username)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        posts = await user.search_posts(query=search_query,
+            >>>    with requests.Session() as request_session:
+            >>>        posts = user.search_posts(query=search_query,
             >>>                                limit=posts_limit, session=request_session)
-            >>>        print(posts)
+            >>>        pprint(posts)
 
 
-            >>> asyncio.run(async_search_user_posts(username="AutoModerator",
-            >>>                             search_query="user has been banned", posts_limit=100))
+            >>> search_user_posts(username="AutoModerator",
+            >>>                             search_query="user has been banned", posts_limit=100)
         """
-        user_posts: list = await api.get_posts(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type=f"{limit} posts for '{query}'", username=self._username
+                )
+            )
+
+        user_posts: List = api.get_posts(
             posts_type="user_posts",
             username=self._username,
             limit=limit,
@@ -1390,7 +1608,7 @@ class User:
             status=status,
             session=session,
         )
-        found_posts: list = []
+        found_posts: List = []
         regex_pattern: re.Pattern = self._build_regex_pattern(text=query)
 
         for post in user_posts:
@@ -1406,23 +1624,23 @@ class User:
         if found_posts:
             return parse_posts(found_posts, time_format=self._time_format)
 
-    async def search_comments(
+    def search_comments(
         self,
         query: str,
         limit: int,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get a user's comments that contain the specified search query.
 
         :param query: Search query.
         :type query: str
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
-        :type session: aiohttp.ClientSession.
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
+        :type session: requests.Session.
         :param limit: Maximum number of comments to search from.
         :type limit: int
         :param sort: Sort criterion for the comments.
@@ -1432,27 +1650,35 @@ class User:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing comment data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import User
+            >>> import requests
 
 
-            >>> async def async_search_user_comments(username, search_query, comments_limit):
+            >>> def search_user_comments(username, search_query, comments_limit):
             >>>    user = User(username=username)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        comments = await user.search_comments(query=search_query,
+            >>>    with requests.Session() as request_session:
+            >>>        comments = user.search_comments(query=search_query,
             >>>                                limit=comments_limit, session=request_session)
-            >>>        print(comments)
+            >>>        pprint(comments)
 
 
-            >>> asyncio.run(async_search_user_comments(username="AutoModerator",
-            >>>                            search_query="this action is automated", comments_limit=100))
+            >>> search_user_comments(username="AutoModerator",
+            >>>                            search_query="this action is automated", comments_limit=100)
         """
-        user_comments: list = await api.get_posts(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type=f"{limit} comments for '{query}'",
+                    username=self._username,
+                )
+            )
+
+        user_comments: List = api.get_posts(
             username=self._username,
             posts_type="user_comments",
             limit=limit,
@@ -1461,7 +1687,7 @@ class User:
             status=status,
             session=session,
         )
-        found_comments: list = []
+        found_comments: List = []
         regex_pattern = self._build_regex_pattern(text=query)
 
         for comment in user_comments:
@@ -1472,9 +1698,9 @@ class User:
         if found_comments:
             return parse_comments(found_comments, time_format=self._time_format)
 
-    async def top_subreddits(
+    def top_subreddits(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         top_n: int,
         limit: int,
         timeframe: TIMEFRAME = "all",
@@ -1483,8 +1709,8 @@ class User:
         """
         Get a user's top n subreddits based on subreddit frequency in n posts.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param top_n: Communities arranging number.
         :type top_n: int
         :param limit: Maximum number of posts to scrape.
@@ -1498,23 +1724,31 @@ class User:
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import User
+            >>> import requests
 
 
-            >>> async def async_user_top_subreddits(username, top_number, subreddits_limit):
+            >>> def get_user_top_subreddits(username, top_number, subreddits_limit):
             >>>    user = User(username=username)
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        top_subs = await user.top_subreddits(top_n=top_number,
+            >>>    with requests.Session() as request_session:
+            >>>        top_subs = user.top_subreddits(top_n=top_number,
             >>>                             limit=subreddits_limit, session=request_session)
-            >>>        print(top_subs)
+            >>>        pprint(top_subs)
 
 
-            >>> asyncio.run(async_user_top_subreddits(username="TheRealKSI",
-            >>>                                     top_number=10, subreddits_limit=100))
+            >>> get_user_top_subreddits(username="TheRealKSI",
+            >>>                                     top_number=10, subreddits_limit=100)
         """
-        posts = await api.get_posts(
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type=f"top {top_n}/{limit} subreddits",
+                    username=self._username,
+                )
+            )
+
+        posts = api.get_posts(
             posts_type="user_posts",
             username=self._username,
             limit=limit,
@@ -1545,19 +1779,20 @@ class Users:
         :type time_format: Literal["concise", "locale"]
         """
         self._time_format = time_format
+        self._status_template: str = "Fetching {limit} {query_type} users..."
 
-    async def new(
+    def new(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get new users.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of new users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new posts.
@@ -1565,46 +1800,50 @@ class Users:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing a user's data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Users
+            >>> import requests
 
 
-            >>> async def async_new_users(users_limit):
+            >>> def get_new_users(users_limit):
             >>>    users = Users()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        new = await users.new(limit=users_limit, session=request_session)
-            >>>        print(new)
+            >>>    with requests.Session() as request_session:
+            >>>        new = users.new(limit=users_limit, session=request_session)
+            >>>        pprint(new)
 
 
-            >>> asyncio.run(async_new_users(users_limit=500))
+            >>> get_new_users(users_limit=500)
         """
-        new_users: list = await api.get_users(
+        if status:
+            status.update(self._status_template.format(query_type="new", limit=limit))
+
+        new_users: List = api.get_users(
             users_type="new",
             limit=limit,
             timeframe=timeframe,
             status=status,
             session=session,
         )
+
         if new_users:
             return parse_users(new_users, time_format=self._time_format)
 
-    async def popular(
+    def popular(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get popular users.
 
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param limit: Maximum number of popular users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular posts.
@@ -1612,77 +1851,90 @@ class Users:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing a user's data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Users
+            >>> import requests
 
 
-            >>> async def async_popular_users(users_limit):
+            >>> def get_popular_users(users_limit):
             >>>    users = Users()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        popular = await users.popular(limit=users_limit, session=request_session)
-            >>>        print(popular)
+            >>>    with requests.Session() as request_session:
+            >>>        popular = users.popular(limit=users_limit, session=request_session)
+            >>>        pprint(popular)
 
 
-            >>> asyncio.run(async_popular_users(users_limit=100))
+            >>> get_popular_users(users_limit=100)
         """
-        popular_users: list = await api.get_users(
+        if status:
+            status.update(
+                self._status_template.format(query_type="popular", limit=limit)
+            )
+
+        popular_users: List = api.get_users(
             users_type="popular",
             limit=limit,
             timeframe=timeframe,
             status=status,
             session=session,
         )
+
         if popular_users:
             return parse_users(popular_users, time_format=self._time_format)
 
-    async def all(
+    def all(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Get all users.
 
         :param limit: Maximum number of all users to return.
         :type limit: int
-        :param session: Aiohttp session to use for the request.
-        :type session: aiohttp.ClientSession
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
         :param timeframe: Timeframe from which to get all posts.
         :type timeframe: Literal[str]
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing a user's data.
-        :rtype: list[dict]
+        :rtype: List[Dict]
 
         Usage::
 
-            >>> import aiohttp
-            >>> import asyncio
+            >>> from pprint import pprint
             >>> from knewkarma import Users
+            >>> import requests
 
 
-            >>> async def async_all_users(users_limit):
+            >>> def get_all_users(users_limit):
             >>>    users = Users()
-            >>>    async with aiohttp.ClientSession() as request_session:
-            >>>        all_users_data = await users.all(limit=users_limit, session=request_session)
-            >>>        print(all_users_data)
+            >>>    with requests.Session() as request_session:
+            >>>        all_users_data = users.all(limit=users_limit, session=request_session)
+            >>>        pprint(all_users_data)
 
 
-            >>> asyncio.run(async_all_users(users_limit=1000))
+            >>> get_all_users(users_limit=1000))
         """
-        all_users: list = await api.get_users(
+        if status:
+            status.update(self._status_template.format(query_type="all", limit=limit))
+
+        all_users: List = api.get_users(
             users_type="all",
             limit=limit,
             timeframe=timeframe,
             status=status,
             session=session,
         )
+
         if all_users:
             return parse_users(all_users, time_format=self._time_format)
+
+
+# -------------------------------- END ----------------------------------------- #
