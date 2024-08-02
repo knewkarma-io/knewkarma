@@ -57,8 +57,11 @@ A Reddit Data Analysis Toolkit
      - ``Profile``
      - Retrieves subreddit profile information.
    * -
+     - ``Comments``
+     - Retrieves comments from a subreddit.
+   * -
      - ``Posts``
-     - Retrieves posts from a specified subreddit.
+     - Retrieves posts from a subreddit.
    * -
      - ``Search Posts``
      - Returns a subreddit's posts that contain the specified keyword.

@@ -467,3 +467,6 @@ def parse_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
         raise ValueError(
             f"Unknown data type ({wiki_page}: {type(wiki_page)}), expected a Dict."
         )
+
+
+# -------------------------------- END ----------------------------------------- #

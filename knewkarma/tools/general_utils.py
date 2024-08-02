@@ -117,3 +117,5 @@ def pathfinder(directories: list[str]):
 
 
 console = Console(color_system="auto", log_time=False)
+
+# -------------------------------- END ----------------------------------------- #

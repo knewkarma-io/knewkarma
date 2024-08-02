@@ -5,9 +5,6 @@
 The Knew Karma API offers a seamless way to interact with Reddit data, providing asynchronous access to user profiles,
 subreddit information, posts, comments, and more.
 
-This API is designed for developers with a basic understanding of
-asynchronous programming.
-
 To help you get started, I've included detailed examples showcasing how to utilise various
 API features effectively.
 
@@ -32,31 +29,31 @@ Initialises an instance for getting data from a specified post.
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">Post.</span><strong>data</strong>(session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Post.</span><strong>data</strong>(session: requests.Session)</span>
 
 Returns a post's data. This method fetches the detailed data of a specified Reddit post.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Post
+import requests
 
 
-async def get_post_data(post_id, post_subreddit):
+def get_post_data(post_id, post_subreddit):
     post = Post(post_id=post_id, post_subreddit=post_subreddit)
-    async with aiohttp.ClientSession() as session:
+    with requests.Session() as session:
         data = post.data(session=session)
-        print(data)
+        pprint(data)
 
 
-asyncio.run(post_data(post_id="13ptwzd", post_subreddit="AskReddit"))
+get_post_data(post_id="13ptwzd", post_subreddit="AskReddit")
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Post.</span><strong>comments</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Post.</span><strong>comments</strong>(session: requests.Session, limit: int, sort: Literal[str] = "all")</span>
 
 Returns a post's comments. This method retrieves comments from the specified post. You can limit the number of comments
 returned and sort them based on a specified criterion.
@@ -64,19 +61,19 @@ returned and sort them based on a specified criterion.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Post
+import requests
 
 
-async def get_post_comments(post_id, post_subreddit, comments_limit):
+def get_post_comments(post_id, post_subreddit, comments_limit):
     post = Post(post_id=post_id, post_subreddit=post_subreddit)
-    async with aiohttp.ClientSession() as session:
+    with requests.Session() as session:
         comments = post.comments(limit=comments_limit, session=session)
-        print(comments)
+        pprint(comments)
 
 
-asyncio.run(get_post_comments(post_id="13ptwzd", post_subreddit="AskReddit", comments_limit=50))
+get_post_comments(post_id="13ptwzd", post_subreddit="AskReddit", comments_limit=50))
 ```
 
 ***
@@ -98,7 +95,7 @@ Initialises an instance for getting data from multiple posts.
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>best</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>best</strong>(limit: int, session: requests.Session)</span>
 
 Returns posts from the best listing. This method retrieves the best posts according to Reddit's algorithm. You can limit
 the number of posts returned.
@@ -106,24 +103,24 @@ the number of posts returned.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Posts
+import requests
 
 
-async def get_best_posts(posts_limit):
+def get_best_posts(posts_limit):
     posts = Posts()
-    async with aiohttp.ClientSession() as request_session:
-        best = await posts.best(limit=posts_limit, session=request_session)
-        print(best)
+    with requests.Session() as session:
+        best = posts.best(limit=posts_limit, session=session)
+        pprint(best)
 
 
-asyncio.run(get_best_posts(posts_limit=120))
+get_best_posts(posts_limit=120)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>controversial</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>controversial</strong>(limit: int, session: requests.Session)</span>
 
 Returns posts from the controversial listing. This method fetches posts that are considered controversial based on
 Reddit's algorithm. You can limit the number of posts returned.
@@ -131,24 +128,24 @@ Reddit's algorithm. You can limit the number of posts returned.
 ##### Code Example::
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Posts
+import requests
 
 
-async def get_controversial_posts(posts_limit):
+def get_controversial_posts(posts_limit):
     posts = Posts()
-    async with aiohttp.ClientSession() as request_session:
-        controversial = await posts.controversial(limit=posts_limit, session=request_session)
-        print(controversial)
+    with requests.Session() as session:
+        controversial = posts.controversial(limit=posts_limit, session=session)
+        pprint(controversial)
 
 
-asyncio.run(get_controversial_posts(posts_limit=50))
+get_controversial_posts(posts_limit=50)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>front_page</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>front_page</strong>(session: requests.Session, limit: int, sort: Literal[str] = "all")</span>
 
 Returns posts from the Reddit front-page. This method retrieves posts from Reddit's front page. You can limit the number
 of posts returned and sort them based on a specified criterion.
@@ -156,24 +153,24 @@ of posts returned and sort them based on a specified criterion.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Posts
+import requests
 
 
-async def get_frontpage_posts(posts_limit):
+def get_frontpage_posts(posts_limit):
     posts = Posts()
-    async with aiohttp.ClientSession() as request_session:
-        frontpage = await posts.front_page(limit=posts_limit, session=request_session)
-        print(frontpage)
+    with requests.Session() as session:
+        frontpage = posts.front_page(limit=posts_limit, session=session)
+        pprint(frontpage)
 
 
-asyncio.run(get_frontpage_posts(posts_limit=10))
+get_frontpage_posts(posts_limit=10)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>new</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>new</strong>(session: requests.Session, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
 
 Returns new posts. This method fetches new posts. You can limit the number of posts returned, sort them based on a
 specified criterion, and filter them by a timeframe.
@@ -181,67 +178,67 @@ specified criterion, and filter them by a timeframe.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Posts
+import requests
 
 
-async def get_new_posts(posts_limit):
+def get_new_posts(posts_limit):
     posts = Posts()
-    async with aiohttp.ClientSession() as request_session:
-        new = await posts.new(limit=posts_limit, session=request_session)
-        print(new)
+    with requests.Session() as session:
+        new = posts.new(limit=posts_limit, session=session)
+        pprint(new)
 
 
-asyncio.run(get_new_posts(posts_limit=10))
+get_new_posts(posts_limit=10)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>popular</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>popular</strong>(limit: int, session: requests.Session)</span>
 
 Returns posts from the popular listing. This method retrieves popular posts. You can limit the number of posts returned.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Posts
+import requests
 
 
-async def get_popular_posts(posts_limit):
+def get_popular_posts(posts_limit):
     posts = Posts()
-    async with aiohttp.ClientSession() as request_session:
-        popular = await posts.popular(limit=posts_limit, session=request_session)
-        print(popular)
+    with requests.Session() as session:
+        popular = posts.popular(limit=posts_limit, session=session)
+        pprint(popular)
 
 
-asyncio.run(get_popular_posts(posts_limit=50))
+get_popular_posts(posts_limit=50)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>rising</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>rising</strong>(limit: int, session: requests.Session)</span>
 
 Returns posts from the rising listing. This method fetches rising posts. You can limit the number of posts returned.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Posts
+import requests
 
 
-async def get_rising_posts(posts_limit):
+def get_rising_posts(posts_limit):
     posts = Posts()
-    async with aiohttp.ClientSession() as request_session:
-        rising = await posts.rising(limit=posts_limit, session=request_session)
-        print(rising)
+    with requests.Session() as session:
+        rising = posts.rising(limit=posts_limit, session=session)
+        pprint(rising)
 
 
-asyncio.run(get_rising_posts(posts_limit=100))
+get_rising_posts(posts_limit=100)
 ```
 
 ***
@@ -265,7 +262,7 @@ Initialises an instance for performing searches across Reddit.
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">Search.</span><strong>posts</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Search.</span><strong>posts</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: requests.Session)</span>
 
 Returns posts matching the search query. This method retrieves posts that match the search query. You can limit the
 number of posts returned, sort them based on a specified criterion, and filter them by a timeframe.
@@ -273,24 +270,24 @@ number of posts returned, sort them based on a specified criterion, and filter t
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Search
+import requests
 
 
-async def get_search_posts(query, results_limit):
+def get_search_posts(query, results_limit):
     search = Search(query=query)
-    async with aiohttp.ClientSession() as request_session:
-        posts = await search.posts(limit=results_limit, session=request_session)
-        print(posts)
+    with requests.Session() as session:
+        posts = search.posts(limit=results_limit, session=session)
+        pprint(posts)
 
 
-asyncio.run(get_search_posts(query="something in data science", results_limit=200))
+get_search_posts(query="something in data science", results_limit=200)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Search.</span><strong>subreddits</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Search.</span><strong>subreddits</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: requests.Session)</span>
 
 Search subreddits. This method searches for subreddits that match the query. You can limit the number of subreddits
 returned, sort them based on a specified criterion, and filter them by a timeframe.
@@ -298,24 +295,24 @@ returned, sort them based on a specified criterion, and filter them by a timefra
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Search
+import requests
 
 
-async def get_search_subreddits(query, results_limit):
+def get_search_subreddits(query, results_limit):
     search = Search(query=query)
-    async with aiohttp.ClientSession() as request_session:
-        subreddits = await search.subreddits(limit=results_limit, session=request_session)
-        print(subreddits)
+    with requests.Session() as session:
+        subreddits = search.subreddits(limit=results_limit, session=session)
+        pprint(subreddits)
 
 
-asyncio.run(get_search_subreddits(query="questions", results_limit=200))
+get_search_subreddits(query="questions", results_limit=200)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Search.</span><strong>users</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Search.</span><strong>users</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: requests.Session)</span>
 
 Search users. This method searches for users that match the query. You can limit the number of users returned, sort them
 based on a specified criterion, and filter them by a timeframe.
@@ -323,19 +320,19 @@ based on a specified criterion, and filter them by a timeframe.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Search
+import requests
 
 
-async def get_search_users(query, results_limit):
+def get_search_users(query, results_limit):
     search = Search(query=query)
-    async with aiohttp.ClientSession() as request_session:
-        users = await search.users(limit=results_limit, session=request_session)
-        print(users)
+    with requests.Session() as session:
+        users = search.users(limit=results_limit, session=session)
+        pprint(users)
 
 
-asyncio.run(get_search_users(query="john", results_limit=200))
+get_search_users(query="john", results_limit=200)
 ```
 
 ***
@@ -358,79 +355,79 @@ Initialises a Subreddit instance for getting profile and posts from the specifie
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>profile</strong>(session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>profile</strong>(session: requests.Session)</span>
 
 Returns a subreddit's profile data. This method fetches the profile data of a specified subreddit.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Subreddit
+import requests
 
 
-async def get_subreddit_profile(subreddit):
+def get_subreddit_profile(subreddit):
     subreddit = Subreddit(subreddit=subreddit)
-    async with aiohttp.ClientSession() as request_session:
-        profile = await subreddit.profile(session=request_session)
-        print(profile)
+    with requests.Session() as session:
+        profile = subreddit.profile(session=session)
+        pprint(profile)
 
 
-asyncio.run(get_subreddit_profile(subreddit="MachineLearning"))
+get_subreddit_profile(subreddit="MachineLearning")
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>wiki_pages</strong>(session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>wiki_pages</strong>(session: requests.Session)</span>
 
 Returns a subreddit's wiki pages. This method retrieves the wiki pages of a specified subreddit.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Subreddit
+import requests
 
 
-async def get_subreddit_wiki_pages(subreddit):
+def get_subreddit_wiki_pages(subreddit):
     subreddit = Subreddit(subreddit=subreddit)
-    async with aiohttp.ClientSession() as request_session:
-        wiki_pages = await subreddit.wiki_pages(session=request_session)
-        print(wiki_pages)
+    with requests.Session() as session:
+        wiki_pages = subreddit.wiki_pages(session=session)
+        pprint(wiki_pages)
 
 
-asyncio.run(get_subreddit_wiki_pages(subreddit="MachineLearning"))
+get_subreddit_wiki_pages(subreddit="MachineLearning")
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>wiki_page</strong>(page: str, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>wiki_page</strong>(page: str, session: requests.Session)</span>
 
 Returns a subreddit's specified wiki page data. This method fetches the data of a specified wiki page from a subreddit.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Subreddit
+import requests
 
 
-async def get_subreddit_wiki_page(page, subreddit):
+def get_subreddit_wiki_page(page, subreddit):
     subreddit = Subreddit(subreddit=subreddit)
-    async with aiohttp.ClientSession() as request_session:
-        wiki_page_data = await subreddit.wiki_page(page_name=page, session=request_session)
-        print(wiki_page_data)
+    with requests.Session() as session:
+        wiki_page_data = subreddit.wiki_page(page_name=page, session=session)
+        pprint(wiki_page_data)
 
 
-asyncio.run(get_subreddit_wiki_page(page="rules", subreddit="MachineLearning"))
+get_subreddit_wiki_page(page="rules", subreddit="MachineLearning")
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>posts</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>posts</strong>(session: requests.Session, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
 
 Returns a subreddit's posts. This method retrieves posts from a specified subreddit. You can limit the number of posts
 returned, sort them based on a specified criterion, and filter them by a timeframe.
@@ -438,24 +435,24 @@ returned, sort them based on a specified criterion, and filter them by a timefra
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Subreddit
+import requests
 
 
-async def get_subreddit_posts(subreddit, posts_limit):
+def get_subreddit_posts(subreddit, posts_limit):
     subreddit = Subreddit(subreddit=subreddit)
-    async with aiohttp.ClientSession() as request_session:
-        posts = await subreddit.posts(limit=posts_limit, session=request_session)
-        print(posts)
+    with requests.Session() as session:
+        posts = subreddit.posts(limit=posts_limit, session=session)
+        pprint(posts)
 
 
-asyncio.run(get_subreddit_posts(posts_limit=500, subreddit="MachineLearning"))
+get_subreddit_posts(posts_limit=500, subreddit="MachineLearning")
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>search</strong>(session: aiohttp.ClientSession, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>search</strong>(session: requests.Session, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
 
 Returns posts that contain a specified keyword from a subreddit. This method searches for posts in a subreddit that
 contain the specified keyword. You can limit the number of posts returned, sort them based on a specified criterion, and
@@ -464,19 +461,51 @@ filter them by a timeframe.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Subreddit
+import requests
 
 
-async def get_search_subreddit_posts(search_query, subreddit, posts_limit):
+def search_subreddit_comments(search_query, subreddit, limit):
     subreddit = Subreddit(subreddit=subreddit)
-    async with aiohttp.ClientSession() as request_session:
-        posts = await subreddit.search(query=search_query, limit=posts_limit, session=request_session)
-        print(posts)
+    with requests.Session() as session:
+        posts = subreddit.search_comments(query=search_query, limit=limit, session=session)
+        pprint(posts)
 
 
-asyncio.run(get_search_subreddit_posts(search_query="ML jobs", posts_limit=100, subreddit="MachineLearning"))
+search_subreddit_comments(search_query="ML jobs", limit=100, subreddit="MachineLearning")
+```
+
+##### Note:
+
+The limit of posts will be the same as the number of comments that will be returned, e.i., If you specify the limit as
+500, then the search will also look through 500 comments for matches of the query (I intend to improve this, but that's
+how it'll work for now.)
+
+***
+
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>search</strong>(session: requests.Session, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+
+Returns posts that contain a specified keyword from a subreddit. This method searches for posts in a subreddit that
+contain the specified keyword. You can limit the number of posts returned, sort them based on a specified criterion, and
+filter them by a timeframe.
+
+##### Code Example:
+
+```python
+from pprint import pprint
+from knewkarma import Subreddit
+import requests
+
+
+def search_subreddit_posts(search_query, subreddit, posts_limit):
+    subreddit = Subreddit(subreddit=subreddit)
+    with requests.Session() as session:
+        posts = subreddit.search_posts(query=search_query, limit=posts_limit, session=session)
+        pprint(posts)
+
+
+search_subreddit_posts(search_query="ML jobs", posts_limit=100, subreddit="MachineLearning")
 ```
 
 ***
@@ -498,7 +527,7 @@ Initialises an instance for getting data from multiple subreddits.
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">Subreddits.</span><strong>all</strong>(limit: int, timeframe: Literal[str] = "all", session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Subreddits.</span><strong>all</strong>(limit: int, timeframe: Literal[str] = "all", session: requests.Session)</span>
 
 Returns all subreddits. This method retrieves all subreddits. You can limit the number of subreddits returned and filter
 them by a timeframe.
@@ -506,48 +535,48 @@ them by a timeframe.
 ##### implementation
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Subreddits
+import requests
 
 
-async def get_all_subreddits(subreddits_limit):
+def get_all_subreddits(subreddits_limit):
     subreddits = Subreddits()
-    async with aiohttp.ClientSession() as request_session:
-        all_subs = await subreddits.all(limit=subreddits_limit, session=request_session)
-        print(all_subs)
+    with requests.Session() as session:
+        all_subs = subreddits.all(limit=subreddits_limit, session=session)
+        pprint(all_subs)
 
 
-asyncio.run(get_all_subreddits(subreddits_limit=500))
+get_all_subreddits(subreddits_limit=500)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddits.</span><strong>default</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Subreddits.</span><strong>default</strong>(limit: int, session: requests.Session)</span>
 
 Returns default subreddits. This method fetches the default subreddits. You can limit the number of subreddits returned.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Subreddits
+import requests
 
 
-async def get_default_subreddits(subreddits_limit):
+def get_default_subreddits(subreddits_limit):
     subreddits = Subreddits()
-    async with aiohttp.ClientSession() as request_session:
-        default_subs = await subreddits.default(limit=subreddits_limit, session=request_session)
-        print(default_subs)
+    with requests.Session() as session:
+        default_subs = subreddits.default(limit=subreddits_limit, session=session)
+        pprint(default_subs)
 
 
-asyncio.run(get_default_subreddits(subreddits_limit=20))
+get_default_subreddits(subreddits_limit=20)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddits.</span><strong>new</strong>(limit: int, session: aiohttp.ClientSession, timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Subreddits.</span><strong>new</strong>(limit: int, session: requests.Session, timeframe: Literal[str] = "all")</span>
 
 Returns new subreddits. This method retrieves new subreddits. You can limit the number of subreddits returned and filter
 them by a timeframe.
@@ -555,24 +584,24 @@ them by a timeframe.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Subreddits
+import requests
 
 
-async def get_new_subreddits(subreddits_limit):
+def get_new_subreddits(subreddits_limit):
     subreddits = Subreddits()
-    async with aiohttp.ClientSession() as request_session:
-        new_subs = await subreddits.new(limit=subreddits_limit, session=request_session)
-        print(new_subs)
+    with requests.Session() as session:
+        new_subs = subreddits.new(limit=subreddits_limit, session=session)
+        pprint(new_subs)
 
 
-asyncio.run(get_new_subreddits(subreddits_limit=50))
+get_new_subreddits(subreddits_limit=50)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddits.</span><strong>popular</strong>(limit: int, session: aiohttp.ClientSession, timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Subreddits.</span><strong>popular</strong>(limit: int, session: requests.Session, timeframe: Literal[str] = "all")</span>
 
 Returns popular subreddits. This method fetches popular subreddits. You can limit the number of subreddits returned and
 filter them by a timeframe.
@@ -580,19 +609,19 @@ filter them by a timeframe.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Subreddits
+import requests
 
 
-async def get_popular_subreddits(subreddits_limit):
+def get_popular_subreddits(subreddits_limit):
     subreddits = Subreddits()
-    async with aiohttp.ClientSession() as request_session:
-        popular_subs = await subreddits.popular(limit=subreddits_limit, session=request_session)
-        print(popular_subs)
+    with requests.Session() as session:
+        popular_subs = subreddits.popular(limit=subreddits_limit, session=session)
+        pprint(popular_subs)
 
 
-asyncio.run(get_popular_subreddits(subreddits_limit=100))
+get_popular_subreddits(subreddits_limit=100)
 ```
 
 ***
@@ -615,32 +644,32 @@ Initialises a User instance for getting profile, posts, and comments data from t
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">User.</span><strong>profile</strong>(session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>profile</strong>(session: requests.Session)</span>
 
 Returns a user's profile data. This method fetches the profile data of a specified user. It requires
-an `aiohttp.ClientSession` to make the asynchronous HTTP request.
+an `requests.Session` to make the asynchronous HTTP request.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import User
+import requests
 
 
-async def get_user_profile(username):
+def get_user_profile(username):
     user = User(username=username)
-    async with aiohttp.ClientSession() as request_session:
-        profile = await user.profile(session=request_session)
-        print(profile)
+    with requests.Session() as session:
+        profile = user.profile(session=session)
+        pprint(profile)
 
 
-asyncio.run(get_user_profile(username="AutoModerator"))
+get_user_profile(username="AutoModerator")
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>posts</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>posts</strong>(session: requests.Session, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
 
 Returns a user's posts. This method retrieves posts from a specified user. You can limit the number of posts returned,
 sort them based on a specified criterion, and filter them by a timeframe.
@@ -648,24 +677,24 @@ sort them based on a specified criterion, and filter them by a timeframe.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import User
+import requests
 
 
-async def get_user_posts(username, posts_limit):
+def get_user_posts(username, posts_limit):
     user = User(username=username)
-    async with aiohttp.ClientSession() as request_session:
-        posts = await user.posts(limit=posts_limit, session=request_session)
-        print(posts)
+    with requests.Session() as session:
+        posts = user.posts(limit=posts_limit, session=session)
+        pprint(posts)
 
 
-asyncio.run(get_user_posts(username="AutoModerator", posts_limit=100))
+get_user_posts(username="AutoModerator", posts_limit=100)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>comments</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>comments</strong>(session: requests.Session, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
 
 Returns a user's comments. This method retrieves comments from a specified user. You can limit the number of comments
 returned, sort them based on a specified criterion, and filter them by a timeframe.
@@ -673,24 +702,24 @@ returned, sort them based on a specified criterion, and filter them by a timefra
 ##### COde Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import User
+import requests
 
 
-async def get_user_comments(username, comments_limit):
+def get_user_comments(username, comments_limit):
     user = User(username=username)
-    async with aiohttp.ClientSession() as request_session:
-        comments = await user.comments(limit=comments_limit, session=request_session)
-        print(comments)
+    with requests.Session() as session:
+        comments = user.comments(limit=comments_limit, session=session)
+        pprint(comments)
 
 
-asyncio.run(get_user_comments(username="AutoModerator", comments_limit=100))
+get_user_comments(username="AutoModerator", comments_limit=100)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>overview</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>overview</strong>(limit: int, session: requests.Session)</span>
 
 Returns a user's most recent comments. This method retrieves the most recent comments of a specified user. You can limit
 the number of comments returned.
@@ -698,24 +727,24 @@ the number of comments returned.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import User
+import requests
 
 
-async def get_user_overview(username, comments_limit):
+def get_user_overview(username, comments_limit):
     user = User(username=username)
-    async with aiohttp.ClientSession() as request_session:
-        comments = await user.overview(limit=comments_limit, session=request_session)
-        print(comments)
+    with requests.Session() as session:
+        comments = user.overview(limit=comments_limit, session=session)
+        pprint(comments)
 
 
-asyncio.run(get_user_overview(username="AutoModerator", comments_limit=100))
+get_user_overview(username="AutoModerator", comments_limit=100)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>search_posts</strong>(session: aiohttp.ClientSession, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>search_posts</strong>(session: requests.Session, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
 
 Returns a user's posts that contain the specified keywords. This method searches for posts from a specified user that
 contain the specified keywords. You can limit the number of posts returned, sort them based on a specified criterion,
@@ -724,26 +753,26 @@ and filter them by a timeframe.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import User
+import requests
 
 
-async def get_search_user_posts(username, search_query, posts_limit):
+def get_search_user_posts(username, search_query, posts_limit):
     user = User(username=username)
-    async with aiohttp.ClientSession() as request_session:
-        posts = await user.search_posts(query=search_query,
-                                        limit=posts_limit, session=request_session)
-        print(posts)
+    with requests.Session() as session:
+        posts = user.search_posts(query=search_query,
+                                  limit=posts_limit, session=session)
+        pprint(posts)
 
 
-asyncio.run(get_search_user_posts(username="AutoModerator",
-                                  search_query="banned", posts_limit=100))
+get_search_user_posts(username="AutoModerator",
+                      search_query="banned", posts_limit=100)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>search_comments</strong>(session: aiohttp.ClientSession, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>search_comments</strong>(session: requests.Session, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
 
 Returns a user's comments that contain the specified keyword. This method searches for comments from a specified user
 that contain the specified keyword. You can limit the number of comments returned, sort them based on a specified
@@ -752,56 +781,56 @@ criterion, and filter them by a timeframe.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import User
+import requests
 
 
-async def get_search_user_comments(username, search_query, comments_limit):
+def get_search_user_comments(username, search_query, comments_limit):
     user = User(username=username)
-    async with aiohttp.ClientSession() as request_session:
-        comments = await user.search_comments(
+    with requests.Session() as session:
+        comments = user.search_comments(
             query=search_query,
             limit=comments_limit,
-            session=request_session
+            session=session
         )
-        print(comments)
+        pprint(comments)
 
 
-asyncio.run(get_search_user_comments(
+get_search_user_comments(
     username="AutoModerator",
     search_query="this is an automated action",
-    comments_limit=100)
+    comments_limit=100
 )
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>moderated_subreddits</strong>(session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>moderated_subreddits</strong>(session: requests.Session)</span>
 
 Returns subreddits moderated by the user. This method fetches the subreddits moderated by a specified user.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import User
+import requests
 
 
-async def get_user_moderated_subreddits(username):
+def get_user_moderated_subreddits(username):
     user = User(username=username)
-    async with aiohttp.ClientSession() as request_session:
-        moderated_subs = await user.moderated_subreddits(session=request_session)
-        print(moderated_subs)
+    with requests.Session() as session:
+        moderated_subs = user.moderated_subreddits(session=session)
+        pprint(moderated_subs)
 
 
-asyncio.run(get_user_moderated_subreddits(username="TheRealKSI"))
+get_user_moderated_subreddits(username="TheRealKSI")
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>top_subreddits</strong>(session: aiohttp.ClientSession, top_n: int, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all") -> list[tuple]</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>top_subreddits</strong>(session: requests.Session, top_n: int, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all") -> list[tuple]</span>
 
 Returns a user's top n subreddits based on subreddit frequency in n posts. This method retrieves the top n subreddits
 that a specified user is most active in. You can limit the number of posts considered, sort them based on a specified
@@ -810,29 +839,25 @@ criterion, and filter them by a timeframe.
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
 from knewkarma import User
+import requests
 
 
-async def get_user_top_subreddits(username, top_number, subreddits_limit):
+def get_user_top_subreddits(username, top_number, subreddits_limit):
     user = User(username=username)
-    async with aiohttp.ClientSession() as request_session:
-        top_subs = await user.top_subreddits(
+    with requests.Session() as session:
+        top_subs = user.top_subreddits(
             top_n=top_number,
             limit=subreddits_limit,
-            session=request_session
+            session=session
         )
-        print(top_subs)
+        pprint(top_subs)
 
-
-asyncio.run(
     get_user_top_subreddits(
         username="TheRealKSI",
         top_number=10,
         subreddits_limit=100
     )
-)
 ```
 
 ***
@@ -854,74 +879,74 @@ Initialises an instance for getting data from multiple users.
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">Users.</span><strong>all</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Users.</span><strong>all</strong>(limit: int, session: requests.Session)</span>
 
 Returns all users. This method retrieves all users. You can limit the number of users returned.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Users
+import requests
 
 
-async def get_all_users(users_limit):
+def get_all_users(users_limit):
     users = Users()
-    async with aiohttp.ClientSession() as request_session:
-        all_users = await users.all(limit=users_limit, session=request_session)
-        print(all_users)
+    with requests.Session() as session:
+        all_users = users.all(limit=users_limit, session=session)
+        pprint(all_users)
 
 
-asyncio.run(get_all_users(users_limit=1000))
+get_all_users(users_limit=1000)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Users.</span><strong>new</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Users.</span><strong>new</strong>(limit: int, session: requests.Session)</span>
 
 Returns new users. This method retrieves new users. You can limit the number of users returned.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Users
+import requests
 
 
-async def get_new_users(users_limit):
+def get_new_users(users_limit):
     users = Users()
-    async with aiohttp.ClientSession() as request_session:
-        new = await users.new(limit=users_limit, session=request_session)
-        print(new)
+    with requests.Session() as session:
+        new = users.new(limit=users_limit, session=session)
+        pprint(new)
 
 
-asyncio.run(get_new_users(users_limit=500))
+get_new_users(users_limit=500)
 ```
 
 ***
 
-#### <span class="method-name"><span class="italic">Users.</span><strong>popular</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Users.</span><strong>popular</strong>(limit: int, session: requests.Session)</span>
 
 Returns popular users. This method retrieves popular users. You can limit the number of users returned.
 
 ##### Code Example:
 
 ```python
-import aiohttp
-import asyncio
+from pprint import pprint
 from knewkarma import Users
+import requests
 
 
-async def get_popular_users(users_limit):
+def get_popular_users(users_limit):
     users = Users()
-    async with aiohttp.ClientSession() as request_session:
-        popular = await users.popular(limit=users_limit, session=request_session)
-        print(popular)
+    with requests.Session() as session:
+        popular = users.popular(limit=users_limit, session=session)
+        pprint(popular)
 
 
-asyncio.run(get_popular_users(users_limit=100))
+get_popular_users(users_limit=100)
 ```
 
 ***
