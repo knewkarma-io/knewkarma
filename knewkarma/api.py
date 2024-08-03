@@ -58,14 +58,14 @@ class Api:
                     return response.json()
                 else:
                     error_message = response.json()
-                    console.log(f"[red]✘[/] An API error occurred: {error_message}")
+                    console.log(f"[[red]✘[/]] An API error occurred: {error_message}")
                     return {}
 
         except requests.ConnectionError as error:
-            console.log(f"[red]✘[/] An HTTP error occurred: {error}")
+            console.log(f"[[red]✘[/]] An HTTP error occurred: {error}")
             return {}
         except Exception as error:
-            console.log(f"[red]✘[/] An unknown error occurred: {error}")
+            console.log(f"[[red]✘[/]] An unknown error occurred: {error}")
             return {}
 
     @staticmethod
@@ -121,22 +121,23 @@ class Api:
         )
 
         if release:
-            remote_version: str = release.get("tag_name")
+            remote_version_str: str = release.get("tag_name")
             markup_release_notes: str = release.get("body")
 
             # Splitting the version strings into components
-            remote_parts: list = remote_version.split(".")
+            local_version_parts: list = [Version.major, Version.minor, Version.patch]
+            remote_version_parts: list = remote_version_str.split(".")
 
             update_level: str = ""
 
             # Check for differences in version parts
-            if remote_parts[0] != Version.major:
+            if remote_version_parts[0] != local_version_parts[0]:
                 update_level = "[red]MAJOR[/]"
 
-            elif remote_parts[1] != Version.minor:
+            elif remote_version_str[1] != local_version_parts[1]:
                 update_level = "[yellow]]MINOR[/]"
 
-            elif remote_parts[2] != Version.patch:
+            elif remote_version_str[2] != local_version_parts[2]:
                 update_level = "[green]PATCH[/]"
 
             if update_level:
@@ -145,14 +146,13 @@ class Api:
                 console.print(
                     Panel.fit(
                         markdown_release_notes,
-                        title=f"\n[bold]{update_level} update [underline]{remote_version}[/] available[/]",
-                        # title_align="left",
+                        title=f"\n[bold]{update_level} update [underline][cyan]{remote_version_str}[/][/] available[/]",
                         subtitle="[italic]Thank you, for using Knew Karma![/] ❤️ ",
                     )
                 )
 
                 if Confirm.ask(
-                    f"Would you like to upgrade to [underline]{remote_version}[/]?",
+                    f"[[blue][bold]?[/][/]] Would you like to install this update?",
                     default=False,
                     console=console,
                 ):

@@ -310,7 +310,10 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     help="Get a subreddit's comments (beta)",
 )
 @click.option(
-    "-cpp", "--comments-per-post", type=int, help="To be used with `-c/--comments`"
+    "-cpp",
+    "--comments-per-post",
+    type=int,
+    help="To be used when getting comments with `-c/--comments`",
 )
 @click.option("-p", "--profile", is_flag=True, help="Get a subreddit's profile")
 @click.option("-pp", "--posts", is_flag=True, help="Get a subreddit's posts")
@@ -741,11 +744,11 @@ def handle_method_calls(
                                 console.print(tree)
                         break
     except KeyboardInterrupt:
-        console.log("[yellow]✘[/] User interruption detected ([yellow]Ctrl+C[/])")
+        console.log("[[yellow]✘[/]] Process aborted /w CTRL+C.")
     finally:
         elapsed_time = datetime.now() - start_time
         console.print(
-            f"[green]✔[/] DONE. {elapsed_time.total_seconds():.2f} seconds elapsed."
+            f"[[green]✔[/]] DONE. {elapsed_time.total_seconds():.2f} seconds elapsed."
         )
 
 
