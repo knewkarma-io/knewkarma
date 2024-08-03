@@ -452,6 +452,34 @@ get_subreddit_posts(posts_limit=500, subreddit="MachineLearning")
 
 ***
 
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>comments</strong>(session: requests.Session, posts_limit: int, comments_per_post: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+
+Returns a subreddit's comments. This method retrieves comments from a specified subreddit. You can limit the number of
+posts
+to get comments from, and the number of comments to get from each post.
+
+##### Code Example:
+
+```python
+from pprint import pprint
+from knewkarma import Subreddit
+import requests
+
+
+def get_subreddit_comments(subreddit, posts_limit, comments_per_post):
+    subreddit = Subreddit(subreddit=subreddit)
+    with requests.Session() as request_session:
+        comments = subreddit.comments(
+            posts_limit=posts_limit,
+            comments_per_post=comments_per_post,
+            session=request_session
+        )
+        pprint(comments)
+
+
+get_subreddit_comments(subreddit="AskScience", posts_limit=100, comments_per_post=20)
+```
+
 #### <span class="method-name"><span class="italic">Subreddit.</span><strong>search</strong>(session: requests.Session, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
 
 Returns posts that contain a specified keyword from a subreddit. This method searches for posts in a subreddit that

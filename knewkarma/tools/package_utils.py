@@ -12,7 +12,7 @@ def is_snap_package(package: str) -> bool:
 
     :param package: Name of the package to check.
     :type package: str
-    :return: True is the specified package is installed as a snap package, otherwise False.
+    :return: True if the specified package is installed as a snap package, otherwise False.
     :rtype: bool
 
     Usage::
@@ -99,6 +99,10 @@ def update_package(package: str, package_type: Literal["pypi", "snap"]):
                 subprocess.run(["pip", "install", "--upgrade", package])
             elif package == "snap":
                 subprocess.run(["sudo", "snap", "refresh", package])
+
+            console.print(
+                f"[green]✔[/] DONE. Updates will be applied nex time you run {package}."
+            )
         except Exception as e:
             console.log(f"[red]✘[/] Failed to update {package}: {e}")
     else:

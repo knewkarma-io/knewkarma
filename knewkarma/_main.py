@@ -834,6 +834,43 @@ class Subreddit:
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
     ) -> List[Dict]:
+        """
+        Get a subreddit's comments.
+
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
+        :param posts_limit: Maximum number of posts to get comments from.
+        :type posts_limit: int
+        :param comments_per_post: Maximum number of comments to get from each post.
+        :type comments_per_post: int
+        :param sort: Sort criterion for the posts and comments.
+        :type sort: str
+        :param timeframe: Timeframe from which to get posts and comments.
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
+        :return: A list of comments, each containing comment data.
+        :rtype: List[Dict]
+
+        Usage::
+
+            >>> from pprint import pprint
+            >>> from knewkarma import Subreddit
+            >>> import requests
+
+            >>> def get_subreddit_comments(subreddit, posts_count, comments_p_post):
+            >>>    subreddit = Subreddit(subreddit=subreddit)
+            >>>    with requests.Session() as request_session:
+            >>>        comments = subreddit.comments(
+            >>>                       posts_limit=posts_count,
+            >>>                       comments_per_post=comments_p_post,
+            >>>                       session=request_session
+            >>>                   )
+            >>>        pprint(comments)
+
+
+            >>> get_subreddit_comments( subreddit="AskScience", posts_count=100, comments_p_post=20)
+        """
         posts = self.posts(
             session=session,
             limit=posts_limit,
@@ -884,14 +921,13 @@ class Subreddit:
 
             >>> from pprint import pprint
             >>> from knewkarma import Subreddit
-            >>> from pprint import pprint
+            >>> import requests
 
             >>> def get_subreddit_posts(subreddit, posts_limit):
             >>>    subreddit = Subreddit(subreddit=subreddit)
             >>>    with requests.Session() as request_session:
             >>>        posts = subreddit.posts(limit=posts_limit, session=request_session)
-            >>>        print(posts)
-
+            >>>        pprint(posts)
 
             >>> get_subreddit_posts(posts_limit=500, subreddit="MachineLearning")
         """
