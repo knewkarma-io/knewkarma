@@ -140,17 +140,17 @@ class Api:
                 update_level = "[green]PATCH[/]"
 
             if update_level:
+                status.stop()
                 markdown_release_notes = Markdown(markup=markup_release_notes)
                 console.print(
                     Panel.fit(
                         markdown_release_notes,
                         title=f"\n[bold]{update_level} update [underline]{remote_version}[/] available[/]",
-                        title_align="left",
+                        # title_align="left",
                         subtitle="[italic]Thank you, for using Knew Karma![/] ❤️ ",
                     )
                 )
 
-                status.stop()
                 if Confirm.ask(
                     f"Would you like to upgrade to [underline]{remote_version}[/]?",
                     default=False,
@@ -264,7 +264,11 @@ class Api:
         # Get the endpoint directly from the dictionary
         endpoint: str = entity_mapping.get(entity_type, "")
 
-        entity_data = self.make_request(endpoint=endpoint, session=session)
+        response = self.make_request(endpoint=endpoint, session=session)
+        if entity_type == "post":
+            entity_data = response[0].get("data").get("children")[0]
+        else:
+            entity_data = response
 
         return self._process_response(
             response_data=entity_data.get("data", {}),

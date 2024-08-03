@@ -3,6 +3,7 @@ from collections import Counter
 from typing import List, Dict
 
 import requests
+from rich.pretty import pprint
 
 from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .tools.general_utils import console
@@ -68,7 +69,13 @@ class Post:
             >>> get_post_data()
         """
         if status:
-            status.update(self._status_template.format(query_type="data"))
+            status.update(
+                self._status_template.format(
+                    query_type="data",
+                    post_id=self._post_id,
+                    post_subreddit=self._post_subreddit,
+                )
+            )
 
         post_data: dict = api.get_entity(
             post_id=self._post_id,
@@ -80,10 +87,7 @@ class Post:
 
         if post_data:
             return parse_posts(
-                data=post_data[0]
-                .get("data", {})
-                .get("children", [])[0]
-                .get("data", {}),
+                data=post_data,
                 time_format=self._time_format,
             )
 
@@ -943,8 +947,12 @@ class Subreddit:
 
             all_comments.extend(comments)
 
+        pattern: str = rf"(?i)\b{re.escape(query)}\b"
+        regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
+
         for comment in all_comments:
-            if query in comment.get("body"):
+            match: re.Match = regex.search(comment.get("body", ""))
+            if match:
                 found_comments.append(comment)
 
         if found_comments:
@@ -1004,7 +1012,6 @@ class Subreddit:
                     subreddit=self._subreddit,
                 )
             )
-
         found_posts: List = api.get_posts(
             posts_type="search_subreddit_posts",
             subreddit=self._subreddit,
@@ -1599,6 +1606,9 @@ class User:
                 )
             )
 
+        pattern: str = rf"(?i)\b{re.escape(query)}\b"
+        regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
+
         user_posts: List = api.get_posts(
             posts_type="user_posts",
             username=self._username,
@@ -1609,14 +1619,13 @@ class User:
             session=session,
         )
         found_posts: List = []
-        regex_pattern: re.Pattern = self._build_regex_pattern(text=query)
 
         for post in user_posts:
             post_data: dict = post.get("data")
 
-            match = regex_pattern.search(
-                post_data.get("title")
-            ) or regex_pattern.search(post_data.get("selftext"))
+            match: re.Match = regex.search(post_data.get("title", "")) or regex.search(
+                post_data.get("selftext", "")
+            )
 
             if match:
                 found_posts.append(post)
@@ -1678,6 +1687,9 @@ class User:
                 )
             )
 
+        pattern: str = rf"(?i)\b{re.escape(query)}\b"
+        regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
+
         user_comments: List = api.get_posts(
             username=self._username,
             posts_type="user_comments",
@@ -1688,10 +1700,9 @@ class User:
             session=session,
         )
         found_comments: List = []
-        regex_pattern = self._build_regex_pattern(text=query)
 
         for comment in user_comments:
-            match = regex_pattern.search(comment.get("data").get("body"))
+            match = regex.search(comment.get("data", {}).get("body", ""))
             if match:
                 found_comments.append(comment)
 

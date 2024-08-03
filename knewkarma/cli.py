@@ -142,7 +142,9 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
         "comments": lambda session, status=None: post_instance.comments(
             limit=limit, sort=sort, status=status, session=session
         ),
-        "data": lambda session, status=None: post_instance.data(session=session),
+        "data": lambda session, status=None: post_instance.data(
+            session=session, status=status
+        ),
     }
 
     handle_method_calls(
@@ -300,7 +302,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     help="Use this command to get a subreddit's data, such as comments, posts, wiki-pages, wiki-page data, and more...",
     cls=click.RichCommand,
 )
-@click.argument("subreddit")
+@click.argument("subreddit_name")
 @click.option(
     "-c",
     "--comments",
