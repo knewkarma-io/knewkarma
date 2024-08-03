@@ -1266,25 +1266,6 @@ class User:
         self._time_format = time_format
         self._status_template: str = "Fetching {query_type} from user u/{username}..."
 
-    @staticmethod
-    def _build_regex_pattern(text: str) -> re.Pattern:
-        """
-        Builds a regex pattern for word boundaries and OR conditions from a given text.
-        Each word in the text will be matched as a whole word in a case-insensitive manner.
-
-        :param text: The input text to create a regex pattern from.
-        :type text: str
-        :return: A compiled regex pattern that matches any of the words in the input text.
-        :rtype: re.Pattern
-        """
-        words = text.split()
-
-        # Create a regex pattern for word boundaries and OR conditions
-        word_patterns = [f"\\b{re.escape(word)}\\b" for word in words]
-        regex_pattern = "|".join(word_patterns)
-
-        return re.compile(regex_pattern, re.IGNORECASE)
-
     def comments(
         self,
         session: requests.Session,
