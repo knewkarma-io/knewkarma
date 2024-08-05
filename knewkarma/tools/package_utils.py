@@ -3,7 +3,7 @@ from typing import Literal
 
 __all__ = ["is_pypi_package", "is_snap_package", "update_package"]
 
-from knewkarma.tools.general_utils import console
+from .general_utils import console
 
 
 def is_snap_package(package: str) -> bool:
@@ -107,6 +107,5 @@ def update_package(package: str, package_type: Literal["pypi", "snap"]):
             console.log(f"[red]✘[/] Failed to update {package}: {e}")
     else:
         raise ValueError(f"Empty package name provided.")
-
 
 # -------------------------------- END ----------------------------------------- #
