@@ -11,7 +11,7 @@ project = About.name
 author = About.author
 copyright = (
     f" {date.today().year} MIT License, "
-    f'<a href="https://gravatar.com/rly0nheart" target="_blank">{author}</a>'
+    f'<a href="{About.author_link}" target="_blank">{author}</a>'
 )
 
 release = Version.release
