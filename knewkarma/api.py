@@ -135,7 +135,7 @@ class Api:
                 update_level = "[red]MAJOR[/]"
 
             elif remote_version_str[1] != local_version_parts[1]:
-                update_level = "[yellow]]MINOR[/]"
+                update_level = "[yellow]MINOR[/]"
 
             elif remote_version_str[2] != local_version_parts[2]:
                 update_level = "[green]PATCH[/]"
