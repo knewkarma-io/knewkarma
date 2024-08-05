@@ -152,7 +152,7 @@ class Api:
                 )
 
                 if Confirm.ask(
-                        f"[[blue][bold]?[/][/]] Would you like to install this update?",
+                        f"Would you like to install this update?",
                         default=False,
                         console=console,
                 ):
