@@ -50,7 +50,7 @@ class Api:
             with session.get(
                     endpoint,
                     headers={
-                        "User-Agent": f"Knew-Karma/{Version.release} "
+                        "User-Agent": f"{About.name.replace(' ', '-')}/{Version.release} "
                                       f"(Python {python_version}; +{About.documentation})"
                     },
             ) as response:
