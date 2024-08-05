@@ -32,7 +32,7 @@ def countdown_timer(status: Status, duration: int, current_count: int, overall_c
         status.update(
             f"Fetched [cyan]{current_count}[/]/[cyan]{overall_count}[/] "
             f"items so far, resuming in [cyan]{remaining}[/]"
-            f" {'second' if remaining <= 1 else 'seconds'}[yellow]...[/]"
+            f" {'second' if remaining <= 1 else 'seconds'}..."
         )
         time.sleep(1)  # Sleep for one second as part of countdown
 
