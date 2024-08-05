@@ -147,7 +147,7 @@ class Api:
                     Panel.fit(
                         markdown_release_notes,
                         title=f"\n[bold]{update_level} update [underline][cyan]{remote_version_str}[/][/] available[/]",
-                        subtitle="[italic]Thank you, for using Knew Karma![/] ❤️ ",
+                        subtitle=f"[italic]Thank you, for using {About.name}![/] ❤️ ",
                     )
                 )
 

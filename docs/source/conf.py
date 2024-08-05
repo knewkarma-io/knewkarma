@@ -8,7 +8,7 @@ from knewkarma.version import Version
 # -- Project information
 
 project = About.name
-author = "Richard Mwewa"
+author = About.author
 copyright = (
     f" {date.today().year} MIT License, "
     f'<a href="https://gravatar.com/rly0nheart" target="_blank">{author}</a>'
