@@ -1,18 +1,18 @@
 from datetime import date
 
+from knewkarma.about import About
 from knewkarma.version import Version
 
 # Configuration file for the Sphinx documentation builder.
 
 # -- Project information
 
-project = "Knew Karma"
+project = About.name
 author = "Richard Mwewa"
 copyright = (
     f" {date.today().year} MIT License, "
     f'<a href="https://gravatar.com/rly0nheart" target="_blank">{author}</a>'
 )
-
 
 release = Version.release
 version = Version.full
