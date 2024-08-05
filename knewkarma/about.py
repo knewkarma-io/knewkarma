@@ -16,9 +16,10 @@ class About:
 
     name: str = "Knew Karma"
     author: str = "Richard Mwewa"
+    author_link: str = "https://gravatar.com/rly0nheart"
     copyright: str = f"{name} {Version.release} © {author}. All rights reserved."
     documentation: str = "https://knewkarma.readthedocs.io"
-    summary: str = f"{name}: A Reddit data analysis toolkit — by {author}"
+    summary: str = f"{name}: A Reddit data analysis toolkit — by {author} <{author_link}>"
     description: str = f"""
 {name} (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a Command-Line Interface (CLI), and an
@@ -26,7 +27,7 @@ Application Programming Interface (API) to enable an easy integration in other P
 
 
 
-Refer to the documentation ({documentation}) for usage examples and integration guide.
+Refer to the documentation <{documentation}> for usage examples and integration guide.
 """
 
 # -------------------------------- END ----------------------------------------- #
