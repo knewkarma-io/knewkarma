@@ -14,13 +14,13 @@ class About:
           description (str): A full description of Knew Karma as a CLI, and Library program for Reddit data analysis.
     """
 
+    name: str = "Knew Karma"
     author: str = "Richard Mwewa"
-    copyright: str = f"Knew Karma {Version.release} © {author}. All rights reserved."
+    copyright: str = f"{name} {Version.release} © {author}. All rights reserved."
     documentation: str = "https://knewkarma.readthedocs.io"
-
-    summary: str = f"Knew Karma: A Reddit data analysis toolkit — by {author}"
+    summary: str = f"{name}: A Reddit data analysis toolkit — by {author}"
     description: str = f"""
-Knew Karma (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
+{name} (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a Command-Line Interface (CLI), and an
 Application Programming Interface (API) to enable an easy integration in other Python Projects.
 
@@ -28,6 +28,5 @@ Application Programming Interface (API) to enable an easy integration in other P
 
 Refer to the documentation ({documentation}) for usage examples and integration guide.
 """
-
 
 # -------------------------------- END ----------------------------------------- #
