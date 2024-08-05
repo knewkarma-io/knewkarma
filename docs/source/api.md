@@ -275,14 +275,14 @@ from knewkarma import Search
 import requests
 
 
-def get_search_posts(query, results_limit):
+def search_posts(query, results_limit):
     search = Search(query=query)
     with requests.Session() as session:
         posts = search.posts(limit=results_limit, session=session)
         pprint(posts)
 
 
-get_search_posts(query="something in data science", results_limit=200)
+search_posts(query="something in data science", results_limit=200)
 ```
 
 ***
@@ -300,14 +300,14 @@ from knewkarma import Search
 import requests
 
 
-def get_search_subreddits(query, results_limit):
+def search_subreddits(query, results_limit):
     search = Search(query=query)
     with requests.Session() as session:
         subreddits = search.subreddits(limit=results_limit, session=session)
         pprint(subreddits)
 
 
-get_search_subreddits(query="questions", results_limit=200)
+search_subreddits(query="questions", results_limit=200)
 ```
 
 ***
@@ -325,14 +325,14 @@ from knewkarma import Search
 import requests
 
 
-def get_search_users(query, results_limit):
+def search_users(query, results_limit):
     search = Search(query=query)
     with requests.Session() as session:
         users = search.users(limit=results_limit, session=session)
         pprint(users)
 
 
-get_search_users(query="john", results_limit=200)
+search_users(query="john", results_limit=200)
 ```
 
 ***
@@ -480,9 +480,9 @@ def get_subreddit_comments(subreddit, posts_limit, comments_per_post):
 get_subreddit_comments(subreddit="AskScience", posts_limit=100, comments_per_post=20)
 ```
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>search</strong>(session: requests.Session, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>search_comments</strong>(session: requests.Session, keyword: str, posts_limit: int, comments_per_post: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
 
-Returns posts that contain a specified keyword from a subreddit. This method searches for posts in a subreddit that
+Returns comments that contain a specified keyword from a subreddit. This method searches for posts in a subreddit that
 contain the specified keyword. You can limit the number of posts returned, sort them based on a specified criterion, and
 filter them by a timeframe.
 
@@ -494,14 +494,15 @@ from knewkarma import Subreddit
 import requests
 
 
-def search_subreddit_comments(search_query, subreddit, limit):
+def search_subreddit_comments(search_query, subreddit, posts_limit, comments_per_post):
     subreddit = Subreddit(subreddit=subreddit)
     with requests.Session() as session:
-        posts = subreddit.search_comments(query=search_query, limit=limit, session=session)
+        posts = subreddit.search_comments(query=search_query, posts_limit=posts_limit,
+                                          comments_per_post=comments_per_post, session=session)
         pprint(posts)
 
 
-search_subreddit_comments(search_query="ML jobs", limit=100, subreddit="MachineLearning")
+search_subreddit_comments(search_query="ML jobs", posts_limit=100, comments_per_post=10, subreddit="MachineLearning")
 ```
 
 ##### Note:
@@ -512,7 +513,7 @@ how it'll work for now.)
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>search</strong>(session: requests.Session, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>search_posts</strong>(session: requests.Session, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
 
 Returns posts that contain a specified keyword from a subreddit. This method searches for posts in a subreddit that
 contain the specified keyword. You can limit the number of posts returned, sort them based on a specified criterion, and
@@ -786,7 +787,7 @@ from knewkarma import User
 import requests
 
 
-def get_search_user_posts(username, search_query, posts_limit):
+def search_user_posts(username, search_query, posts_limit):
     user = User(username=username)
     with requests.Session() as session:
         posts = user.search_posts(query=search_query,
@@ -794,8 +795,8 @@ def get_search_user_posts(username, search_query, posts_limit):
         pprint(posts)
 
 
-get_search_user_posts(username="AutoModerator",
-                      search_query="banned", posts_limit=100)
+search_user_posts(username="AutoModerator",
+                  search_query="banned", posts_limit=100)
 ```
 
 ***
@@ -814,7 +815,7 @@ from knewkarma import User
 import requests
 
 
-def get_search_user_comments(username, search_query, comments_limit):
+def search_user_comments(username, search_query, comments_limit):
     user = User(username=username)
     with requests.Session() as session:
         comments = user.search_comments(
@@ -825,7 +826,7 @@ def get_search_user_comments(username, search_query, comments_limit):
         pprint(comments)
 
 
-get_search_user_comments(
+search_user_comments(
     username="AutoModerator",
     search_query="this is an automated action",
     comments_limit=100
