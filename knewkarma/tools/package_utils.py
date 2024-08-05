@@ -101,7 +101,7 @@ def update_package(package: str, package_type: Literal["pypi", "snap"]):
                 subprocess.run(["sudo", "snap", "refresh", package])
 
             console.print(
-                f"[green]✔[/] DONE. Updates will be applied nex time you run {package}."
+                f"[green]✔[/] DONE. Updates will be applied on next run."
             )
         except Exception as e:
             console.log(f"[red]✘[/] Failed to update {package}: {e}")
