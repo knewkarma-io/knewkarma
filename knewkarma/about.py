@@ -19,7 +19,7 @@ class About:
     author_link: str = "https://gravatar.com/rly0nheart"
     copyright: str = f"{name} {Version.release} © {author}. All rights reserved."
     documentation: str = "https://knewkarma.readthedocs.io"
-    summary: str = f"{name}: A Reddit data analysis toolkit — by {author} <{author_link}>"
+    summary: str = f"A Reddit data analysis toolkit — by {author} <{author_link}>"
     description: str = f"""
 {name} (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a Command-Line Interface (CLI), and an
