@@ -7,6 +7,7 @@ from rich.console import Console
 from rich.table import Table
 
 from .time_utils import timestamp_to_concise
+from ..about import About
 from ..api import python_version
 from ..version import Version
 
@@ -80,7 +81,7 @@ def get_system_info() -> Table:
         system_uptime = timestamp_to_concise(timestamp=int(psutil.boot_time()))
 
     table.add_row("Username", getpass.getuser())
-    table.add_row("Knew Karma", Version.full)
+    table.add_row(About.name, Version.full)
     table.add_row("Python", python_version)
     table.add_row("System", f"{platform.system()} {platform.version()}")
     table.add_row(
@@ -88,13 +89,13 @@ def get_system_info() -> Table:
     )
     table.add_row(
         "Disk",
-        f"{psutil.disk_usage('/').free / (1024**3):.2f} GB free"
-        f" / {psutil.disk_usage('/').total / (1024**3):.2f} GB",
+        f"{psutil.disk_usage('/').free / (1024 ** 3):.2f} GB free"
+        f" / {psutil.disk_usage('/').total / (1024 ** 3):.2f} GB",
     )
     table.add_row(
         "Memory",
-        f"{psutil.virtual_memory().available / (1024**3):.2f} GB free"
-        f" / {psutil.virtual_memory().total / (1024**3):.2f} GB",
+        f"{psutil.virtual_memory().available / (1024 ** 3):.2f} GB free"
+        f" / {psutil.virtual_memory().total / (1024 ** 3):.2f} GB",
     )
 
     table.add_row(
@@ -117,3 +118,5 @@ def pathfinder(directories: list[str]):
 
 
 console = Console(color_system="auto", log_time=False)
+
+# -------------------------------- END ----------------------------------------- #

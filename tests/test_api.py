@@ -1,7 +1,6 @@
 from datetime import timezone, datetime, timedelta
 
-import aiohttp
-import pytest
+import requests
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
 from knewkarma.api import Api
@@ -16,18 +15,17 @@ TEST_SUBREDDIT_2: str = "AskReddit"
 @retry(
     stop=stop_after_attempt(5),
     wait=wait_fixed(15),
-    retry=retry_if_exception_type(aiohttp.ClientError),
+    retry=retry_if_exception_type(requests.ConnectionError),
 )
-async def get_with_retry(get_function, *args, **kwargs):
-    async with aiohttp.ClientSession() as session:
-        return await get_function(*args, session=session, **kwargs)
+def get_with_retry(get_function, *args, **kwargs):
+    with requests.Session() as session:
+        return get_function(*args, session=session, **kwargs)
 
 
-@pytest.mark.asyncio
-async def test_search_for_posts():
+def test_search_for_posts():
     """Tests searching for posts that contain a query string from all over Reddit."""
     search_posts_query: str = "coronavirus"
-    search_posts: list[dict] = await get_with_retry(
+    search_posts: list[dict] = get_with_retry(
         api.search_entities,
         entity_type="posts",
         query=search_posts_query,
@@ -45,12 +43,11 @@ async def test_search_for_posts():
         )
 
 
-@pytest.mark.asyncio
-async def test_search_for_posts_in_a_subreddit():
+def test_search_for_posts_in_a_subreddit():
     """Tests searching for posts that match the search query from a subreddit."""
     search_query: str = "Rick and Morty"
     posts_subreddit: str = "AdultSwim"
-    search_results = await get_with_retry(
+    search_results = get_with_retry(
         api.get_posts,
         posts_type="search_subreddit_posts",
         query=search_query,
@@ -69,11 +66,10 @@ async def test_search_for_posts_in_a_subreddit():
         )
 
 
-@pytest.mark.asyncio
-async def test_search_for_subreddits():
+def test_search_for_subreddits():
     """Tests searching for subreddits."""
     search_subreddits_query: str = "science"
-    search_subreddits: list[dict] = await get_with_retry(
+    search_subreddits: list[dict] = get_with_retry(
         api.search_entities,
         entity_type="subreddits",
         query=search_subreddits_query,
@@ -92,11 +88,10 @@ async def test_search_for_subreddits():
         )
 
 
-@pytest.mark.asyncio
-async def test_search_for_users():
+def test_search_for_users():
     """Tests searching for users."""
     search_users_query: str = "john"
-    search_users: list[dict] = await get_with_retry(
+    search_users: list[dict] = get_with_retry(
         api.search_entities,
         entity_type="users",
         query=search_users_query,
@@ -115,10 +110,9 @@ async def test_search_for_users():
         )
 
 
-@pytest.mark.asyncio
-async def test_get_user_and_subreddit_profiles():
+def test_get_user_and_subreddit_profiles():
     """Tests getting user and subreddit profiles."""
-    user_profile: dict = await get_with_retry(
+    user_profile: dict = get_with_retry(
         api.get_entity,
         entity_type="user",
         username=TEST_USERNAME,
@@ -127,7 +121,7 @@ async def test_get_user_and_subreddit_profiles():
     assert user_profile.get("id") == "6l4z3"
     assert user_profile.get("created") == 1325741068
 
-    subreddit_profile: dict = await get_with_retry(
+    subreddit_profile: dict = get_with_retry(
         api.get_entity,
         entity_type="subreddit",
         subreddit=TEST_SUBREDDIT_2,
@@ -137,10 +131,9 @@ async def test_get_user_and_subreddit_profiles():
     assert subreddit_profile.get("created") == 1201233135
 
 
-@pytest.mark.asyncio
-async def test_get_posts_from_a_subreddit():
+def test_get_posts_from_a_subreddit():
     """Tests getting posts from a subreddit."""
-    subreddit_posts: list = await get_with_retry(
+    subreddit_posts: list = get_with_retry(
         api.get_posts,
         posts_type="subreddit_posts",
         subreddit=TEST_SUBREDDIT_1,
@@ -157,11 +150,10 @@ async def test_get_posts_from_a_subreddit():
         assert post_data.get("subreddit").lower() == TEST_SUBREDDIT_1.lower()
 
 
-@pytest.mark.asyncio
-async def test_get_posts_from_a_user():
+def test_get_posts_from_a_user():
     """Tests getting posts from a user."""
     username: str = "AutoModerator"
-    user_posts: list = await get_with_retry(
+    user_posts: list = get_with_retry(
         api.get_posts,
         posts_type="user_posts",
         username=username,
@@ -176,10 +168,9 @@ async def test_get_posts_from_a_user():
         assert post_data.get("author").lower() == username.lower()
 
 
-@pytest.mark.asyncio
-async def test_get_new_posts():
+def test_get_new_posts():
     """Tests getting new posts."""
-    new_posts = await get_with_retry(
+    new_posts = get_with_retry(
         api.get_posts,
         posts_type="new",
         limit=200,
@@ -199,10 +190,9 @@ async def test_get_new_posts():
         ), f"Post {post_data.get('id')} was not created recently."
 
 
-@pytest.mark.asyncio
-async def test_get_new_users():
+def test_get_new_users():
     """Tests getting new users."""
-    new_users: list[dict] = await get_with_retry(
+    new_users: list[dict] = get_with_retry(
         api.get_users,
         users_type="new",
         timeframe="week",
@@ -223,10 +213,9 @@ async def test_get_new_users():
         ), f"User {user_data.get('name')} was not created recently."
 
 
-@pytest.mark.asyncio
-async def test_get_new_subreddits():
+def test_get_new_subreddits():
     """Tests getting new subreddits."""
-    new_subreddits = await get_with_retry(
+    new_subreddits = get_with_retry(
         api.get_subreddits,
         timeframe="day",
         subreddits_type="new",
@@ -244,3 +233,6 @@ async def test_get_new_subreddits():
         assert (
             now - timedelta(days=1) < created_timestamp
         ), f"Subreddit {subreddit_data.get('display_name')} was not created recently."
+
+
+# -------------------------------- END ----------------------------------------- #

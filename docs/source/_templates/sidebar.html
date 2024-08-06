@@ -6,7 +6,7 @@
 <h3>Useful Links</h3>
 <ul>
     <li><a href="{{ pathto('installation') }}">Installation</a></li>
-    <li><a href="{{ pathto('usage') }}">Usage</a></li>
+    <li><a href="{{ pathto('usage') }}">CLI Usage</a></li>
     <li><a href="{{ pathto('api') }}">API Reference</a></li>
 
     <p></p>
@@ -27,120 +27,126 @@
             <li><a href="#class-knewkarma-post">knewkarma.Post</a>
                 <ul>
                     <li><a class="method-link"
-                           href="#post-data-session-aiohttp-clientsession">Post.data</a>
+                           href="#post-data-session-requests-session">Post.data</a>
                     </li>
                     <li><a class="method-link"
-                           href="#post-comments-session-aiohttp-clientsession-limit-int-sort-literal-str-all">Post.comments</a>
+                           href="#post-comments-session-requests-session-limit-int-sort-literal-str-all">Post.comments</a>
                     </li>
                 </ul>
             </li>
             <li><a href="#class-knewkarma-posts">knewkarma.Posts</a>
                 <ul>
                     <li><a class="method-link"
-                           href="#posts-best-limit-int-session-aiohttp-clientsession">Posts.best</a>
+                           href="#posts-best-limit-int-session-requests-session">Posts.best</a>
                     </li>
                     <li><a class="method-link"
-                           href="#posts-controversial-limit-int-session-aiohttp-clientsession">Posts.controversial</a>
+                           href="#posts-controversial-limit-int-session-requests-session">Posts.controversial</a>
                     </li>
                     <li><a class="method-link"
-                           href="#posts-front-page-session-aiohttp-clientsession-limit-int-sort-literal-str-all">Posts.front_page</a>
+                           href="#posts-front-page-session-requests-session-limit-int-sort-literal-str-all">Posts.front_page</a>
                     </li>
                     <li><a class="method-link"
-                           href="#posts-new-session-aiohttp-clientsession-limit-int-sort-literal-str-all-timeframe-literal-str-all">Posts.new</a>
+                           href="#posts-new-session-requests-session-limit-int-sort-literal-str-all-timeframe-literal-str-all">Posts.new</a>
                     </li>
                     <li><a class="method-link"
-                           href="#posts-popular-limit-int-session-aiohttp-clientsession">Posts.popular</a>
+                           href="#posts-popular-limit-int-session-requests-session">Posts.popular</a>
                     </li>
                     <li><a class="method-link"
-                           href="#posts-rising-limit-int-session-aiohttp-clientsession">Posts.rising</a>
+                           href="#posts-rising-limit-int-session-requests-session">Posts.rising</a>
                     </li>
                 </ul>
             </li>
             <li><a href="#class-knewkarma-search">knewkarma.Search</a>
                 <ul>
                     <li><a class="method-link"
-                           href="#search-posts-timeframe-literal-str-sort-literal-str-limit-int-session-aiohttp-clientsession">Search.posts</a>
+                           href="#search-posts-timeframe-literal-str-sort-literal-str-limit-int-session-requests-session">Search.posts</a>
                     </li>
                     <li><a class="method-link"
-                           href="#search-subreddits-timeframe-literal-str-sort-literal-str-limit-int-session-aiohttp-clientsession">Search.subreddits</a>
+                           href="#search-subreddits-timeframe-literal-str-sort-literal-str-limit-int-session-requests-session">Search.subreddits</a>
                     </li>
                     <li><a class="method-link"
-                           href="#search-users-timeframe-literal-str-sort-literal-str-limit-int-session-aiohttp-clientsession">Search.users</a>
+                           href="#search-users-timeframe-literal-str-sort-literal-str-limit-int-session-requests-session">Search.users</a>
                     </li>
                 </ul>
             </li>
             <li><a href="#class-knewkarma-subreddit">knewkarma.Subreddit</a>
                 <ul>
                     <li><a class="method-link"
-                           href="#subreddit-profile-session-aiohttp-clientsession">Subreddit.profile</a>
+                           href="#subreddit-comments-session-requests-session-posts-limit-int-comments-per-post-int-sort-literal-str-all-timeframe-literal-str-all">Subreddit.comments</a>
                     </li>
                     <li><a class="method-link"
-                           href="#subreddit-wiki-pages-session-aiohttp-clientsession">Subreddit.wiki_pages</a>
+                           href="#subreddit-posts-session-requests-session-limit-int-sort-literal-str-all-timeframe-literal-str-all">Subreddit.posts</a>
                     </li>
                     <li><a class="method-link"
-                           href="#subreddit-wiki-page-page-str-session-aiohttp-clientsession">Subreddit.wiki_page</a>
+                           href="#subreddit-search-comments-session-requests-session-keyword-str-posts-limit-int-comments-per-post-int-sort-literal-str-all-timeframe-literal-str-all">Subreddit.search_comments</a>
                     </li>
                     <li><a class="method-link"
-                           href="#subreddit-posts-session-aiohttp-clientsession-limit-int-sort-literal-str-all-timeframe-literal-str-all">Subreddit.posts</a>
+                           href="#subreddit-search-posts-session-requests-session-keyword-str-limit-int-sort-literal-str-all-timeframe-literal-str-all">Subreddit.search_posts</a>
                     </li>
                     <li><a class="method-link"
-                           href="#subreddit-search-session-aiohttp-clientsession-keyword-str-limit-int-sort-literal-str-all-timeframe-literal-str-all">Subreddit.search</a>
+                           href="#subreddit-profile-session-requests-session">Subreddit.profile</a>
+                    </li>
+                    <li><a class="method-link"
+                           href="#subreddit-wiki-page-page-str-session-requests-session">Subreddit.wiki_page</a>
+                    </li>
+                    <li><a class="method-link"
+                           href="#subreddit-wiki-pages-session-requests-session">Subreddit.wiki_pages</a>
                     </li>
                 </ul>
             </li>
             <li><a href="#class-knewkarma-subreddits">knewkarma.Subreddits</a>
                 <ul>
                     <li><a class="method-link"
-                           href="#subreddits-all-limit-int-timeframe-timeframe-all-session-aiohttp-clientsession">Subreddits.all</a>
+                           href="#subreddits-all-limit-int-timeframe-timeframe-all-session-requests-session">Subreddits.all</a>
                     </li>
                     <li><a class="method-link"
-                           href="#subreddits-default-limit-int-session-aiohttp-clientsession">Subreddits.default</a>
+                           href="#subreddits-default-limit-int-session-requests-session">Subreddits.default</a>
                     </li>
                     <li><a class="method-link"
-                           href="#subreddits-new-limit-int-session-aiohttp-clientsession-timeframe-timeframe-all">Subreddits.new</a>
+                           href="#subreddits-new-limit-int-session-requests-session-timeframe-timeframe-all">Subreddits.new</a>
                     </li>
                     <li><a class="method-link"
-                           href="#subreddits-popular-limit-int-session-aiohttp-clientsession-timeframe-timeframe-all">Subreddits.popular</a>
+                           href="#subreddits-popular-limit-int-session-requests-session-timeframe-timeframe-all">Subreddits.popular</a>
                     </li>
                 </ul>
             </li>
             <li><a href="#class-knewkarma-user">knewkarma.User</a>
                 <ul>
                     <li><a class="method-link"
-                           href="#user-profile-session-aiohttp-clientsession">User.profile</a></li>
+                           href="#user-profile-session-requests-session">User.profile</a></li>
                     <li><a class="method-link"
-                           href="#user-posts-session-aiohttp-clientsession-limit-int-sort-literal-str-all-timeframe-literal-str-all">User.posts</a>
+                           href="#user-posts-session-requests-session-limit-int-sort-literal-str-all-timeframe-literal-str-all">User.posts</a>
                     </li>
                     <li><a class="method-link"
-                           href="#user-comments-session-aiohttp-clientsession-limit-int-sort-literal-str-all-timeframe-literal-str-all">User.comments</a>
+                           href="#user-comments-session-requests-session-limit-int-sort-literal-str-all-timeframe-literal-str-all">User.comments</a>
                     </li>
                     <li><a class="method-link"
-                           href="#user-overview-limit-int-session-aiohttp-clientsession">User.overview</a>
+                           href="#user-overview-limit-int-session-requests-session">User.overview</a>
                     </li>
                     <li><a class="method-link"
-                           href="#user-search-posts-session-aiohttp-clientsession-keyword-str-limit-int-sort-literal-str-all-timeframe-literal-str-all">User.search_posts</a>
+                           href="#user-search-posts-session-requests-session-keyword-str-limit-int-sort-literal-str-all-timeframe-literal-str-all">User.search_posts</a>
                     </li>
                     <li><a class="method-link"
-                           href="#user-search-comments-session-aiohttp-clientsession-keyword-str-limit-int-sort-literal-all-timeframe-literal-all">User.search_comments</a>
+                           href="#user-search-comments-session-requests-session-keyword-str-limit-int-sort-literal-all-timeframe-literal-all">User.search_comments</a>
                     </li>
                     <li><a class="method-link"
-                           href="#user-moderated-subreddits-session-aiohttp-clientsession">User.moderated_subreddits</a>
+                           href="#user-moderated-subreddits-session-requests-session">User.moderated_subreddits</a>
                     </li>
                     <li><a class="method-link"
-                           href="#user-top-subreddits-session-aiohttp-clientsession-top-n-int-limit-int-sort-literal-str-all-timeframe-literal-str-all">User.top_subreddits</a>
+                           href="#user-top-subreddits-session-requests-session-top-n-int-limit-int-sort-literal-str-all-timeframe-literal-str-all">User.top_subreddits</a>
                     </li>
                 </ul>
             </li>
             <li><a href="#knewkarma-users">knewkarma.Users</a>
                 <ul>
                     <li><a class="method-link"
-                           href="#users-all-limit-int-session-aiohttp-clientsession">Users.all</a>
+                           href="#users-all-limit-int-session-requests-session">Users.all</a>
                     </li>
                     <li><a class="method-link"
-                           href="#users-new-limit-int-session-aiohttp-clientsession">Users.new</a>
+                           href="#users-new-limit-int-session-requests-session">Users.new</a>
                     </li>
                     <li><a class="method-link"
-                           href="#users-popular-limit-int-session-aiohttp-clientsession">Users.popular</a>
+                           href="#users-popular-limit-int-session-requests-session">Users.popular</a>
                     </li>
                 </ul>
             </li>
@@ -165,4 +171,25 @@
     </li>
 </ul>
 
+{% elif pagename == "usage" %}
+<h3>Table of Contents</h3>
+<ul class="current">
+    <li>
+        <a href="usage.html">Usage</a>
+
+        <ul>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <ul>
+                <li><a href="#basic-usage-examples">Basic Usage Examples</a></li>
+                <li><a href="#post-command">Post Command</a></li>
+                <li><a href="#posts-command">Posts Command</a></li>
+                <li><a href="#search-command">Search Command</a></li>
+                <li><a href="#subreddit-command">Subreddit Command</a></li>
+                <li><a href="#subreddits-command">Subreddits Command</a></li>
+                <li><a href="#user-command">User Command</a></li>
+                <li><a href="#users-command">Users Command</a></li>
+            </ul>
+        </ul>
+    </li>
+</ul>
 {% endif %}

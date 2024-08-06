@@ -3,15 +3,15 @@ A Reddit Data Analysis Toolkit
 
 **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an **Application Programming Interface (API)** to enable an easy integration in other Python Projects.
 
-.. image:: https://static.pepy.tech/badge/knewkarma
-    :target: https://pepy.tech/project/knewkarma
-    :alt: Requests Downloads
+.. image:: https://img.shields.io/pepy/dt/knewkarma?logo=pypi
+   :target: https://pepy.tech/project/knewkarma/
+   :alt: Pepy Total Downlods
 
-.. image:: https://img.shields.io/pypi/pyversions/knewkarma.svg
+.. image:: https://img.shields.io/pypi/pyversions/knewkarma.svg?logo=python
     :target: https://pypi.org/project/knewkarma/
     :alt: Python Version Support Badge
 
-.. image:: https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma
+.. image:: https://img.shields.io/pypi/v/knewkarma?logo=pypi
     :target: https://pypi.org/project/knewkarma
     :alt: PyPI Badge
 
@@ -57,8 +57,11 @@ A Reddit Data Analysis Toolkit
      - ``Profile``
      - Retrieves subreddit profile information.
    * -
+     - ``Comments``
+     - Retrieves comments from a subreddit.
+   * -
      - ``Posts``
-     - Retrieves posts from a specified subreddit.
+     - Retrieves posts from a subreddit.
    * -
      - ``Search Posts``
      - Returns a subreddit's posts that contain the specified keyword.
