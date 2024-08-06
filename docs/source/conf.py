@@ -7,8 +7,8 @@ from knewkarma.version import Version
 
 # -- Project information
 
-project = About.name
-author = About.author
+project = f"{About.name}"
+author = f"{About.author}"
 copyright = (
     f" {date.today().year} MIT License, "
     f'<a href="{About.author_link}" target="_blank">{author}</a>'
