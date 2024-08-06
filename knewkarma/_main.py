@@ -684,149 +684,6 @@ class Subreddit:
             "Fetching {query_type} from subreddit r/{subreddit}..."
         )
 
-    def profile(
-            self,
-            session: requests.Session,
-            status: console.status = None,
-    ) -> Dict:
-        """
-        Get a subreddit's profile data.
-
-        :param session: aiohttp session to use for the request.
-        :type session: requests.Session
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A dictionary containing subreddit profile data.
-        :rtype: dict
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
-            >>> from pprint import pprint
-
-            >>> def get_subreddit_profile(subreddit):
-            >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    with requests.Session() as request_session:
-            >>>        profile = subreddit.profile(session=request_session)
-            >>>        pprint(profile)
-
-
-            >>> get_subreddit_profile(subreddit="MachineLearning")
-        """
-        if status:
-            status.update(
-                self._status_template.format(
-                    query_type="profile data", subreddit=self._subreddit
-                )
-            )
-
-        subreddit_profile: dict = api.get_entity(
-            entity_type="subreddit",
-            subreddit=self._subreddit,
-            status=status,
-            session=session,
-        )
-        if subreddit_profile:
-            return parse_subreddits(
-                data=subreddit_profile, time_format=self._time_format
-            )
-
-    def wiki_pages(
-            self,
-            session: requests.Session,
-            status: console.status = None,
-    ) -> list[str]:
-        """
-        Get a subreddit's wiki pages.
-
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of strings, each representing a wiki page.
-        :rtype: list[str]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
-            >>> from pprint import pprint
-
-            >>> def get_subreddit_wiki_pages(subreddit):
-            >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    with requests.Session() as request_session:
-            >>>        wiki_pages = subreddit.wiki_pages(session=request_session)
-            >>>        pprint(wiki_pages)
-
-
-            >>> get_subreddit_wiki_pages(subreddit="MachineLearning")
-        """
-        if status:
-            status.update(
-                self._status_template.format(
-                    query_type="wiki pages", subreddit=self._subreddit
-                )
-            )
-
-        pages: dict = api.make_request(
-            endpoint=f"{api.subreddit_endpoint}/{self._subreddit}/wiki/pages.json",
-            session=session,
-        )
-
-        return pages.get("data")
-
-    def wiki_page(
-            self,
-            page_name: str,
-            session: requests.Session,
-            status: console.status = None,
-    ) -> Dict:
-        """
-        Get a subreddit's specified wiki page data.
-
-        :param page_name: Wiki page to get data from.
-        :type page_name: str
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of strings, each representing a wiki page.
-        :rtype: list[str]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
-            >>> from pprint import pprint
-
-            >>> def get_subreddit_wiki_page(page, subreddit):
-            >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    with requests.Session() as request_session:
-            >>>        wiki_page_data = subreddit.wiki_page(page_name=page, session=request_session)
-            >>>        pprint(wiki_page_data)
-
-
-            >>> get_subreddit_wiki_page(page="rules", subreddit="MachineLearning")
-        """
-        if status:
-            status.update(
-                self._status_template.format(
-                    query_type="wiki page data", subreddit=self._subreddit
-                )
-            )
-
-        wiki_page: dict = api.get_entity(
-            entity_type="wiki_page",
-            page_name=page_name,
-            subreddit=self._subreddit,
-            status=status,
-            session=session,
-        )
-
-        if wiki_page:
-            return parse_wiki_page(wiki_page=wiki_page, time_format=self._time_format)
-
     def comments(
             self,
             session: requests.Session,
@@ -953,6 +810,54 @@ class Subreddit:
         if subreddit_posts:
             return parse_posts(data=subreddit_posts, time_format=self._time_format)
 
+    def profile(
+            self,
+            session: requests.Session,
+            status: console.status = None,
+    ) -> Dict:
+        """
+        Get a subreddit's profile data.
+
+        :param session: aiohttp session to use for the request.
+        :type session: requests.Session
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
+        :return: A dictionary containing subreddit profile data.
+        :rtype: dict
+
+        Usage::
+
+            >>> from pprint import pprint
+            >>> from knewkarma import Subreddit
+            >>> from pprint import pprint
+
+            >>> def get_subreddit_profile(subreddit):
+            >>>    subreddit = Subreddit(subreddit=subreddit)
+            >>>    with requests.Session() as request_session:
+            >>>        profile = subreddit.profile(session=request_session)
+            >>>        pprint(profile)
+
+
+            >>> get_subreddit_profile(subreddit="MachineLearning")
+        """
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type="profile data", subreddit=self._subreddit
+                )
+            )
+
+        subreddit_profile: dict = api.get_entity(
+            entity_type="subreddit",
+            subreddit=self._subreddit,
+            status=status,
+            session=session,
+        )
+        if subreddit_profile:
+            return parse_subreddits(
+                data=subreddit_profile, time_format=self._time_format
+            )
+
     def search_comments(
             self,
             session: requests.Session,
@@ -963,6 +868,52 @@ class Subreddit:
             timeframe: TIMEFRAME = "all",
             status: console.status = None,
     ) -> List[Dict]:
+        """
+        Get comments that contain the specified query string from a subreddit.
+
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session.
+        :param query: Search query.
+        :type query: str
+        :param posts_limit: Maximum number of posts to get comments from.
+        :type posts_limit: int
+        :param comments_per_post: A maximum number of comments to get for each post.
+        :type comments_per_post: int
+        :param sort: Sort criterion for the posts.
+        :type sort: str
+        :param timeframe: Timeframe from which to get posts.
+        :type timeframe: Literal[str]
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
+        :return: A list of dictionaries, each containing comment data.
+        :rtype: List[Dict]
+
+        Usage::
+
+            >>> from pprint import pprint
+            >>> from knewkarma import Subreddit
+            >>> from pprint import pprint
+
+            >>> def search_subreddit_comments(search_query, subreddit, post_limit, comments_p_post):
+            >>>    subreddit = Subreddit(subreddit=subreddit)
+            >>>    with requests.Session() as request_session:
+            >>>        subreddit_comments = subreddit.search_comments(
+            >>>            query=search_query, 
+            >>>            posts_limit=post_limit,
+            >>>            comments_per_post=comments_p_post,
+            >>>            session=request_session
+            >>>        )
+            >>>        pprint(subreddit_comments)
+
+
+            >>> search_subreddit_comments(
+            >>>     search_query="ML jobs",
+            >>>     post_limit=100,
+            >>>     comments_per_post=10,
+            >>>     subreddit="MachineLearning"
+            >>>   )
+            >>> )
+        """
         posts: List = self.posts(
             session=session,
             limit=posts_limit,
@@ -1007,7 +958,7 @@ class Subreddit:
             status: console.status = None,
     ) -> List[Dict]:
         """
-        Get posts that match the specified query from a subreddit.
+        Get posts that contain the specified query string from a subreddit.
 
         :param session: A requests.Session to use for the request.
         :type session: requests.Session.
@@ -1030,14 +981,14 @@ class Subreddit:
             >>> from knewkarma import Subreddit
             >>> from pprint import pprint
 
-            >>> def get_search_subreddit_posts(search_query, subreddit, posts_limit):
+            >>> def search_subreddit_posts(search_query, subreddit, posts_limit):
             >>>    subreddit = Subreddit(subreddit=subreddit)
             >>>    with requests.Session() as request_session:
-            >>>        posts = subreddit.search(query=search_query, limit=posts_limit, session=request_session)
+            >>>        posts = subreddit.search_posts(query=search_query, limit=posts_limit, session=request_session)
             >>>        pprint(posts)
 
 
-            >>> get_search_subreddit_posts(
+            >>> search_subreddit_posts(
             >>>     search_query="ML jobs",
             >>>     posts_limit=100,
             >>>     subreddit="MachineLearning"
@@ -1064,6 +1015,101 @@ class Subreddit:
 
         if found_posts:
             return parse_posts(data=found_posts, time_format=self._time_format)
+
+    def wiki_pages(
+            self,
+            session: requests.Session,
+            status: console.status = None,
+    ) -> list[str]:
+        """
+        Get a subreddit's wiki pages.
+
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
+        :return: A list of strings, each representing a wiki page.
+        :rtype: list[str]
+
+        Usage::
+
+            >>> from pprint import pprint
+            >>> from knewkarma import Subreddit
+            >>> from pprint import pprint
+
+            >>> def get_subreddit_wiki_pages(subreddit):
+            >>>    subreddit = Subreddit(subreddit=subreddit)
+            >>>    with requests.Session() as request_session:
+            >>>        wiki_pages = subreddit.wiki_pages(session=request_session)
+            >>>        pprint(wiki_pages)
+
+
+            >>> get_subreddit_wiki_pages(subreddit="MachineLearning")
+        """
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type="wiki pages", subreddit=self._subreddit
+                )
+            )
+
+        pages: dict = api.make_request(
+            endpoint=f"{api.subreddit_endpoint}/{self._subreddit}/wiki/pages.json",
+            session=session,
+        )
+
+        return pages.get("data")
+
+    def wiki_page(
+            self,
+            page_name: str,
+            session: requests.Session,
+            status: console.status = None,
+    ) -> Dict:
+        """
+        Get a subreddit's specified wiki page data.
+
+        :param page_name: Wiki page to get data from.
+        :type page_name: str
+        :param session: A requests.Session to use for the request.
+        :type session: requests.Session
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type: rich.console.Console.status
+        :return: A list of strings, each representing a wiki page.
+        :rtype: list[str]
+
+        Usage::
+
+            >>> from pprint import pprint
+            >>> from knewkarma import Subreddit
+            >>> from pprint import pprint
+
+            >>> def get_subreddit_wiki_page(page, subreddit):
+            >>>    subreddit = Subreddit(subreddit=subreddit)
+            >>>    with requests.Session() as request_session:
+            >>>        wiki_page_data = subreddit.wiki_page(page_name=page, session=request_session)
+            >>>        pprint(wiki_page_data)
+
+
+            >>> get_subreddit_wiki_page(page="rules", subreddit="MachineLearning")
+        """
+        if status:
+            status.update(
+                self._status_template.format(
+                    query_type="wiki page data", subreddit=self._subreddit
+                )
+            )
+
+        wiki_page: dict = api.get_entity(
+            entity_type="wiki_page",
+            page_name=page_name,
+            subreddit=self._subreddit,
+            status=status,
+            session=session,
+        )
+
+        if wiki_page:
+            return parse_wiki_page(wiki_page=wiki_page, time_format=self._time_format)
 
 
 class Subreddits:

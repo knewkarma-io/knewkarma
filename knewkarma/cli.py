@@ -35,7 +35,7 @@ __all__ = ["start"]
     "-e",
     "--export",
     type=str,
-    help="A comma-separated list of file types to export the output to [supported: csv,html,json,xml]",
+    help="A comma-separated list (without spaces) of file types to export the output to [supported: csv,html,json,xml]",
 )
 @click.option(
     "-l",
