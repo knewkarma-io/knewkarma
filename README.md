@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/8d661d07-453a-4ff8-89e8-153472565b33" />
-</p>
-
 **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
 **Application Programming Interface (API)** to enable an easy integration in other Python Projects.
@@ -13,7 +9,7 @@ functionalities for exploring and analysing Reddit data. It includes a **Command
 [Read the Docs](https://knewkarma.readthedocs.io) for the *Feature Overview*, *Installation*, *Integration* and
 *Usage* instructions.
 
-![readthedocs](https://github.com/user-attachments/assets/c7a4513f-bc5a-4268-a496-3dd1b1198190)
+![docs](https://github.com/user-attachments/assets/0878f249-3c1a-41cc-9879-da98ffcced0a)
 
 ## Star History
 
