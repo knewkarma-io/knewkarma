@@ -1,12 +1,19 @@
 import os
-from typing import Union, Literal
+from typing import Union, Literal, List
 
 import pandas as pd
 from rich.tree import Tree
 
 from .general_utils import console
 
-__all__ = ["create_dataframe", "export_dataframe", "show_exported_files"]
+__all__ = [
+    "create_dataframe",
+    "export_dataframe",
+    "show_exported_files",
+    "EXPORT_FORMATS",
+]
+
+EXPORT_FORMATS = Literal["csv", "html", "json", "xml"]
 
 
 def create_dataframe(
@@ -57,7 +64,7 @@ def export_dataframe(
     dataframe: pd.DataFrame,
     filename: str,
     directory: str,
-    formats: list[Literal["csv", "html", "json", "xml"]],
+    formats: List[EXPORT_FORMATS],
 ):
     """
     Exports a Pandas dataframe to specified file formats.
@@ -105,3 +112,6 @@ def export_dataframe(
             )
         else:
             console.log(f"Unsupported file format: {file_format}")
+
+
+# -------------------------------- END ----------------------------------------- #
