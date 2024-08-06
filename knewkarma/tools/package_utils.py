@@ -36,7 +36,7 @@ def is_snap_package(package: str) -> bool:
                 installed_snaps = result.stdout
                 if package in installed_snaps:
                     return True
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
             console.log(f"[red]✘[/] Error checking snap packages: {e}")
         return False
     else:
