@@ -1,9 +1,9 @@
 import subprocess
 from typing import Literal
 
-__all__ = ["is_pypi_package", "is_snap_package", "update_package"]
-
 from .general_utils import console
+
+__all__ = ["is_pypi_package", "is_snap_package", "update_package"]
 
 
 def is_snap_package(package: str) -> bool:
@@ -17,10 +17,10 @@ def is_snap_package(package: str) -> bool:
 
     Usage::
 
-        >>> from knewkarma.tools.package_utils import is_pypi_package
+        >>> from knewkarma.tools.package_utils import is_snap_package
 
         >>> package_name = "knewkarma"
-        >>> print(is_pypi_package(package=package_name))
+        >>> print(is_snap_package(package=package_name))
         >>> True
     """
     if package:
@@ -36,11 +36,11 @@ def is_snap_package(package: str) -> bool:
                 installed_snaps = result.stdout
                 if package in installed_snaps:
                     return True
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
             console.log(f"[red]✘[/] Error checking snap packages: {e}")
         return False
     else:
-        raise ValueError(f"Empty package name provided.")
+        raise ValueError("Empty package name provided.")
 
 
 def is_pypi_package(package: str) -> bool:
@@ -49,17 +49,16 @@ def is_pypi_package(package: str) -> bool:
 
     :param package: Name of the package to check.
     :type package: str
-    :return: True is the specified package is installed as a pypi package, otherwise False.
+    :return: True if the specified package is installed as a pypi package, otherwise False.
     :rtype: bool
 
     Usage::
 
-        >>> from knewkarma.tools.package_utils is_snap_package
+        >>> from knewkarma.tools.package_utils import is_pypi_package
 
-        >>> # Assuming snap is installed
-        >>> package_name = "knewkarma-something-something-something"
-        >>> print(is_snap_package(package=package_name))
-        >>> False
+        >>> package_name = "knewkarma"
+        >>> print(is_pypi_package(package=package_name))
+        >>> True
     """
     if package:
         try:
@@ -69,7 +68,7 @@ def is_pypi_package(package: str) -> bool:
         except ImportError:
             return False
     else:
-        raise ValueError(f"Empty package name provided.")
+        raise ValueError("Empty package name provided.")
 
 
 def update_package(package: str, package_type: Literal["pypi", "snap"]):
@@ -95,17 +94,21 @@ def update_package(package: str, package_type: Literal["pypi", "snap"]):
     """
     if package:
         try:
-            if package_type == "pypi":
-                subprocess.run(["pip", "install", "--upgrade", package])
-            elif package == "snap":
-                subprocess.run(["sudo", "snap", "refresh", package])
+            if package_type == "pypi" and is_pypi_package(package=package):
+                subprocess.run(["pip", "install", "--upgrade", package], check=True)
+            elif package_type == "snap" and is_snap_package(package=package):
+                subprocess.run(["sudo", "snap", "refresh", package], check=True)
+            else:
+                raise ValueError(f"Invalid package_type or package not installed: {package_type}")
 
             console.print(
                 f"[green]✔[/] DONE. Updates will be applied on next run."
             )
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
             console.log(f"[red]✘[/] Failed to update {package}: {e}")
+        except Exception as e:
+            console.log(f"[red]✘[/] Unexpected error: {e}")
     else:
-        raise ValueError(f"Empty package name provided.")
+        raise ValueError("Empty package name provided.")
 
 # -------------------------------- END ----------------------------------------- #
