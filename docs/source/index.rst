@@ -7,7 +7,7 @@ A Reddit Data Analysis Toolkit
    :target: https://pepy.tech/project/knewkarma/
    :alt: Pepy Total Downlods
 
-.. image:: https://img.shields.io/pypi/pyversions/knewkarma.svg
+.. image:: https://img.shields.io/pypi/pyversions/knewkarma.svg?logo=python
     :target: https://pypi.org/project/knewkarma/
     :alt: Python Version Support Badge
 
