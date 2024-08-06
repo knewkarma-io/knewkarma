@@ -8,8 +8,9 @@ functionalities for exploring and analysing Reddit data. It includes a **Command
 
 ## Documentation
 
-[Read the Docs](https://knewkarma.readthedocs.io) for the *Feature Overview*, *Installation*, *Integration* and
-*Usage* instructions.
+Refer to the [documentation](https://knewkarma.readthedocs.io) for **Feature Overview**, **Installation**, **API
+Integration** and
+**Usage** instructions.
 
 ![docs](https://github.com/user-attachments/assets/0878f249-3c1a-41cc-9879-da98ffcced0a)
 
