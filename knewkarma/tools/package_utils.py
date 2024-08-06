@@ -1,9 +1,9 @@
 import subprocess
 from typing import Literal
 
-__all__ = ["is_pypi_package", "is_snap_package", "update_package"]
-
 from .general_utils import console
+
+__all__ = ["is_pypi_package", "is_snap_package", "update_package"]
 
 
 def is_snap_package(package: str) -> bool:
