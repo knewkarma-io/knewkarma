@@ -37,7 +37,7 @@ def is_snap_package(package: str) -> bool:
                 if package in installed_snaps:
                     return True
         except subprocess.CalledProcessError as e:
-            console.log(f"[red]✘[/] Error checking snap packages: {e}")
+            console.log(f"[[red]✘[/]] Error checking snap packages: {e}")
         return False
     else:
         raise ValueError("Empty package name provided.")
@@ -102,12 +102,12 @@ def update_package(package: str, package_type: Literal["pypi", "snap"]):
                 raise ValueError(f"Invalid package_type or package not installed: {package_type}")
 
             console.print(
-                f"[green]✔[/] DONE. Updates will be applied on next run."
+                f"[[green]✔[/]] DONE. Updates will be applied on next run."
             )
         except subprocess.CalledProcessError as e:
-            console.log(f"[red]✘[/] Failed to update {package}: {e}")
+            console.log(f"[[red]✘[/]] Failed to update {package}: {e}")
         except Exception as e:
-            console.log(f"[red]✘[/] Unexpected error: {e}")
+            console.log(f"[[red]✘[/]] Unexpected error: {e}")
     else:
         raise ValueError("Empty package name provided.")
 
