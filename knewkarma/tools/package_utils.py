@@ -67,7 +67,7 @@ def update_pypi_package(package: str):
 
     Usage::
 
-        >>> from knewkarma.tools.package_utils import update_pypi_ackage
+        >>> from knewkarma.tools.package_utils import update_pypi_package
 
         >>> # This will update the pypi package
         >>> package_name = "knewkarma"
