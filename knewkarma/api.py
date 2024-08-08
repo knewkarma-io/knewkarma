@@ -1,7 +1,7 @@
 import time
 from random import randint
 from sys import version as python_version
-from typing import Union, Literal
+from typing import Union, Literal, Callable
 
 import requests
 from rich.markdown import Markdown
@@ -41,7 +41,7 @@ class Api:
 
         :param endpoint: The API endpoint to fetch data from.
         :type endpoint: str
-        :param session: aiohttp session to use for the request.
+        :param session: A requests.Session to use for the request. to use for the request.
         :type session: requests.Session
         :return: JSON data as a dictionary or list. Returns an empty dict if fetching fails.
         :rtype: Union[dict, list]
@@ -105,7 +105,7 @@ class Api:
 
         Assumes version format: major.minor.patch.prefix
 
-        :param session: aiohttp session to use for the request.
+        :param session: A requests.Session to use for the request. to use for the request.
         :type session: requests.Session
         :param status: An instance of `console.status` used to display animated status messages.
         :type status: Console.console.status
@@ -147,7 +147,9 @@ class Api:
                     Panel.fit(
                         markdown_release_notes,
                         title=f"\n[bold]{update_level} update [underline][cyan]{remote_version_str}[/][/] available[/]",
-                        subtitle=f"[italic]Thank you, for using {About.name}![/] ❤️ ",
+                        title_align="left",
+                        subtitle=f"[bold]Thank you, for using {About.name}![/] ❤️ ",
+                        subtitle_align="left",
                     )
                 )
 
@@ -167,7 +169,8 @@ class Api:
             self,
             limit: int,
             session: requests.Session,
-            **kwargs,
+            data_processor: Callable,
+            **kwargs: Union[str, console.status],
     ) -> list[dict]:
         """
         Fetches and processes data in a paginated manner
@@ -179,12 +182,13 @@ class Api:
         :type limit: int
         :param session: An Aiohttp session to use for the request.
         :type session: requests.Session
+        :param data_processor: A callable used to process response data.
+        :type data_processor: Callable
         :return: A list of dict objects, each containing paginated data.
         :rtype: list[dict]
         """
         all_items = []
         last_item_id = None
-        status: console.status = kwargs.get("status")
 
         while len(all_items) < limit:
             paginated_endpoint = (
@@ -210,8 +214,8 @@ class Api:
             if not items:
                 break
 
-            processed_items = kwargs.get("data_processor")(response_data=items)
-            items_to_limit = limit - len(all_items)
+            processed_items: Callable = data_processor(response_data=items)
+            items_to_limit: int = limit - len(all_items)
             all_items.extend(processed_items[:items_to_limit])
 
             last_item_id = (
@@ -225,9 +229,9 @@ class Api:
 
             sleep_duration: int = randint(1, 10)
 
-            if status:
+            if kwargs.get("status"):
                 countdown_timer(
-                    status=status,
+                    status=kwargs.get("status"),
                     duration=sleep_duration,
                     current_count=len(all_items),
                     overall_count=limit,
@@ -241,14 +245,14 @@ class Api:
             self,
             entity_type: Literal["post", "subreddit", "user", "wiki_page"],
             session: requests.Session,
-            **kwargs,
+            **kwargs: str,
     ) -> dict:
         """
         Gets data from the specified entity.
 
         :param entity_type: The type of entity to get data from
         :type entity_type: str
-        :param session: aiohttp session to use for the request.
+        :param session: A requests.Session to use for the request. to use for the request.
         :return: A dictionary containing a specified entity's data.
         :rtype: dict
         """
@@ -295,12 +299,12 @@ class Api:
             session: requests.Session,
             timeframe: TIMEFRAME = "all",
             sort: SORT_CRITERION = "all",
-            **kwargs,
+            **kwargs: Union[console.status, str],
     ) -> list[dict]:
         """
         Gets a specified number of posts, with a specified sorting criterion, from the specified source.
 
-        :param session: aiohttp session to use for the request.
+        :param session: A requests.Session to use for the request. to use for the request.
         :type session: requests.Session
         :param limit: Maximum number of posts to get.
         :type limit: int
@@ -350,7 +354,7 @@ class Api:
             subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
             limit: int,
             timeframe: TIMEFRAME = "all",
-            **kwargs,
+            **kwargs: Union[str, console.status],
     ) -> Union[list[dict], dict]:
         """
         Gets the specified type of subreddits.

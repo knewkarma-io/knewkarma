@@ -14,7 +14,7 @@ class Version:
 
     major: str = "6"
     minor: str = "0"
-    patch: str = "2"
+    patch: str = "3"
     full: str = f"{major}.{minor}.{patch}"
     release: str = f"{major}.{minor}"
 
