@@ -1,10 +1,9 @@
 import os
 from datetime import datetime
-from typing import get_args
+from typing import get_args, Union, Callable, Literal
 
 import requests
 import rich_click as click
-from rich.tree import Tree
 
 from . import Post, Posts, Search, Subreddit, Subreddits, User, Users
 from .about import About
@@ -12,7 +11,6 @@ from .api import SORT_CRITERION, TIMEFRAME, TIME_FORMAT, Api
 from .tools.data_utils import (
     create_dataframe,
     export_dataframe,
-    show_exported_files,
     EXPORT_FORMATS,
 )
 from .tools.general_utils import console, pathfinder, print_banner
@@ -686,12 +684,49 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     )
 
 
-def handle_method_calls(
-        ctx: click.Context,
-        method_map: dict,
-        export: str,
-        **kwargs,
-):
+def call_method(method: Callable, session: requests.session, status: console.status,
+                **kwargs: Union[str, click.Context]):
+    """
+    Calls a method with the provided arguments.
+
+    :param method: A method to call.
+    :type method: Callable
+    :param session: A requests.Session to use for the method's requests.
+    :type session: requests.Session
+    :param status: An instance of `console.status` used to display animated status messages inside the method.
+    :type status: Console.console.status
+    :param kwargs: Additional keyword arguments for `export: str`, `argument: str` and `ctx: click.Context` .
+    """
+    response_data = method(session=session, status=status)
+    if response_data:
+        dataframe = create_dataframe(data=response_data)
+        console.print(dataframe)
+
+        if kwargs.get("export"):
+            output_parent_dir: str = os.path.expanduser(
+                os.path.join("~", "knewkarma-data")
+            )
+            output_child_dir: str = os.path.join(
+                output_parent_dir, kwargs.get("ctx").command.name, kwargs.get("argument")
+            )
+
+            pathfinder(
+                directories=[
+                    os.path.join(output_child_dir, extension)
+                    for extension in ["csv", "html", "json", "xml"]
+                ]
+            )
+
+            selected_export_formats: list = kwargs.get("export").split(",")
+            export_dataframe(
+                dataframe=dataframe,
+                filename=filename_timestamp(),
+                directory=output_child_dir,
+                formats=selected_export_formats,
+            )
+
+
+def handle_method_calls(ctx: click.Context, method_map: dict, export: str, **kwargs: Union[str, int, bool]):
     """
     Handle the method calls based on the provided arguments.
 
@@ -703,54 +738,30 @@ def handle_method_calls(
     :type export: str
     :param kwargs: Additional keyword arguments.
     """
-    print_banner()
-    start_time: datetime = datetime.now()
-    try:
-        with console.status(
-                "Establishing connection /w new session...", spinner="dots2"
-        ) as status:
-            with requests.Session() as session:
-                Api().check_updates(session=session, status=status)
-                for argument, method in method_map.items():
-                    if kwargs.get(argument):
-                        method_data = method(session=session, status=status)
-                        if method_data:
-                            dataframe = create_dataframe(data=method_data)
-                            console.print(dataframe)
+    arg_is_present: bool = False
+    for argument, method in method_map.items():
+        if kwargs.get(argument):
+            print_banner()
+            start_time: datetime = datetime.now()
+            arg_is_present = True
+            try:
+                with console.status(
+                        "Establishing connection /w new session...", spinner="dots2"
+                ) as status:
+                    with requests.Session() as session:
+                        Api().check_updates(session=session, status=status)
+                        call_method(method=method, session=session, status=status, ctx=ctx, export=export,
+                                    argument=argument)
+            except KeyboardInterrupt:
+                console.log("[[yellow]✘[/]] Process aborted /w CTRL+C.")
+            finally:
+                elapsed_time = datetime.now() - start_time
+                console.print(
+                    f"[[green]✔[/]] DONE. {elapsed_time.total_seconds():.2f} seconds elapsed."
+                )
 
-                            if export:
-                                output_dir: str = os.path.expanduser(
-                                    os.path.join("~", "knewkarma-data")
-                                )
-                                directory: str = os.path.join(
-                                    output_dir, ctx.invoked_subcommand, argument
-                                )
-                                pathfinder(
-                                    directories=[
-                                        os.path.join(directory, ext)
-                                        for ext in ["csv", "html", "json", "xml"]
-                                    ]
-                                )
-                                export_dataframe(
-                                    dataframe=dataframe,
-                                    filename=filename_timestamp(),
-                                    directory=directory,
-                                    formats=list(EXPORT_FORMATS),
-                                )
-                                tree = Tree(
-                                    f":open_file_folder: [bold]{directory}",
-                                    guide_style="bold bright_blue",
-                                )
-                                show_exported_files(tree=tree, directory=directory)
-                                console.print(tree)
-                        break
-    except KeyboardInterrupt:
-        console.log("[[yellow]✘[/]] Process aborted /w CTRL+C.")
-    finally:
-        elapsed_time = datetime.now() - start_time
-        console.print(
-            f"[[green]✔[/]] DONE. {elapsed_time.total_seconds():.2f} seconds elapsed."
-        )
+    if arg_is_present is False:
+        ctx.get_usage()
 
 
 def start():

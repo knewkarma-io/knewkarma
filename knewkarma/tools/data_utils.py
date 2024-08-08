@@ -1,23 +1,21 @@
 import os
-from typing import Union, Literal, List
+from typing import Union, Literal
 
 import pandas as pd
-from rich.tree import Tree
 
 from .general_utils import console
 
 __all__ = [
     "create_dataframe",
     "export_dataframe",
-    "show_exported_files",
-    "EXPORT_FORMATS",
+    "EXPORT_FORMATS"
 ]
 
 EXPORT_FORMATS = Literal["csv", "html", "json", "xml"]
 
 
 def create_dataframe(
-    data: Union[dict, list[dict], list[tuple]],
+        data: Union[dict, list[dict], list[tuple]],
 ):
     """
     Converts provided data into a pandas DataFrame.
@@ -35,7 +33,7 @@ def create_dataframe(
 
     # Convert a list of objects (Comment, Community, Post, PreviewCommunity, User) to a list of dictionaries
     elif isinstance(data, list) and all(
-        isinstance(item, (dict, tuple)) for item in data
+            isinstance(item, (dict, tuple)) for item in data
     ):
         # Each object in the list is converted to its dictionary representation
         data = [item for item in data]
@@ -49,22 +47,11 @@ def create_dataframe(
     return dataframe.dropna(axis=1, how="all")
 
 
-def show_exported_files(tree: Tree, directory: str, base_path: str = ""):
-    for item in sorted(os.listdir(directory)):
-        path = os.path.join(directory, item)
-        if os.path.isdir(path):
-            branch = tree.add(f":open_file_folder: {item}", guide_style="blue")
-            show_exported_files(branch, path, os.path.join(base_path, item))
-        else:
-            filepath: str = os.path.join(directory, path, item, path)
-            tree.add(f":page_facing_up: [italic][link file://{filepath}]{item}[/]")
-
-
 def export_dataframe(
-    dataframe: pd.DataFrame,
-    filename: str,
-    directory: str,
-    formats: List[EXPORT_FORMATS],
+        dataframe: pd.DataFrame,
+        filename: str,
+        directory: str,
+        formats: list[EXPORT_FORMATS],
 ):
     """
     Exports a Pandas dataframe to specified file formats.
@@ -89,8 +76,6 @@ def export_dataframe(
         ),
         "json": lambda: dataframe.to_json(
             os.path.join(directory, "json", f"{filename}.json"),
-            orient="records",
-            lines=True,
             force_ascii=False,
             indent=4,
         ),
@@ -107,11 +92,10 @@ def export_dataframe(
                 directory, file_format, f"{filename}.{file_format}"
             )
             file_mapping.get(file_format)()
-            console.log(
-                f"[green]✔[/] {os.path.getsize(filepath)} bytes written to [link file://{filepath}]{filepath}"
+            console.print(
+                f"[[green]✔[/]] {os.path.getsize(filepath)} bytes written to [link file://{filepath}]{filepath}"
             )
         else:
-            console.log(f"Unsupported file format: {file_format}")
-
+            raise ValueError(f"Unsupported file format: {file_format}")
 
 # -------------------------------- END ----------------------------------------- #
