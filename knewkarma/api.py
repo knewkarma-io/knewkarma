@@ -10,7 +10,7 @@ from rich.prompt import Confirm
 
 from .about import About
 from .tools.general_utils import console
-from .tools.package_utils import is_pypi_package, update_package, is_snap_package
+from .tools.package_utils import is_pypi_package, update_pypi_package, is_snap_package
 from .tools.time_utils import countdown_timer
 from .version import Version
 
@@ -141,29 +141,35 @@ class Api:
                 update_level = "[green]PATCH[/]"
 
             if update_level:
-                status.stop()
                 markdown_release_notes = Markdown(markup=markup_release_notes)
                 console.print(
                     Panel.fit(
                         markdown_release_notes,
-                        title=f"\n[bold]{update_level} update [underline][cyan]{remote_version_str}[/][/] available[/]",
+                        title=f"[bold]{update_level} update [underline][cyan]{remote_version_str}[/][/] available[/]",
                         title_align="left",
                         subtitle=f"[bold]Thank you, for using {About.name}![/] ❤️ ",
                         subtitle_align="left",
                     )
                 )
 
-                if Confirm.ask(
-                        f"Would you like to install this update?",
-                        default=False,
-                        console=console,
-                ):
-                    if is_pypi_package(package=package_name):
-                        update_package(package=package_name, package_type="pypi")
-                    elif is_snap_package(package=package_name):
-                        update_package(package=package_name, package_type="snap")
-
-                status.start()
+                # Skip auto-updating of the snap package
+                if is_snap_package(package=package_name):
+                    console.print(
+                        Panel.fit(
+                            f"Run [underline]snap refresh knewkarma[/] to update the [bold]{About.name}[/] snap.",
+                            title=f"[bold]How to update[/]",
+                            title_align="left",
+                        )
+                    )
+                elif is_pypi_package(package=package_name):
+                    status.stop()
+                    if Confirm.ask(
+                            f"Would you like to install this update?",
+                            default=False,
+                            console=console,
+                    ):
+                        update_pypi_package(package=package_name)
+                    status.start()
 
     def _paginate(
             self,
