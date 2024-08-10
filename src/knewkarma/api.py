@@ -207,16 +207,24 @@ class Api:
             local_version_parts: list = [Version.major[0], Version.minor[0], Version.patch[0]]
             remote_version_parts: list = remote_version_str.split(".")
 
+            local_major: int = local_version_parts[0]
+            local_minor: int = local_version_parts[1]
+            local_patch: int = local_version_parts[2]
+
+            remote_major: int = int(remote_version_parts[0])
+            remote_minor: int = int(remote_version_parts[1])
+            remote_patch: int = int(remote_version_parts[2])
+
             update_level: str = ""
 
             # Check for differences in version parts
-            if remote_version_parts[0] != local_version_parts[0]:
+            if remote_major != local_major:
                 update_level = f"{Text.red}{Version.major[1]}{Text.reset}"
 
-            elif remote_version_parts[1] != local_version_parts[1]:
+            elif remote_minor != local_minor:
                 update_level = f"{Text.yellow}{Version.minor[1]}{Text.reset}"
 
-            elif remote_version_parts[2] != local_version_parts[2]:
+            elif remote_patch != local_patch:
                 update_level = f"{Text.green}{Version.patch[1]}{Text.reset}"
 
             if update_level:
