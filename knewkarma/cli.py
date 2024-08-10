@@ -771,7 +771,7 @@ def handle_method_calls(
                         "Establishing connection /w new session...", spinner="dots2"
                 ) as status:
                     with requests.Session() as session:
-                        # Api().check_updates(session=session, status=status)
+                        Api().check_updates(session=session, status=status)
                         call_method(
                             method=method,
                             session=session,
