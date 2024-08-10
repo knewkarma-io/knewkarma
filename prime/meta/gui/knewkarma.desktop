@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Knew Karma
-Comment=A Reddit Data Analysis Toolkit
-Icon=${SNAP}/meta/gui/icon.png
-Exec=knewkarma -c "--help"
-Terminal=true
-Type=Application
-Categories=Utility;Development;
-
