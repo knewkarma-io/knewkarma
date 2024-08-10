@@ -19,7 +19,6 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # Define absolute file paths
 VERSION_PY="$SCRIPT_DIR/knewkarma/version.py"
 PYPROJECT_TOML="$SCRIPT_DIR/pyproject.toml"
-SNAPCRAFT_YML="$SCRIPT_DIR/snapcraft.yaml"  # Corrected to .yaml
 
 # Print the current directory and the files in it for debugging
 echo "Current directory: $SCRIPT_DIR"
@@ -37,10 +36,6 @@ if [ ! -f "$PYPROJECT_TOML" ]; then
   exit 1
 fi
 
-if [ ! -f "$SNAPCRAFT_YML" ]; then
-  echo "Error: $SNAPCRAFT_YML not found!"
-  exit 1
-fi
 
 # Update version in knewkarma/version.py
 sed -i.bak "s/\(major: str = \)\"[^\"]*\"/\1\"$MAJOR\"/" "$VERSION_PY"
@@ -50,12 +45,8 @@ sed -i.bak "s/\(patch: str = \)\"[^\"]*\"/\1\"$PATCH\"/" "$VERSION_PY"
 # Update version in pyproject.toml
 sed -i.bak "s/version = \".*\"/version = \"$VERSION\"/" "$PYPROJECT_TOML"
 
-# Update version in snapcraft.yaml
-sed -i.bak "s/version: .*/version: $VERSION/" "$SNAPCRAFT_YML"
-
 # Clean up backup files created by sed
 rm "${VERSION_PY}.bak"
 rm "${PYPROJECT_TOML}.bak"
-rm "${SNAPCRAFT_YML}.bak"
 
 echo "Version updated to $VERSION in $VERSION_PY, $PYPROJECT_TOML, and $SNAPCRAFT_YML"
