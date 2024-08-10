@@ -4,6 +4,7 @@ from typing import get_args, Union, Callable, Literal
 
 import requests
 import rich_click as click
+from rich.text import Text
 
 from . import Post, Posts, Search, Subreddit, Subreddits, User, Users
 from .about import About
@@ -717,7 +718,7 @@ def call_method(
         create_panel(
             title=panel_title,
             subtitle=f"[italic]Thank you, for using {About.name}![/] ❤️ ",
-            content=str(dataframe),
+            content=Text(text=str(dataframe), style="dim"),
         )
 
         if kwargs.get("export"):
