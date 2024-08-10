@@ -210,13 +210,13 @@ class Api:
             update_level: str = ""
 
             # Check for differences in version parts
-            if remote_version_parts[0] != local_version_parts[0]:
+            if int(remote_version_parts[0]) != local_version_parts[0]:
                 update_level = f"{Text.red}{Version.major[1]}{Text.reset}"
 
-            elif remote_version_parts[1] != local_version_parts[1]:
+            elif int(remote_version_parts[1]) != local_version_parts[1]:
                 update_level = f"{Text.yellow}{Version.minor[1]}{Text.reset}"
 
-            elif remote_version_parts[2] != local_version_parts[2]:
+            elif int(remote_version_parts[2]) != local_version_parts[2]:
                 update_level = f"{Text.green}{Version.patch[1]}{Text.reset}"
 
             if update_level:
