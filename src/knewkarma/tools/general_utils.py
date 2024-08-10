@@ -7,9 +7,6 @@ from rich.panel import Panel
 
 __all__ = ["console", "create_panel", "pathfinder"]
 
-from ..about import About
-from ..version import Version
-
 
 def create_panel(
         title: str,
@@ -60,6 +57,5 @@ def pathfinder(directories: list[str]):
 
 
 console = Console(color_system="auto", log_time=False)
-console.set_window_title(f"{About.name} {Version.release}")
 
 # -------------------------------- END ----------------------------------------- #

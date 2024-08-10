@@ -216,7 +216,6 @@ class Api:
 
             if update_level:
                 markdown_release_notes = Markdown(markup=markup_release_notes)
-                console.bell()
                 create_panel(
                     title=f"[bold]{update_level} update ([cyan]{remote_version_str}[/])[/]",
                     content=markdown_release_notes,
