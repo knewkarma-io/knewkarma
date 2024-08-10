@@ -228,7 +228,7 @@ class Api:
                 elif is_pypi_package(package=About.package):
                     status.stop()
                     if Confirm.ask(
-                            f"Would you like to install this update?",
+                            f"[bold]Would you like to install this update?[/]",
                             default=False,
                             console=console,
                     ):
