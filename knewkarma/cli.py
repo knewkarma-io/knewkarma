@@ -4,6 +4,7 @@ from typing import get_args, Union, Callable, Literal
 
 import requests
 import rich_click as click
+from rich.text import Text
 
 from . import Post, Posts, Search, Subreddit, Subreddits, User, Users
 from .about import About
@@ -709,15 +710,15 @@ def call_method(
         dataframe = create_dataframe(data=response_data)
 
         panel_title: str = (
-            f"[bold]Showing[/] [cyan]{len(response_data)}[/] [bold]{command} {argument}[/]"
+            f"[cyan]{len(response_data)}[/] {command} {argument}"
             if isinstance(response_data, list)
-            else f"[bold]Showing {command} {argument}[/]"
+            else f"{command} {argument}"
         )
 
         create_panel(
             title=panel_title,
-            subtitle=f"[bold]Thank you, for using {About.name}![/] ❤️ ",
-            content=str(dataframe),
+            subtitle=f"[italic]Thank you, for using {About.name}![/] ❤️ ",
+            content=Text(text=str(dataframe), style="dim"),
         )
 
         if kwargs.get("export"):
