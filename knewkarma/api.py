@@ -1,15 +1,14 @@
 import time
 from random import randint
 from sys import version as python_version
-from typing import Union, Literal, Callable
+from typing import Callable, Literal, Union
 
 import requests
 from rich.markdown import Markdown
-from rich.panel import Panel
 from rich.prompt import Confirm
 
 from .about import About
-from .tools.general_utils import console
+from .tools.general_utils import console, create_panel
 from .tools.package_utils import is_pypi_package, update_pypi_package, is_snap_package
 from .tools.time_utils import countdown_timer
 from .version import Version
@@ -30,43 +29,6 @@ class Api:
         self._users_endpoint: str = f"{self.base_endpoint}/users"
         self.subreddit_endpoint: str = f"{self.base_endpoint}/r"
         self._subreddits_endpoint: str = f"{self.base_endpoint}/subreddits"
-
-    @staticmethod
-    def make_request(
-            endpoint: str,
-            session: requests.Session,
-    ) -> Union[dict, list]:
-        """
-        Sends a  GET request to the specified endpoint and returns JSON or list response.
-
-        :param endpoint: The API endpoint to fetch data from.
-        :type endpoint: str
-        :param session: A requests.Session to use for the request. to use for the request.
-        :type session: requests.Session
-        :return: JSON data as a dictionary or list. Returns an empty dict if fetching fails.
-        :rtype: Union[dict, list]
-        """
-        try:
-            with session.get(
-                    endpoint,
-                    headers={
-                        "User-Agent": f"{About.name.replace(' ', '-')}/{Version.release} "
-                                      f"(Python {python_version}; +{About.documentation})"
-                    },
-            ) as response:
-                if response.status_code == 200:
-                    return response.json()
-                else:
-                    error_message = response.json()
-                    console.log(f"[[red]✘[/]] An API error occurred: {error_message}")
-                    return {}
-
-        except requests.ConnectionError as error:
-            console.log(f"[[red]✘[/]] An HTTP error occurred: {error}")
-            return {}
-        except Exception as error:
-            console.log(f"[[red]✘[/]] An unknown error occurred: {error}")
-            return {}
 
     @staticmethod
     def _process_response(
@@ -96,82 +58,10 @@ class Api:
             return response_data if response_data else []
         else:
             raise ValueError(
-                f"Unknown data type ({response_data}: {type(response_data)}), expected a List[Dict] or Dict."
+                f"Unknown data type ({response_data}: {type(response_data)}), expected a list[dict] or dict."
             )
 
-    def check_updates(self, session: requests.Session, status: console.status):
-        """
-        Checks for updates by comparing the current local version with the remote version.
-
-        Assumes version format: major.minor.patch.prefix
-
-        :param session: A requests.Session to use for the request. to use for the request.
-        :type session: requests.Session
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type status: Console.console.status
-        """
-        package_name: str = "knewkarma"
-        # Make a GET request to PyPI to get the project's latest release.
-        response: dict = self.make_request(
-            endpoint=f"https://api.github.com/repos/bellingcat/{package_name}/releases/latest",
-            session=session,
-        )
-        release: dict = self._process_response(
-            response_data=response, valid_key="tag_name"
-        )
-
-        if release:
-            remote_version_str: str = release.get("tag_name")
-            markup_release_notes: str = release.get("body")
-
-            # Splitting the version strings into components
-            local_version_parts: list = [Version.major, Version.minor, Version.patch]
-            remote_version_parts: list = remote_version_str.split(".")
-
-            update_level: str = ""
-
-            # Check for differences in version parts
-            if remote_version_parts[0] != local_version_parts[0]:
-                update_level = "[red]MAJOR[/]"
-
-            elif remote_version_parts[1] != local_version_parts[1]:
-                update_level = "[yellow]MINOR[/]"
-
-            elif remote_version_parts[2] != local_version_parts[2]:
-                update_level = "[green]PATCH[/]"
-
-            if update_level:
-                markdown_release_notes = Markdown(markup=markup_release_notes)
-                console.print(
-                    Panel.fit(
-                        markdown_release_notes,
-                        title=f"[bold]{update_level} update [underline][cyan]{remote_version_str}[/][/] available[/]",
-                        title_align="left",
-                        subtitle=f"[bold]Thank you, for using {About.name}![/] ❤️ ",
-                        subtitle_align="left",
-                    )
-                )
-
-                # Skip auto-updating of the snap package
-                if is_snap_package(package=package_name):
-                    console.print(
-                        Panel.fit(
-                            f"Run [underline]snap refresh knewkarma[/] to update the [bold]{About.name}[/] snap.",
-                            title=f"[bold]How to update[/]",
-                            title_align="left",
-                        )
-                    )
-                elif is_pypi_package(package=package_name):
-                    status.stop()
-                    if Confirm.ask(
-                            f"Would you like to install this update?",
-                            default=False,
-                            console=console,
-                    ):
-                        update_pypi_package(package=package_name)
-                    status.start()
-
-    def _paginate(
+    def _paginate_response(
             self,
             limit: int,
             session: requests.Session,
@@ -246,6 +136,104 @@ class Api:
                 time.sleep(sleep_duration)
 
         return all_items
+
+    @staticmethod
+    def make_request(
+            endpoint: str,
+            session: requests.Session,
+    ) -> Union[dict, list]:
+        """
+        Sends a  GET request to the specified endpoint and returns JSON or list response.
+
+        :param endpoint: The API endpoint to fetch data from.
+        :type endpoint: str
+        :param session: A requests.Session to use for the request. to use for the request.
+        :type session: requests.Session
+        :return: JSON data as a dictionary or list. Returns an empty dict if fetching fails.
+        :rtype: Union[dict, list]
+        """
+        try:
+            with session.get(
+                    endpoint,
+                    headers={
+                        "User-Agent": f"{About.name.replace(' ', '-')}/{Version.release} "
+                                      f"(Python {python_version}; +{About.documentation})"
+                    },
+            ) as response:
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    error_message: dict = response.json()
+                    console.log(f"[[red]✘[/]] An API error occurred: {error_message}")
+                    return {}
+
+        except requests.ConnectionError as connection_error:
+            console.log(f"[[red]✘[/]] An HTTP error occurred: {connection_error}")
+            return {}
+        except Exception as unexpected_error:
+            console.log(f"[[red]✘[/]] An unexpected error occurred: {unexpected_error}")
+            return {}
+
+    def check_updates(self, session: requests.Session, status: console.status):
+        """
+        Checks for updates by comparing the current local version with the remote version.
+
+        Assumes version format: major.minor.patch.prefix
+
+        :param session: A requests.Session to use for the request. to use for the request.
+        :type session: requests.Session
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type status: Console.console.status
+        """
+        package_name: str = "knewkarma"
+        # Make a GET request to PyPI to get the project's latest release.
+        response: dict = self.make_request(
+            endpoint=f"https://api.github.com/repos/bellingcat/{package_name}/releases/latest",
+            session=session,
+        )
+        release: dict = self._process_response(
+            response_data=response, valid_key="tag_name"
+        )
+
+        if release:
+            remote_version_str: str = release.get("tag_name")
+            markup_release_notes: str = release.get("body")
+
+            # Splitting the version strings into components
+            local_version_parts: list = [Version.major, Version.minor, Version.patch]
+            remote_version_parts: list = remote_version_str.split(".")
+
+            update_level: str = ""
+
+            # Check for differences in version parts
+            if remote_version_parts[0] != local_version_parts[0]:
+                update_level = "[red]MAJOR[/]"
+
+            elif remote_version_parts[1] != local_version_parts[1]:
+                update_level = "[yellow]MINOR[/]"
+
+            elif remote_version_parts[2] != local_version_parts[2]:
+                update_level = "[green]PATCH[/]"
+
+            if update_level:
+                markdown_release_notes = Markdown(markup=markup_release_notes)
+                create_panel(
+                    title=f"[bold]{update_level} update [underline][cyan]{remote_version_str}[/][/] available[/]",
+                    content=markdown_release_notes,
+                )
+
+                # Skip auto-updating of the snap package
+                if is_snap_package(package=package_name):
+                    pass
+                elif is_pypi_package(package=package_name):
+                    status.stop()
+                    if Confirm.ask(
+                            f"Would you like to install this update?",
+                            default=False,
+                            console=console,
+                    ):
+                        update_pypi_package(package=package_name)
+                    status.start()
 
     def get_entity(
             self,
@@ -343,7 +331,7 @@ class Api:
         endpoint = source_map.get(posts_type, "")
         endpoint += f"?limit={limit}&sort={sort}&t={timeframe}&raw_json=1"
 
-        posts: list[dict] = self._paginate(
+        posts: list[dict] = self._paginate_response(
             limit=limit,
             session=session,
             posts_type=posts_type,
@@ -394,7 +382,7 @@ class Api:
         else:
             endpoint += f"?limit={limit}&t={timeframe}"
 
-            subreddits: list[dict] = self._paginate(
+            subreddits: list[dict] = self._paginate_response(
                 limit=limit,
                 session=session,
                 status=kwargs.get("status"),
@@ -436,7 +424,7 @@ class Api:
 
         endpoint = users_mapping.get(users_type, "")
         endpoint += f"?limit={limit}&t={timeframe}"
-        users: list[dict] = self._paginate(
+        users: list[dict] = self._paginate_response(
             limit=limit,
             session=session,
             status=status,
@@ -481,7 +469,7 @@ class Api:
         endpoint = search_mapping.get(entity_type, "")
         endpoint += f"/search.json?q={query}&limit={limit}&sort={sort}"
 
-        search_results: list[dict] = self._paginate(
+        search_results: list[dict] = self._paginate_response(
             limit=limit,
             session=session,
             status=status,
