@@ -20,11 +20,6 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 VERSION_PY="$SCRIPT_DIR/src/knewkarma/version.py"
 PYPROJECT_TOML="$SCRIPT_DIR/pyproject.toml"
 
-# Print the current directory and the files in it for debugging
-echo "Current directory: $SCRIPT_DIR"
-echo "Files in the current directory:"
-ls -la "$SCRIPT_DIR"
-
 # Check if files exist
 if [ ! -f "$VERSION_PY" ]; then
   echo "Error: $VERSION_PY not found!"
