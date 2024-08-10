@@ -185,10 +185,9 @@ class Api:
         :param status: An instance of `console.status` used to display animated status messages.
         :type status: Console.console.status
         """
-        package_name: str = "knewkarma"
         # Make a GET request to PyPI to get the project's latest release.
         response: dict = self.make_request(
-            endpoint=f"https://api.github.com/repos/bellingcat/{package_name}/releases/latest",
+            endpoint=f"https://api.github.com/repos/bellingcat/{About.package}/releases/latest",
             session=session,
         )
         release: dict = self._process_response(
@@ -217,22 +216,26 @@ class Api:
 
             if update_level:
                 markdown_release_notes = Markdown(markup=markup_release_notes)
+                console.bell()
                 create_panel(
                     title=f"[bold]{update_level} update [underline][cyan]{remote_version_str}[/][/] available[/]",
                     content=markdown_release_notes,
+                    subtitle=f"[bold][italic]Thank you, for using {About.name}![/][/] ❤️ ",
                 )
 
                 # Skip auto-updating of the snap package
-                if is_snap_package(package=package_name):
+                if is_snap_package(package=About.package):
                     pass
-                elif is_pypi_package(package=package_name):
+                elif is_pypi_package(package=About.package):
                     status.stop()
                     if Confirm.ask(
                             f"Would you like to install this update?",
                             default=False,
                             console=console,
                     ):
-                        update_pypi_package(package=package_name)
+                        update_pypi_package(package=About.package)
+                        
+                    console.clear()
                     status.start()
 
     def get_entity(

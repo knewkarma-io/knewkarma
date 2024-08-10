@@ -1,7 +1,7 @@
 from datetime import date
 
-from knewkarma.about import About
-from knewkarma.version import Version
+from src import About
+from src import Version
 
 # Configuration file for the Sphinx documentation builder.
 
@@ -61,7 +61,7 @@ html_sidebars = {
 html_theme_options = {
     "show_powered_by": False,
     "github_user": "bellingcat",
-    "github_repo": "knewkarma",
+    "github_repo": About.package,
     "github_banner": True,
     "sidebar_collapse": True,
     "show_related": False,

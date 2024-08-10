@@ -27,7 +27,7 @@ def parse_users(
 
     Usage::
 
-        >>> from knewkarma.tools import parsing_utils
+        >>> from src import parsing_utils
 
         >>> # The raw user data could also be a list of object containing user data in the same format.
         >>> raw_user = {
@@ -106,7 +106,7 @@ def parse_posts(
 
     Usage::
 
-        >>> from knewkarma.tools import parsing_utils
+        >>> from src import parsing_utils
 
         >>> # The raw post data could also be a list of object containing post data in the same format.
         >>> raw_post = {
@@ -210,7 +210,7 @@ def parse_comments(comments: list[dict], time_format: TIME_FORMAT) -> list[dict]
 
     Usage::
 
-        >>> from knewkarma.tools import parsing_utils
+        >>> from src import parsing_utils
 
         >>> # The raw comment data could also be a list of object containing comment data in the same format.
         >>> raw_comment = {
@@ -295,7 +295,7 @@ def parse_subreddits(data: Union[list, dict], time_format) -> Union[list[dict], 
 
     Usage::
 
-        >>> from knewkarma.tools import parsing_utils
+        >>> from src import parsing_utils
 
         >>> # The raw subreddit data could also be a list of object containing subreddit data in the same format.
         >>> raw_subreddit = {
@@ -415,7 +415,7 @@ def parse_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> dict:
 
     Usage::
 
-        >>> from knewkarma.tools import parsing_utils
+        >>> from src import parsing_utils
 
         >>> raw_wiki_page = {
         >>>                 "kind": "wikipage",

@@ -50,7 +50,7 @@ def timestamp_to_locale(timestamp: float) -> str:
 
     Usage::
 
-        >>> from knewkarma.tools.time_utils import timestamp_to_locale
+        >>> from src import timestamp_to_locale
 
         >>> coffee_time = 1722277062
         >>> difference = timestamp_to_locale(timestamp=coffee_time)
@@ -82,7 +82,7 @@ def timestamp_to_concise(timestamp: int) -> str:
 
     Usage::
 
-        >>> from knewkarma.tools.time_utils import timestamp_to_concise
+        >>> from src import timestamp_to_concise
 
         >>> coffee_time = 1722277062
         >>> difference = timestamp_to_concise(timestamp=coffee_time)
@@ -151,7 +151,7 @@ def timestamp_to_readable(
 
     Usage::
 
-        >>> from knewkarma.tools.time_utils import timestamp_to_readable
+        >>> from src import timestamp_to_readable
 
         >>> coffee_time = 1722277062
         >>> difference = timestamp_to_readable(timestamp=coffee_time, time_format="concise")

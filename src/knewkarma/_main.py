@@ -58,7 +58,7 @@ class Post:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Post
+            >>> from src import Post
             >>> from pprint import pprint
 
             >>> def get_post_data():
@@ -116,7 +116,7 @@ class Post:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Post
+            >>> from src import Post
             >>> from pprint import pprint
 
             >>> def get_post_comments(comments_limit, comments_sort):
@@ -193,7 +193,7 @@ class Posts:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Posts
+            >>> from src import Posts
             >>> from pprint import pprint
 
             >>> def get_best_posts(posts_limit):
@@ -243,7 +243,7 @@ class Posts:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Posts
+            >>> from src import Posts
 
 
             >>> def get_controversial_posts(posts_limit):
@@ -294,7 +294,7 @@ class Posts:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Posts
+            >>> from src import Posts
             >>> from pprint import pprint
 
             >>> def get_frontpage_posts(posts_limit):
@@ -346,7 +346,7 @@ class Posts:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Posts
+            >>> from src import Posts
             >>> from pprint import pprint
 
             >>> def get_new_posts(posts_limit):
@@ -396,7 +396,7 @@ class Posts:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Posts
+            >>> from src import Posts
             >>> from pprint import pprint
 
             >>> def get_popular_posts(posts_limit):
@@ -446,7 +446,7 @@ class Posts:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Posts
+            >>> from src import Posts
             >>> from pprint import pprint
 
             >>> def get_rising_posts(posts_limit):
@@ -519,7 +519,7 @@ class Search:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Search
+            >>> from src import Search
             >>> from pprint import pprint
 
             >>> def search_posts(query, results_limit):
@@ -573,7 +573,7 @@ class Search:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Search
+            >>> from src import Search
             >>> from pprint import pprint
 
             >>> def search_for_subreddits(query, results_limit):
@@ -630,7 +630,7 @@ class Search:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Search
+            >>> from src import Search
             >>> from pprint import pprint
 
             >>> def search_for_users(query, results_limit):
@@ -714,7 +714,7 @@ class Subreddit:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
+            >>> from src import Subreddit
             >>> import requests
 
             >>> def get_subreddit_comments(subreddit, posts_count, comments_p_post):
@@ -779,7 +779,7 @@ class Subreddit:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
+            >>> from src import Subreddit
             >>> import requests
 
             >>> def get_subreddit_posts(subreddit, posts_limit):
@@ -828,7 +828,7 @@ class Subreddit:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
+            >>> from src import Subreddit
             >>> from pprint import pprint
 
             >>> def get_subreddit_profile(subreddit):
@@ -891,7 +891,7 @@ class Subreddit:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
+            >>> from src import Subreddit
             >>> from pprint import pprint
 
             >>> def search_subreddit_comments(search_query, subreddit, post_limit, comments_p_post):
@@ -980,7 +980,7 @@ class Subreddit:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
+            >>> from src import Subreddit
             >>> from pprint import pprint
 
             >>> def search_subreddit_posts(search_query, subreddit, posts_limit):
@@ -1036,7 +1036,7 @@ class Subreddit:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
+            >>> from src import Subreddit
             >>> from pprint import pprint
 
             >>> def get_subreddit_wiki_pages(subreddit):
@@ -1083,7 +1083,7 @@ class Subreddit:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
+            >>> from src import Subreddit
             >>> from pprint import pprint
 
             >>> def get_subreddit_wiki_page(page, subreddit):
@@ -1155,7 +1155,7 @@ class Subreddits:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Subreddits
+            >>> from src import Subreddits
             >>> from pprint import pprint
 
             >>> def get_all_subreddits(subreddits_limit):
@@ -1203,7 +1203,7 @@ class Subreddits:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Subreddits
+            >>> from src import Subreddits
             >>> import requests
 
 
@@ -1255,7 +1255,7 @@ class Subreddits:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Subreddits
+            >>> from src import Subreddits
             >>> import requests
 
 
@@ -1307,7 +1307,7 @@ class Subreddits:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Subreddits
+            >>> from src import Subreddits
             >>> import requests
 
 
@@ -1380,7 +1380,7 @@ class User:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import User
+            >>> from src import User
             >>> import requests
 
 
@@ -1431,7 +1431,7 @@ class User:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import User
+            >>> from src import User
             >>> import requests
 
 
@@ -1486,7 +1486,7 @@ class User:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import User
+            >>> from src import User
             >>> import requests
 
 
@@ -1544,7 +1544,7 @@ class User:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import User
+            >>> from src import User
             >>> import requests
 
 
@@ -1595,7 +1595,7 @@ class User:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import User
+            >>> from src import User
             >>> import requests
 
 
@@ -1652,7 +1652,7 @@ class User:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import User
+            >>> from src import User
             >>> import requests
 
 
@@ -1732,7 +1732,7 @@ class User:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import User
+            >>> from src import User
             >>> import requests
 
 
@@ -1804,7 +1804,7 @@ class User:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import User
+            >>> from src import User
             >>> import requests
 
 
@@ -1884,7 +1884,7 @@ class Users:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Users
+            >>> from src import Users
             >>> import requests
 
 
@@ -1935,7 +1935,7 @@ class Users:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Users
+            >>> from src import Users
             >>> import requests
 
 
@@ -1988,7 +1988,7 @@ class Users:
         Usage::
 
             >>> from pprint import pprint
-            >>> from knewkarma import Users
+            >>> from src import Users
             >>> import requests
 
 
