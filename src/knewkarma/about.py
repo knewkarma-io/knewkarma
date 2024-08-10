@@ -15,6 +15,7 @@ class About:
     """
 
     name: str = "Knew Karma"
+    package: str = "knewkarma"
     author: str = "Richard Mwewa"
     author_link: str = "https://gravatar.com/rly0nheart"
     copyright: str = f"{name} {Version.release} © {author}. All rights reserved."

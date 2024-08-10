@@ -37,7 +37,7 @@ if [ ! -f "$PYPROJECT_TOML" ]; then
 fi
 
 
-# Update version in knewkarma/version.py
+# Update version in src/knewkarma/version.py
 sed -i.bak "s/\(major: str = \)\"[^\"]*\"/\1\"$MAJOR\"/" "$VERSION_PY"
 sed -i.bak "s/\(minor: str = \)\"[^\"]*\"/\1\"$MINOR\"/" "$VERSION_PY"
 sed -i.bak "s/\(patch: str = \)\"[^\"]*\"/\1\"$PATCH\"/" "$VERSION_PY"

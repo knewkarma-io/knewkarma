@@ -2,11 +2,11 @@ import os
 from datetime import datetime
 from typing import get_args, Union, Callable, Literal
 
+import pandas as pd
 import requests
 import rich_click as click
-from rich.text import Text
 
-from . import Post, Posts, Search, Subreddit, Subreddits, User, Users
+from ._main import Post, Posts, Search, Subreddit, Subreddits, User, Users
 from .about import About
 from .api import SORT_CRITERION, TIMEFRAME, TIME_FORMAT, Api
 from .tools.data_utils import (
@@ -14,7 +14,7 @@ from .tools.data_utils import (
     export_dataframe,
     EXPORT_FORMATS,
 )
-from .tools.general_utils import console, pathfinder, create_panel
+from .tools.general_utils import console, pathfinder
 from .tools.time_utils import filename_timestamp
 from .version import Version
 
@@ -704,29 +704,21 @@ def call_method(
     """
     command: str = kwargs.get("ctx").command.name
     argument: str = kwargs.get("argument")
+    
+    response_data: Union[list, dict, str] = method(session=session, status=status)
 
-    response_data = method(session=session, status=status)
+    console.set_window_title(
+        f"Showing {len(response_data)} {command} {argument} — {About.name} {Version.release}"
+        if isinstance(response_data, list)
+        else f"Showing {command} {argument} — {About.name} {Version.release}"
+    )
+
     if response_data:
-        dataframe = create_dataframe(data=response_data)
-
-        panel_title: str = (
-            f"Showing [cyan]{len(response_data)}[/] {command} [italic]{argument}[/]"
-            if isinstance(response_data, list)
-            else f"Showing {command} [italic]{argument}[/]"
-        )
-
-        panel_title += f" — {About.name} [cyan]{Version.release}[/]"
-
-        create_panel(
-            title=panel_title,
-            subtitle=f"[italic]Thank you, for using {About.name}![/] ❤️ ",
-            content=Text(text=str(dataframe), style="dim"),
-        )
+        dataframe: pd.DataFrame = create_dataframe(data=response_data)
+        console.print(dataframe)
 
         if kwargs.get("export"):
-            output_parent_dir: str = os.path.expanduser(
-                os.path.join("~", "knewkarma-data")
-            )
+            output_parent_dir: str = os.path.expanduser(os.path.join("~", "src-data"))
             output_child_dir: str = os.path.join(
                 output_parent_dir,
                 command,
@@ -767,6 +759,7 @@ def handle_method_calls(
     for argument, method in method_map.items():
         if kwargs.get(argument):
             is_valid_arg = True
+            console.show_cursor(show=False)
             start_time: datetime = datetime.now()
             try:
                 with console.status(

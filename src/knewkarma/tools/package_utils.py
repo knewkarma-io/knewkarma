@@ -18,9 +18,9 @@ def is_snap_package(package: str) -> bool:
 
     Usage::
 
-        >>> from knewkarma.tools.package_utils import is_snap_package
+        >>> from src import is_snap_package
 
-        >>> package_name = "knewkarma"
+        >>> package_name = "src"
         >>> print(is_snap_package(package=package_name))
         >>> False # If script isn't running in a SNAP environment.
     """
@@ -41,9 +41,9 @@ def is_pypi_package(package: str) -> bool:
 
     Usage::
 
-        >>> from knewkarma.tools.package_utils import is_pypi_package
+        >>> from src import is_pypi_package
 
-        >>> package_name = "knewkarma"
+        >>> package_name = "src"
         >>> print(is_pypi_package(package=package_name))
         >>> True
     """
@@ -67,10 +67,10 @@ def update_pypi_package(package: str):
 
     Usage::
 
-        >>> from knewkarma.tools.package_utils import update_pypi_package
+        >>> from src import update_pypi_package
 
         >>> # This will update the pypi package
-        >>> package_name = "knewkarma"
+        >>> package_name = "src"
         >>> update_pypi_package(package=package_name)
     """
     if package:

@@ -7,11 +7,14 @@ from rich.panel import Panel
 
 __all__ = ["console", "create_panel", "pathfinder"]
 
+from knewkarma.about import About
+from knewkarma.version import Version
+
 
 def create_panel(
-        title: str,
-        content: Union[ConsoleRenderable, RichCast, Text],
-        subtitle: str = None,
+    title: str,
+    content: Union[ConsoleRenderable, RichCast, Text],
+    subtitle: str = None,
 ):
     """
     Creates a rich Panel for whatever data is needed to be placed in it.
@@ -38,16 +41,16 @@ def create_panel(
             renderable=content,
             title=f"[bold]{title}[/]",
             subtitle=(subtitle if subtitle else None),
-            style="white on black",
             expand=False,
             box=DOUBLE,
+            style="white on blue",
         )
     )
 
 
 def pathfinder(directories: list[str]):
     """
-    Creates directories in knewkarma-output directory of the user's home folder.
+    Creates directories in src-output directory of the user's home folder.
 
     :param directories: A list of file directories to create.
     :type directories: list[str]
@@ -57,5 +60,6 @@ def pathfinder(directories: list[str]):
 
 
 console = Console(color_system="auto", log_time=False)
+console.set_window_title(f"{About.name} {Version.release}")
 
 # -------------------------------- END ----------------------------------------- #
