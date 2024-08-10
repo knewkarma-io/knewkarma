@@ -33,7 +33,7 @@ class Api:
 
     @staticmethod
     def _process_response(
-        response_data: Union[dict, list], valid_key: str = None
+            response_data: Union[dict, list], valid_key: str = None
     ) -> Union[dict, list]:
         """
         Processes and validates the API response data.
@@ -63,11 +63,11 @@ class Api:
             )
 
     def _paginate_response(
-        self,
-        limit: int,
-        session: requests.Session,
-        data_processor: Callable,
-        **kwargs: Union[str, console.status],
+            self,
+            limit: int,
+            session: requests.Session,
+            data_processor: Callable,
+            **kwargs: Union[str, console.status],
     ) -> list[dict]:
         """
         Fetches and processes data in a paginated manner
@@ -140,8 +140,8 @@ class Api:
 
     @staticmethod
     def make_request(
-        endpoint: str,
-        session: requests.Session,
+            endpoint: str,
+            session: requests.Session,
     ) -> Union[dict, list]:
         """
         Sends a  GET request to the specified endpoint and returns JSON or list response.
@@ -155,11 +155,11 @@ class Api:
         """
         try:
             with session.get(
-                endpoint,
-                headers={
-                    "User-Agent": f"{About.name.replace(' ', '-')}/{Version.release} "
-                    f"(Python {python_version}; +{About.documentation})"
-                },
+                    endpoint,
+                    headers={
+                        "User-Agent": f"{About.name.replace(' ', '-')}/{Version.release} "
+                                      f"(Python {python_version}; +{About.documentation})"
+                    },
             ) as response:
                 if response.status_code == 200:
                     return response.json()
@@ -204,7 +204,7 @@ class Api:
             markup_release_notes: str = release.get("body")
 
             # Splitting the version strings into components
-            local_version_parts: list = [Version.major, Version.minor, Version.patch]
+            local_version_parts: list = [Version.major[0], Version.minor[0], Version.patch[0]]
             remote_version_parts: list = remote_version_str.split(".")
 
             update_level: str = ""
@@ -233,9 +233,9 @@ class Api:
                 elif is_pypi_package(package=About.package):
                     status.stop()
                     if Confirm.ask(
-                        f"{Text.bold}Would you like to install this update?{Text.reset}",
-                        default=False,
-                        console=console,
+                            f"{Text.bold}Would you like to install this update?{Text.reset}",
+                            default=False,
+                            console=console,
                     ):
                         update_pypi_package(package=About.package)
 
@@ -243,10 +243,10 @@ class Api:
                     status.start()
 
     def get_entity(
-        self,
-        entity_type: Literal["post", "subreddit", "user", "wiki_page"],
-        session: requests.Session,
-        **kwargs: str,
+            self,
+            entity_type: Literal["post", "subreddit", "user", "wiki_page"],
+            session: requests.Session,
+            **kwargs: str,
     ) -> dict:
         """
         Gets data from the specified entity.
@@ -260,7 +260,7 @@ class Api:
         # Use a dictionary for direct mapping
         entity_mapping: dict = {
             "post": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-            f"/comments/{kwargs.get('post_id')}.json",
+                    f"/comments/{kwargs.get('post_id')}.json",
             "user": f"{self._user_endpoint}/{kwargs.get('username')}/about.json",
             "subreddit": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/about.json",
             "wiki_page": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/wiki/{kwargs.get('page_name')}.json",
@@ -281,26 +281,26 @@ class Api:
         )
 
     def get_posts(
-        self,
-        posts_type: Literal[
-            "best",
-            "controversial",
-            "front_page",
-            "new",
-            "popular",
-            "rising",
-            "subreddit_posts",
-            "search_subreddit_posts",
-            "user_posts",
-            "user_overview",
-            "user_comments",
-            "post_comments",
-        ],
-        limit: int,
-        session: requests.Session,
-        timeframe: TIMEFRAME = "all",
-        sort: SORT_CRITERION = "all",
-        **kwargs: Union[console.status, str],
+            self,
+            posts_type: Literal[
+                "best",
+                "controversial",
+                "front_page",
+                "new",
+                "popular",
+                "rising",
+                "subreddit_posts",
+                "search_subreddit_posts",
+                "user_posts",
+                "user_overview",
+                "user_comments",
+                "post_comments",
+            ],
+            limit: int,
+            session: requests.Session,
+            timeframe: TIMEFRAME = "all",
+            sort: SORT_CRITERION = "all",
+            **kwargs: Union[console.status, str],
     ) -> list[dict]:
         """
         Gets a specified number of posts, with a specified sorting criterion, from the specified source.
@@ -330,9 +330,9 @@ class Api:
             "user_overview": f"{self._user_endpoint}/{kwargs.get('username')}/overview.json",
             "user_comments": f"{self._user_endpoint}/{kwargs.get('username')}/comments.json",
             "post_comments": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-            f"/comments/{kwargs.get('post_id')}.json",
+                             f"/comments/{kwargs.get('post_id')}.json",
             "search_subreddit_posts": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}"
-            f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
+                                      f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
         }
 
         endpoint = source_map.get(posts_type, "")
@@ -350,12 +350,12 @@ class Api:
         return posts
 
     def get_subreddits(
-        self,
-        session: requests.Session,
-        subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
-        limit: int,
-        timeframe: TIMEFRAME = "all",
-        **kwargs: Union[str, console.status],
+            self,
+            session: requests.Session,
+            subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
+            limit: int,
+            timeframe: TIMEFRAME = "all",
+            **kwargs: Union[str, console.status],
     ) -> Union[list[dict], dict]:
         """
         Gets the specified type of subreddits.
@@ -400,12 +400,12 @@ class Api:
         return subreddits
 
     def get_users(
-        self,
-        session: requests.Session,
-        users_type: Literal["all", "popular", "new"],
-        limit: int,
-        timeframe: TIMEFRAME = "all",
-        status: console.status = None,
+            self,
+            session: requests.Session,
+            users_type: Literal["all", "popular", "new"],
+            limit: int,
+            timeframe: TIMEFRAME = "all",
+            status: console.status = None,
     ) -> list[dict]:
         """
         Gets the specified type of subreddits.
@@ -442,13 +442,13 @@ class Api:
         return users
 
     def search_entities(
-        self,
-        session: requests.Session,
-        entity_type: Literal["users", "subreddits", "posts"],
-        query: str,
-        limit: int,
-        sort: SORT_CRITERION = "all",
-        status: console.status = None,
+            self,
+            session: requests.Session,
+            entity_type: Literal["users", "subreddits", "posts"],
+            query: str,
+            limit: int,
+            sort: SORT_CRITERION = "all",
+            status: console.status = None,
     ) -> list[dict]:
         """
         Searches from a specified results type that match the specified query.
@@ -485,6 +485,5 @@ class Api:
         )
 
         return search_results
-
 
 # -------------------------------- END ----------------------------------------- #
