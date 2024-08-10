@@ -7,13 +7,13 @@ import rich_click as click
 
 from . import Post, Posts, Search, Subreddit, Subreddits, User, Users
 from .about import About
-from .api import SORT_CRITERION, TIMEFRAME, TIME_FORMAT, Api
+from .api import SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .tools.data_utils import (
     create_dataframe,
     export_dataframe,
     EXPORT_FORMATS,
 )
-from .tools.general_utils import console, pathfinder, print_banner
+from .tools.general_utils import console, pathfinder, create_panel
 from .tools.time_utils import filename_timestamp
 from .version import Version
 
@@ -74,12 +74,12 @@ __all__ = ["start"]
 )
 @click.pass_context
 def cli(
-        ctx: click.Context,
-        timeframe: TIMEFRAME,
-        sort: SORT_CRITERION,
-        limit: int,
-        time_format: str,
-        export: list[EXPORT_FORMATS],
+    ctx: click.Context,
+    timeframe: TIMEFRAME,
+    sort: SORT_CRITERION,
+    limit: int,
+    time_format: str,
+    export: list[EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -107,7 +107,7 @@ def cli(
 
 @cli.command(
     help="Use this command to get an individual post's data including its comments, "
-         "provided the post's `id` and source `subreddit` are specified.",
+    "provided the post's `id` and source `subreddit` are specified.",
     cls=click.RichCommand,
 )
 @click.argument("id")
@@ -177,13 +177,13 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 @click.option("-r", "--rising", is_flag=True, help="Get posts from the rising listing")
 @click.pass_context
 def posts(
-        ctx: click.Context,
-        best: bool,
-        controversial: bool,
-        front_page: bool,
-        new: bool,
-        popular: bool,
-        rising: bool,
+    ctx: click.Context,
+    best: bool,
+    controversial: bool,
+    front_page: bool,
+    new: bool,
+    popular: bool,
+    rising: bool,
 ):
     """
     Retrieve various types of posts such as best, controversial, popular, new, and front-page.
@@ -325,16 +325,16 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
 @click.option("-wps", "--wiki-pages", is_flag=True, help="Get a subreddit's wiki pages")
 @click.pass_context
 def subreddit(
-        ctx: click.Context,
-        subreddit_name: str,
-        comments: bool,
-        comments_per_post: int,
-        posts: bool,
-        profile: bool,
-        search_comments: str,
-        search_post: str,
-        wiki_page: str,
-        wiki_pages: bool,
+    ctx: click.Context,
+    subreddit_name: str,
+    comments: bool,
+    comments_per_post: int,
+    posts: bool,
+    profile: bool,
+    search_comments: str,
+    search_post: str,
+    wiki_page: str,
+    wiki_pages: bool,
 ):
     """
     Retrieve data about a specific subreddit including profile, comments, posts, and wiki pages.
@@ -498,7 +498,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 
 @cli.command(
     help="Use this command to get user data, such as profile, posts, "
-         "comments, top subreddits, moderated subreddits, and more...",
+    "comments, top subreddits, moderated subreddits, and more...",
     cls=click.RichCommand,
 )
 @click.argument("username")
@@ -532,16 +532,16 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 )
 @click.pass_context
 def user(
-        ctx: click.Context,
-        username: str,
-        comments: bool,
-        moderated_subreddits: bool,
-        overview: bool,
-        posts: bool,
-        profile: bool,
-        search_comments: str,
-        search_posts: str,
-        top_subreddits: int,
+    ctx: click.Context,
+    username: str,
+    comments: bool,
+    moderated_subreddits: bool,
+    overview: bool,
+    posts: bool,
+    profile: bool,
+    search_comments: str,
+    search_posts: str,
+    top_subreddits: int,
 ):
     """
     Retrieve data about a specific user including profile, posts, comments, and top subreddits.
@@ -684,8 +684,12 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     )
 
 
-def call_method(method: Callable, session: requests.session, status: console.status,
-                **kwargs: Union[str, click.Context]):
+def call_method(
+    method: Callable,
+    session: requests.session,
+    status: console.status,
+    **kwargs: Union[str, click.Context],
+):
     """
     Calls a method with the provided arguments.
 
@@ -697,17 +701,34 @@ def call_method(method: Callable, session: requests.session, status: console.sta
     :type status: Console.console.status
     :param kwargs: Additional keyword arguments for `export: str`, `argument: str` and `ctx: click.Context` .
     """
+    command: str = kwargs.get("ctx").command.name
+    argument: str = kwargs.get("argument")
+
     response_data = method(session=session, status=status)
     if response_data:
         dataframe = create_dataframe(data=response_data)
-        console.print(dataframe)
 
-        if kwargs.get("export"):
+        panel_title: str = (
+            f"[bold]Showing[/] [cyan]{len(response_data)}[/] [bold]{command} {argument}[/]"
+            if isinstance(response_data, list)
+            else f"[bold]Showing {command} {argument}[/]"
+        )
+
+        create_panel(
+            title=panel_title,
+            subtitle=f"[bold]Thank you, for using {About.name}![/] ❤️ ",
+            content=str(dataframe),
+        )
+
+        export_to_files: list = kwargs.get("export").split(",")
+        if export_to_files:
             output_parent_dir: str = os.path.expanduser(
                 os.path.join("~", "knewkarma-data")
             )
             output_child_dir: str = os.path.join(
-                output_parent_dir, kwargs.get("ctx").command.name, kwargs.get("argument")
+                output_parent_dir,
+                command,
+                argument,
             )
 
             pathfinder(
@@ -717,16 +738,17 @@ def call_method(method: Callable, session: requests.session, status: console.sta
                 ]
             )
 
-            selected_export_formats: list = kwargs.get("export").split(",")
             export_dataframe(
                 dataframe=dataframe,
                 filename=filename_timestamp(),
                 directory=output_child_dir,
-                formats=selected_export_formats,
+                formats=export_to_files,
             )
 
 
-def handle_method_calls(ctx: click.Context, method_map: dict, export: str, **kwargs: Union[str, int, bool]):
+def handle_method_calls(
+    ctx: click.Context, method_map: dict, export: str, **kwargs: Union[str, int, bool]
+):
     """
     Handle the method calls based on the provided arguments.
 
@@ -738,29 +760,34 @@ def handle_method_calls(ctx: click.Context, method_map: dict, export: str, **kwa
     :type export: str
     :param kwargs: Additional keyword arguments.
     """
-    arg_is_present: bool = False
+    is_valid_arg: bool = False
     for argument, method in method_map.items():
         if kwargs.get(argument):
-            print_banner()
+            is_valid_arg = True
             start_time: datetime = datetime.now()
-            arg_is_present = True
             try:
                 with console.status(
-                        "Establishing connection /w new session...", spinner="dots2"
+                    "Establishing connection /w new session...", spinner="dots2"
                 ) as status:
                     with requests.Session() as session:
-                        Api().check_updates(session=session, status=status)
-                        call_method(method=method, session=session, status=status, ctx=ctx, export=export,
-                                    argument=argument)
+                        # Api().check_updates(session=session, status=status)
+                        call_method(
+                            method=method,
+                            session=session,
+                            status=status,
+                            ctx=ctx,
+                            export=export,
+                            argument=argument,
+                        )
             except KeyboardInterrupt:
-                console.log("[[yellow]✘[/]] Process aborted /w CTRL+C.")
+                console.print("[[yellow]✘[/]] Process aborted /w CTRL+C.")
             finally:
                 elapsed_time = datetime.now() - start_time
                 console.print(
-                    f"[[green]✔[/]] DONE. {elapsed_time.total_seconds():.2f} seconds elapsed."
+                    f"[[green]✔[/]] DONE. {elapsed_time.total_seconds():.2f}ms elapsed."
                 )
 
-    if arg_is_present is False:
+    if not is_valid_arg:
         ctx.get_usage()
 
 
@@ -769,5 +796,6 @@ def start():
     Main entrypoint for the Knew Karma command-line interface.
     """
     cli(obj={})
+
 
 # -------------------------------- END ----------------------------------------- #

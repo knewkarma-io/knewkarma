@@ -1,15 +1,14 @@
 import time
 from random import randint
 from sys import version as python_version
-from typing import Union, Literal, Callable
+from typing import Callable, Literal, Union
 
 import requests
 from rich.markdown import Markdown
-from rich.panel import Panel
 from rich.prompt import Confirm
 
 from .about import About
-from .tools.general_utils import console
+from .tools.general_utils import console, create_panel
 from .tools.package_utils import is_pypi_package, update_pypi_package, is_snap_package
 from .tools.time_utils import countdown_timer
 from .version import Version
@@ -32,45 +31,8 @@ class Api:
         self._subreddits_endpoint: str = f"{self.base_endpoint}/subreddits"
 
     @staticmethod
-    def make_request(
-            endpoint: str,
-            session: requests.Session,
-    ) -> Union[dict, list]:
-        """
-        Sends a  GET request to the specified endpoint and returns JSON or list response.
-
-        :param endpoint: The API endpoint to fetch data from.
-        :type endpoint: str
-        :param session: A requests.Session to use for the request. to use for the request.
-        :type session: requests.Session
-        :return: JSON data as a dictionary or list. Returns an empty dict if fetching fails.
-        :rtype: Union[dict, list]
-        """
-        try:
-            with session.get(
-                    endpoint,
-                    headers={
-                        "User-Agent": f"{About.name.replace(' ', '-')}/{Version.release} "
-                                      f"(Python {python_version}; +{About.documentation})"
-                    },
-            ) as response:
-                if response.status_code == 200:
-                    return response.json()
-                else:
-                    error_message = response.json()
-                    console.log(f"[[red]✘[/]] An API error occurred: {error_message}")
-                    return {}
-
-        except requests.ConnectionError as error:
-            console.log(f"[[red]✘[/]] An HTTP error occurred: {error}")
-            return {}
-        except Exception as error:
-            console.log(f"[[red]✘[/]] An unknown error occurred: {error}")
-            return {}
-
-    @staticmethod
     def _process_response(
-            response_data: Union[dict, list], valid_key: str = None
+        response_data: Union[dict, list], valid_key: str = None
     ) -> Union[dict, list]:
         """
         Processes and validates the API response data.
@@ -96,87 +58,15 @@ class Api:
             return response_data if response_data else []
         else:
             raise ValueError(
-                f"Unknown data type ({response_data}: {type(response_data)}), expected a List[Dict] or Dict."
+                f"Unknown data type ({response_data}: {type(response_data)}), expected a list[dict] or dict."
             )
 
-    def check_updates(self, session: requests.Session, status: console.status):
-        """
-        Checks for updates by comparing the current local version with the remote version.
-
-        Assumes version format: major.minor.patch.prefix
-
-        :param session: A requests.Session to use for the request. to use for the request.
-        :type session: requests.Session
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type status: Console.console.status
-        """
-        package_name: str = "knewkarma"
-        # Make a GET request to PyPI to get the project's latest release.
-        response: dict = self.make_request(
-            endpoint=f"https://api.github.com/repos/bellingcat/{package_name}/releases/latest",
-            session=session,
-        )
-        release: dict = self._process_response(
-            response_data=response, valid_key="tag_name"
-        )
-
-        if release:
-            remote_version_str: str = release.get("tag_name")
-            markup_release_notes: str = release.get("body")
-
-            # Splitting the version strings into components
-            local_version_parts: list = [Version.major, Version.minor, Version.patch]
-            remote_version_parts: list = remote_version_str.split(".")
-
-            update_level: str = ""
-
-            # Check for differences in version parts
-            if remote_version_parts[0] != local_version_parts[0]:
-                update_level = "[red]MAJOR[/]"
-
-            elif remote_version_parts[1] != local_version_parts[1]:
-                update_level = "[yellow]MINOR[/]"
-
-            elif remote_version_parts[2] != local_version_parts[2]:
-                update_level = "[green]PATCH[/]"
-
-            if update_level:
-                markdown_release_notes = Markdown(markup=markup_release_notes)
-                console.print(
-                    Panel.fit(
-                        markdown_release_notes,
-                        title=f"[bold]{update_level} update [underline][cyan]{remote_version_str}[/][/] available[/]",
-                        title_align="left",
-                        subtitle=f"[bold]Thank you, for using {About.name}![/] ❤️ ",
-                        subtitle_align="left",
-                    )
-                )
-
-                # Skip auto-updating of the snap package
-                if is_snap_package(package=package_name):
-                    console.print(
-                        Panel.fit(
-                            f"Run [underline]snap refresh knewkarma[/] to update the [bold]{About.name}[/] snap.",
-                            title=f"[bold]How to update[/]",
-                            title_align="left",
-                        )
-                    )
-                elif is_pypi_package(package=package_name):
-                    status.stop()
-                    if Confirm.ask(
-                            f"Would you like to install this update?",
-                            default=False,
-                            console=console,
-                    ):
-                        update_pypi_package(package=package_name)
-                    status.start()
-
-    def _paginate(
-            self,
-            limit: int,
-            session: requests.Session,
-            data_processor: Callable,
-            **kwargs: Union[str, console.status],
+    def _paginate_response(
+        self,
+        limit: int,
+        session: requests.Session,
+        data_processor: Callable,
+        **kwargs: Union[str, console.status],
     ) -> list[dict]:
         """
         Fetches and processes data in a paginated manner
@@ -247,11 +137,109 @@ class Api:
 
         return all_items
 
+    @staticmethod
+    def make_request(
+        endpoint: str,
+        session: requests.Session,
+    ) -> Union[dict, list]:
+        """
+        Sends a  GET request to the specified endpoint and returns JSON or list response.
+
+        :param endpoint: The API endpoint to fetch data from.
+        :type endpoint: str
+        :param session: A requests.Session to use for the request. to use for the request.
+        :type session: requests.Session
+        :return: JSON data as a dictionary or list. Returns an empty dict if fetching fails.
+        :rtype: Union[dict, list]
+        """
+        try:
+            with session.get(
+                endpoint,
+                headers={
+                    "User-Agent": f"{About.name.replace(' ', '-')}/{Version.release} "
+                    f"(Python {python_version}; +{About.documentation})"
+                },
+            ) as response:
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    error_message: dict = response.json()
+                    console.log(f"[[red]✘[/]] An API error occurred: {error_message}")
+                    return {}
+
+        except requests.ConnectionError as connection_error:
+            console.log(f"[[red]✘[/]] An HTTP error occurred: {connection_error}")
+            return {}
+        except Exception as unexpected_error:
+            console.log(f"[[red]✘[/]] An unexpected error occurred: {unexpected_error}")
+            return {}
+
+    def check_updates(self, session: requests.Session, status: console.status):
+        """
+        Checks for updates by comparing the current local version with the remote version.
+
+        Assumes version format: major.minor.patch.prefix
+
+        :param session: A requests.Session to use for the request. to use for the request.
+        :type session: requests.Session
+        :param status: An instance of `console.status` used to display animated status messages.
+        :type status: Console.console.status
+        """
+        package_name: str = "knewkarma"
+        # Make a GET request to PyPI to get the project's latest release.
+        response: dict = self.make_request(
+            endpoint=f"https://api.github.com/repos/bellingcat/{package_name}/releases/latest",
+            session=session,
+        )
+        release: dict = self._process_response(
+            response_data=response, valid_key="tag_name"
+        )
+
+        if release:
+            remote_version_str: str = release.get("tag_name")
+            markup_release_notes: str = release.get("body")
+
+            # Splitting the version strings into components
+            local_version_parts: list = [Version.major, Version.minor, Version.patch]
+            remote_version_parts: list = remote_version_str.split(".")
+
+            update_level: str = ""
+
+            # Check for differences in version parts
+            if remote_version_parts[0] != local_version_parts[0]:
+                update_level = "[red]MAJOR[/]"
+
+            elif remote_version_parts[1] != local_version_parts[1]:
+                update_level = "[yellow]MINOR[/]"
+
+            elif remote_version_parts[2] != local_version_parts[2]:
+                update_level = "[green]PATCH[/]"
+
+            if update_level:
+                markdown_release_notes = Markdown(markup=markup_release_notes)
+                create_panel(
+                    title=f"[bold]{update_level} update [underline][cyan]{remote_version_str}[/][/] available[/]",
+                    content=markdown_release_notes,
+                )
+
+                # Skip auto-updating of the snap package
+                if is_snap_package(package=package_name):
+                    pass
+                elif is_pypi_package(package=package_name):
+                    status.stop()
+                    if Confirm.ask(
+                        f"Would you like to install this update?",
+                        default=False,
+                        console=console,
+                    ):
+                        update_pypi_package(package=package_name)
+                    status.start()
+
     def get_entity(
-            self,
-            entity_type: Literal["post", "subreddit", "user", "wiki_page"],
-            session: requests.Session,
-            **kwargs: str,
+        self,
+        entity_type: Literal["post", "subreddit", "user", "wiki_page"],
+        session: requests.Session,
+        **kwargs: str,
     ) -> dict:
         """
         Gets data from the specified entity.
@@ -265,7 +253,7 @@ class Api:
         # Use a dictionary for direct mapping
         entity_mapping: dict = {
             "post": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-                    f"/comments/{kwargs.get('post_id')}.json",
+            f"/comments/{kwargs.get('post_id')}.json",
             "user": f"{self._user_endpoint}/{kwargs.get('username')}/about.json",
             "subreddit": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/about.json",
             "wiki_page": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/wiki/{kwargs.get('page_name')}.json",
@@ -286,26 +274,26 @@ class Api:
         )
 
     def get_posts(
-            self,
-            posts_type: Literal[
-                "best",
-                "controversial",
-                "front_page",
-                "new",
-                "popular",
-                "rising",
-                "subreddit_posts",
-                "search_subreddit_posts",
-                "user_posts",
-                "user_overview",
-                "user_comments",
-                "post_comments",
-            ],
-            limit: int,
-            session: requests.Session,
-            timeframe: TIMEFRAME = "all",
-            sort: SORT_CRITERION = "all",
-            **kwargs: Union[console.status, str],
+        self,
+        posts_type: Literal[
+            "best",
+            "controversial",
+            "front_page",
+            "new",
+            "popular",
+            "rising",
+            "subreddit_posts",
+            "search_subreddit_posts",
+            "user_posts",
+            "user_overview",
+            "user_comments",
+            "post_comments",
+        ],
+        limit: int,
+        session: requests.Session,
+        timeframe: TIMEFRAME = "all",
+        sort: SORT_CRITERION = "all",
+        **kwargs: Union[console.status, str],
     ) -> list[dict]:
         """
         Gets a specified number of posts, with a specified sorting criterion, from the specified source.
@@ -335,15 +323,15 @@ class Api:
             "user_overview": f"{self._user_endpoint}/{kwargs.get('username')}/overview.json",
             "user_comments": f"{self._user_endpoint}/{kwargs.get('username')}/comments.json",
             "post_comments": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-                             f"/comments/{kwargs.get('post_id')}.json",
+            f"/comments/{kwargs.get('post_id')}.json",
             "search_subreddit_posts": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}"
-                                      f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
+            f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
         }
 
         endpoint = source_map.get(posts_type, "")
         endpoint += f"?limit={limit}&sort={sort}&t={timeframe}&raw_json=1"
 
-        posts: list[dict] = self._paginate(
+        posts: list[dict] = self._paginate_response(
             limit=limit,
             session=session,
             posts_type=posts_type,
@@ -355,12 +343,12 @@ class Api:
         return posts
 
     def get_subreddits(
-            self,
-            session: requests.Session,
-            subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            **kwargs: Union[str, console.status],
+        self,
+        session: requests.Session,
+        subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        **kwargs: Union[str, console.status],
     ) -> Union[list[dict], dict]:
         """
         Gets the specified type of subreddits.
@@ -394,7 +382,7 @@ class Api:
         else:
             endpoint += f"?limit={limit}&t={timeframe}"
 
-            subreddits: list[dict] = self._paginate(
+            subreddits: list[dict] = self._paginate_response(
                 limit=limit,
                 session=session,
                 status=kwargs.get("status"),
@@ -405,12 +393,12 @@ class Api:
         return subreddits
 
     def get_users(
-            self,
-            session: requests.Session,
-            users_type: Literal["all", "popular", "new"],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        users_type: Literal["all", "popular", "new"],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Gets the specified type of subreddits.
@@ -436,7 +424,7 @@ class Api:
 
         endpoint = users_mapping.get(users_type, "")
         endpoint += f"?limit={limit}&t={timeframe}"
-        users: list[dict] = self._paginate(
+        users: list[dict] = self._paginate_response(
             limit=limit,
             session=session,
             status=status,
@@ -447,13 +435,13 @@ class Api:
         return users
 
     def search_entities(
-            self,
-            session: requests.Session,
-            entity_type: Literal["users", "subreddits", "posts"],
-            query: str,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        entity_type: Literal["users", "subreddits", "posts"],
+        query: str,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Searches from a specified results type that match the specified query.
@@ -481,7 +469,7 @@ class Api:
         endpoint = search_mapping.get(entity_type, "")
         endpoint += f"/search.json?q={query}&limit={limit}&sort={sort}"
 
-        search_results: list[dict] = self._paginate(
+        search_results: list[dict] = self._paginate_response(
             limit=limit,
             session=session,
             status=status,
@@ -490,5 +478,6 @@ class Api:
         )
 
         return search_results
+
 
 # -------------------------------- END ----------------------------------------- #

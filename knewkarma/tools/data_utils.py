@@ -5,18 +5,35 @@ import pandas as pd
 
 from .general_utils import console
 
-__all__ = [
-    "create_dataframe",
-    "export_dataframe",
-    "EXPORT_FORMATS"
-]
+__all__ = ["create_dataframe", "export_dataframe", "EXPORT_FORMATS", "get_file_size"]
 
 EXPORT_FORMATS = Literal["csv", "html", "json", "xml"]
 
 
+def get_file_size(file_path: str) -> str:
+    """
+    Gets a file size and puts it in human-readable form.
+
+    :param file_path: Path to target file.
+    :type file_path: str
+    :return: A human-readable form of the file size.
+    :rtype: str
+    """
+    file_size_bytes: int = os.path.getsize(file_path)
+    units: list = ["B", "KB", "MB", "GB", "TB", "PB"]
+
+    unit_index: int = 0
+
+    while file_size_bytes >= 1024 and unit_index < len(units) - 1:
+        file_size_bytes /= 1024
+        unit_index += 1
+
+    return f"{file_size_bytes:.2f} {units[unit_index]}"
+
+
 def create_dataframe(
-        data: Union[dict, list[dict], list[tuple]],
-):
+    data: Union[dict, list[dict], list[tuple]],
+) -> pd.DataFrame:
     """
     Converts provided data into a pandas DataFrame.
 
@@ -33,7 +50,7 @@ def create_dataframe(
 
     # Convert a list of objects (Comment, Community, Post, PreviewCommunity, User) to a list of dictionaries
     elif isinstance(data, list) and all(
-            isinstance(item, (dict, tuple)) for item in data
+        isinstance(item, (dict, tuple)) for item in data
     ):
         # Each object in the list is converted to its dictionary representation
         data = [item for item in data]
@@ -48,10 +65,10 @@ def create_dataframe(
 
 
 def export_dataframe(
-        dataframe: pd.DataFrame,
-        filename: str,
-        directory: str,
-        formats: list[EXPORT_FORMATS],
+    dataframe: pd.DataFrame,
+    filename: str,
+    directory: str,
+    formats: list[EXPORT_FORMATS],
 ):
     """
     Exports a Pandas dataframe to specified file formats.
@@ -93,9 +110,10 @@ def export_dataframe(
             )
             file_mapping.get(file_format)()
             console.print(
-                f"[[green]✔[/]] {os.path.getsize(filepath)} bytes written to [link file://{filepath}]{filepath}"
+                f"[[green]*[/]] {get_file_size(file_path=filepath)} written to [link file://{filepath}]{filepath}"
             )
         else:
             raise ValueError(f"Unsupported file format: {file_format}")
+
 
 # -------------------------------- END ----------------------------------------- #

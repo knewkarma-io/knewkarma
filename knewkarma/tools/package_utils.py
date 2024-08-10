@@ -25,7 +25,7 @@ def is_snap_package(package: str) -> bool:
         >>> False # If script isn't running in a SNAP environment.
     """
     if package:
-        return True if os.getenv('SNAP') else False
+        return True if os.getenv("SNAP") else False
     else:
         raise ValueError("Empty package name provided.")
 
@@ -76,14 +76,13 @@ def update_pypi_package(package: str):
     if package:
         try:
             subprocess.run(["pip", "install", "--upgrade", package], check=True)
-            console.print(
-                f"[[green]✔[/]] DONE. Updates will be applied on next run."
-            )
+            console.print(f"[[green]✔[/]] DONE. Updates will be applied on next run.")
         except subprocess.CalledProcessError as e:
             console.log(f"[[red]✘[/]] Failed to update {package}: {e}")
         except Exception as e:
             console.log(f"[[red]✘[/]] Unexpected error: {e}")
     else:
         raise ValueError("Empty package name provided.")
+
 
 # -------------------------------- END ----------------------------------------- #
