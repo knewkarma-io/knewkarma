@@ -3,7 +3,7 @@ from datetime import timezone, datetime, timedelta
 import requests
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
-from knewkarma.api import Api
+from src import Api
 
 api = Api()
 

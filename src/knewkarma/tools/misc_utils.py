@@ -1,17 +1,19 @@
 import os
-from typing import Union, Text
+from typing import Union
 
 from rich.box import DOUBLE
 from rich.console import Console, ConsoleRenderable, RichCast
 from rich.panel import Panel
 
+from .styling_utils import Text
+
 __all__ = ["console", "create_panel", "pathfinder"]
 
 
 def create_panel(
-        title: str,
-        content: Union[ConsoleRenderable, RichCast, Text],
-        subtitle: str = None,
+    title: str,
+    content: Union[ConsoleRenderable, RichCast, str],
+    subtitle: str = None,
 ):
     """
     Creates a rich Panel for whatever data is needed to be placed in it.
@@ -25,7 +27,7 @@ def create_panel(
 
     Usage::
 
-        >>> from knewkarma.tools.general_utils import create_panel
+        >>> from knewkarma.tools.misc_utils import create_panel
 
         >>> create_panel(
         >>>     title="Did you know?",
@@ -36,18 +38,18 @@ def create_panel(
     console.print(
         Panel(
             renderable=content,
-            title=f"[bold]{title}[/]",
+            title=f"{Text.bold}{title}{Text.reset}",
             subtitle=(subtitle if subtitle else None),
-            style="white on black",
             expand=False,
             box=DOUBLE,
+            style=f"{Text.white.strip('[,]')} on {Text.blue.strip('[,]')}",
         )
     )
 
 
 def pathfinder(directories: list[str]):
     """
-    Creates directories in knewkarma-output directory of the user's home folder.
+    Creates directories in src-output directory of the user's home folder.
 
     :param directories: A list of file directories to create.
     :type directories: list[str]

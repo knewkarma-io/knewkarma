@@ -17,13 +17,8 @@ PATCH="${VERSION_PARTS[2]}"
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 # Define absolute file paths
-VERSION_PY="$SCRIPT_DIR/knewkarma/version.py"
+VERSION_PY="$SCRIPT_DIR/src/knewkarma/version.py"
 PYPROJECT_TOML="$SCRIPT_DIR/pyproject.toml"
-
-# Print the current directory and the files in it for debugging
-echo "Current directory: $SCRIPT_DIR"
-echo "Files in the current directory:"
-ls -la "$SCRIPT_DIR"
 
 # Check if files exist
 if [ ! -f "$VERSION_PY" ]; then
@@ -36,11 +31,12 @@ if [ ! -f "$PYPROJECT_TOML" ]; then
   exit 1
 fi
 
-
-# Update version in knewkarma/version.py
-sed -i.bak "s/\(major: str = \)\"[^\"]*\"/\1\"$MAJOR\"/" "$VERSION_PY"
-sed -i.bak "s/\(minor: str = \)\"[^\"]*\"/\1\"$MINOR\"/" "$VERSION_PY"
-sed -i.bak "s/\(patch: str = \)\"[^\"]*\"/\1\"$PATCH\"/" "$VERSION_PY"
+# Update version in src/knewkarma/version.py
+sed -i.bak "s/major: tuple\[int, str\] = [0-9]\+/major: tuple[int, str] = $MAJOR/" "$VERSION_PY"
+sed -i.bak "s/minor: tuple\[int, str\] = [0-9]\+/minor: tuple[int, str] = $MINOR/" "$VERSION_PY"
+sed -i.bak "s/patch: tuple\[int, str\] = [0-9]\+/patch: tuple[int, str] = $PATCH/" "$VERSION_PY"
+sed -i.bak "s/full: str = \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/full: str = \"$MAJOR.$MINOR.$PATCH\"/" "$VERSION_PY"
+sed -i.bak "s/release: str = \"[0-9]\+\.[0-9]\+\"/release: str = \"$MAJOR.$MINOR\"/" "$VERSION_PY"
 
 # Update version in pyproject.toml
 sed -i.bak "s/version = \".*\"/version = \"$VERSION\"/" "$PYPROJECT_TOML"
@@ -49,4 +45,5 @@ sed -i.bak "s/version = \".*\"/version = \"$VERSION\"/" "$PYPROJECT_TOML"
 rm "${VERSION_PY}.bak"
 rm "${PYPROJECT_TOML}.bak"
 
-echo "Version updated to $VERSION in $VERSION_PY, $PYPROJECT_TOML, and $SNAPCRAFT_YML"
+echo "Version updated to $VERSION in $VERSION_PY and $PYPROJECT_TOML"
+
