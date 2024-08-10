@@ -74,12 +74,12 @@ __all__ = ["start"]
 )
 @click.pass_context
 def cli(
-    ctx: click.Context,
-    timeframe: TIMEFRAME,
-    sort: SORT_CRITERION,
-    limit: int,
-    time_format: str,
-    export: list[EXPORT_FORMATS],
+        ctx: click.Context,
+        timeframe: TIMEFRAME,
+        sort: SORT_CRITERION,
+        limit: int,
+        time_format: str,
+        export: list[EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -107,7 +107,7 @@ def cli(
 
 @cli.command(
     help="Use this command to get an individual post's data including its comments, "
-    "provided the post's `id` and source `subreddit` are specified.",
+         "provided the post's `id` and source `subreddit` are specified.",
     cls=click.RichCommand,
 )
 @click.argument("id")
@@ -177,13 +177,13 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 @click.option("-r", "--rising", is_flag=True, help="Get posts from the rising listing")
 @click.pass_context
 def posts(
-    ctx: click.Context,
-    best: bool,
-    controversial: bool,
-    front_page: bool,
-    new: bool,
-    popular: bool,
-    rising: bool,
+        ctx: click.Context,
+        best: bool,
+        controversial: bool,
+        front_page: bool,
+        new: bool,
+        popular: bool,
+        rising: bool,
 ):
     """
     Retrieve various types of posts such as best, controversial, popular, new, and front-page.
@@ -325,16 +325,16 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
 @click.option("-wps", "--wiki-pages", is_flag=True, help="Get a subreddit's wiki pages")
 @click.pass_context
 def subreddit(
-    ctx: click.Context,
-    subreddit_name: str,
-    comments: bool,
-    comments_per_post: int,
-    posts: bool,
-    profile: bool,
-    search_comments: str,
-    search_post: str,
-    wiki_page: str,
-    wiki_pages: bool,
+        ctx: click.Context,
+        subreddit_name: str,
+        comments: bool,
+        comments_per_post: int,
+        posts: bool,
+        profile: bool,
+        search_comments: str,
+        search_post: str,
+        wiki_page: str,
+        wiki_pages: bool,
 ):
     """
     Retrieve data about a specific subreddit including profile, comments, posts, and wiki pages.
@@ -498,7 +498,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 
 @cli.command(
     help="Use this command to get user data, such as profile, posts, "
-    "comments, top subreddits, moderated subreddits, and more...",
+         "comments, top subreddits, moderated subreddits, and more...",
     cls=click.RichCommand,
 )
 @click.argument("username")
@@ -532,16 +532,16 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 )
 @click.pass_context
 def user(
-    ctx: click.Context,
-    username: str,
-    comments: bool,
-    moderated_subreddits: bool,
-    overview: bool,
-    posts: bool,
-    profile: bool,
-    search_comments: str,
-    search_posts: str,
-    top_subreddits: int,
+        ctx: click.Context,
+        username: str,
+        comments: bool,
+        moderated_subreddits: bool,
+        overview: bool,
+        posts: bool,
+        profile: bool,
+        search_comments: str,
+        search_posts: str,
+        top_subreddits: int,
 ):
     """
     Retrieve data about a specific user including profile, posts, comments, and top subreddits.
@@ -685,10 +685,10 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 
 
 def call_method(
-    method: Callable,
-    session: requests.session,
-    status: console.status,
-    **kwargs: Union[str, click.Context],
+        method: Callable,
+        session: requests.session,
+        status: console.status,
+        **kwargs: Union[str, click.Context],
 ):
     """
     Calls a method with the provided arguments.
@@ -720,8 +720,7 @@ def call_method(
             content=str(dataframe),
         )
 
-        export_to_files: list = kwargs.get("export").split(",")
-        if export_to_files:
+        if kwargs.get("export"):
             output_parent_dir: str = os.path.expanduser(
                 os.path.join("~", "knewkarma-data")
             )
@@ -738,6 +737,7 @@ def call_method(
                 ]
             )
 
+            export_to_files: list = kwargs.get("export").split(",")
             export_dataframe(
                 dataframe=dataframe,
                 filename=filename_timestamp(),
@@ -747,7 +747,7 @@ def call_method(
 
 
 def handle_method_calls(
-    ctx: click.Context, method_map: dict, export: str, **kwargs: Union[str, int, bool]
+        ctx: click.Context, method_map: dict, export: str, **kwargs: Union[str, int, bool]
 ):
     """
     Handle the method calls based on the provided arguments.
@@ -767,7 +767,7 @@ def handle_method_calls(
             start_time: datetime = datetime.now()
             try:
                 with console.status(
-                    "Establishing connection /w new session...", spinner="dots2"
+                        "Establishing connection /w new session...", spinner="dots2"
                 ) as status:
                     with requests.Session() as session:
                         # Api().check_updates(session=session, status=status)
@@ -796,6 +796,5 @@ def start():
     Main entrypoint for the Knew Karma command-line interface.
     """
     cli(obj={})
-
 
 # -------------------------------- END ----------------------------------------- #
