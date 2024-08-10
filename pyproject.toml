@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "knewkarma"
-version = "6.0.4"
+version = "6.1.0"
 description = "A Reddit data analysis toolkit"
 authors = ["Richard Mwewa <rly0nheart@duck.com>"]
 readme = "README.md"
@@ -28,7 +28,6 @@ classifiers = [
 python = "^3.10"
 click = "^8.1.7"
 pandas = "^2.1.4"
-psutil = "^5.9.4"
 requests = "^2.32.3"
 rich = "^13.3.1"
 rich-click = "^1.8.3"

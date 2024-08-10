@@ -7,13 +7,13 @@ import rich_click as click
 
 from . import Post, Posts, Search, Subreddit, Subreddits, User, Users
 from .about import About
-from .api import SORT_CRITERION, TIMEFRAME, TIME_FORMAT, Api
+from .api import SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .tools.data_utils import (
     create_dataframe,
     export_dataframe,
     EXPORT_FORMATS,
 )
-from .tools.general_utils import console, pathfinder, print_banner
+from .tools.general_utils import console, pathfinder, create_panel
 from .tools.time_utils import filename_timestamp
 from .version import Version
 
@@ -684,8 +684,12 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     )
 
 
-def call_method(method: Callable, session: requests.session, status: console.status,
-                **kwargs: Union[str, click.Context]):
+def call_method(
+        method: Callable,
+        session: requests.session,
+        status: console.status,
+        **kwargs: Union[str, click.Context],
+):
     """
     Calls a method with the provided arguments.
 
@@ -697,17 +701,33 @@ def call_method(method: Callable, session: requests.session, status: console.sta
     :type status: Console.console.status
     :param kwargs: Additional keyword arguments for `export: str`, `argument: str` and `ctx: click.Context` .
     """
+    command: str = kwargs.get("ctx").command.name
+    argument: str = kwargs.get("argument")
+
     response_data = method(session=session, status=status)
     if response_data:
         dataframe = create_dataframe(data=response_data)
-        console.print(dataframe)
+
+        panel_title: str = (
+            f"[bold]Showing[/] [cyan]{len(response_data)}[/] [bold]{command} {argument}[/]"
+            if isinstance(response_data, list)
+            else f"[bold]Showing {command} {argument}[/]"
+        )
+
+        create_panel(
+            title=panel_title,
+            subtitle=f"[bold]Thank you, for using {About.name}![/] ❤️ ",
+            content=str(dataframe),
+        )
 
         if kwargs.get("export"):
             output_parent_dir: str = os.path.expanduser(
                 os.path.join("~", "knewkarma-data")
             )
             output_child_dir: str = os.path.join(
-                output_parent_dir, kwargs.get("ctx").command.name, kwargs.get("argument")
+                output_parent_dir,
+                command,
+                argument,
             )
 
             pathfinder(
@@ -717,16 +737,18 @@ def call_method(method: Callable, session: requests.session, status: console.sta
                 ]
             )
 
-            selected_export_formats: list = kwargs.get("export").split(",")
+            export_to_files: list = kwargs.get("export").split(",")
             export_dataframe(
                 dataframe=dataframe,
                 filename=filename_timestamp(),
                 directory=output_child_dir,
-                formats=selected_export_formats,
+                formats=export_to_files,
             )
 
 
-def handle_method_calls(ctx: click.Context, method_map: dict, export: str, **kwargs: Union[str, int, bool]):
+def handle_method_calls(
+        ctx: click.Context, method_map: dict, export: str, **kwargs: Union[str, int, bool]
+):
     """
     Handle the method calls based on the provided arguments.
 
@@ -738,29 +760,34 @@ def handle_method_calls(ctx: click.Context, method_map: dict, export: str, **kwa
     :type export: str
     :param kwargs: Additional keyword arguments.
     """
-    arg_is_present: bool = False
+    is_valid_arg: bool = False
     for argument, method in method_map.items():
         if kwargs.get(argument):
-            print_banner()
+            is_valid_arg = True
             start_time: datetime = datetime.now()
-            arg_is_present = True
             try:
                 with console.status(
                         "Establishing connection /w new session...", spinner="dots2"
                 ) as status:
                     with requests.Session() as session:
-                        Api().check_updates(session=session, status=status)
-                        call_method(method=method, session=session, status=status, ctx=ctx, export=export,
-                                    argument=argument)
+                        # Api().check_updates(session=session, status=status)
+                        call_method(
+                            method=method,
+                            session=session,
+                            status=status,
+                            ctx=ctx,
+                            export=export,
+                            argument=argument,
+                        )
             except KeyboardInterrupt:
-                console.log("[[yellow]✘[/]] Process aborted /w CTRL+C.")
+                console.print("[[yellow]✘[/]] Process aborted /w CTRL+C.")
             finally:
                 elapsed_time = datetime.now() - start_time
                 console.print(
-                    f"[[green]✔[/]] DONE. {elapsed_time.total_seconds():.2f} seconds elapsed."
+                    f"[[green]✔[/]] DONE. {elapsed_time.total_seconds():.2f}ms elapsed."
                 )
 
-    if arg_is_present is False:
+    if not is_valid_arg:
         ctx.get_usage()
 
 
