@@ -8,7 +8,7 @@ from rich.text import Text
 
 from . import Post, Posts, Search, Subreddit, Subreddits, User, Users
 from .about import About
-from .api import SORT_CRITERION, TIMEFRAME, TIME_FORMAT
+from .api import SORT_CRITERION, TIMEFRAME, TIME_FORMAT, Api
 from .tools.data_utils import (
     create_dataframe,
     export_dataframe,
