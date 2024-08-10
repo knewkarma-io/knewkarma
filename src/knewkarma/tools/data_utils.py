@@ -5,7 +5,7 @@ import pandas as pd
 
 from .general_utils import console
 
-__all__ = ["create_dataframe", "export_dataframe", "EXPORT_FORMATS", "get_file_size"]
+__all__ = ["create_dataframe", "export_dataframe", "EXPORT_FORMATS"]
 
 EXPORT_FORMATS = Literal["csv", "html", "json", "xml"]
 
@@ -32,7 +32,7 @@ def get_file_size(file_path: str) -> str:
 
 
 def create_dataframe(
-    data: Union[dict, list[dict], list[tuple]],
+        data: Union[dict, list[dict], list[tuple]],
 ) -> pd.DataFrame:
     """
     Converts provided data into a pandas DataFrame.
@@ -50,7 +50,7 @@ def create_dataframe(
 
     # Convert a list of objects (Comment, Community, Post, PreviewCommunity, User) to a list of dictionaries
     elif isinstance(data, list) and all(
-        isinstance(item, (dict, tuple)) for item in data
+            isinstance(item, (dict, tuple)) for item in data
     ):
         # Each object in the list is converted to its dictionary representation
         data = [item for item in data]
@@ -65,10 +65,10 @@ def create_dataframe(
 
 
 def export_dataframe(
-    dataframe: pd.DataFrame,
-    filename: str,
-    directory: str,
-    formats: list[EXPORT_FORMATS],
+        dataframe: pd.DataFrame,
+        filename: str,
+        directory: str,
+        formats: list[EXPORT_FORMATS],
 ):
     """
     Exports a Pandas dataframe to specified file formats.
@@ -114,6 +114,5 @@ def export_dataframe(
             )
         else:
             raise ValueError(f"Unsupported file format: {file_format}")
-
 
 # -------------------------------- END ----------------------------------------- #
