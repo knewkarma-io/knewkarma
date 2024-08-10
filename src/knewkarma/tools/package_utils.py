@@ -18,7 +18,7 @@ def is_snap_package(package: str) -> bool:
 
     Usage::
 
-        >>> from knewkarma.tools import is_snap_package
+        >>> from knewkarma.tools.package_utils import is_snap_package
 
         >>> package_name = "src"
         >>> print(is_snap_package(package=package_name))
@@ -41,7 +41,7 @@ def is_pypi_package(package: str) -> bool:
 
     Usage::
 
-        >>> from knewkarma.tools import is_pypi_package
+        >>> from knewkarma.tools.package_utils import is_pypi_package
 
         >>> package_name = "src"
         >>> print(is_pypi_package(package=package_name))
@@ -67,7 +67,7 @@ def update_pypi_package(package: str):
 
     Usage::
 
-        >>> from knewkarma.tools import update_pypi_package
+        >>> from knewkarma.tools.package_utils import update_pypi_package
 
         >>> # This will update the pypi package
         >>> package_name = "src"

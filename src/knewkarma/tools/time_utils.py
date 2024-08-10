@@ -16,7 +16,7 @@ __all__ = [
 
 
 def countdown_timer(
-    status: Status, duration: int, current_count: int, overall_count: int
+        status: Status, duration: int, current_count: int, overall_count: int
 ):
     """
     Handles the live countdown during pagination, updating the status bar with the remaining time.
@@ -50,7 +50,7 @@ def timestamp_to_locale(timestamp: float) -> str:
 
     Usage::
 
-        >>> from src import timestamp_to_locale
+        >>> from knewkarma.tools.time_utils import timestamp_to_locale
 
         >>> coffee_time = 1722277062
         >>> difference = timestamp_to_locale(timestamp=coffee_time)
@@ -82,7 +82,7 @@ def timestamp_to_concise(timestamp: int) -> str:
 
     Usage::
 
-        >>> from src import timestamp_to_concise
+        >>> from knewkarma.tools.time_utils import timestamp_to_concise
 
         >>> coffee_time = 1722277062
         >>> difference = timestamp_to_concise(timestamp=coffee_time)
@@ -133,7 +133,7 @@ def timestamp_to_concise(timestamp: int) -> str:
 
 
 def timestamp_to_readable(
-    timestamp: float, time_format: Literal["concise", "locale"] = "locale"
+        timestamp: float, time_format: Literal["concise", "locale"] = "locale"
 ) -> Union[str, None]:
     """
     Converts a Unix timestamp into a more readable format based on the specified `time_format`.
@@ -151,7 +151,7 @@ def timestamp_to_readable(
 
     Usage::
 
-        >>> from src import timestamp_to_readable
+        >>> from knewkarma.tools.time_utils import timestamp_to_readable
 
         >>> coffee_time = 1722277062
         >>> difference = timestamp_to_readable(timestamp=coffee_time, time_format="concise")
@@ -194,6 +194,5 @@ def filename_timestamp() -> str:
         if os.name == "nt"
         else now.strftime("%d-%B-%Y-%I:%M:%S%p")
     )
-
 
 # -------------------------------- END ----------------------------------------- #
