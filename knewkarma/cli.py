@@ -715,6 +715,8 @@ def call_method(
             else f"Showing {command} [italic]{argument}[/]"
         )
 
+        panel_title += f" — {About.name} [cyan]{Version.release}[/]"
+
         create_panel(
             title=panel_title,
             subtitle=f"[italic]Thank you, for using {About.name}![/] ❤️ ",
