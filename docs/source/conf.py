@@ -9,10 +9,7 @@ from knewkarma.version import Version
 
 project = About.name
 author = About.author
-copyright = (
-    f" {date.today().year} MIT License, "
-    f'<a href="{author[1]}" target="_blank">{author[0]}</a>'
-)
+copyright = f' {date.today().year} MIT License, <a href="{author[1]}" target="_blank">{author[0]}</a>'
 
 release = Version.release
 version = Version.full

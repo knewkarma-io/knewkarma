@@ -13,6 +13,7 @@ class Text:
         white (str): Rich code for white text.
         reset (str): Rich code to reset text formatting.
     """
+
     blue: str = "[blue]"
     bold: str = "[bold]"
     cyan: str = "[cyan]"
@@ -34,9 +35,11 @@ class Prefix:
         ok (str): A styled prefix for successful operations, displaying a green '✔'.
         notify (str): A styled prefix for general notifications, displaying a green '*'.
     """
+
     error: str = f"[{Text.red}✘{Text.reset}]"
     warning: str = f"[{Text.yellow}✘{Text.reset}]"
     ok: str = f"[{Text.green}✔{Text.reset}]"
     notify: str = f"[{Text.green}*{Text.reset}]"
+
 
 # -------------------------------- END ----------------------------------------- #

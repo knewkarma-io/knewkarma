@@ -11,9 +11,9 @@ __all__ = ["console", "create_panel", "pathfinder"]
 
 
 def create_panel(
-        title: str,
-        content: Union[ConsoleRenderable, RichCast, str],
-        subtitle: str = None,
+    title: str,
+    content: Union[ConsoleRenderable, RichCast, str],
+    subtitle: str = None,
 ):
     """
     Creates a rich Panel for whatever data is needed to be placed in it.
