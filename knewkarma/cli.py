@@ -710,9 +710,9 @@ def call_method(
         dataframe = create_dataframe(data=response_data)
 
         panel_title: str = (
-            f"[cyan]{len(response_data)}[/] {command} {argument}"
+            f"Showing [cyan]{len(response_data)}[/] {command} [italic]{argument}[/]"
             if isinstance(response_data, list)
-            else f"{command} {argument}"
+            else f"Showing {command} [italic]{argument}[/]"
         )
 
         create_panel(
