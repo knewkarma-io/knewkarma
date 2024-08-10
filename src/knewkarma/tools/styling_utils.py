@@ -3,15 +3,15 @@ __all__ = ["Text", "Prefix"]
 
 class Text:
     """
-    A class containing rich formatting codes for styling text.
+    A class containing rich formatting codes for styling text.svg.
 
     Attributes:
-        blue (str): Rich code for blue text.
-        green (str): Rich code for green text.
-        yellow (str): Rich code for yellow text.
-        red (str): Rich code for red text.
-        white (str): Rich code for white text.
-        reset (str): Rich code to reset text formatting.
+        blue (str): Rich code for blue text.svg.
+        green (str): Rich code for green text.svg.
+        yellow (str): Rich code for yellow text.svg.
+        red (str): Rich code for red text.svg.
+        white (str): Rich code for white text.svg.
+        reset (str): Rich code to reset text.svg formatting.
     """
 
     blue: str = "[blue]"
