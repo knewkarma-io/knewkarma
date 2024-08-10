@@ -6,11 +6,13 @@ description: |
   **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
   functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
   **Application Programming Interface (API)** to enable an easy integration in other Python Projects. Refer to the documentation (https://knewkarma.readthedocs.io) for the **usage** and **integration** guide.
-version: 6.1.0
 license: MIT
+version: "0.1" # Placeholder; this will be overridden
+
 base: core22
 grade: stable
 confinement: strict
+adopt-info: knewkarma
 
 source-code: https://github.com/bellingcat/knewkarma
 issues:
@@ -24,6 +26,13 @@ parts:
   knewkarma:
     plugin: python
     source: .
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version "$(git describe --tags --always)"
+    override-build: |
+      snapcraftctl build
+      # Ensure all commit history is available
+      git fetch --unshallow || true
 
 type: app
 apps:
