@@ -6,10 +6,11 @@ from knewkarma.version import Version
 # Configuration file for the Sphinx documentation builder.
 
 # -- Project information
+author_name, author_link = About.author
 
 project = About.name
-author = About.author[0]
-copyright = f' {date.today().year} MIT License, <a href="{About.author[1]}" target="_blank">{author}</a>'
+author = author_name
+copyright = f' {date.today().year} MIT License, <a href="{author_link}" target="_blank">{author_name}</a>'
 
 release = Version.release
 version = Version.full
