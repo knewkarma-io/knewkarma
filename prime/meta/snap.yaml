@@ -1,0 +1,34 @@
+name: knewkarma
+title: Knew Karma
+version: 0+git.7141175-dirty
+summary: A Reddit data analysis toolkit
+description: |
+  **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
+  functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
+  **Application Programming Interface (API)** to enable an easy integration in other Python Projects. Refer to the documentation (https://knewkarma.readthedocs.io) for the **usage** and **integration** guide.
+license: MIT
+type: app
+architectures:
+- amd64
+base: core22
+apps:
+  knewkarma:
+    command: bin/knewkarma
+    plugs:
+    - network
+    - network-bind
+    - home
+confinement: strict
+grade: stable
+environment:
+  LD_LIBRARY_PATH: ${SNAP_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}:$SNAP/lib
+  PATH: $SNAP/usr/sbin:$SNAP/usr/bin:$SNAP/sbin:$SNAP/bin:$PATH
+links:
+  contact:
+  - mailto:rly0nheart@duck.com
+  donation:
+  - https://buymeacoffee.com/rly0nheart/
+  issues:
+  - https://github.com/bellingcat/knewkarma/issues
+  source-code:
+  - https://github.com/bellingcat/knewkarma
