@@ -7,14 +7,14 @@ from rich.panel import Panel
 
 __all__ = ["console", "create_panel", "pathfinder"]
 
-from knewkarma.about import About
-from knewkarma.version import Version
+from ..about import About
+from ..version import Version
 
 
 def create_panel(
-    title: str,
-    content: Union[ConsoleRenderable, RichCast, Text],
-    subtitle: str = None,
+        title: str,
+        content: Union[ConsoleRenderable, RichCast, Text],
+        subtitle: str = None,
 ):
     """
     Creates a rich Panel for whatever data is needed to be placed in it.
