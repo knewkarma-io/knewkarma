@@ -39,7 +39,7 @@ def create_panel(
     console.print(
         Panel(
             renderable=content,
-            title=f"[bold]( {title} — {About.name} [cyan]{Version.release}[/] )[/]",
+            title=f"[bold][ {title} — {About.name} [cyan]{Version.release}[/] ][/]",
             subtitle=(subtitle if subtitle else None),
             style="white on black",
             expand=False,
