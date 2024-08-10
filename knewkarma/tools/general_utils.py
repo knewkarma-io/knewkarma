@@ -7,9 +7,6 @@ from rich.panel import Panel
 
 __all__ = ["console", "create_panel", "pathfinder"]
 
-from knewkarma.about import About
-from knewkarma.version import Version
-
 
 def create_panel(
         title: str,
@@ -39,7 +36,7 @@ def create_panel(
     console.print(
         Panel(
             renderable=content,
-            title=f"[bold][ {title} — {About.name} [cyan]{Version.release}[/] ][/]",
+            title=f"[bold]{title}[/]",
             subtitle=(subtitle if subtitle else None),
             style="white on black",
             expand=False,
