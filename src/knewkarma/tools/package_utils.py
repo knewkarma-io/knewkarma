@@ -1,7 +1,8 @@
 import os
 import subprocess
 
-from .general_utils import console
+from .misc_utils import console
+from .styling_utils import Prefix
 
 __all__ = ["is_pypi_package", "is_snap_package", "update_pypi_package"]
 
@@ -20,7 +21,7 @@ def is_snap_package(package: str) -> bool:
 
         >>> from knewkarma.tools.package_utils import is_snap_package
 
-        >>> package_name = "knewkarma"
+        >>> package_name = "src"
         >>> print(is_snap_package(package=package_name))
         >>> False # If script isn't running in a SNAP environment.
     """
@@ -43,7 +44,7 @@ def is_pypi_package(package: str) -> bool:
 
         >>> from knewkarma.tools.package_utils import is_pypi_package
 
-        >>> package_name = "knewkarma"
+        >>> package_name = "src"
         >>> print(is_pypi_package(package=package_name))
         >>> True
     """
@@ -70,17 +71,17 @@ def update_pypi_package(package: str):
         >>> from knewkarma.tools.package_utils import update_pypi_package
 
         >>> # This will update the pypi package
-        >>> package_name = "knewkarma"
+        >>> package_name = "src"
         >>> update_pypi_package(package=package_name)
     """
     if package:
         try:
             subprocess.run(["pip", "install", "--upgrade", package], check=True)
-            console.print(f"[[green]✔[/]] DONE. Updates will be applied on next run.")
+            console.print(f"{Prefix.ok} DONE. Updates will be applied on next run.")
         except subprocess.CalledProcessError as e:
-            console.log(f"[[red]✘[/]] Failed to update {package}: {e}")
+            console.log(f"{Prefix.error} Failed to update {package}: {e}")
         except Exception as e:
-            console.log(f"[[red]✘[/]] Unexpected error: {e}")
+            console.log(f"{Prefix.error} Unexpected error: {e}")
     else:
         raise ValueError("Empty package name provided.")
 

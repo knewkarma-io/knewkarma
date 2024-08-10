@@ -9,10 +9,7 @@ from knewkarma.version import Version
 
 project = About.name
 author = About.author
-copyright = (
-    f" {date.today().year} MIT License, "
-    f'<a href="{About.author_link}" target="_blank">{author}</a>'
-)
+copyright = f' {date.today().year} MIT License, <a href="{author[1]}" target="_blank">{author[0]}</a>'
 
 release = Version.release
 version = Version.full
@@ -61,7 +58,7 @@ html_sidebars = {
 html_theme_options = {
     "show_powered_by": False,
     "github_user": "bellingcat",
-    "github_repo": "knewkarma",
+    "github_repo": About.package,
     "github_banner": True,
     "sidebar_collapse": True,
     "show_related": False,

@@ -2,7 +2,7 @@
 
 FROM python:latest
 
-LABEL maintainer="Richard Mwewa <rly0nheart@duck.com>"
+LABEL maintainer="Richard Mwewa <https://gravatar.com/rly0nheart>"
 LABEL description="A Reddit data analysis toolkit."
 
 WORKDIR /app

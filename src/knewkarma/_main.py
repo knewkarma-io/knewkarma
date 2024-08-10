@@ -6,7 +6,7 @@ import requests
 from rich.pretty import pprint
 
 from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
-from .tools.general_utils import console
+from .tools.misc_utils import console
 from .tools.parsing_utils import (
     parse_comments,
     parse_subreddits,

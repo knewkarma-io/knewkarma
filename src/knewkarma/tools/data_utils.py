@@ -3,10 +3,10 @@ from typing import Union, Literal
 
 import pandas as pd
 
-from .general_utils import console
+from .misc_utils import console
+from .styling_utils import Prefix
 
-__all__ = ["create_dataframe", "export_dataframe", "EXPORT_FORMATS", "get_file_size"]
-
+__all__ = ["create_dataframe", "export_dataframe", "EXPORT_FORMATS"]
 EXPORT_FORMATS = Literal["csv", "html", "json", "xml"]
 
 
@@ -110,7 +110,7 @@ def export_dataframe(
             )
             file_mapping.get(file_format)()
             console.print(
-                f"[[green]*[/]] {get_file_size(file_path=filepath)} written to [link file://{filepath}]{filepath}"
+                f"{Prefix.notify} {get_file_size(file_path=filepath)} written to [link file://{filepath}]{filepath}"
             )
         else:
             raise ValueError(f"Unsupported file format: {file_format}")
