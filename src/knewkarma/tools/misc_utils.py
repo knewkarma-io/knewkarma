@@ -1,16 +1,18 @@
 import os
-from typing import Union, Text
+from typing import Union
 
 from rich.box import DOUBLE
 from rich.console import Console, ConsoleRenderable, RichCast
 from rich.panel import Panel
+
+from .styling_utils import Text
 
 __all__ = ["console", "create_panel", "pathfinder"]
 
 
 def create_panel(
         title: str,
-        content: Union[ConsoleRenderable, RichCast, Text],
+        content: Union[ConsoleRenderable, RichCast, str],
         subtitle: str = None,
 ):
     """
@@ -25,7 +27,7 @@ def create_panel(
 
     Usage::
 
-        >>> from knewkarma.tools.general_utils import create_panel
+        >>> from knewkarma.tools.misc_utils import create_panel
 
         >>> create_panel(
         >>>     title="Did you know?",
@@ -36,11 +38,11 @@ def create_panel(
     console.print(
         Panel(
             renderable=content,
-            title=f"[bold]{title}[/]",
+            title=f"{Text.bold}{title}{Text.reset}",
             subtitle=(subtitle if subtitle else None),
             expand=False,
             box=DOUBLE,
-            style="white on blue",
+            style=f"{Text.white.strip('[,]')} on {Text.blue.strip('[,]')}",
         )
     )
 

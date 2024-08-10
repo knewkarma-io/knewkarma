@@ -1,22 +1,23 @@
 class Version:
     """
-    Represents Knew Karma's version in a structured format, providing access
-    to the major, minor, and patch components, as well as composite representations
-    like the full version string and the release string.
+    Represents Knew Karma's version in a structured format, providing access to the
+    individual components of the version and composite representations.
 
     Attributes:
-        major (str): The major version number, indicating major changes and milestones.
-        minor (str): The minor version number, representing minor improvements and significant fixes.
-        patch (str): The patch version number, typically used for small fixes and updates.
-        full (str): A composite string representing the full version, combining major, minor, and patch.
-        release (str): A string representing the release version, combining only the major and minor numbers.
+        major (tuple[int, str]): A tuple containing the major version number and its label.
+            The major version indicates significant changes or milestones.
+        minor (tuple[int, str]): A tuple containing the minor version number and its label.
+            The minor version signifies incremental improvements or substantial fixes.
+        patch (tuple[int, str]): A tuple containing the patch version number and its label.
+            The patch version is used for small fixes and updates.
+        full (str): A string that combines the major, minor, and patch version numbers
+            to represent the full version (e.g., "6.1.2").
+        release (str): A string that combines only the major and minor version numbers
+            to represent the release version (e.g., "6.1").
     """
 
-    major: str = "6"
-    minor: str = "1"
-    patch: str = "2"
-    full: str = f"{major}.{minor}.{patch}"
-    release: str = f"{major}.{minor}"
-
-
-# -------------------------------- END ----------------------------------------- #
+    major: tuple[int, str] = 6, "MAJOR"
+    minor: tuple[int, str] = 1, "MINOR"
+    patch: tuple[int, str] = 2, "PATCH"
+    full: str = f"{major[0]}.{minor[0]}.{patch[0]}"
+    release: str = f"{major[0]}.{minor[0]}"

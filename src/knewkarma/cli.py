@@ -14,7 +14,8 @@ from .tools.data_utils import (
     export_dataframe,
     EXPORT_FORMATS,
 )
-from .tools.general_utils import console, pathfinder
+from .tools.misc_utils import console, pathfinder
+from .tools.styling_utils import Prefix
 from .tools.time_utils import filename_timestamp
 from .version import Version
 
@@ -776,11 +777,11 @@ def handle_method_calls(
                             argument=argument,
                         )
             except KeyboardInterrupt:
-                console.print("[[yellow]✘[/]] Process aborted /w CTRL+C.")
+                console.print(f"{Prefix.warning} Process aborted /w CTRL+C.")
             finally:
                 elapsed_time = datetime.now() - start_time
                 console.print(
-                    f"[[green]✔[/]] DONE. {elapsed_time.total_seconds():.2f}ms elapsed."
+                    f"{Prefix.ok} DONE. {elapsed_time.total_seconds():.2f}ms elapsed."
                 )
 
     if not is_valid_arg:
