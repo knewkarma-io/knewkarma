@@ -1,7 +1,7 @@
 from datetime import date
 
-from src import About
-from src import Version
+from knewkarma.about import About
+from knewkarma.version import Version
 
 # Configuration file for the Sphinx documentation builder.
 
@@ -11,7 +11,7 @@ project = About.name
 author = About.author
 copyright = (
     f" {date.today().year} MIT License, "
-    f'<a href="{About.author_link}" target="_blank">{author}</a>'
+    f'<a href="{author[1]}" target="_blank">{author[0]}</a>'
 )
 
 release = Version.release

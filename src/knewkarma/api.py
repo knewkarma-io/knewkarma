@@ -8,8 +8,9 @@ from rich.markdown import Markdown
 from rich.prompt import Confirm
 
 from .about import About
-from .tools.general_utils import console, create_panel
+from .tools.misc_utils import console, create_panel
 from .tools.package_utils import is_pypi_package, update_pypi_package, is_snap_package
+from .tools.styling_utils import Prefix, Text
 from .tools.time_utils import countdown_timer
 from .version import Version
 
@@ -164,14 +165,14 @@ class Api:
                     return response.json()
                 else:
                     error_message: dict = response.json()
-                    console.log(f"[[red]✘[/]] An API error occurred: {error_message}")
+                    console.log(f"{Prefix.error} An API error occurred: {error_message}")
                     return {}
 
         except requests.ConnectionError as connection_error:
-            console.log(f"[[red]✘[/]] An HTTP error occurred: {connection_error}")
+            console.log(f"{Prefix.error} An HTTP error occurred: {connection_error}")
             return {}
         except Exception as unexpected_error:
-            console.log(f"[[red]✘[/]] An unexpected error occurred: {unexpected_error}")
+            console.log(f"{Prefix.error} An unexpected error occurred: {unexpected_error}")
             return {}
 
     def check_updates(self, session: requests.Session, status: console.status):
@@ -206,20 +207,20 @@ class Api:
 
             # Check for differences in version parts
             if remote_version_parts[0] != local_version_parts[0]:
-                update_level = "[red]MAJOR[/]"
+                update_level = f"{Text.red}{Version.major[1]}{Text.reset}"
 
             elif remote_version_parts[1] != local_version_parts[1]:
-                update_level = "[yellow]MINOR[/]"
+                update_level = f"{Text.yellow}{Version.minor[1]}{Text.reset}"
 
             elif remote_version_parts[2] != local_version_parts[2]:
-                update_level = "[green]PATCH[/]"
+                update_level = f"{Text.green}{Version.patch[1]}{Text.reset}"
 
             if update_level:
                 markdown_release_notes = Markdown(markup=markup_release_notes)
                 create_panel(
-                    title=f"[bold]{update_level} update ([cyan]{remote_version_str}[/])[/]",
+                    title=f"{Text.bold}{update_level} update ({Text.cyan}{remote_version_str}{Text.reset}){Text.reset}",
                     content=markdown_release_notes,
-                    subtitle=f"[bold][italic]Thank you, for using {About.name}![/][/] ❤️ ",
+                    subtitle=f"{Text.bold}{Text.italic}Thank you, for using {About.name}!{Text.reset}{Text.reset} ❤️ ",
                 )
 
                 # Skip auto-updating of the snap package
@@ -228,7 +229,7 @@ class Api:
                 elif is_pypi_package(package=About.package):
                     status.stop()
                     if Confirm.ask(
-                            f"[bold]Would you like to install this update?[/]",
+                            f"{Text.bold}Would you like to install this update?{Text.reset}",
                             default=False,
                             console=console,
                     ):
