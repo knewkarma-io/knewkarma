@@ -17,6 +17,7 @@ class About:
         description (str): A detailed description of Knew Karma, its purpose, and functionality, including
             links to further documentation and usage examples.
     """
+
     package: str = "knewkarma"
     name: str = "Knew Karma"
     author: tuple[str, str] = "Richard Mwewa", "https://gravatar.com/rly0nheart"
@@ -32,5 +33,6 @@ Application Programming Interface (API) to enable an easy integration in other P
 
 Refer to the documentation <{documentation}> for usage examples and integration guide.
 """
+
 
 # -------------------------------- END ----------------------------------------- #
