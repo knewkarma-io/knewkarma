@@ -18,5 +18,4 @@ class Version:
     full: str = f"{major}.{minor}.{patch}"
     release: str = f"{major}.{minor}"
 
-
 # -------------------------------- END ----------------------------------------- #
