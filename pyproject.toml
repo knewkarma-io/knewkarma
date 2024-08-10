@@ -9,6 +9,7 @@ description = "A Reddit data analysis toolkit"
 authors = ["Richard Mwewa <rly0nheart@duck.com>"]
 readme = "README.md"
 license = "MIT License"
+homepage = "https://knewkarma.readthedocs.io"
 documentation = "https://knewkarma.readthedocs.io"
 repository = "https://github.com/bellingcat/knewkarma"
 keywords = ["reddit", "reddit-api", "reddit-data-analysis"]
