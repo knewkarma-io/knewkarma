@@ -28,7 +28,7 @@ class About:
     sponsor: str = f"https://opencollective.com/{package}"
     copyright: str = f"{name} {Version.release} © {author[0]}. All rights reserved."
     documentation: str = "https://knewkarma.readthedocs.io"
-    summary: str = f"A Reddit data analysis toolkit — by {author[0]} <{author[1]}>"
+    summary: str = f"A Reddit data analysis toolkit — by {author[0]} <{author[2]}>"
     description: str = f"""
 {name} (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a Command-Line Interface (CLI), and an
@@ -36,9 +36,9 @@ Application Programming Interface (API) to enable an easy integration in other P
 
 
 
-Refer to the documentation <{documentation}> for usage examples and integration guide.
+🕮  Refer to the documentation <{documentation}> for usage examples and integration guide.
 
-Become a sponsor through Open Collective <{sponsor}>
+❤️  Become a sponsor <{sponsor}>
 """
 
 # -------------------------------- END ----------------------------------------- #
