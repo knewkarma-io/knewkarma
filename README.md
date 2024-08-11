@@ -6,7 +6,7 @@ functionalities for exploring and analysing Reddit data. It includes a **Command
 
 [![Downloads](https://img.shields.io/pepy/dt/knewkarma?logo=pypi)](https://pepy.tech/project/knewkarma) [![PyPI - Version](https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma)](https://pypi.org/project/knewkarma) [![Snap version](https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A)](https://snapcraft.io/knewkarma) ![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/knewkarma?logo=open-collective) [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/rly0nheart)
 
-## 🕮 Documentation
+## Documentation
 
 Refer to the [documentation](https://knewkarma.readthedocs.io) for **Feature Overview**, **Installation**, **API
 Integration** and
@@ -14,7 +14,7 @@ Integration** and
 
 ![docs](https://github.com/user-attachments/assets/0878f249-3c1a-41cc-9879-da98ffcced0a)
 
-## ❤️ Sponsorship
+## Sponsorship
 
 Knew Karma is an open-source project developed and maintained by... [me](https://gravatar.com/rly0nheart).
 
@@ -43,7 +43,7 @@ Thank you for considering sponsoring Knew Karma. Your support keeps the project 
 
 [Become a Sponsor](https://opencollective.com/knewkarma)
 
-## 🌟 Star History
+## Star History
 
 <a href="https://star-history.com/#rly0nheart/knewkarma&Date">
  <picture>
