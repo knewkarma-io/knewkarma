@@ -30,13 +30,18 @@ def countdown_timer(
     :param overall_count: Overall number of items to fetch.
     :type overall_count: int
     """
-    for remaining in range(duration, 0, -1):
+    end_time = time.time() + duration
+    while time.time() < end_time:
+        remaining_time = end_time - time.time()
+        remaining_seconds = int(remaining_time)
+        remaining_milliseconds = int((remaining_time - remaining_seconds) * 1000)
+
         status.update(
             f"Fetched [cyan]{current_count}[/]/[cyan]{overall_count}[/] "
-            f"items so far, resuming in [cyan]{remaining}[/]"
-            f" {'second' if remaining == 1 else 'seconds'}..."
+            f"items so far, resuming in [cyan]{remaining_seconds}[/]"
+            f".[cyan]{remaining_milliseconds:03}[/]ms..."
         )
-        time.sleep(1)  # Sleep for one second as part of countdown
+        time.sleep(0.01)  # Sleep for 10 milliseconds
 
 
 def timestamp_to_locale(timestamp: float) -> str:
