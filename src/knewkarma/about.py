@@ -10,7 +10,7 @@ class About:
     Attributes:
         package (str): The package name for Knew Karma.
         name (str): The full name of the project.
-        author (tuple[str, str]): A tuple containing the author's name and URL to gravatar profile.
+        author (tuple[str, str, str]): A tuple containing the author's name, username and URL to gravatar profile.
         copyright (str): Copyright notice including the project name, release version, and author's name.
         documentation (str): URL to the official documentation for Knew Karma.
         summary (str): A brief summary of the project, including the author's name and URL.
@@ -20,7 +20,11 @@ class About:
 
     package: str = "knewkarma"
     name: str = "Knew Karma"
-    author: tuple[str, str] = "Richard Mwewa", "https://gravatar.com/rly0nheart"
+    author: tuple[str, str, str] = (
+        "Richard Mwewa",
+        "rly0nheart",
+        "https://gravatar.com/rly0nheart",
+    )
     copyright: str = f"{name} {Version.release} © {author[0]}. All rights reserved."
     documentation: str = "https://knewkarma.readthedocs.io"
     summary: str = f"A Reddit data analysis toolkit — by {author[0]} <{author[1]}>"
