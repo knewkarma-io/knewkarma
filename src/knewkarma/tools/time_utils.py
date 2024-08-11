@@ -38,7 +38,7 @@ def countdown_timer(
 
         status.update(
             f"Fetched [cyan]{current_count}[/]/[cyan]{overall_count}[/] items so far. "
-            f"Resuming in [cyan]{remaining_seconds}[/].[cyan]{remaining_milliseconds:02}[/]s..."
+            f"Resuming in [cyan]{remaining_seconds}[/].[cyan]{remaining_milliseconds:02}[/]ms..."
         )
         time.sleep(0.01)  # Sleep for 10 milliseconds
 
