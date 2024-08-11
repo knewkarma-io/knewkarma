@@ -38,8 +38,8 @@ def test_search_for_posts():
         post_data: dict = post_result.get("data")
         assert search_posts[0].get("kind") == "t3"
         assert (
-                search_posts_query.lower() in post_data.get("selftext").lower()
-                or post_data.get("title").lower()
+            search_posts_query.lower() in post_data.get("selftext").lower()
+            or post_data.get("title").lower()
         )
 
 
@@ -61,8 +61,8 @@ def test_search_for_posts_in_a_subreddit():
         post_data: dict = search_result.get("data")
         assert post_data.get("subreddit").lower() == posts_subreddit.lower()
         assert (
-                search_query.lower() in post_data.get("title").lower()
-                or post_data.get("selftext").lower()
+            search_query.lower() in post_data.get("title").lower()
+            or post_data.get("selftext").lower()
         )
 
 
@@ -82,9 +82,9 @@ def test_search_for_subreddits():
         subreddit_data: dict = subreddit_result.get("data")
         assert search_subreddits[0].get("kind") == "t5"
         assert (
-                search_subreddits_query.lower()
-                in subreddit_data.get("public_description").lower()
-                or subreddit_data.get("display_name").lower()
+            search_subreddits_query.lower()
+            in subreddit_data.get("public_description").lower()
+            or subreddit_data.get("display_name").lower()
         )
 
 
@@ -105,8 +105,8 @@ def test_search_for_users():
         user_data: dict = user_result.get("data")
         assert search_users[0].get("kind") == "t2"
         assert (
-                search_users_query.lower() in user_data.get("name").lower()
-                or user_data.get("subreddit").get("display_name").lower()
+            search_users_query.lower() in user_data.get("name").lower()
+            or user_data.get("subreddit").get("display_name").lower()
         )
 
 
@@ -186,7 +186,7 @@ def test_get_new_posts():
         )
         assert new_posts[0].get("kind") == "t3"
         assert (
-                now - timedelta(days=1) < created_timestamp
+            now - timedelta(days=1) < created_timestamp
         ), f"Post {post_data.get('id')} was not created recently."
 
 
@@ -209,7 +209,7 @@ def test_get_new_users():
             user_data.get("created"), timezone.utc
         )
         assert (
-                now - timedelta(days=7) < created_timestamp
+            now - timedelta(days=7) < created_timestamp
         ), f"User {user_data.get('name')} was not created recently."
 
 
@@ -231,7 +231,8 @@ def test_get_new_subreddits():
             subreddit_data.get("created"), timezone.utc
         )
         assert (
-                now - timedelta(days=1) < created_timestamp
+            now - timedelta(days=1) < created_timestamp
         ), f"Subreddit {subreddit_data.get('display_name')} was not created recently."
+
 
 # -------------------------------- END ----------------------------------------- #
