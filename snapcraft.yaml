@@ -14,9 +14,9 @@ grade: stable
 confinement: strict
 adopt-info: knewkarma
 
-source-code: https://github.com/bellingcat/knewkarma
+source-code: https://github.com/rly0nheart/knewkarma
 issues:
-  - https://github.com/bellingcat/knewkarma/issues
+  - https://github.com/rly0nheart/knewkarma/issues
 donation:
   - https://buymeacoffee.com/rly0nheart/
 contact:
