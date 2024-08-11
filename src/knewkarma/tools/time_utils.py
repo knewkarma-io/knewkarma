@@ -16,7 +16,7 @@ __all__ = [
 
 
 def countdown_timer(
-        status: Status, duration: int, current_count: int, overall_count: int
+    status: Status, duration: int, current_count: int, overall_count: int
 ):
     """
     Handles the live countdown during pagination, updating the status bar with the remaining time.
@@ -137,7 +137,7 @@ def timestamp_to_concise(timestamp: int) -> str:
 
 
 def timestamp_to_readable(
-        timestamp: float, time_format: Literal["concise", "locale"] = "locale"
+    timestamp: float, time_format: Literal["concise", "locale"] = "locale"
 ) -> Union[str, None]:
     """
     Converts a Unix timestamp into a more readable format based on the specified `time_format`.
@@ -198,5 +198,6 @@ def filename_timestamp() -> str:
         if os.name == "nt"
         else now.strftime("%d-%B-%Y-%I:%M:%S%p")
     )
+
 
 # -------------------------------- END ----------------------------------------- #
