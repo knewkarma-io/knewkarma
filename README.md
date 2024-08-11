@@ -16,7 +16,7 @@ Integration** and
 
 ## ❤️ Sponsorship
 
-Knew Karma is an open-source project maintained by... [me](https://gravatar.com/rly0nheart).
+Knew Karma is an open-source project developed and maintained by... [me](https://gravatar.com/rly0nheart).
 
 If you find this toolkit useful and would like to support its development, you can sponsor the project
 through [Open Collective](https://opencollective.com).
