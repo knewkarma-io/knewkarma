@@ -26,7 +26,7 @@ class Post:
     """Represents a Reddit post and provides method(s) for getting data from the specified post."""
 
     def __init__(
-            self, post_id: str, post_subreddit: str, time_format: TIME_FORMAT = "locale"
+        self, post_id: str, post_subreddit: str, time_format: TIME_FORMAT = "locale"
     ):
         """
         Initialises the `Post()` instance for getting post's `data` and `comments`.
@@ -96,11 +96,11 @@ class Post:
             )
 
     def comments(
-            self,
-            session: requests.Session,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get a post's comments.
@@ -172,11 +172,11 @@ class Posts:
         self._status_template: str = "Fetching {limit} {listing} posts..."
 
     def best(
-            self,
-            session: requests.Session,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get best posts.
@@ -208,7 +208,11 @@ class Posts:
             >>> get_best_posts(posts_limit=120)
         """
         if status:
-            status.update(self._status_template.format(listing="best", limit=f"{Text.cyan}{limit}{Text.reset}"))
+            status.update(
+                self._status_template.format(
+                    listing="best", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         best_posts: List = api.get_posts(
             posts_type="best",
@@ -222,11 +226,11 @@ class Posts:
             return parse_posts(data=best_posts, time_format=self._time_format)
 
     def controversial(
-            self,
-            session: requests.Session,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get controversial posts.
@@ -258,7 +262,9 @@ class Posts:
         """
         if status:
             status.update(
-                self._status_template.format(listing="controversial", limit=f"{Text.cyan}{limit}{Text.reset}")
+                self._status_template.format(
+                    listing="controversial", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         controversial_posts: List = api.get_posts(
@@ -273,11 +279,11 @@ class Posts:
             return parse_posts(data=controversial_posts, time_format=self._time_format)
 
     def front_page(
-            self,
-            session: requests.Session,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get posts from the Reddit front-page.
@@ -310,7 +316,9 @@ class Posts:
         """
         if status:
             status.update(
-                self._status_template.format(listing="front-page", limit=f"{Text.cyan}{limit}{Text.reset}")
+                self._status_template.format(
+                    listing="front-page", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         front_page_posts: List = api.get_posts(
@@ -325,11 +333,11 @@ class Posts:
             return parse_posts(data=front_page_posts, time_format=self._time_format)
 
     def new(
-            self,
-            session: requests.Session,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get new posts.
@@ -361,7 +369,11 @@ class Posts:
             >>> get_new_posts(posts_limit=10)
         """
         if status:
-            status.update(self._status_template.format(listing="new", limit=f"{Text.cyan}{limit}{Text.reset}"))
+            status.update(
+                self._status_template.format(
+                    listing="new", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         new_posts: List = api.get_posts(
             posts_type="new",
@@ -375,11 +387,11 @@ class Posts:
             return parse_posts(data=new_posts, time_format=self._time_format)
 
     def popular(
-            self,
-            session: requests.Session,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get popular posts.
@@ -411,7 +423,11 @@ class Posts:
             >>> get_popular_posts(posts_limit=50)
         """
         if status:
-            status.update(self._status_template.format(listing="popular", limit=f"{Text.cyan}{limit}{Text.reset}"))
+            status.update(
+                self._status_template.format(
+                    listing="popular", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         popular_posts: List = api.get_posts(
             posts_type="popular",
@@ -425,11 +441,11 @@ class Posts:
             return parse_posts(data=popular_posts, time_format=self._time_format)
 
     def rising(
-            self,
-            session: requests.Session,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get rising posts.
@@ -461,7 +477,11 @@ class Posts:
             >>> get_rising_posts(posts_limit=100)
         """
         if status:
-            status.update(self._status_template.format(listing="rising", limit=f"{Text.cyan}{limit}{Text.reset}"))
+            status.update(
+                self._status_template.format(
+                    listing="rising", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         rising_posts: List = api.get_posts(
             posts_type="rising",
@@ -498,11 +518,11 @@ class Search:
         )
 
     def posts(
-            self,
-            session: requests.Session,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Search posts.
@@ -536,7 +556,9 @@ class Search:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="posts", limit=f"{Text.cyan}{limit}{Text.reset}", query=self._query
+                    query_type="posts",
+                    limit=f"{Text.cyan}{limit}{Text.reset}",
+                    query=self._query,
                 )
             )
 
@@ -552,11 +574,11 @@ class Search:
             return parse_posts(data=posts_results, time_format=self._time_format)
 
     def subreddits(
-            self,
-            session: requests.Session,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Search subreddits.
@@ -590,7 +612,9 @@ class Search:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="subreddits", limit=f"{Text.cyan}{limit}{Text.reset}", query=self._query
+                    query_type="subreddits",
+                    limit=f"{Text.cyan}{limit}{Text.reset}",
+                    query=self._query,
                 )
             )
 
@@ -609,11 +633,11 @@ class Search:
         return subreddits_results
 
     def users(
-            self,
-            session: requests.Session,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Search users.
@@ -647,7 +671,9 @@ class Search:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="users", limit=f"{Text.cyan}{limit}{Text.reset}", query=self._query
+                    query_type="users",
+                    limit=f"{Text.cyan}{limit}{Text.reset}",
+                    query=self._query,
                 )
             )
 
@@ -687,13 +713,13 @@ class Subreddit:
         )
 
     def comments(
-            self,
-            session: requests.Session,
-            posts_limit: int,
-            comments_per_post: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        posts_limit: int,
+        comments_per_post: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get a subreddit's comments.
@@ -755,12 +781,12 @@ class Subreddit:
         return all_comments
 
     def posts(
-            self,
-            session: requests.Session,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get a subreddit's posts.
@@ -795,7 +821,8 @@ class Subreddit:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} posts", subreddit=self._subreddit
+                    query_type=f"{Text.cyan}{limit}{Text.reset} posts",
+                    subreddit=self._subreddit,
                 )
             )
 
@@ -813,9 +840,9 @@ class Subreddit:
             return parse_posts(data=subreddit_posts, time_format=self._time_format)
 
     def profile(
-            self,
-            session: requests.Session,
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        status: console.status = None,
     ) -> Dict:
         """
         Get a subreddit's profile data.
@@ -861,14 +888,14 @@ class Subreddit:
             )
 
     def search_comments(
-            self,
-            session: requests.Session,
-            query: str,
-            posts_limit: int,
-            comments_per_post: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        query: str,
+        posts_limit: int,
+        comments_per_post: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get comments that contain the specified query string from a subreddit.
@@ -953,13 +980,13 @@ class Subreddit:
             return found_comments
 
     def search_posts(
-            self,
-            session: requests.Session,
-            query: str,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        query: str,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get posts that contain the specified query string from a subreddit.
@@ -1021,9 +1048,9 @@ class Subreddit:
             return parse_posts(data=found_posts, time_format=self._time_format)
 
     def wiki_pages(
-            self,
-            session: requests.Session,
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        status: console.status = None,
     ) -> list[str]:
         """
         Get a subreddit's wiki pages.
@@ -1065,10 +1092,10 @@ class Subreddit:
         return pages.get("data")
 
     def wiki_page(
-            self,
-            page_name: str,
-            session: requests.Session,
-            status: console.status = None,
+        self,
+        page_name: str,
+        session: requests.Session,
+        status: console.status = None,
     ) -> Dict:
         """
         Get a subreddit's specified wiki page data.
@@ -1131,11 +1158,11 @@ class Subreddits:
         self._status_template: str = "Fetching {limit} {subreddits_type} subreddits..."
 
     def all(
-            self,
-            session: requests.Session,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get all subreddits.
@@ -1171,7 +1198,9 @@ class Subreddits:
         """
         if status:
             status.update(
-                self._status_template.format(subreddits_type="all", limit=f"{Text.cyan}{limit}{Text.reset}")
+                self._status_template.format(
+                    subreddits_type="all", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         all_subreddits: List = api.get_subreddits(
@@ -1185,10 +1214,10 @@ class Subreddits:
             return parse_subreddits(data=all_subreddits, time_format=self._time_format)
 
     def default(
-            self,
-            limit: int,
-            session: requests.Session,
-            status: console.status = None,
+        self,
+        limit: int,
+        session: requests.Session,
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get default subreddits.
@@ -1220,7 +1249,9 @@ class Subreddits:
         """
         if status:
             status.update(
-                self._status_template.format(subreddits_type="default", limit=f"{Text.cyan}{limit}{Text.reset}")
+                self._status_template.format(
+                    subreddits_type="default", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         default_subreddits: List = api.get_subreddits(
@@ -1234,11 +1265,11 @@ class Subreddits:
             return parse_subreddits(default_subreddits, time_format=self._time_format)
 
     def new(
-            self,
-            session: requests.Session,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get new subreddits.
@@ -1272,7 +1303,9 @@ class Subreddits:
         """
         if status:
             status.update(
-                self._status_template.format(subreddits_type="new", limit=f"{Text.cyan}{limit}{Text.reset}")
+                self._status_template.format(
+                    subreddits_type="new", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         new_subreddits: List = api.get_subreddits(
@@ -1286,11 +1319,11 @@ class Subreddits:
             return parse_subreddits(new_subreddits, time_format=self._time_format)
 
     def popular(
-            self,
-            session: requests.Session,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get popular subreddits.
@@ -1324,7 +1357,9 @@ class Subreddits:
         """
         if status:
             status.update(
-                self._status_template.format(subreddits_type="popular", limit=f"{Text.cyan}{limit}{Text.reset}")
+                self._status_template.format(
+                    subreddits_type="popular", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         popular_subreddits: List = api.get_subreddits(
@@ -1356,12 +1391,12 @@ class User:
         self._status_template: str = "Fetching {query_type} from user u/{username}..."
 
     def comments(
-            self,
-            session: requests.Session,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get a user's comments.
@@ -1398,7 +1433,8 @@ class User:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} comments", username=self._username
+                    query_type=f"{Text.cyan}{limit}{Text.reset} comments",
+                    username=self._username,
                 )
             )
 
@@ -1416,9 +1452,9 @@ class User:
             return parse_comments(comments=user_comments, time_format=self._time_format)
 
     def moderated_subreddits(
-            self,
-            session: requests.Session,
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get subreddits moderated by user.
@@ -1468,10 +1504,10 @@ class User:
             )
 
     def overview(
-            self,
-            limit: int,
-            session: requests.Session,
-            status: console.status = None,
+        self,
+        limit: int,
+        session: requests.Session,
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get a user's most recent comments.
@@ -1504,7 +1540,8 @@ class User:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} recent comments", username=self._username
+                    query_type=f"{Text.cyan}{limit}{Text.reset} recent comments",
+                    username=self._username,
                 )
             )
 
@@ -1520,12 +1557,12 @@ class User:
             return parse_comments(user_overview, time_format=self._time_format)
 
     def posts(
-            self,
-            session: requests.Session,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get a user's posts.
@@ -1562,7 +1599,8 @@ class User:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} posts", username=self._username
+                    query_type=f"{Text.cyan}{limit}{Text.reset} posts",
+                    username=self._username,
                 )
             )
 
@@ -1580,9 +1618,9 @@ class User:
             return parse_posts(user_posts, time_format=self._time_format)
 
     def profile(
-            self,
-            session: requests.Session,
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        status: console.status = None,
     ) -> Dict:
         """
         Get a user's profile data.
@@ -1625,13 +1663,13 @@ class User:
             return parse_users(data=user_profile, time_format=self._time_format)
 
     def search_posts(
-            self,
-            query: str,
-            limit: int,
-            session: requests.Session,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        query: str,
+        limit: int,
+        session: requests.Session,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get a user's posts that match with the specified search query.
@@ -1672,7 +1710,8 @@ class User:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} posts for '{query}'", username=self._username
+                    query_type=f"{Text.cyan}{limit}{Text.reset} posts for '{query}'",
+                    username=self._username,
                 )
             )
 
@@ -1704,13 +1743,13 @@ class User:
             return parse_posts(found_posts, time_format=self._time_format)
 
     def search_comments(
-            self,
-            query: str,
-            limit: int,
-            session: requests.Session,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        query: str,
+        limit: int,
+        session: requests.Session,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get a user's comments that contain the specified search query.
@@ -1780,12 +1819,12 @@ class User:
             return parse_comments(found_comments, time_format=self._time_format)
 
     def top_subreddits(
-            self,
-            session: requests.Session,
-            top_n: int,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        top_n: int,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[tuple]:
         """
         Get a user's top n subreddits based on subreddit frequency in n posts.
@@ -1863,11 +1902,11 @@ class Users:
         self._status_template: str = "Fetching {limit} {query_type} users..."
 
     def new(
-            self,
-            session: requests.Session,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get new users.
@@ -1900,7 +1939,11 @@ class Users:
             >>> get_new_users(users_limit=500)
         """
         if status:
-            status.update(self._status_template.format(query_type="new", limit=f"{Text.cyan}{limit}{Text.reset}"))
+            status.update(
+                self._status_template.format(
+                    query_type="new", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         new_users: List = api.get_users(
             users_type="new",
@@ -1914,11 +1957,11 @@ class Users:
             return parse_users(new_users, time_format=self._time_format)
 
     def popular(
-            self,
-            session: requests.Session,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get popular users.
@@ -1952,7 +1995,9 @@ class Users:
         """
         if status:
             status.update(
-                self._status_template.format(query_type="popular", limit=f"{Text.cyan}{limit}{Text.reset}")
+                self._status_template.format(
+                    query_type="popular", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         popular_users: List = api.get_users(
@@ -1967,11 +2012,11 @@ class Users:
             return parse_users(popular_users, time_format=self._time_format)
 
     def all(
-            self,
-            session: requests.Session,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: requests.Session,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> List[Dict]:
         """
         Get all users.
@@ -2004,7 +2049,11 @@ class Users:
             >>> get_all_users(users_limit=1000))
         """
         if status:
-            status.update(self._status_template.format(query_type="all", limit=f"{Text.cyan}{limit}{Text.reset}"))
+            status.update(
+                self._status_template.format(
+                    query_type="all", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         all_users: List = api.get_users(
             users_type="all",
@@ -2016,5 +2065,6 @@ class Users:
 
         if all_users:
             return parse_users(all_users, time_format=self._time_format)
+
 
 # -------------------------------- END ----------------------------------------- #
