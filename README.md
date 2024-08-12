@@ -24,6 +24,8 @@ through Open Collective.
 Your sponsorship will help cover the costs of ongoing maintenance, new feature development, and overall project
 sustainability.
 
+![sponsorship](https://github.com/user-attachments/assets/d6e6f97b-d6d7-40d9-965d-ed9a3dbc095e)
+
 ### How to Sponsor
 
 You can sponsor the project by visiting Knew Karma's [Open Collective page](https://opencollective.com/knewkarma) and

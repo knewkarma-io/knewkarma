@@ -1,4 +1,4 @@
-# Usage
+# Usage (CLI)
 
 ## Getting Started
 
