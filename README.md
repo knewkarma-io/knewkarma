@@ -19,10 +19,11 @@ Integration** and
 Knew Karma is an open-source project developed and maintained by... [me](https://gravatar.com/rly0nheart).
 
 If you find this toolkit useful and would like to support its development, you can sponsor the project
-through Open Collective.
+through **Open Collective**.
 
-Your sponsorship will help cover the costs of ongoing maintenance, new feature development, and overall project
-sustainability.
+Your sponsorship will help cover the **costs of ongoing maintenance**, **new feature development**, and **overall
+project
+sustainability**.
 
 ![sponsorship](https://github.com/user-attachments/assets/d6e6f97b-d6d7-40d9-965d-ed9a3dbc095e)
 
