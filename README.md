@@ -59,6 +59,6 @@ Thank you for considering sponsoring Knew Karma. Your support keeps the project 
 
 MIT License © [Richard Mwewa](https://gravatar.com/rly0nheart)
 
-##
+***
 
 [![richard-mwewa](https://github.com/user-attachments/assets/5b29ee58-ea36-4ec0-aea3-4b2f9f7999fb)](https://gravatar.com/rly0nheart)
