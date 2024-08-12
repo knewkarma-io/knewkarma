@@ -760,7 +760,6 @@ def handle_method_calls(
     for argument, method in method_map.items():
         if kwargs.get(argument):
             is_valid_arg = True
-            console.show_cursor(show=False)
             start_time: datetime = datetime.now()
             try:
                 with console.status(

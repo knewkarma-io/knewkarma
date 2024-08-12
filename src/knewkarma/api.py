@@ -192,7 +192,7 @@ class Api:
         """
         # Make a GET request to PyPI to get the project's latest release.
         response: dict = self.make_request(
-            endpoint=f"https://api.github.com/repos/bellingcat/{About.package}/releases/latest",
+            endpoint=f"https://api.github.com/repos/{About.author[1]}/{About.package}/releases/latest",
             session=session,
         )
         release: dict = self._process_response(

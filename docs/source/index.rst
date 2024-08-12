@@ -7,10 +7,6 @@ A Reddit Data Analysis Toolkit
    :target: https://pepy.tech/project/knewkarma/
    :alt: Pepy Total Downlods
 
-.. image:: https://img.shields.io/pypi/pyversions/knewkarma.svg?logo=python
-    :target: https://pypi.org/project/knewkarma/
-    :alt: Python Version Support Badge
-
 .. image:: https://img.shields.io/pypi/v/knewkarma?logo=pypi
     :target: https://pypi.org/project/knewkarma
     :alt: PyPI Badge
@@ -18,6 +14,10 @@ A Reddit Data Analysis Toolkit
 .. image:: https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A
     :target: https://snapcraft.io/knewkarma
     :alt: Snap Store Badge
+
+.. image:: https://img.shields.io/opencollective/all/knewkarma?logo=open-collective
+   :target: https://opencollective.com/knewkarma
+   :alt: Open Collective backers and sponsors
 
 .. image:: https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black
     :target: https://buymeacoffee.com/rly0nheart
