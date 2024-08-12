@@ -17,6 +17,8 @@ from .tools.parsing_utils import (
 
 __all__ = ["Post", "Posts", "Search", "Subreddit", "Subreddits", "User", "Users"]
 
+from .tools.styling_utils import Text
+
 api = Api()
 
 
@@ -131,7 +133,7 @@ class Post:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{limit} comments",
+                    query_type=f"{Text.cyan}{limit}{Text.reset} comments",
                     post_id=self._post_id,
                     post_subreddit=self._post_subreddit,
                 )
@@ -206,7 +208,11 @@ class Posts:
             >>> get_best_posts(posts_limit=120)
         """
         if status:
-            status.update(self._status_template.format(listing="best", limit=limit))
+            status.update(
+                self._status_template.format(
+                    listing="best", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         best_posts: List = api.get_posts(
             posts_type="best",
@@ -256,7 +262,9 @@ class Posts:
         """
         if status:
             status.update(
-                self._status_template.format(listing="controversial", limit=limit)
+                self._status_template.format(
+                    listing="controversial", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         controversial_posts: List = api.get_posts(
@@ -308,7 +316,9 @@ class Posts:
         """
         if status:
             status.update(
-                self._status_template.format(listing="front-page", limit=limit)
+                self._status_template.format(
+                    listing="front-page", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         front_page_posts: List = api.get_posts(
@@ -359,7 +369,11 @@ class Posts:
             >>> get_new_posts(posts_limit=10)
         """
         if status:
-            status.update(self._status_template.format(listing="new", limit=limit))
+            status.update(
+                self._status_template.format(
+                    listing="new", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         new_posts: List = api.get_posts(
             posts_type="new",
@@ -409,7 +423,11 @@ class Posts:
             >>> get_popular_posts(posts_limit=50)
         """
         if status:
-            status.update(self._status_template.format(listing="popular", limit=limit))
+            status.update(
+                self._status_template.format(
+                    listing="popular", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         popular_posts: List = api.get_posts(
             posts_type="popular",
@@ -459,7 +477,11 @@ class Posts:
             >>> get_rising_posts(posts_limit=100)
         """
         if status:
-            status.update(self._status_template.format(listing="rising", limit=limit))
+            status.update(
+                self._status_template.format(
+                    listing="rising", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         rising_posts: List = api.get_posts(
             posts_type="rising",
@@ -534,7 +556,9 @@ class Search:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="posts", limit=limit, query=self._query
+                    query_type="posts",
+                    limit=f"{Text.cyan}{limit}{Text.reset}",
+                    query=self._query,
                 )
             )
 
@@ -588,7 +612,9 @@ class Search:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="subreddits", limit=limit, query=self._query
+                    query_type="subreddits",
+                    limit=f"{Text.cyan}{limit}{Text.reset}",
+                    query=self._query,
                 )
             )
 
@@ -645,7 +671,9 @@ class Search:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="users", limit=limit, query=self._query
+                    query_type="users",
+                    limit=f"{Text.cyan}{limit}{Text.reset}",
+                    query=self._query,
                 )
             )
 
@@ -793,7 +821,8 @@ class Subreddit:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{limit} posts", subreddit=self._subreddit
+                    query_type=f"{Text.cyan}{limit}{Text.reset} posts",
+                    subreddit=self._subreddit,
                 )
             )
 
@@ -1000,7 +1029,7 @@ class Subreddit:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{limit} posts with '{query}'",
+                    query_type=f"{Text.cyan}{limit}{Text.reset} posts with '{query}'",
                     subreddit=self._subreddit,
                 )
             )
@@ -1169,7 +1198,9 @@ class Subreddits:
         """
         if status:
             status.update(
-                self._status_template.format(subreddits_type="all", limit=limit)
+                self._status_template.format(
+                    subreddits_type="all", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         all_subreddits: List = api.get_subreddits(
@@ -1218,7 +1249,9 @@ class Subreddits:
         """
         if status:
             status.update(
-                self._status_template.format(subreddits_type="default", limit=limit)
+                self._status_template.format(
+                    subreddits_type="default", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         default_subreddits: List = api.get_subreddits(
@@ -1270,7 +1303,9 @@ class Subreddits:
         """
         if status:
             status.update(
-                self._status_template.format(subreddits_type="new", limit=limit)
+                self._status_template.format(
+                    subreddits_type="new", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         new_subreddits: List = api.get_subreddits(
@@ -1322,7 +1357,9 @@ class Subreddits:
         """
         if status:
             status.update(
-                self._status_template.format(subreddits_type="popular", limit=limit)
+                self._status_template.format(
+                    subreddits_type="popular", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         popular_subreddits: List = api.get_subreddits(
@@ -1396,7 +1433,8 @@ class User:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{limit} comments", username=self._username
+                    query_type=f"{Text.cyan}{limit}{Text.reset} comments",
+                    username=self._username,
                 )
             )
 
@@ -1502,7 +1540,8 @@ class User:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{limit} recent comments", username=self._username
+                    query_type=f"{Text.cyan}{limit}{Text.reset} recent comments",
+                    username=self._username,
                 )
             )
 
@@ -1560,7 +1599,8 @@ class User:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{limit} posts", username=self._username
+                    query_type=f"{Text.cyan}{limit}{Text.reset} posts",
+                    username=self._username,
                 )
             )
 
@@ -1670,7 +1710,8 @@ class User:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{limit} posts for '{query}'", username=self._username
+                    query_type=f"{Text.cyan}{limit}{Text.reset} posts for '{query}'",
+                    username=self._username,
                 )
             )
 
@@ -1750,7 +1791,7 @@ class User:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{limit} comments for '{query}'",
+                    query_type=f"{Text.cyan}{limit}{Text.reset} comments for '{query}'",
                     username=self._username,
                 )
             )
@@ -1822,7 +1863,7 @@ class User:
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"top {top_n}/{limit} subreddits",
+                    query_type=f"top {Text.cyan}{top_n}{Text.reset}/{Text.cyan}{limit}{Text.reset} subreddits",
                     username=self._username,
                 )
             )
@@ -1898,7 +1939,11 @@ class Users:
             >>> get_new_users(users_limit=500)
         """
         if status:
-            status.update(self._status_template.format(query_type="new", limit=limit))
+            status.update(
+                self._status_template.format(
+                    query_type="new", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         new_users: List = api.get_users(
             users_type="new",
@@ -1950,7 +1995,9 @@ class Users:
         """
         if status:
             status.update(
-                self._status_template.format(query_type="popular", limit=limit)
+                self._status_template.format(
+                    query_type="popular", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
             )
 
         popular_users: List = api.get_users(
@@ -2002,7 +2049,11 @@ class Users:
             >>> get_all_users(users_limit=1000))
         """
         if status:
-            status.update(self._status_template.format(query_type="all", limit=limit))
+            status.update(
+                self._status_template.format(
+                    query_type="all", limit=f"{Text.cyan}{limit}{Text.reset}"
+                )
+            )
 
         all_users: List = api.get_users(
             users_type="all",

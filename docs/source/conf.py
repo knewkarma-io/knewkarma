@@ -6,7 +6,7 @@ from knewkarma.version import Version
 # Configuration file for the Sphinx documentation builder.
 
 # -- Project information
-author_name, author_link = About.author
+author_name, author_username, author_link = About.author
 
 project = About.name
 author = author_name
@@ -58,7 +58,7 @@ html_sidebars = {
 }
 html_theme_options = {
     "show_powered_by": False,
-    "github_user": "bellingcat",
+    "github_user": author_username,
     "github_repo": About.package,
     "github_banner": True,
     "sidebar_collapse": True,
