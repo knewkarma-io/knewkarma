@@ -12,7 +12,7 @@ Refer to the [documentation](https://knewkarma.readthedocs.io) for **Feature Ove
 Integration** and
 **Usage** instructions.
 
-![docs](https://github.com/user-attachments/assets/0878f249-3c1a-41cc-9879-da98ffcced0a)
+![docs](https://github.com/user-attachments/assets/1cfd097c-e5fa-4fe0-98f8-a7dd9d37c555)
 
 ## Sponsorship
 
@@ -59,6 +59,6 @@ Thank you for considering sponsoring Knew Karma. Your support keeps the project 
 
 MIT License © [Richard Mwewa](https://gravatar.com/rly0nheart)
 
-##
+***
 
 [![richard-mwewa](https://github.com/user-attachments/assets/5b29ee58-ea36-4ec0-aea3-4b2f9f7999fb)](https://gravatar.com/rly0nheart)
