@@ -1,5 +1,3 @@
-<h3 align="center">Knew Karma</h3>
-
 <p align="center"><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), and an
 <strong>Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.
