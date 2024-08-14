@@ -5,6 +5,8 @@ functionalities for exploring and analysing Reddit data. It includes a <strong>C
 
 [![Downloads](https://img.shields.io/pepy/dt/knewkarma?logo=pypi)](https://pepy.tech/project/knewkarma) [![PyPI - Version](https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma)](https://pypi.org/project/knewkarma) [![Snap version](https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A)](https://snapcraft.io/knewkarma) [![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/knewkarma?logo=open-collective)](https://opencollective.com/knewkarma) [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/rly0nheart)
 
+##
+
 ## Table Of Contents
 
 * [Documentation](#documentation)
