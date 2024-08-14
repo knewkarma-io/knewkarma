@@ -1,10 +1,18 @@
-## Knew Karma
-
-**Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
-functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface** (**CLI**), and an
-**Application Programming Interface** (**API**) to enable easy integration in other Python projects and/or scripts.
+<p align="center"><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
+functionalities for exploring and analysing Reddit data. It includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), and an
+<strong>Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.
+</p>
 
 [![Downloads](https://img.shields.io/pepy/dt/knewkarma?logo=pypi)](https://pepy.tech/project/knewkarma) [![PyPI - Version](https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma)](https://pypi.org/project/knewkarma) [![Snap version](https://img.shields.io/snapcraft/v/knewkarma/latest/stable?logo=snapcraft&color=%23BB431A)](https://snapcraft.io/knewkarma) [![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/knewkarma?logo=open-collective)](https://opencollective.com/knewkarma) [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/rly0nheart)
+
+## Table Of Contents
+
+* [Documentation](#documentation)
+* [Sponsorship](#sponsorship)
+    * [How to Sponsor](#how-to-sponsor)
+    * [What Sponsors Get](#what-sponsors-get)
+* [Star History](#star-history)
+* [Licence](#license)
 
 ## Documentation
 
