@@ -41,7 +41,8 @@ Your sponsorship will help cover the **costs of ongoing maintenance**, **new fea
 project
 sustainability**.
 
-![sponsorship](https://github.com/user-attachments/assets/d6e6f97b-d6d7-40d9-965d-ed9a3dbc095e)
+![sponsorship](https://github.com/user-attachments/assets/30519732-91ba-477a-8a6d-0e23a158ea67)
+
 
 ### How to Sponsor
 
