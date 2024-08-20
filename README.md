@@ -1,6 +1,6 @@
 <p align="center"><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), and an
-<strong>Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.
+<strong>Application Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.
 </p>
 
 <p align="center">
@@ -41,7 +41,8 @@ Your sponsorship will help cover the **costs of ongoing maintenance**, **new fea
 project
 sustainability**.
 
-![sponsorship](https://github.com/user-attachments/assets/d6e6f97b-d6d7-40d9-965d-ed9a3dbc095e)
+![sponsorship](https://github.com/user-attachments/assets/30519732-91ba-477a-8a6d-0e23a158ea67)
+
 
 ### How to Sponsor
 
