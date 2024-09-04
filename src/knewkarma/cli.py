@@ -1,29 +1,64 @@
+import asyncio
+import json
 import os
 from datetime import datetime
 from typing import get_args, Union, Callable, Literal
 
+import aiohttp
 import pandas as pd
-import requests
 import rich_click as click
 
 from ._main import Post, Posts, Search, Subreddit, Subreddits, User, Users
 from .about import About
 from .api import SORT_CRITERION, TIMEFRAME, TIME_FORMAT, Api
-from .tools.data_utils import (
+from .extras import (
+    plot_analysis,
+    DISTRIBUTION_LABELS_AND_COLOURS,
+    analyse_text,
+    ml_deps_installed,
+    visualisation_deps_installed,
+)
+from .tools.console import Colour, Notify
+from .tools.data import (
     create_dataframe,
     export_dataframe,
     EXPORT_FORMATS,
 )
-from .tools.misc_utils import console, pathfinder
-from .tools.styling_utils import Prefix
-from .tools.time_utils import filename_timestamp
+from .tools.general import console, pathfinder, OUTPUT_PARENT_DIR, ML_MODELS_DIR
+from .tools.package import is_snap_package
+from .tools.timing import filename_timestamp
 from .version import Version
 
 __all__ = ["start"]
 
+colour = Colour
+notify = Notify
+
+
+def help_callback(ctx: click.Context, option: click.Option, value: bool):
+    """
+    Custom callback function for handling the '--help' option in Click commands.
+
+    Additionally, if the application is running as a Snap package, the
+    function will pause execution, prompting the user to press any key
+    before continuing. This is useful for when the user clicks the Knew Karma icon in application menu.
+
+    :param ctx: The Click context object.
+    :type ctx: click.Context
+    :param option: The Click option that triggered this callback.
+    :type option: click.Option
+    :param value: The value of the custom help option. If True, the help
+            message is displayed and the command execution is halted.
+    :type value: bool
+    """
+    if value and not ctx.resilient_parsing:
+        click.echo(ctx.get_help())
+        if is_snap_package(package=About.package):
+            click.pause(info="Press any key to continue ...")
+        ctx.exit()
+
 
 @click.group(
-    cls=click.RichGroup,
     help=f"""
 {About.summary}
 
@@ -35,7 +70,7 @@ __all__ = ["start"]
     "-e",
     "--export",
     type=str,
-    help="A comma-separated list (without spaces) of file types to export the output to [supported: csv,html,json,xml]",
+    help="A comma-separated list (no whitespaces) of file types to export the output to <supported: csv,html,json,xml>",
 )
 @click.option(
     "-l",
@@ -43,7 +78,7 @@ __all__ = ["start"]
     default=100,
     show_default=True,
     type=int,
-    help=f"[bulk/semi-bulk] Maximum data output limit",
+    help=f"<bulk/semi-bulk> Maximum data output limit",
 )
 @click.option(
     "-s",
@@ -51,7 +86,7 @@ __all__ = ["start"]
     default="all",
     show_default=True,
     type=click.Choice(get_args(SORT_CRITERION)),
-    help=f"[bulk/semi-bulk] Sort criterion",
+    help=f"<bulk/semi-bulk> Sort criterion",
 )
 @click.option(
     "-t",
@@ -59,29 +94,39 @@ __all__ = ["start"]
     default="all",
     show_default=True,
     type=click.Choice(get_args(TIMEFRAME)),
-    help=f"[bulk/semi-bulk] Timeframe to get data from",
+    help=f"<bulk/semi-bulk> Timeframe to get data from",
 )
 @click.option(
+    "-tfm",
     "--time-format",
     default="locale",
     show_default=True,
     type=click.Choice(["concise", "locale"]),
     help=f"Determines the format of the output time",
 )
+@click.option(
+    "-h",
+    "--help",
+    is_flag=True,
+    expose_value=False,
+    is_eager=True,
+    callback=help_callback,
+    help="Show this message and exit.",
+)
 @click.version_option(
-    Version.release,
+    Version.full,
     "-v",
     "--version",
     message=About.copyright,
 )
 @click.pass_context
 def cli(
-    ctx: click.Context,
-    timeframe: TIMEFRAME,
-    sort: SORT_CRITERION,
-    limit: int,
-    time_format: str,
-    export: list[EXPORT_FORMATS],
+        ctx: click.Context,
+        timeframe: TIMEFRAME,
+        sort: SORT_CRITERION,
+        limit: int,
+        time_format: str,
+        export: list[EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -107,10 +152,55 @@ def cli(
     ctx.obj["export"] = export
 
 
+# Check if Machine Learning and visualisation dependencies are installed,
+# and also check if current package is not a snap.
+if ml_deps_installed and visualisation_deps_installed:
+    @cli.command(
+        help="[extra] Use this command to analyse the sentiment and/or emotion distributions of posts (exported from knewkarma).",
+    )
+    @click.argument("analysis_type", type=click.Choice(["sentiment", "emotion"]))
+    @click.option("-p", "--posts", help="A file containing posts data")
+    @click.pass_context
+    def analyse(
+            ctx: click.Context,
+            analysis_type: Literal["sentiment", "emotion"],
+            posts: str,
+            emotion: bool,
+            sentiment: bool,
+    ):
+        """
+        Analyses a posts sentiment or emotion distribution and plots the output in a bar chat.
+        """
+
+        with open(posts, "w") as file:
+            posts_data: dict = json.load(file)
+        post_texts: list[str] = [post.get("body") for post in posts_data]
+
+        sentiment_labels: list[Union[int, float, bool]] = [
+            analyse_text(
+                text=text,
+                analysis_type=analysis_type,
+            )
+            for text in post_texts
+        ]
+
+        # Convert numeric labels to their corresponding string labels
+        label_names: list[str] = DISTRIBUTION_LABELS_AND_COLOURS[analysis_type][
+            "labels"
+        ]
+        labels: list[str] = [label_names[label] for label in sentiment_labels]
+
+        plot_analysis(
+            posts=post_texts,
+            labels=labels,
+            analysis_type=analysis_type,
+            filename="test_file",
+        )
+
+
 @cli.command(
     help="Use this command to get an individual post's data including its comments, "
-    "provided the post's `id` and source `subreddit` are specified.",
-    cls=click.RichCommand,
+         "provided the post's <id> and source <subreddit> are specified.",
 )
 @click.argument("id")
 @click.argument("subreddit")
@@ -137,7 +227,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     export: str = ctx.obj["export"]
     time_format: TIME_FORMAT = ctx.obj["time_format"]
 
-    post_instance = Post(post_id=id, post_subreddit=subreddit, time_format=time_format)
+    post_instance = Post(id=id, subreddit=subreddit, time_format=time_format)
     method_map: dict = {
         "comments": lambda session, status=None: post_instance.comments(
             limit=limit, sort=sort, status=status, session=session
@@ -147,14 +237,15 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
         ),
     }
 
-    handle_method_calls(
-        ctx=ctx, method_map=method_map, export=export, data=data, comments=comments
+    asyncio.run(
+        handle_method_calls(
+            ctx=ctx, method_map=method_map, export=export, data=data, comments=comments
+        )
     )
 
 
 @cli.command(
-    help="Use this command get best, controversial, popular, new and/or front-page posts.",
-    cls=click.RichCommand,
+    help="Use this command get best, controversial, front-page, new, popular, and/or rising posts.",
 )
 @click.option("-b", "--best", is_flag=True, help="Get posts from the best listing")
 @click.option(
@@ -179,13 +270,13 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 @click.option("-r", "--rising", is_flag=True, help="Get posts from the rising listing")
 @click.pass_context
 def posts(
-    ctx: click.Context,
-    best: bool,
-    controversial: bool,
-    front_page: bool,
-    new: bool,
-    popular: bool,
-    rising: bool,
+        ctx: click.Context,
+        best: bool,
+        controversial: bool,
+        front_page: bool,
+        new: bool,
+        popular: bool,
+        rising: bool,
 ):
     """
     Retrieve various types of posts such as best, controversial, popular, new, and front-page.
@@ -233,22 +324,23 @@ def posts(
         ),
     }
 
-    handle_method_calls(
-        ctx=ctx,
-        method_map=method_map,
-        export=export,
-        best=best,
-        controversial=controversial,
-        front_page=front_page,
-        new=new,
-        popular=popular,
-        rising=rising,
+    asyncio.run(
+        handle_method_calls(
+            ctx=ctx,
+            method_map=method_map,
+            export=export,
+            best=best,
+            controversial=controversial,
+            front_page=front_page,
+            new=new,
+            popular=popular,
+            rising=rising,
+        )
     )
 
 
 @cli.command(
-    help="Use this command search/discovery of targets in users, subreddits, and posts.",
-    cls=click.RichCommand,
+    help="Use this command for search/discovery of users, subreddits, and posts.",
 )
 @click.argument("query")
 @click.option("-p", "--posts", is_flag=True, help="Search posts")
@@ -288,19 +380,20 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
         ),
     }
 
-    handle_method_calls(
-        ctx=ctx,
-        method_map=method_map,
-        export=export,
-        posts=posts,
-        subreddits=subreddits,
-        users=users,
+    asyncio.run(
+        handle_method_calls(
+            ctx=ctx,
+            method_map=method_map,
+            export=export,
+            posts=posts,
+            subreddits=subreddits,
+            users=users,
+        )
     )
 
 
 @cli.command(
     help="Use this command to get a subreddit's data, such as comments, posts, wiki-pages, wiki-page data, and more...",
-    cls=click.RichCommand,
 )
 @click.argument("subreddit_name")
 @click.option(
@@ -327,16 +420,16 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
 @click.option("-wps", "--wiki-pages", is_flag=True, help="Get a subreddit's wiki pages")
 @click.pass_context
 def subreddit(
-    ctx: click.Context,
-    subreddit_name: str,
-    comments: bool,
-    comments_per_post: int,
-    posts: bool,
-    profile: bool,
-    search_comments: str,
-    search_post: str,
-    wiki_page: str,
-    wiki_pages: bool,
+        ctx: click.Context,
+        subreddit_name: str,
+        comments: bool,
+        comments_per_post: int,
+        posts: bool,
+        profile: bool,
+        search_comments: str,
+        search_post: str,
+        wiki_page: str,
+        wiki_pages: bool,
 ):
     """
     Retrieve data about a specific subreddit including profile, comments, posts, and wiki pages.
@@ -368,7 +461,7 @@ def subreddit(
     export: str = ctx.obj["export"]
     time_format: TIME_FORMAT = ctx.obj["time_format"]
 
-    subreddit_instance = Subreddit(subreddit=subreddit_name, time_format=time_format)
+    subreddit_instance = Subreddit(name=subreddit_name, time_format=time_format)
     method_map: dict = {
         "comments": lambda session, status=None: subreddit_instance.comments(
             session=session,
@@ -409,24 +502,25 @@ def subreddit(
         ),
     }
 
-    handle_method_calls(
-        ctx=ctx,
-        method_map=method_map,
-        export=export,
-        profile=profile,
-        comments=comments,
-        comments_per_post=comments_per_post,
-        posts=posts,
-        search_comments=search_comments,
-        search_post=search_post,
-        wiki_pages=wiki_pages,
-        wiki_page=wiki_page,
+    asyncio.run(
+        handle_method_calls(
+            ctx=ctx,
+            method_map=method_map,
+            export=export,
+            profile=profile,
+            comments=comments,
+            comments_per_post=comments_per_post,
+            posts=posts,
+            search_comments=search_comments,
+            search_post=search_post,
+            wiki_pages=wiki_pages,
+            wiki_page=wiki_page,
+        )
     )
 
 
 @cli.command(
-    help="Use this command to get new, popular, default and/or all subreddits.",
-    cls=click.RichCommand,
+    help="Use this command to get all, default, new, and/or popular subreddits.",
 )
 @click.option("-a", "--all", is_flag=True, help="Get all subreddits")
 @click.option(
@@ -486,22 +580,23 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
         ),
     }
 
-    handle_method_calls(
-        ctx=ctx,
-        method_map=method_map,
-        export=export,
-        timeframe=timeframe,
-        all=all,
-        default=default,
-        new=new,
-        popular=popular,
+    asyncio.run(
+        handle_method_calls(
+            ctx=ctx,
+            method_map=method_map,
+            export=export,
+            timeframe=timeframe,
+            all=all,
+            default=default,
+            new=new,
+            popular=popular,
+        )
     )
 
 
 @cli.command(
     help="Use this command to get user data, such as profile, posts, "
-    "comments, top subreddits, moderated subreddits, and more...",
-    cls=click.RichCommand,
+         "comments, top subreddits, moderated subreddits, and more...",
 )
 @click.argument("username")
 @click.option("-c", "--comments", is_flag=True, help="Get user's comments")
@@ -534,16 +629,16 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 )
 @click.pass_context
 def user(
-    ctx: click.Context,
-    username: str,
-    comments: bool,
-    moderated_subreddits: bool,
-    overview: bool,
-    posts: bool,
-    profile: bool,
-    search_comments: str,
-    search_posts: str,
-    top_subreddits: int,
+        ctx: click.Context,
+        username: str,
+        comments: bool,
+        moderated_subreddits: bool,
+        overview: bool,
+        posts: bool,
+        profile: bool,
+        search_comments: str,
+        search_posts: str,
+        top_subreddits: int,
 ):
     """
     Retrieve data about a specific user including profile, posts, comments, and top subreddits.
@@ -575,7 +670,7 @@ def user(
     export: str = ctx.obj["export"]
     time_format: TIME_FORMAT = ctx.obj["time_format"]
 
-    user_instance: User = User(username=username, time_format=time_format)
+    user_instance: User = User(name=username, time_format=time_format)
     method_map: dict = {
         "comments": lambda session, status=None: user_instance.comments(
             session=session, limit=limit, sort=sort, timeframe=timeframe, status=status
@@ -617,24 +712,25 @@ def user(
         ),
     }
 
-    handle_method_calls(
-        ctx=ctx,
-        method_map=method_map,
-        export=export,
-        comments=comments,
-        moderated_subreddits=moderated_subreddits,
-        overview=overview,
-        posts=posts,
-        profile=profile,
-        search_comments=search_comments,
-        search_posts=search_posts,
-        top_subreddits=top_subreddits,
+    asyncio.run(
+        handle_method_calls(
+            ctx=ctx,
+            method_map=method_map,
+            export=export,
+            comments=comments,
+            moderated_subreddits=moderated_subreddits,
+            overview=overview,
+            posts=posts,
+            profile=profile,
+            search_comments=search_comments,
+            search_posts=search_posts,
+            top_subreddits=top_subreddits,
+        )
     )
 
 
 @cli.command(
-    help="Use this command to get new, popular, and/or all users.",
-    cls=click.RichCommand,
+    help="Use this command to get all, new, and/or popular users.",
 )
 @click.option("-a", "--all", is_flag=True, help="Get all users")
 @click.option(
@@ -681,24 +777,31 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
         ),
     }
 
-    handle_method_calls(
-        ctx=ctx, method_map=method_map, export=export, all=all, new=new, popular=popular
+    asyncio.run(
+        handle_method_calls(
+            ctx=ctx,
+            method_map=method_map,
+            export=export,
+            all=all,
+            new=new,
+            popular=popular,
+        )
     )
 
 
-def call_method(
-    method: Callable,
-    session: requests.session,
-    status: console.status,
-    **kwargs: Union[str, click.Context],
+async def call_method(
+        method: Callable,
+        session: aiohttp.ClientSession,
+        status: console.status,
+        **kwargs: Union[str, click.Context],
 ):
     """
     Calls a method with the provided arguments.
 
     :param method: A method to call.
     :type method: Callable
-    :param session: A requests.Session to use for the method's requests.
-    :type session: requests.Session
+    :param session: A aiohttp.ClientSession to use for the method's requests.
+    :type session: aiohttp.ClientSession
     :param status: An instance of `console.status` used to display animated status messages inside the method.
     :type status: Console.console.status
     :param kwargs: Additional keyword arguments for `export: str`, `argument: str` and `ctx: click.Context` .
@@ -706,7 +809,7 @@ def call_method(
     command: str = kwargs.get("ctx").command.name
     argument: str = kwargs.get("argument")
 
-    response_data: Union[list, dict, str] = method(session=session, status=status)
+    response_data: Union[list, dict, str] = await method(session=session, status=status)
 
     console.set_window_title(
         f"Showing {len(response_data)} {command} {argument} — {About.name} {Version.release}"
@@ -719,17 +822,20 @@ def call_method(
         console.print(dataframe)
 
         if kwargs.get("export"):
-            output_parent_dir: str = os.path.expanduser(os.path.join("~", "src-data"))
             output_child_dir: str = os.path.join(
-                output_parent_dir,
+                OUTPUT_PARENT_DIR,
+                "exports",
                 command,
                 argument,
             )
 
             pathfinder(
                 directories=[
-                    os.path.join(output_child_dir, extension)
-                    for extension in ["csv", "html", "json", "xml"]
+                    ML_MODELS_DIR if argument == "analyse" else None,
+                    [
+                        os.path.join(output_child_dir, extension)
+                        for extension in ["csv", "html", "json", "xml"]
+                    ],
                 ]
             )
 
@@ -742,8 +848,11 @@ def call_method(
             )
 
 
-def handle_method_calls(
-    ctx: click.Context, method_map: dict, export: str, **kwargs: Union[str, int, bool]
+async def handle_method_calls(
+        ctx: click.Context,
+        method_map: dict,
+        export: str,
+        **kwargs: Union[str, int, bool],
 ):
     """
     Handle the method calls based on the provided arguments.
@@ -755,19 +864,23 @@ def handle_method_calls(
     :param export: The export format.
     :type export: str
     :param kwargs: Additional keyword arguments.
+    :type kwargs: Union[str, int, bool]
     """
     is_valid_arg: bool = False
+
     for argument, method in method_map.items():
         if kwargs.get(argument):
             is_valid_arg = True
             start_time: datetime = datetime.now()
             try:
                 with console.status(
-                    "Establishing connection /w new session...", spinner="dots2"
+                        f"Establishing connection /w new session",
+                        spinner="dots",
+                        spinner_style=colour.yellow.strip("[,]"),
                 ) as status:
-                    with requests.Session() as session:
-                        Api().check_updates(session=session, status=status)
-                        call_method(
+                    async with aiohttp.ClientSession() as session:
+                        await Api().check_updates(session=session, status=status)
+                        await call_method(
                             method=method,
                             session=session,
                             status=status,
@@ -775,13 +888,12 @@ def handle_method_calls(
                             export=export,
                             argument=argument,
                         )
+
             except KeyboardInterrupt:
-                console.print(f"{Prefix.warning} Process aborted /w CTRL+C.")
+                notify.warning("Process aborted /w CTRL+C.")
             finally:
                 elapsed_time = datetime.now() - start_time
-                console.print(
-                    f"{Prefix.ok} DONE. {elapsed_time.total_seconds():.2f}ms elapsed."
-                )
+                notify.info(f"{elapsed_time.total_seconds():.2f} seconds elapsed.")
 
     if not is_valid_arg:
         ctx.get_usage()
@@ -793,6 +905,5 @@ def start():
     """
     console.set_window_title(f"{About.name} {Version.release}")
     cli(obj={})
-
 
 # -------------------------------- END ----------------------------------------- #

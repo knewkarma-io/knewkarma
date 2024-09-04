@@ -1,13 +1,15 @@
 import re
 from collections import Counter
-from typing import List, Dict
+from types import SimpleNamespace
+from typing import Literal, Union
 
-import requests
-from rich.pretty import pprint
+import aiohttp
 
 from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
-from .tools.misc_utils import console
-from .tools.parsing_utils import (
+from .extras import plot_bar_chart, visualisation_deps_installed
+from .tools.console import Colour
+from .tools.general import console
+from .tools.parsers import (
     parse_comments,
     parse_subreddits,
     parse_posts,
@@ -15,75 +17,73 @@ from .tools.parsing_utils import (
     parse_wiki_page,
 )
 
-__all__ = ["Post", "Posts", "Search", "Subreddit", "Subreddits", "User", "Users"]
-
-from .tools.styling_utils import Text
+__all__ = [
+    "Comment",
+    "Post",
+    "Posts",
+    "Search",
+    "Subreddit",
+    "Subreddits",
+    "User",
+    "Users",
+]
 
 api = Api()
+colour = Colour
+
+
+class Comment:
+    """Represents a Reddit comment and provides methods for interacting with it."""
+
+    pass
 
 
 class Post:
-    """Represents a Reddit post and provides method(s) for getting data from the specified post."""
+    """Represents a Reddit post and provides methods for fetching post data and comments."""
 
-    def __init__(
-        self, post_id: str, post_subreddit: str, time_format: TIME_FORMAT = "locale"
-    ):
+    def __init__(self, id: str, subreddit: str, time_format: TIME_FORMAT = "locale"):
         """
-        Initialises the `Post()` instance for getting post's `data` and `comments`.
+        Initialises a `Post` instance to fetch the post's data and comments.
 
-        :param post_id: ID of a post to get data from.
-        :type post_id: str
-        :param post_subreddit: Subreddit where the post was created.
-        :type post_subreddit: str
-        :param time_format: Time format of the output data. Use `concise` for a human-readable
-                        time difference, or `locale` for a localized datetime string. Defaults to `locale`.
+        :param id: The ID of the Reddit post to retrieve.
+        :type id: str
+        :param subreddit: The subreddit where the post was created.
+        :type subreddit: str
+        :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
         :type time_format: Literal["concise", "locale"]
         """
-        self._post_id = post_id
-        self._post_subreddit = post_subreddit
+        self._id = id
+        self._subreddit = subreddit
         self._time_format = time_format
         self._status_template: str = (
-            "Fetching {query_type} from post {post_id} in r/{post_subreddit}..."
+            "Fetching {query_type} from post {post_id} in r/{post_subreddit}"
         )
 
-    def data(self, session: requests.Session, status: console.status = None) -> Dict:
+    async def data(
+        self, session: aiohttp.ClientSession, status: console.status = None
+    ) -> SimpleNamespace:
         """
-        Get a post's data (without comments)
+        Asynchronously retrieves data for a Reddit post, excluding comments.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A dictionary containing a post's data.
-        :rtype: dict
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Post
-            >>> from pprint import pprint
-
-            >>> def get_post_data():
-            >>>    post = Post(post_id="13ptwzd", post_subreddit="AskReddit")
-            >>>    with requests.Session() as request_session:
-            >>>        data = post.data(session=request_session)
-            >>>        pprint(data)
-
-
-            >>> get_post_data()
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A `SimpleNamespace` object containing parsed post data.
+        :rtype: SimpleNamespace
         """
         if status:
             status.update(
                 self._status_template.format(
                     query_type="data",
-                    post_id=self._post_id,
-                    post_subreddit=self._post_subreddit,
+                    post_id=self._id,
+                    post_subreddit=self._subreddit,
                 )
             )
 
-        post_data: dict = api.get_entity(
-            post_id=self._post_id,
-            post_subreddit=self._post_subreddit,
+        post_data: dict = await api.get_entity(
+            post_id=self._id,
+            post_subreddit=self._subreddit,
             entity_type="post",
             status=status,
             session=session,
@@ -91,58 +91,44 @@ class Post:
 
         if post_data:
             return parse_posts(
-                data=post_data,
+                raw_posts=post_data,
                 time_format=self._time_format,
             )
 
-    def comments(
+    async def comments(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get a post's comments.
+        Asynchronously retrieves comments for a Reddit post.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param limit: Maximum number of comments to return.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param limit: Maximum number of comments to retrieve.
         :type limit: int
-        :param sort: Sort criterion for the comments.
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of dictionaries, each containing comment data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Post
-            >>> from pprint import pprint
-
-            >>> def get_post_comments(comments_limit, comments_sort):
-            >>>    post = Post(post_id="13ptwzd", post_subreddit="AskReddit")
-            >>>    with requests.Session() as request_session:
-            >>>        comments = post.comments(limit=comments_limit, sort=comments_sort, session=request_session)
-            >>>        pprint(comments)
-
-
-            >>> get_post_comments(comments_limit=50, comments_sort="top")
+        :param sort: The sorting criterion for the comments. Defaults to "all".
+        :type sort: SORT_CRITERION, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
+        :rtype: list[SimpleNamespace]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} comments",
-                    post_id=self._post_id,
-                    post_subreddit=self._post_subreddit,
+                    query_type=f"{colour.cyan}{limit}{colour.reset} comments",
+                    post_id=self._id,
+                    post_subreddit=self._subreddit,
                 )
             )
 
-        comments_data: List = api.get_posts(
+        comments_data: list = await api.get_posts(
             posts_type="post_comments",
-            post_id=self._post_id,
-            post_subreddit=self._post_subreddit,
+            post_id=self._id,
+            post_subreddit=self._subreddit,
             limit=limit,
             sort=sort,
             status=status,
@@ -151,70 +137,54 @@ class Post:
 
         if comments_data:
             return parse_comments(
-                comments=comments_data,
+                raw_comments=comments_data,
                 time_format=self._time_format,
             )
 
 
 class Posts:
-    """Represents Reddit posts and provides methods for getting posts from various sources."""
+    """Represents Reddit posts and provides methods for retrieving posts from various sources."""
 
     def __init__(self, time_format: TIME_FORMAT = "locale"):
         """
-        Initialises the `Posts()` instance for getting `best`, `controversial`,
-        `front-page`, `new`, `popular`, and `rising` posts.
+        Initialises a `Posts` instance for retrieving posts such as 'best', 'controversial',
+        'front-page', 'new', 'popular', and 'rising'.
 
-        :param time_format: Time format of the output data. Use `concise` for a human-readable
-                        time difference, or `locale` for a localized datetime string. Defaults to `locale`.
+        :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
         :type time_format: Literal["concise", "locale"]
         """
         self._time_format = time_format
-        self._status_template: str = "Fetching {limit} {listing} posts..."
+        self._status_template: str = "Fetching {limit} {listing} posts"
 
-    def best(
+    async def best(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get best posts.
+        Asynchronously retrieves the best posts.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param limit: Maximum number of posts to return.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param limit: Maximum number of posts to retrieve.
         :type limit: int
-        :param timeframe: Timeframe from which to get best posts.
-        :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of dictionaries, each containing post data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Posts
-            >>> from pprint import pprint
-
-            >>> def get_best_posts(posts_limit):
-            >>>    posts = Posts()
-            >>>    with requests.Session() as request_session:
-            >>>        best = posts.best(limit=posts_limit, session=request_session)
-            >>>        pprint(best)
-
-
-            >>> get_best_posts(posts_limit=120)
+        :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
+        :type timeframe: TIMEFRAME, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed post data.
+        :rtype: list[SimpleNamespace]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    listing="best", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    listing="best", limit=f"{colour.cyan}{limit}{colour.reset}"
                 )
             )
 
-        best_posts: List = api.get_posts(
+        best_posts: list = await api.get_posts(
             posts_type="best",
             timeframe=timeframe,
             limit=limit,
@@ -223,51 +193,37 @@ class Posts:
         )
 
         if best_posts:
-            return parse_posts(data=best_posts, time_format=self._time_format)
+            return parse_posts(raw_posts=best_posts, time_format=self._time_format)
 
-    def controversial(
+    async def controversial(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get controversial posts.
+        Asynchronously retrieves the controversial posts.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param limit: Maximum number of posts to return.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param limit: Maximum number of posts to retrieve.
         :type limit: int
-        :param timeframe: Timeframe from which to get controversial posts.
-        :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of dictionaries, each containing post data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Posts
-
-
-            >>> def get_controversial_posts(posts_limit):
-            >>>    posts = Posts()
-            >>>    with requests.Session() as request_session:
-            >>>        controversial = posts.controversial(limit=posts_limit, session=request_session)
-            >>>        print(controversial)
-
-            >>> get_controversial_posts(posts_limit=50)
+        :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
+        :type timeframe: TIMEFRAME, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed post data.
+        :rtype: list[SimpleNamespace]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    listing="controversial", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    listing="controversial", limit=f"{colour.cyan}{limit}{colour.reset}"
                 )
             )
 
-        controversial_posts: List = api.get_posts(
+        controversial_posts: list = await api.get_posts(
             posts_type="controversial",
             timeframe=timeframe,
             limit=limit,
@@ -276,160 +232,127 @@ class Posts:
         )
 
         if controversial_posts:
-            return parse_posts(data=controversial_posts, time_format=self._time_format)
+            return parse_posts(
+                raw_posts=controversial_posts, time_format=self._time_format
+            )
 
-    def front_page(
+    async def front_page(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
+        timeframe: TIMEFRAME = "all",
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get posts from the Reddit front-page.
+        Asynchronously retrieves the front-page posts.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session.
-        :param limit: Maximum number of posts to return.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param limit: Maximum number of posts to retrieve.
         :type limit: int
-        :param sort: Sort criterion for the posts.
-        :type sort: str
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of dictionaries, each containing post data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Posts
-            >>> from pprint import pprint
-
-            >>> def get_frontpage_posts(posts_limit):
-            >>>    posts = Posts()
-            >>>    with requests.Session() as request_session:
-            >>>        frontpage = posts.front_page(limit=posts_limit, session=request_session)
-            >>>        print(frontpage)
-
-
-            >>> get_frontpage_posts(posts_limit=10)
+        :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
+        :type timeframe: TIMEFRAME, optional
+        :param sort: Sorting criterion for posts. Defaults to "all".
+        :type sort: SORT_CRITERION, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed post data.
+        :rtype: list[SimpleNamespace]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    listing="front-page", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    listing="front-page", limit=f"{colour.cyan}{limit}{colour.reset}"
                 )
             )
 
-        front_page_posts: List = api.get_posts(
+        front_page_posts: list = await api.get_posts(
             posts_type="front_page",
             limit=limit,
+            timeframe=timeframe,
             sort=sort,
             status=status,
             session=session,
         )
 
         if front_page_posts:
-            return parse_posts(data=front_page_posts, time_format=self._time_format)
+            return parse_posts(
+                raw_posts=front_page_posts, time_format=self._time_format
+            )
 
-    def new(
+    async def new(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
+        timeframe: TIMEFRAME = "all",
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get new posts.
+        Asynchronously retrieves the new posts.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session.
-        :param limit: Maximum number of posts to return.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param limit: Maximum number of posts to retrieve.
         :type limit: int
-        :param sort: Sort criterion for the posts.
-        :type sort: str
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of dictionaries, each containing post data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Posts
-            >>> from pprint import pprint
-
-            >>> def get_new_posts(posts_limit):
-            >>>    posts = Posts()
-            >>>    with requests.Session() as request_session:
-            >>>        new = posts.new(limit=posts_limit, session=request_session)
-            >>>        print(new)
-
-
-            >>> get_new_posts(posts_limit=10)
+        :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
+        :type timeframe: TIMEFRAME, optional
+        :param sort: Sorting criterion for posts. Defaults to "all".
+        :type sort: SORT_CRITERION, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed post data.
+        :rtype: list[SimpleNamespace]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    listing="new", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    listing="new", limit=f"{colour.cyan}{limit}{colour.reset}"
                 )
             )
 
-        new_posts: List = api.get_posts(
+        new_posts: list = await api.get_posts(
             posts_type="new",
             limit=limit,
+            timeframe=timeframe,
             sort=sort,
             status=status,
             session=session,
         )
 
         if new_posts:
-            return parse_posts(data=new_posts, time_format=self._time_format)
+            return parse_posts(raw_posts=new_posts, time_format=self._time_format)
 
-    def popular(
+    async def popular(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get popular posts.
+        Asynchronously retrieves the popular posts.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param limit: Maximum number of posts to return.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param limit: Maximum number of posts to retrieve.
         :type limit: int
-        :param timeframe: Timeframe from which to get popular posts.
-        :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of dictionaries, each containing post data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Posts
-            >>> from pprint import pprint
-
-            >>> def get_popular_posts(posts_limit):
-            >>>    posts = Posts()
-            >>>    with requests.Session() as request_session:
-            >>>        popular = posts.popular(limit=posts_limit, session=request_session)
-            >>>        pprint(popular)
-
-
-            >>> get_popular_posts(posts_limit=50)
+        :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
+        :type timeframe: TIMEFRAME, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed post data.
+        :rtype: list[SimpleNamespace]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    listing="popular", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    listing="popular", limit=f"{colour.cyan}{limit}{colour.reset}"
                 )
             )
 
-        popular_posts: List = api.get_posts(
+        popular_posts: list = await api.get_posts(
             posts_type="popular",
             timeframe=timeframe,
             limit=limit,
@@ -438,52 +361,37 @@ class Posts:
         )
 
         if popular_posts:
-            return parse_posts(data=popular_posts, time_format=self._time_format)
+            return parse_posts(raw_posts=popular_posts, time_format=self._time_format)
 
-    def rising(
+    async def rising(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get rising posts.
+        Asynchronously retrieves the rising posts.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param limit: Maximum number of posts to return.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param limit: Maximum number of posts to retrieve.
         :type limit: int
-        :param timeframe: Timeframe from which to get rising posts.
-        :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of dictionaries, each containing post data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Posts
-            >>> from pprint import pprint
-
-            >>> def get_rising_posts(posts_limit):
-            >>>    posts = Posts()
-            >>>    with requests.Session() as request_session:
-            >>>        rising = posts.rising(limit=posts_limit, session=request_session)
-            >>>        pprint(rising)
-
-
-            >>> get_rising_posts(posts_limit=100)
+        :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
+        :type timeframe: TIMEFRAME, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed post data.
+        :rtype: list[SimpleNamespace]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    listing="rising", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    listing="rising", limit=f"{colour.cyan}{limit}{colour.reset}"
                 )
             )
 
-        rising_posts: List = api.get_posts(
+        rising_posts: list = await api.get_posts(
             posts_type="rising",
             timeframe=timeframe,
             limit=limit,
@@ -492,77 +400,59 @@ class Posts:
         )
 
         if rising_posts:
-            return parse_posts(data=rising_posts, time_format=self._time_format)
+            return parse_posts(raw_posts=rising_posts, time_format=self._time_format)
 
 
 class Search:
     """
-    Represents the Readit search functionality and provides
-    methods for getting search results from different entities
+    Represents the Reddit search functionality and provides methods for retrieving search results
+    from different entities.
     """
 
     def __init__(self, query: str, time_format: TIME_FORMAT = "locale"):
         """
-        Initialises the `Search()` instance for searching `posts`, `subreddits` and `users`.
+        Initialises the `Search` instance for searching posts, subreddits, and users.
 
-        :param query: Search query.
+        :param query: The search query string.
         :type query: str
-        :param time_format: Time format of the output data. Use `concise` for a human-readable
-                        time difference, or `locale` for a localized datetime string. Defaults to `locale`.
+        :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
         :type time_format: Literal["concise", "locale"]
         """
         self._query = query
         self._time_format = time_format
-        self._status_template: str = (
-            "Searching for '{query}' in {limit} {query_type}..."
-        )
+        self._status_template: str = "Searching for '{query}' in {limit} {query_type}"
 
-    def posts(
+    async def posts(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Search posts.
+        Searches for posts based on the query.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param limit: Maximum number of posts to return.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param limit: Maximum number of posts to retrieve.
         :type limit: int
-        :param sort: Sort criterion for the results.
-        :type sort: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of dictionaries, each containing post data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Search
-            >>> from pprint import pprint
-
-            >>> def search_posts(query, results_limit):
-            >>>    search = Search(query=query)
-            >>>    with requests.Session() as request_session:
-            >>>        posts = search.posts(limit=results_limit, session=request_session)
-            >>>        pprint(posts)
-
-
-            >>> search_posts(query="something in data science", results_limit=200)
+        :param sort: Sorting criterion for the results. Defaults to "all".
+        :type sort: SORT_CRITERION, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed post data.
+        :rtype: list[SimpleNamespace]
         """
         if status:
             status.update(
                 self._status_template.format(
                     query_type="posts",
-                    limit=f"{Text.cyan}{limit}{Text.reset}",
+                    limit=f"{colour.cyan}{limit}{colour.reset}",
                     query=self._query,
                 )
             )
 
-        posts_results: List = api.search_entities(
+        posts_results: list = await api.search_entities(
             query=self._query,
             entity_type="posts",
             sort=sort,
@@ -571,54 +461,39 @@ class Search:
             session=session,
         )
         if posts_results:
-            return parse_posts(data=posts_results, time_format=self._time_format)
+            return parse_posts(raw_posts=posts_results, time_format=self._time_format)
 
-    def subreddits(
+    async def subreddits(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Search subreddits.
+        Searches for subreddits based on the query.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param limit: Maximum number of search results to return.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param limit: Maximum number of subreddits to retrieve.
         :type limit: int
-        :param sort: Sort criterion for the results.
-        :type sort: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of dictionaries, each containing subreddit data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Search
-            >>> from pprint import pprint
-
-            >>> def search_for_subreddits(query, results_limit):
-            >>>    search = Search(query=query)
-            >>>    with requests.Session() as request_session:
-            >>>        subreddits = search.subreddits(limit=results_limit, session=request_session)
-            >>>        pprint(subreddits)
-
-
-            >>> search_for_subreddits(query="questions", results_limit=200)
+        :param sort: Sorting criterion for the results. Defaults to "all".
+        :type sort: SORT_CRITERION, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed subreddit data.
+        :rtype: list[SimpleNamespace]
         """
         if status:
             status.update(
                 self._status_template.format(
                     query_type="subreddits",
-                    limit=f"{Text.cyan}{limit}{Text.reset}",
+                    limit=f"{colour.cyan}{limit}{colour.reset}",
                     query=self._query,
                 )
             )
 
-        search_subreddits: List = api.search_entities(
+        search_subreddits: list = await api.search_entities(
             query=self._query,
             entity_type="subreddits",
             sort=sort,
@@ -626,58 +501,43 @@ class Search:
             status=status,
             session=session,
         )
-        subreddits_results: List[Dict] = parse_subreddits(
-            search_subreddits, time_format=self._time_format
-        )
 
-        return subreddits_results
+        if search_subreddits:
+            return parse_subreddits(
+                raw_subreddits=search_subreddits, time_format=self._time_format
+            )
 
-    def users(
+    async def users(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Search users.
+        Searches for users based on the query.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param sort: Sort criterion for the results.
-        :type sort: Literal[str]
-        :param limit: Maximum number of search results to return.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param limit: Maximum number of users to retrieve.
         :type limit: int
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of dictionaries, each containing user data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Search
-            >>> from pprint import pprint
-
-            >>> def search_for_users(query, results_limit):
-            >>>    search = Search(query=query)
-            >>>    with requests.Session() as request_session:
-            >>>        users = search.users(limit=results_limit, session=request_session)
-            >>>        pprint(users)
-
-
-            >>> search_for_users(query="john", results_limit=200)
+        :param sort: Sorting criterion for the results. Defaults to "all".
+        :type sort: SORT_CRITERION, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed user data.
+        :rtype: list[SimpleNamespace]
         """
         if status:
             status.update(
                 self._status_template.format(
                     query_type="users",
-                    limit=f"{Text.cyan}{limit}{Text.reset}",
+                    limit=f"{colour.cyan}{limit}{colour.reset}",
                     query=self._query,
                 )
             )
 
-        search_users: List = api.search_entities(
+        search_users: list[dict] = await api.search_entities(
             query=self._query,
             entity_type="users",
             sort=sort,
@@ -685,94 +545,72 @@ class Search:
             status=status,
             session=session,
         )
-        users_results: List[Dict] = parse_users(
-            search_users, time_format=self._time_format
-        )
 
-        return users_results
+        if search_users:
+            return parse_users(raw_users=search_users, time_format=self._time_format)
 
 
 class Subreddit:
-    """Represents a Reddit Community (Subreddit) and provides methods for getting data from the specified subreddit."""
+    """Represents a Reddit community (subreddit) and provides methods for retrieving its data."""
 
-    def __init__(self, subreddit: str, time_format: TIME_FORMAT = "locale"):
+    def __init__(self, name: str, time_format: TIME_FORMAT = "locale"):
         """
-        Initialises a `Subreddit()` instance for getting a subreddit's `profile`, `wiki pages`,
-        `wiki page`, and `posts` data, as well as `searching for posts that contain a specified query`.
+        Initialises a `Subreddit` instance to get a subreddit's profile, wiki pages, and posts data,
+        and to search for posts containing a specified query.
 
-        :param subreddit: Name of the subreddit to get data from.
-        :type subreddit: str
-        :param time_format: Time format of the output data. Use "concise" for a human-readable
-                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
+        :param name: The name of the subreddit to retrieve data from.
+        :type name: str
+        :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
         :type time_format: Literal["concise", "locale"]
         """
-        self._subreddit = subreddit
+        self._name = name
         self._time_format = time_format
         self._status_template: str = (
-            "Fetching {query_type} from subreddit r/{subreddit}..."
+            "Fetching {query_type} from subreddit r/{subreddit}"
         )
 
-    def comments(
+    async def comments(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         posts_limit: int,
         comments_per_post: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get a subreddit's comments.
+        Asynchronously retrieves comments from a subreddit.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :param posts_limit: Maximum number of posts to get comments from.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param posts_limit: Maximum number of posts to retrieve comments from.
         :type posts_limit: int
-        :param comments_per_post: Maximum number of comments to get from each post.
+        :param comments_per_post: Maximum number of comments to retrieve per post.
         :type comments_per_post: int
-        :param sort: Sort criterion for the posts and comments.
-        :type sort: str
-        :param timeframe: Timeframe from which to get posts and comments.
-        :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of comments, each containing comment data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
-            >>> import requests
-
-            >>> def get_subreddit_comments(subreddit, posts_count, comments_p_post):
-            >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    with requests.Session() as request_session:
-            >>>        comments = subreddit.comments(
-            >>>                       posts_limit=posts_count,
-            >>>                       comments_per_post=comments_p_post,
-            >>>                       session=request_session
-            >>>                   )
-            >>>        pprint(comments)
-
-
-            >>> get_subreddit_comments( subreddit="AskScience", posts_count=100, comments_p_post=20)
+        :param sort: Sorting criterion for the posts and comments. Defaults to "all".
+        :type sort: SORT_CRITERION, optional
+        :param timeframe: The timeframe from which to retrieve posts and comments. Defaults to "all".
+        :type timeframe: TIMEFRAME, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
+        :rtype: list[SimpleNamespace]
         """
-        posts = self.posts(
+        posts = await self.posts(
             session=session,
             limit=posts_limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
         )
-        all_comments: List = []
+        all_comments: list = []
         for post in posts:
             post = Post(
-                post_id=post.get("id"),
-                post_subreddit=post.get("subreddit"),
+                id=post.get("id"),
+                subreddit=post.get("subreddit"),
                 time_format=self._time_format,
             )
-            post_comments: List = post.comments(
+            post_comments: list = await post.comments(
                 session=session, limit=comments_per_post, sort=sort, status=status
             )
 
@@ -780,55 +618,41 @@ class Subreddit:
 
         return all_comments
 
-    def posts(
+    async def posts(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get a subreddit's posts.
+        Asynchronously retrieves posts from a subreddit.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session.
-        :param limit: Maximum number of posts to return.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param limit: Maximum number of posts to retrieve.
         :type limit: int
-        :param sort: Sort criterion for the posts.
-        :type sort: str
-        :param timeframe: Timeframe from which to get posts.
-        :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A list of dictionaries, each containing post data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
-            >>> import requests
-
-            >>> def get_subreddit_posts(subreddit, posts_limit):
-            >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    with requests.Session() as request_session:
-            >>>        posts = subreddit.posts(limit=posts_limit, session=request_session)
-            >>>        pprint(posts)
-
-            >>> get_subreddit_posts(posts_limit=500, subreddit="MachineLearning")
+        :param sort: Sorting criterion for the posts. Defaults to "all".
+        :type sort: SORT_CRITERION, optional
+        :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
+        :type timeframe: TIMEFRAME, optional
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A list of `SimpleNamespace` objects, each containing parsed post data.
+        :rtype: list[SimpleNamespace]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} posts",
-                    subreddit=self._subreddit,
+                    query_type=f"{colour.cyan}{limit}{colour.reset} posts",
+                    subreddit=self._name,
                 )
             )
 
-        subreddit_posts: List = api.get_posts(
+        subreddit_posts: list = await api.get_posts(
             posts_type="subreddit_posts",
-            subreddit=self._subreddit,
+            subreddit=self._name,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -837,71 +661,56 @@ class Subreddit:
         )
 
         if subreddit_posts:
-            return parse_posts(data=subreddit_posts, time_format=self._time_format)
+            return parse_posts(raw_posts=subreddit_posts, time_format=self._time_format)
 
-    def profile(
+    async def profile(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         status: console.status = None,
-    ) -> Dict:
+    ) -> SimpleNamespace:
         """
-        Get a subreddit's profile data.
+        Asynchronously retrieves a subreddit's profile data.
 
-        :param session: aiohttp session to use for the request.
-        :type session: requests.Session
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
-        :return: A dictionary containing subreddit profile data.
-        :rtype: dict
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
-            >>> from pprint import pprint
-
-            >>> def get_subreddit_profile(subreddit):
-            >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    with requests.Session() as request_session:
-            >>>        profile = subreddit.profile(session=request_session)
-            >>>        pprint(profile)
-
-
-            >>> get_subreddit_profile(subreddit="MachineLearning")
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        :return: A `SimpleNamespace` object containing the parsed subreddit profile data.
+        :rtype: SimpleNamespace
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="profile data", subreddit=self._subreddit
+                    query_type="profile data", subreddit=self._name
                 )
             )
 
-        subreddit_profile: dict = api.get_entity(
+        subreddit_profile: dict = await api.get_entity(
             entity_type="subreddit",
-            subreddit=self._subreddit,
+            subreddit=self._name,
             status=status,
             session=session,
         )
         if subreddit_profile:
             return parse_subreddits(
-                data=subreddit_profile, time_format=self._time_format
+                raw_subreddits=subreddit_profile, time_format=self._time_format
             )
 
-    def search_comments(
+    async def search_comments(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         query: str,
         posts_limit: int,
         comments_per_post: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get comments that contain the specified query string from a subreddit.
+        Asynchronously get comments that contain the specified query string from a subreddit.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session.
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession.
         :param query: Search query.
         :type query: str
         :param posts_limit: Maximum number of posts to get comments from.
@@ -915,54 +724,28 @@ class Subreddit:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing comment data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
-            >>> from pprint import pprint
-
-            >>> def search_subreddit_comments(search_query, subreddit, post_limit, comments_p_post):
-            >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    with requests.Session() as request_session:
-            >>>        subreddit_comments = subreddit.search_comments(
-            >>>            query=search_query,
-            >>>            posts_limit=post_limit,
-            >>>            comments_per_post=comments_p_post,
-            >>>            session=request_session
-            >>>        )
-            >>>        pprint(subreddit_comments)
-
-
-            >>> search_subreddit_comments(
-            >>>     search_query="ML jobs",
-            >>>     post_limit=100,
-            >>>     comments_per_post=10,
-            >>>     subreddit="MachineLearning"
-            >>>   )
-            >>> )
+        :rtype: list[dict]
         """
-        posts: List = self.posts(
+        posts: list = await self.posts(
             session=session,
             limit=posts_limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
         )
-        all_comments: List = []
-        found_comments: List = []
+        all_comments: list = []
+        found_comments: list = []
         for post in posts:
             if status:
-                status.update(f"Fetching comments from post {post.get('id')}...")
+                status.update(f"Fetching comments from post {post.get('id')}")
 
             post = Post(
-                post_id=post.get("id"),
-                post_subreddit=self._subreddit,
+                id=post.get("id"),
+                subreddit=self._name,
                 time_format=self._time_format,
             )
 
-            comments: List = post.comments(
+            comments: list = await post.comments(
                 session=session, limit=comments_per_post, status=status
             )
 
@@ -979,20 +762,20 @@ class Subreddit:
         if found_comments:
             return found_comments
 
-    def search_posts(
+    async def search_posts(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         query: str,
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get posts that contain the specified query string from a subreddit.
+        Asynchronously get posts that contain the specified query string from a subreddit.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session.
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession.
         :param query: Search query.
         :type query: str
         :param limit: Maximum number of posts to return.
@@ -1004,38 +787,18 @@ class Subreddit:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
-            >>> from pprint import pprint
-
-            >>> def search_subreddit_posts(search_query, subreddit, posts_limit):
-            >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    with requests.Session() as request_session:
-            >>>        posts = subreddit.search_posts(query=search_query, limit=posts_limit, session=request_session)
-            >>>        pprint(posts)
-
-
-            >>> search_subreddit_posts(
-            >>>     search_query="ML jobs",
-            >>>     posts_limit=100,
-            >>>     subreddit="MachineLearning"
-            >>>   )
-            >>> )
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} posts with '{query}'",
-                    subreddit=self._subreddit,
+                    query_type=f"{colour.cyan}{limit}{colour.reset} posts with '{query}'",
+                    subreddit=self._name,
                 )
             )
-        found_posts: List = api.get_posts(
+        found_posts: list = await api.get_posts(
             posts_type="search_subreddit_posts",
-            subreddit=self._subreddit,
+            subreddit=self._name,
             query=query,
             limit=limit,
             sort=sort,
@@ -1045,96 +808,66 @@ class Subreddit:
         )
 
         if found_posts:
-            return parse_posts(data=found_posts, time_format=self._time_format)
+            return parse_posts(raw_posts=found_posts, time_format=self._time_format)
 
-    def wiki_pages(
+    async def wiki_pages(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         status: console.status = None,
     ) -> list[str]:
         """
-        Get a subreddit's wiki pages.
+        Asynchronously get a subreddit's wiki pages.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of strings, each representing a wiki page.
         :rtype: list[str]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
-            >>> from pprint import pprint
-
-            >>> def get_subreddit_wiki_pages(subreddit):
-            >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    with requests.Session() as request_session:
-            >>>        wiki_pages = subreddit.wiki_pages(session=request_session)
-            >>>        pprint(wiki_pages)
-
-
-            >>> get_subreddit_wiki_pages(subreddit="MachineLearning")
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="wiki pages", subreddit=self._subreddit
+                    query_type="wiki pages", subreddit=self._name
                 )
             )
 
-        pages: dict = api.make_request(
-            endpoint=f"{api.subreddit_endpoint}/{self._subreddit}/wiki/pages.json",
+        pages: dict = await api.make_request(
+            endpoint=f"{api.subreddit_endpoint}/{self._name}/wiki/pages.json",
             session=session,
         )
 
         return pages.get("data")
 
-    def wiki_page(
+    async def wiki_page(
         self,
         page_name: str,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         status: console.status = None,
-    ) -> Dict:
+    ) -> SimpleNamespace:
         """
-        Get a subreddit's specified wiki page data.
+        Asynchronously get a subreddit's specified wiki page data.
 
         :param page_name: Wiki page to get data from.
         :type page_name: str
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of strings, each representing a wiki page.
         :rtype: list[str]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddit
-            >>> from pprint import pprint
-
-            >>> def get_subreddit_wiki_page(page, subreddit):
-            >>>    subreddit = Subreddit(subreddit=subreddit)
-            >>>    with requests.Session() as request_session:
-            >>>        wiki_page_data = subreddit.wiki_page(page_name=page, session=request_session)
-            >>>        pprint(wiki_page_data)
-
-
-            >>> get_subreddit_wiki_page(page="rules", subreddit="MachineLearning")
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="wiki page data", subreddit=self._subreddit
+                    query_type="wiki page data", subreddit=self._name
                 )
             )
 
-        wiki_page: dict = api.get_entity(
+        wiki_page: dict = await api.get_entity(
             entity_type="wiki_page",
             page_name=page_name,
-            subreddit=self._subreddit,
+            subreddit=self._name,
             status=status,
             session=session,
         )
@@ -1155,20 +888,20 @@ class Subreddits:
         :type time_format: Literal["concise", "locale"]
         """
         self._time_format = time_format
-        self._status_template: str = "Fetching {limit} {subreddits_type} subreddits..."
+        self._status_template: str = "Fetching {limit} {subreddits_type} subreddits"
 
-    def all(
+    async def all(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get all subreddits.
+        Asynchronously get all subreddits.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get all subreddits.
@@ -1176,34 +909,19 @@ class Subreddits:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: List[Dict]
+        :rtype: list[dict]
 
         Note:
             -*imitating Morphius' voice*- "the only limitation you have at this point is the matrix's rate-limit."
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddits
-            >>> from pprint import pprint
-
-            >>> def get_all_subreddits(subreddits_limit):
-            >>>    subreddits = Subreddits()
-            >>>    with requests.Session() as request_session:
-            >>>        all_subs = subreddits.all(limit=subreddits_limit, session=request_session)
-            >>>        pprint(all_subs)
-
-
-            >>> get_all_subreddits(subreddits_limit=500)
         """
         if status:
             status.update(
                 self._status_template.format(
-                    subreddits_type="all", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    subreddits_type="all", limit=f"{colour.cyan}{limit}{colour.reset}"
                 )
             )
 
-        all_subreddits: List = api.get_subreddits(
+        all_subreddits: list = await api.get_subreddits(
             subreddits_type="all",
             limit=limit,
             timeframe=timeframe,
@@ -1211,50 +929,37 @@ class Subreddits:
             session=session,
         )
         if all_subreddits:
-            return parse_subreddits(data=all_subreddits, time_format=self._time_format)
+            return parse_subreddits(
+                raw_subreddits=all_subreddits, time_format=self._time_format
+            )
 
-    def default(
+    async def default(
         self,
         limit: int,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get default subreddits.
+        Asynchronously get default subreddits.
 
         :param limit: Maximum number of subreddits to return.
         :type limit: int
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddits
-            >>> import requests
-
-
-            >>> def get_default_subreddits(subreddits_limit):
-            >>>    subreddits = Subreddits()
-            >>>    with requests.Session() as request_session:
-            >>>        default_subs = subreddits.default(limit=subreddits_limit, session=request_session)
-            >>>        pprint(default_subs)
-
-
-            >>> get_default_subreddits(subreddits_limit=20)
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    subreddits_type="default", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    subreddits_type="default",
+                    limit=f"{colour.cyan}{limit}{colour.reset}",
                 )
             )
 
-        default_subreddits: List = api.get_subreddits(
+        default_subreddits: list = await api.get_subreddits(
             subreddits_type="default",
             timeframe="all",
             limit=limit,
@@ -1264,18 +969,18 @@ class Subreddits:
         if default_subreddits:
             return parse_subreddits(default_subreddits, time_format=self._time_format)
 
-    def new(
+    async def new(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get new subreddits.
+        Asynchronously get new subreddits.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new subreddits.
@@ -1283,32 +988,16 @@ class Subreddits:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddits
-            >>> import requests
-
-
-            >>> def get_new_subreddits(subreddits_limit):
-            >>>    subreddits = Subreddits()
-            >>>    with requests.Session() as request_session:
-            >>>        new_subs = subreddits.new(limit=subreddits_limit, session=request_session)
-            >>>        pprint(new_subs)
-
-
-            >>> get_new_subreddits(subreddits_limit=50)
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    subreddits_type="new", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    subreddits_type="new", limit=f"{colour.cyan}{limit}{colour.reset}"
                 )
             )
 
-        new_subreddits: List = api.get_subreddits(
+        new_subreddits: list = await api.get_subreddits(
             subreddits_type="new",
             limit=limit,
             timeframe=timeframe,
@@ -1318,18 +1007,18 @@ class Subreddits:
         if new_subreddits:
             return parse_subreddits(new_subreddits, time_format=self._time_format)
 
-    def popular(
+    async def popular(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get popular subreddits.
+        Asynchronously get popular subreddits.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular subreddits.
@@ -1337,32 +1026,17 @@ class Subreddits:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Subreddits
-            >>> import requests
-
-
-            >>> def get_popular_subreddits(subreddits_limit):
-            >>>    subreddits = Subreddits()
-            >>>    with requests.Session() as request_session:
-            >>>        popular_subs = subreddits.popular(limit=subreddits_limit, session=request_session)
-            >>>        pprint(popular_subs)
-
-
-            >>> get_popular_subreddits(subreddits_limit=100)
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    subreddits_type="popular", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    subreddits_type="popular",
+                    limit=f"{colour.cyan}{limit}{colour.reset}",
                 )
             )
 
-        popular_subreddits: List = api.get_subreddits(
+        popular_subreddits: list = await api.get_subreddits(
             subreddits_type="popular",
             limit=limit,
             timeframe=timeframe,
@@ -1376,33 +1050,33 @@ class Subreddits:
 class User:
     """Represents a Reddit user and provides methods for getting data from the specified user."""
 
-    def __init__(self, username: str, time_format: TIME_FORMAT = "locale"):
+    def __init__(self, name: str, time_format: TIME_FORMAT = "locale"):
         """
         Initialises a `User()` instance for getting a user's `profile`, `posts` and `comments` data.
 
-        :param username: Username to get data from.
-        :type username: str
+        :param name: Username to get data from.
+        :type name: str
         :param time_format: Time format of the output data. Use "concise" for a human-readable
                         time difference, or "locale" for a localized datetime string. Defaults to "locale".
         :type time_format: Literal["concise", "locale"]
         """
-        self._username = username
+        self._name = name
         self._time_format = time_format
-        self._status_template: str = "Fetching {query_type} from user u/{username}..."
+        self._status_template: str = "Fetching {query_type} from user u/{username}"
 
-    def comments(
+    async def comments(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get a user's comments.
+        Asynchronously get a user's comments.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session.
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession.
         :param limit: Maximum number of comments to return.
         :type limit: int
         :param sort: Sort criterion for the comments.
@@ -1412,34 +1086,18 @@ class User:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing comment data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import User
-            >>> import requests
-
-
-            >>> def get_user_comments(username, comments_limit):
-            >>>    user = User(username=username)
-            >>>    with requests.Session() as request_session:
-            >>>        comments = user.comments(limit=comments_limit, session=request_session)
-            >>>        pprint(comments)
-
-
-            >>> get_user_comments(username="AutoModerator", comments_limit=100)
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} comments",
-                    username=self._username,
+                    query_type=f"{colour.cyan}{limit}{colour.reset} comments",
+                    username=self._name,
                 )
             )
 
-        user_comments: List = api.get_posts(
-            username=self._username,
+        user_comments: list = await api.get_posts(
+            username=self._name,
             posts_type="user_comments",
             limit=limit,
             sort=sort,
@@ -1449,49 +1107,35 @@ class User:
         )
 
         if user_comments:
-            return parse_comments(comments=user_comments, time_format=self._time_format)
+            return parse_comments(
+                raw_comments=user_comments, time_format=self._time_format
+            )
 
-    def moderated_subreddits(
+    async def moderated_subreddits(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get subreddits moderated by user.
+        Asynchronously get subreddits moderated by user.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import User
-            >>> import requests
-
-
-            >>> def get_user_moderated_subreddits(username):
-            >>>    user = User(username=username)
-            >>>    with requests.Session() as request_session:
-            >>>        moderated_subs = user.moderated_subreddits(session=request_session)
-            >>>        pprint(moderated_subs)
-
-
-            >>> get_user_moderated_subreddits(username="TheRealKSI")
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="moderated subreddits", username=self._username
+                    query_type="moderated subreddits", username=self._name
                 )
             )
 
-        subreddits: dict = api.get_subreddits(
+        subreddits: dict = await api.get_subreddits(
             subreddits_type="user_moderated",
-            username=self._username,
+            username=self._name,
             limit=0,
             status=status,
             session=session,
@@ -1503,50 +1147,34 @@ class User:
                 time_format=self._time_format,
             )
 
-    def overview(
+    async def overview(
         self,
         limit: int,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get a user's most recent comments.
+        Asynchronously get a user's most recent comments.
 
         :param limit: Maximum number of comments to return.
         :type limit: int
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing data about a recent comment.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import User
-            >>> import requests
-
-
-            >>> def get_user_overview(username, comments_limit):
-            >>>    user = User(username=username)
-            >>>    with requests.Session() as request_session:
-            >>>        comments = user.overview(limit=comments_limit, session=request_session)
-            >>>        pprint(comments)
-
-
-            >>> get_user_overview(username="AutoModerator", comments_limit=100)
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} recent comments",
-                    username=self._username,
+                    query_type=f"{colour.cyan}{limit}{colour.reset} recent comments",
+                    username=self._name,
                 )
             )
 
-        user_overview: List = api.get_posts(
-            username=self._username,
+        user_overview: list = await api.get_posts(
+            username=self._name,
             posts_type="user_overview",
             limit=limit,
             status=status,
@@ -1556,19 +1184,19 @@ class User:
         if user_overview:
             return parse_comments(user_overview, time_format=self._time_format)
 
-    def posts(
+    async def posts(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get a user's posts.
+        Asynchronously get a user's posts.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session.
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession.
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param sort: Sort criterion for the posts.
@@ -1578,34 +1206,18 @@ class User:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import User
-            >>> import requests
-
-
-            >>> def get_user_posts(username, posts_limit):
-            >>>    user = User(username=username)
-            >>>    with requests.Session() as request_session:
-            >>>        posts = user.posts(limit=posts_limit, session=request_session)
-            >>>        pprint(posts)
-
-
-            >>> get_user_posts(username="AutoModerator", posts_limit=100)
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} posts",
-                    username=self._username,
+                    query_type=f"{colour.cyan}{limit}{colour.reset} posts",
+                    username=self._name,
                 )
             )
 
-        user_posts: List = api.get_posts(
-            username=self._username,
+        user_posts: list = await api.get_posts(
+            username=self._name,
             posts_type="user_posts",
             limit=limit,
             sort=sort,
@@ -1617,67 +1229,51 @@ class User:
         if user_posts:
             return parse_posts(user_posts, time_format=self._time_format)
 
-    def profile(
+    async def profile(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         status: console.status = None,
-    ) -> Dict:
+    ) -> SimpleNamespace:
         """
-        Get a user's profile data.
+        Asynchronously get a user's profile data.
 
-        :param session: aiohttp session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession session to use for the request.
+        :type session: aiohttp.ClientSession
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A dictionary containing user profile data.
         :rtype: dict
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import User
-            >>> import requests
-
-
-            >>> def get_user_profile(username):
-            >>>    user = User(username=username)
-            >>>    with requests.Session() as request_session:
-            >>>        profile = user.profile(session=request_session)
-            >>>        pprint(profile)
-
-
-            >>> get_user_profile(username="AutoModerator")
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="profile data", username=self._username
+                    query_type="profile data", username=self._name
                 )
             )
 
-        user_profile: dict = api.get_entity(
-            username=self._username, entity_type="user", status=status, session=session
+        user_profile: dict = await api.get_entity(
+            username=self._name, entity_type="user", status=status, session=session
         )
 
         if user_profile:
-            return parse_users(data=user_profile, time_format=self._time_format)
+            return parse_users(raw_users=user_profile, time_format=self._time_format)
 
-    def search_posts(
+    async def search_posts(
         self,
         query: str,
         limit: int,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get a user's posts that match with the specified search query.
+        Asynchronously get a user's posts that match with the specified search query.
 
         :param query: Search query.
         :type query: str
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session.
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession.
         :param limit: Maximum number of posts to search from.
         :type limit: int
         :param sort: Sort criterion for the posts.
@@ -1687,47 +1283,29 @@ class User:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing post data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import User
-            >>> import requests
-
-
-            >>> def search_user_posts(username, search_query, posts_limit):
-            >>>    user = User(username=username)
-            >>>    with requests.Session() as request_session:
-            >>>        posts = user.search_posts(query=search_query,
-            >>>                                limit=posts_limit, session=request_session)
-            >>>        pprint(posts)
-
-
-            >>> search_user_posts(username="AutoModerator",
-            >>>                             search_query="user has been banned", posts_limit=100)
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} posts for '{query}'",
-                    username=self._username,
+                    query_type=f"{colour.cyan}{limit}{colour.reset} posts for '{query}'",
+                    username=self._name,
                 )
             )
 
         pattern: str = rf"(?i)\b{re.escape(query)}\b"
         regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
 
-        user_posts: List = api.get_posts(
+        user_posts: list = await api.get_posts(
             posts_type="user_posts",
-            username=self._username,
+            username=self._name,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
             session=session,
         )
-        found_posts: List = []
+        found_posts: list = []
 
         for post in user_posts:
             post_data: dict = post.get("data")
@@ -1742,23 +1320,23 @@ class User:
         if found_posts:
             return parse_posts(found_posts, time_format=self._time_format)
 
-    def search_comments(
+    async def search_comments(
         self,
         query: str,
         limit: int,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         sort: SORT_CRITERION = "all",
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get a user's comments that contain the specified search query.
+        Asynchronously get a user's comments that contain the specified search query.
 
         :param query: Search query.
         :type query: str
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
-        :type session: requests.Session.
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
+        :type session: aiohttp.ClientSession.
         :param limit: Maximum number of comments to search from.
         :type limit: int
         :param sort: Sort criterion for the comments.
@@ -1768,39 +1346,21 @@ class User:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing comment data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import User
-            >>> import requests
-
-
-            >>> def search_user_comments(username, search_query, comments_limit):
-            >>>    user = User(username=username)
-            >>>    with requests.Session() as request_session:
-            >>>        comments = user.search_comments(query=search_query,
-            >>>                                limit=comments_limit, session=request_session)
-            >>>        pprint(comments)
-
-
-            >>> search_user_comments(username="AutoModerator",
-            >>>                            search_query="this action is automated", comments_limit=100)
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"{Text.cyan}{limit}{Text.reset} comments for '{query}'",
-                    username=self._username,
+                    query_type=f"{colour.cyan}{limit}{colour.reset} comments for '{query}'",
+                    username=self._name,
                 )
             )
 
         pattern: str = rf"(?i)\b{re.escape(query)}\b"
         regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
 
-        user_comments: List = api.get_posts(
-            username=self._username,
+        user_comments: list = await api.get_posts(
+            username=self._name,
             posts_type="user_comments",
             limit=limit,
             sort=sort,
@@ -1808,7 +1368,7 @@ class User:
             status=status,
             session=session,
         )
-        found_comments: List = []
+        found_comments: list = []
 
         for comment in user_comments:
             match = regex.search(comment.get("data", {}).get("body", ""))
@@ -1818,59 +1378,42 @@ class User:
         if found_comments:
             return parse_comments(found_comments, time_format=self._time_format)
 
-    def top_subreddits(
+    async def top_subreddits(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         top_n: int,
         limit: int,
+        filename: str = None,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> list[tuple]:
+    ) -> Union[list[tuple[str, int]], None]:
         """
-        Get a user's top n subreddits based on subreddit frequency in n posts.
+        Asynchronously get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param top_n: Communities arranging number.
         :type top_n: int
         :param limit: Maximum number of posts to scrape.
         :type limit: int
+        :param filename: Filename to which the analysis will be saved.
+        :type filename: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: Literal[str]
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
-        :return: Dictionary of top n subreddits and their ratio.
-        :rtype: dict
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import User
-            >>> import requests
-
-
-            >>> def get_user_top_subreddits(username, top_number, subreddits_limit):
-            >>>    user = User(username=username)
-            >>>    with requests.Session() as request_session:
-            >>>        top_subs = user.top_subreddits(top_n=top_number,
-            >>>                             limit=subreddits_limit, session=request_session)
-            >>>        pprint(top_subs)
-
-
-            >>> get_user_top_subreddits(username="TheRealKSI",
-            >>>                                     top_number=10, subreddits_limit=100)
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type=f"top {Text.cyan}{top_n}{Text.reset}/{Text.cyan}{limit}{Text.reset} subreddits",
-                    username=self._username,
+                    query_type=f"top {colour.cyan}{top_n}{colour.reset}/{colour.cyan}{limit}{colour.reset} subreddits",
+                    username=self._name,
                 )
             )
 
-        posts = api.get_posts(
+        posts = await api.get_posts(
             posts_type="user_posts",
-            username=self._username,
+            username=self._name,
             limit=limit,
             timeframe=timeframe,
             status=status,
@@ -1879,12 +1422,30 @@ class User:
 
         if posts:
             # Extract subreddit names
-            subreddits = [post.get("data", {}).get("subreddit") for post in posts]
+            subreddits: list = [post.get("data", {}).get("subreddit") for post in posts]
 
             # Count the occurrences of each subreddit
-            subreddit_counts = Counter(subreddits)
+            subreddit_counts: Counter = Counter(subreddits)
 
-            return subreddit_counts.most_common(top_n)
+            # Get the most common subreddits
+            top_subreddits: list[tuple[str, int]] = subreddit_counts.most_common(top_n)
+
+            # Prepare data for plotting
+            subreddit_names: list = [subreddit[0] for subreddit in top_subreddits]
+            subreddit_frequencies: list = [subreddit[1] for subreddit in top_subreddits]
+
+            if visualisation_deps_installed:
+                plot_bar_chart(
+                    data=dict(zip(subreddit_names, subreddit_frequencies)),
+                    title=f"top {top_n}/{limit} subreddits analysis",
+                    xlabel="Subreddits",
+                    ylabel="Frequency",
+                    figure_size=(top_n + 10, 5),
+                    colours=["lightblue"] * top_n,
+                    filename=f"{filename + '_' if filename else ''}top_{top_n}_of_{limit}_subreddits",
+                )
+            else:
+                return top_subreddits
 
 
 class Users:
@@ -1899,20 +1460,20 @@ class Users:
         :type time_format: Literal["concise", "locale"]
         """
         self._time_format = time_format
-        self._status_template: str = "Fetching {limit} {query_type} users..."
+        self._status_template: str = "Fetching {limit} {query_type} users"
 
-    def new(
+    async def new(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get new users.
+        Asynchronously get new users.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param limit: Maximum number of new users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new posts.
@@ -1920,32 +1481,16 @@ class Users:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing a user's data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Users
-            >>> import requests
-
-
-            >>> def get_new_users(users_limit):
-            >>>    users = Users()
-            >>>    with requests.Session() as request_session:
-            >>>        new = users.new(limit=users_limit, session=request_session)
-            >>>        pprint(new)
-
-
-            >>> get_new_users(users_limit=500)
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="new", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    query_type="new", limit=f"{colour.cyan}{limit}{colour.reset}"
                 )
             )
 
-        new_users: List = api.get_users(
+        new_users: list = await api.get_users(
             users_type="new",
             limit=limit,
             timeframe=timeframe,
@@ -1956,18 +1501,18 @@ class Users:
         if new_users:
             return parse_users(new_users, time_format=self._time_format)
 
-    def popular(
+    async def popular(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get popular users.
+        Asynchronously get popular users.
 
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param limit: Maximum number of popular users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular posts.
@@ -1975,32 +1520,16 @@ class Users:
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing a user's data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Users
-            >>> import requests
-
-
-            >>> def get_popular_users(users_limit):
-            >>>    users = Users()
-            >>>    with requests.Session() as request_session:
-            >>>        popular = users.popular(limit=users_limit, session=request_session)
-            >>>        pprint(popular)
-
-
-            >>> get_popular_users(users_limit=100)
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="popular", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    query_type="popular", limit=f"{colour.cyan}{limit}{colour.reset}"
                 )
             )
 
-        popular_users: List = api.get_users(
+        popular_users: list = await api.get_users(
             users_type="popular",
             limit=limit,
             timeframe=timeframe,
@@ -2011,51 +1540,35 @@ class Users:
         if popular_users:
             return parse_users(popular_users, time_format=self._time_format)
 
-    def all(
+    async def all(
         self,
-        session: requests.Session,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: TIMEFRAME = "all",
         status: console.status = None,
-    ) -> List[Dict]:
+    ) -> list[SimpleNamespace]:
         """
-        Get all users.
+        Asynchronously get all users.
 
         :param limit: Maximum number of all users to return.
         :type limit: int
-        :param session: A requests.Session to use for the request.
-        :type session: requests.Session
+        :param session: A aiohttp.ClientSession to use for the request.
+        :type session: aiohttp.ClientSession
         :param timeframe: Timeframe from which to get all posts.
         :type timeframe: Literal[str]
         :param status: An instance of `console.status` used to display animated status messages.
         :type: rich.console.Console.status
         :return: A list of dictionaries, each containing a user's data.
-        :rtype: List[Dict]
-
-        Usage::
-
-            >>> from pprint import pprint
-            >>> from knewkarma import Users
-            >>> import requests
-
-
-            >>> def get_all_users(users_limit):
-            >>>    users = Users()
-            >>>    with requests.Session() as request_session:
-            >>>        all_users_data = users.all(limit=users_limit, session=request_session)
-            >>>        pprint(all_users_data)
-
-
-            >>> get_all_users(users_limit=1000))
+        :rtype: list[dict]
         """
         if status:
             status.update(
                 self._status_template.format(
-                    query_type="all", limit=f"{Text.cyan}{limit}{Text.reset}"
+                    query_type="all", limit=f"{colour.cyan}{limit}{colour.reset}"
                 )
             )
 
-        all_users: List = api.get_users(
+        all_users: list = await api.get_users(
             users_type="all",
             limit=limit,
             timeframe=timeframe,
