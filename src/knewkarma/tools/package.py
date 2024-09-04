@@ -1,10 +1,11 @@
 import os
 import subprocess
 
-from .misc_utils import console
-from .styling_utils import Prefix
+from .console import Notify
 
 __all__ = ["is_pypi_package", "is_snap_package", "update_pypi_package"]
+
+notify = Notify
 
 
 def is_snap_package(package: str) -> bool:
@@ -19,7 +20,7 @@ def is_snap_package(package: str) -> bool:
 
     Usage::
 
-        >>> from knewkarma.tools.package_utils import is_snap_package
+        >>> from knewkarma.tools.package import is_snap_package
 
         >>> package_name = "src"
         >>> print(is_snap_package(package=package_name))
@@ -28,7 +29,9 @@ def is_snap_package(package: str) -> bool:
     if package:
         return True if os.getenv("SNAP") else False
     else:
-        raise ValueError("Empty package name provided.")
+        notify.raise_exception(
+            ValueError, "The provided package name is not a valid string."
+        )
 
 
 def is_pypi_package(package: str) -> bool:
@@ -42,7 +45,7 @@ def is_pypi_package(package: str) -> bool:
 
     Usage::
 
-        >>> from knewkarma.tools.package_utils import is_pypi_package
+        >>> from knewkarma.tools.package import is_pypi_package
 
         >>> package_name = "src"
         >>> print(is_pypi_package(package=package_name))
@@ -50,13 +53,14 @@ def is_pypi_package(package: str) -> bool:
     """
     if package:
         try:
-            # Try to import the package to see if it exists
             __import__(name=package)
             return True
         except ImportError:
             return False
     else:
-        raise ValueError("Empty package name provided.")
+        notify.raise_exception(
+            ValueError, "The provided package name is not a valid string."
+        )
 
 
 def update_pypi_package(package: str):
@@ -68,7 +72,7 @@ def update_pypi_package(package: str):
 
     Usage::
 
-        >>> from knewkarma.tools.package_utils import update_pypi_package
+        >>> from knewkarma.tools.package import update_pypi_package
 
         >>> # This will update the pypi package
         >>> package_name = "src"
@@ -77,13 +81,22 @@ def update_pypi_package(package: str):
     if package:
         try:
             subprocess.run(["pip", "install", "--upgrade", package], check=True)
-            console.print(f"{Prefix.ok} DONE. Updates will be applied on next run.")
-        except subprocess.CalledProcessError as e:
-            console.log(f"{Prefix.error} Failed to update {package}: {e}")
-        except Exception as e:
-            console.log(f"{Prefix.error} Unexpected error: {e}")
+            notify.ok(f"DONE. Updates will be applied on next run.")
+        except subprocess.CalledProcessError as called_process_error:
+            notify.exception(
+                error=called_process_error,
+                exception_context=f"while updating {package}",
+            )
+        except Exception as unexpected_error:
+            notify.exception(
+                error=unexpected_error,
+                exception_type="unexpected",
+                exception_context=f"while updating {package}",
+            )
     else:
-        raise ValueError("Empty package name provided.")
+        notify.raise_exception(
+            ValueError, "The provided package name is not a valid string."
+        )
 
 
 # -------------------------------- END ----------------------------------------- #

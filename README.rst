@@ -18,10 +18,10 @@ Table Of Contents
 =================
 
 - `Documentation <#documentation>`_
+- `Star History <#star-history>`_
 - `Sponsorship <#sponsorship>`_
    - `How to Sponsor <#how-to-sponsor>`_
    - `What Sponsors Get <#what-sponsors-get>`_
-- `Star History <#star-history>`_
 - `License <#license>`_
 
 Documentation
@@ -32,12 +32,24 @@ Refer to the `documentation <https://knewkarma.readthedocs.io>`_ for **Feature O
 .. image:: https://github.com/user-attachments/assets/1cfd097c-e5fa-4fe0-98f8-a7dd9d37c555
    :alt: docs
 
+Star History
+============
+
+.. raw:: html
+
+   <a href="https://star-history.com/#rly0nheart/knewkarma&Date">
+      <picture>
+         <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=rly0nheart/knewkarma&type=Date&theme=dark" />
+         <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=rly0nheart/knewkarma&type=Date" />
+         <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=rly0nheart/knewkarma&type=Date" />
+      </picture>
+   </a>
+
+
 Sponsorship
 ===========
 
-Knew Karma is an open-source project developed and maintained by... `me <https://gravatar.com/rly0nheart>`_.
-
-If you find this toolkit useful and would like to support its development, you can sponsor the project through **Open Collective**.
+If you find Knew Karma useful and would like to support its development, you can sponsor the project through **Open Collective**.
 
 Your sponsorship will help cover the **costs of ongoing maintenance**, **new feature development**, and **overall project sustainability**.
 
@@ -59,19 +71,6 @@ As a sponsor, you'll be recognized in the README and Documentation, with your lo
 Thank you for considering sponsoring Knew Karma. Your support keeps the project alive and thriving!
 
 `Become a Sponsor <https://opencollective.com/knewkarma>`_
-
-Star History
-============
-
-.. raw:: html
-
-   <a href="https://star-history.com/#rly0nheart/knewkarma&Date">
-      <picture>
-         <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=rly0nheart/knewkarma&type=Date&theme=dark" />
-         <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=rly0nheart/knewkarma&type=Date" />
-         <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=rly0nheart/knewkarma&type=Date" />
-      </picture>
-   </a>
 
 License
 =======

@@ -26,7 +26,7 @@ class About:
         "https://gravatar.com/rly0nheart",
     )
     sponsor: str = f"https://opencollective.com/{package}"
-    copyright: str = f"{name} {Version.release} © {author[0]}. All rights reserved."
+    copyright: str = f"{name} {Version.full} © {author[0]}. All rights reserved."
     documentation: str = "https://knewkarma.readthedocs.io"
     summary: str = f"A Reddit data analysis toolkit — by {author[0]} <{author[2]}>"
     description: str = f"""
@@ -36,9 +36,9 @@ Application Programming Interface (API) to enable an easy integration in other P
 
 
 
-🕮  Refer to the documentation <{documentation}> for usage examples and integration guide.
+📚 Refer to the documentation <{documentation}> for usage examples and integration guide.
 
-❤️  Become a sponsor <{sponsor}>
+❤️  Become a sponsor: <{sponsor}>
 """
 
 

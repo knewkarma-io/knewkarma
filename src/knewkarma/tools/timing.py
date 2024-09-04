@@ -1,3 +1,4 @@
+import asyncio
 import locale
 import os
 import time
@@ -5,6 +6,8 @@ from datetime import datetime, timezone
 from typing import Literal, Union
 
 from rich.status import Status
+
+from .console import Colour, Notify
 
 __all__ = [
     "countdown_timer",
@@ -14,8 +17,11 @@ __all__ = [
     "filename_timestamp",
 ]
 
+colour = Colour
+notify = Notify
 
-def countdown_timer(
+
+async def countdown_timer(
     status: Status, duration: int, current_count: int, overall_count: int
 ):
     """
@@ -37,10 +43,10 @@ def countdown_timer(
         remaining_milliseconds: int = int((remaining_time - remaining_seconds) * 100)
 
         status.update(
-            f"Fetched [cyan]{current_count}[/]/[cyan]{overall_count}[/] items so far. "
-            f"Resuming in [cyan]{remaining_seconds}[/].[cyan]{remaining_milliseconds:02}[/]ms..."
+            f"{colour.cyan}{current_count}{colour.reset} (of {colour.cyan}{overall_count}{colour.reset}) items fetched so far. "
+            f"Resuming in {colour.cyan}{remaining_seconds}.{remaining_milliseconds:02}{colour.reset} seconds"
         )
-        time.sleep(0.01)  # Sleep for 10 milliseconds
+        await asyncio.sleep(0.01)  # Sleep for 10 milliseconds
 
 
 def timestamp_to_locale(timestamp: float) -> str:
@@ -54,7 +60,7 @@ def timestamp_to_locale(timestamp: float) -> str:
 
     Usage::
 
-        >>> from knewkarma.tools.time_utils import timestamp_to_locale
+        >>> from knewkarma.tools.timing import timestamp_to_locale
 
         >>> coffee_time = 1722277062
         >>> difference = timestamp_to_locale(timestamp=coffee_time)
@@ -86,7 +92,7 @@ def timestamp_to_concise(timestamp: int) -> str:
 
     Usage::
 
-        >>> from knewkarma.tools.time_utils import timestamp_to_concise
+        >>> from knewkarma.tools.timing import timestamp_to_concise
 
         >>> coffee_time = 1722277062
         >>> difference = timestamp_to_concise(timestamp=coffee_time)
@@ -155,7 +161,7 @@ def timestamp_to_readable(
 
     Usage::
 
-        >>> from knewkarma.tools.time_utils import timestamp_to_readable
+        >>> from knewkarma.tools.timing import timestamp_to_readable
 
         >>> coffee_time = 1722277062
         >>> difference = timestamp_to_readable(timestamp=coffee_time, time_format="concise")
@@ -171,8 +177,9 @@ def timestamp_to_readable(
         elif time_format == "locale":
             return timestamp_to_locale(timestamp=timestamp)
         else:
-            raise ValueError(
-                f"Unknown time format {time_format}. Expected `concise` or `locale`."
+            notify.raise_exception(
+                ValueError,
+                f"Unsupported time format {time_format}. Expected concise | locale",
             )
     else:
         return None
