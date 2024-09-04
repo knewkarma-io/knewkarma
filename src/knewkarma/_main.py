@@ -7,7 +7,7 @@ import aiohttp
 
 from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .extras import plot_bar_chart, visualisation_deps_installed
-from .tools.console import Colour
+from .tools.console import Colour, Notify
 from .tools.general import console
 from .tools.parsers import (
     parse_comments,
@@ -28,8 +28,10 @@ __all__ = [
     "Users",
 ]
 
-api = Api()
 colour = Colour
+notify = Notify
+
+api = Api()
 
 
 class Comment:
@@ -73,12 +75,13 @@ class Post:
         :rtype: SimpleNamespace
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                message=self._status_template.format(
                     query_type="data",
                     post_id=self._id,
                     post_subreddit=self._subreddit,
-                )
+                ),
+                status=status,
             )
 
         post_data: dict = await api.get_entity(
@@ -117,12 +120,13 @@ class Post:
         :rtype: list[SimpleNamespace]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type=f"{colour.cyan}{limit}{colour.reset} comments",
                     post_id=self._id,
                     post_subreddit=self._subreddit,
-                )
+                ),
             )
 
         comments_data: list = await api.get_posts(
@@ -178,10 +182,11 @@ class Posts:
         :rtype: list[SimpleNamespace]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     listing="best", limit=f"{colour.cyan}{limit}{colour.reset}"
-                )
+                ),
             )
 
         best_posts: list = await api.get_posts(
@@ -217,10 +222,11 @@ class Posts:
         :rtype: list[SimpleNamespace]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     listing="controversial", limit=f"{colour.cyan}{limit}{colour.reset}"
-                )
+                ),
             )
 
         controversial_posts: list = await api.get_posts(
@@ -261,10 +267,11 @@ class Posts:
         :rtype: list[SimpleNamespace]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     listing="front-page", limit=f"{colour.cyan}{limit}{colour.reset}"
-                )
+                ),
             )
 
         front_page_posts: list = await api.get_posts(
@@ -306,10 +313,11 @@ class Posts:
         :rtype: list[SimpleNamespace]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     listing="new", limit=f"{colour.cyan}{limit}{colour.reset}"
-                )
+                ),
             )
 
         new_posts: list = await api.get_posts(
@@ -346,10 +354,11 @@ class Posts:
         :rtype: list[SimpleNamespace]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     listing="popular", limit=f"{colour.cyan}{limit}{colour.reset}"
-                )
+                ),
             )
 
         popular_posts: list = await api.get_posts(
@@ -385,10 +394,11 @@ class Posts:
         :rtype: list[SimpleNamespace]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     listing="rising", limit=f"{colour.cyan}{limit}{colour.reset}"
-                )
+                ),
             )
 
         rising_posts: list = await api.get_posts(
@@ -444,12 +454,13 @@ class Search:
         :rtype: list[SimpleNamespace]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type="posts",
                     limit=f"{colour.cyan}{limit}{colour.reset}",
                     query=self._query,
-                )
+                ),
             )
 
         posts_results: list = await api.search_entities(
@@ -485,12 +496,13 @@ class Search:
         :rtype: list[SimpleNamespace]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type="subreddits",
                     limit=f"{colour.cyan}{limit}{colour.reset}",
                     query=self._query,
-                )
+                ),
             )
 
         search_subreddits: list = await api.search_entities(
@@ -529,12 +541,13 @@ class Search:
         :rtype: list[SimpleNamespace]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type="users",
                     limit=f"{colour.cyan}{limit}{colour.reset}",
                     query=self._query,
-                )
+                ),
             )
 
         search_users: list[dict] = await api.search_entities(
@@ -596,6 +609,15 @@ class Subreddit:
         :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
         :rtype: list[SimpleNamespace]
         """
+        if status:
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
+                    query_type=f"{comments_per_post} comments per post (of {posts_limit})",
+                    subreddit=self._name,
+                ),
+            )
+
         posts = await self.posts(
             session=session,
             limit=posts_limit,
@@ -643,11 +665,12 @@ class Subreddit:
         :rtype: list[SimpleNamespace]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type=f"{colour.cyan}{limit}{colour.reset} posts",
                     subreddit=self._name,
-                )
+                ),
             )
 
         subreddit_posts: list = await api.get_posts(
@@ -679,10 +702,11 @@ class Subreddit:
         :rtype: SimpleNamespace
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type="profile data", subreddit=self._name
-                )
+                ),
             )
 
         subreddit_profile: dict = await api.get_entity(
@@ -737,7 +761,10 @@ class Subreddit:
         found_comments: list = []
         for post in posts:
             if status:
-                status.update(f"Fetching comments from post {post.get('id')}")
+                notify.update_status(
+                    status=status,
+                    message=f"Fetching comments from post {post.get('id')}",
+                )
 
             post = Post(
                 id=post.get("id"),
@@ -790,11 +817,12 @@ class Subreddit:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type=f"{colour.cyan}{limit}{colour.reset} posts with '{query}'",
                     subreddit=self._name,
-                )
+                ),
             )
         found_posts: list = await api.get_posts(
             posts_type="search_subreddit_posts",
@@ -826,10 +854,11 @@ class Subreddit:
         :rtype: list[str]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type="wiki pages", subreddit=self._name
-                )
+                ),
             )
 
         pages: dict = await api.make_request(
@@ -858,10 +887,11 @@ class Subreddit:
         :rtype: list[str]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type="wiki page data", subreddit=self._name
-                )
+                ),
             )
 
         wiki_page: dict = await api.get_entity(
@@ -915,10 +945,11 @@ class Subreddits:
             -*imitating Morphius' voice*- "the only limitation you have at this point is the matrix's rate-limit."
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     subreddits_type="all", limit=f"{colour.cyan}{limit}{colour.reset}"
-                )
+                ),
             )
 
         all_subreddits: list = await api.get_subreddits(
@@ -952,11 +983,12 @@ class Subreddits:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     subreddits_type="default",
                     limit=f"{colour.cyan}{limit}{colour.reset}",
-                )
+                ),
             )
 
         default_subreddits: list = await api.get_subreddits(
@@ -991,10 +1023,11 @@ class Subreddits:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     subreddits_type="new", limit=f"{colour.cyan}{limit}{colour.reset}"
-                )
+                ),
             )
 
         new_subreddits: list = await api.get_subreddits(
@@ -1029,11 +1062,12 @@ class Subreddits:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     subreddits_type="popular",
                     limit=f"{colour.cyan}{limit}{colour.reset}",
-                )
+                ),
             )
 
         popular_subreddits: list = await api.get_subreddits(
@@ -1089,11 +1123,12 @@ class User:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type=f"{colour.cyan}{limit}{colour.reset} comments",
                     username=self._name,
-                )
+                ),
             )
 
         user_comments: list = await api.get_posts(
@@ -1127,10 +1162,11 @@ class User:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type="moderated subreddits", username=self._name
-                )
+                ),
             )
 
         subreddits: dict = await api.get_subreddits(
@@ -1166,11 +1202,12 @@ class User:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type=f"{colour.cyan}{limit}{colour.reset} recent comments",
                     username=self._name,
-                )
+                ),
             )
 
         user_overview: list = await api.get_posts(
@@ -1209,11 +1246,12 @@ class User:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type=f"{colour.cyan}{limit}{colour.reset} posts",
                     username=self._name,
-                )
+                ),
             )
 
         user_posts: list = await api.get_posts(
@@ -1245,10 +1283,11 @@ class User:
         :rtype: dict
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type="profile data", username=self._name
-                )
+                ),
             )
 
         user_profile: dict = await api.get_entity(
@@ -1286,11 +1325,12 @@ class User:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type=f"{colour.cyan}{limit}{colour.reset} posts for '{query}'",
                     username=self._name,
-                )
+                ),
             )
 
         pattern: str = rf"(?i)\b{re.escape(query)}\b"
@@ -1349,11 +1389,12 @@ class User:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type=f"{colour.cyan}{limit}{colour.reset} comments for '{query}'",
                     username=self._name,
-                )
+                ),
             )
 
         pattern: str = rf"(?i)\b{re.escape(query)}\b"
@@ -1404,11 +1445,12 @@ class User:
         :type: rich.console.Console.status
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type=f"top {colour.cyan}{top_n}{colour.reset}/{colour.cyan}{limit}{colour.reset} subreddits",
                     username=self._name,
-                )
+                ),
             )
 
         posts = await api.get_posts(
@@ -1484,10 +1526,11 @@ class Users:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type="new", limit=f"{colour.cyan}{limit}{colour.reset}"
-                )
+                ),
             )
 
         new_users: list = await api.get_users(
@@ -1523,10 +1566,11 @@ class Users:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type="popular", limit=f"{colour.cyan}{limit}{colour.reset}"
-                )
+                ),
             )
 
         popular_users: list = await api.get_users(
@@ -1562,10 +1606,11 @@ class Users:
         :rtype: list[dict]
         """
         if status:
-            status.update(
-                self._status_template.format(
+            notify.update_status(
+                status=status,
+                message=self._status_template.format(
                     query_type="all", limit=f"{colour.cyan}{limit}{colour.reset}"
-                )
+                ),
             )
 
         all_users: list = await api.get_users(

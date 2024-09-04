@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+from rich.console import Console
+
 from .console import Notify
 
 __all__ = ["is_pypi_package", "is_snap_package", "update_pypi_package"]
@@ -63,12 +65,14 @@ def is_pypi_package(package: str) -> bool:
         )
 
 
-def update_pypi_package(package: str):
+def update_pypi_package(package: str, status: Console.status = None):
     """
     Updates a specified pypi package.
 
     :param package: Name of the pypi package to update.
     :type package: str
+    :param status: An optional `console.status` object for displaying status messages.
+    :type status: rich.console.Console.status, optional
 
     Usage::
 
@@ -80,8 +84,21 @@ def update_pypi_package(package: str):
     """
     if package:
         try:
-            subprocess.run(["pip", "install", "--upgrade", package], check=True)
-            notify.ok(f"DONE. Updates will be applied on next run.")
+            if status:
+                status.start()
+                notify.update_status(status=status, message="Downloading updates")
+            subprocess.run(
+                [
+                    "pip",
+                    "install",
+                    "--upgrade",
+                    package,
+                ],
+                check=True,
+                stdout=subprocess.DEVNULL if status else None,
+                stderr=subprocess.STDOUT if status else None,
+            )
+            notify.ok(f"DONE. The updates will be applied on next run.")
         except subprocess.CalledProcessError as called_process_error:
             notify.exception(
                 error=called_process_error,

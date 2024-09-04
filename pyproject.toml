@@ -9,9 +9,6 @@ description = "A Reddit data analysis toolkit"
 authors = ["Richard Mwewa <rly0nheart@duck.com>"]
 readme = "README.rst"
 license = "MIT License"
-homepage = "https://knewkarma.readthedocs.io"
-documentation = "https://knewkarma.readthedocs.io"
-repository = "https://github.com/rly0nheart/knewkarma"
 keywords = ["reddit", "reddit-api", "reddit-data-analysis"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -23,7 +20,10 @@ classifiers = [
 ]
 
 [tool.poetry.urls]
-"Bug Tracker" = "https://github.com/rly0nheart/knewkarma/issues"
+homepage = "https://knewkarma.readthedocs.io"
+sponsor = "https://opencollective.com/knewkarma"
+tracker = "https://github.com/rly0nheart/knewkarma/issues"
+repository = "https://github.com/rly0nheart/knewkarma"
 
 [tool.poetry.dependencies]
 python = "^3.10"
