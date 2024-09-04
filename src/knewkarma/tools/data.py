@@ -35,7 +35,7 @@ def get_file_size(file_path: str) -> str:
 
 
 def create_dataframe(
-        data: Union[SimpleNamespace, list[SimpleNamespace], list[tuple]],
+    data: Union[SimpleNamespace, list[SimpleNamespace], list[tuple]],
 ) -> pd.DataFrame:
     """
     Converts provided data into a pandas DataFrame.
@@ -53,7 +53,7 @@ def create_dataframe(
 
     # Convert a list of SimpleNamespace objects to a list of dictionaries
     elif isinstance(data, list) and all(
-            isinstance(item, (SimpleNamespace, tuple)) for item in data
+        isinstance(item, (SimpleNamespace, tuple)) for item in data
     ):
         # Each object in the list is converted to its dictionary representation
         data = [item.__dict__ for item in data]
@@ -68,10 +68,10 @@ def create_dataframe(
 
 
 def export_dataframe(
-        dataframe: pd.DataFrame,
-        filename: str,
-        directory: str,
-        formats: list[EXPORT_FORMATS],
+    dataframe: pd.DataFrame,
+    filename: str,
+    directory: str,
+    formats: list[EXPORT_FORMATS],
 ):
     """
     Exports a Pandas dataframe to specified file formats.
@@ -117,5 +117,6 @@ def export_dataframe(
             )
         else:
             continue
+
 
 # -------------------------------- END ----------------------------------------- #

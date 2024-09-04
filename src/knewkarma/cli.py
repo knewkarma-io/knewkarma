@@ -121,12 +121,12 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
 )
 @click.pass_context
 def cli(
-        ctx: click.Context,
-        timeframe: TIMEFRAME,
-        sort: SORT_CRITERION,
-        limit: int,
-        time_format: str,
-        export: list[EXPORT_FORMATS],
+    ctx: click.Context,
+    timeframe: TIMEFRAME,
+    sort: SORT_CRITERION,
+    limit: int,
+    time_format: str,
+    export: list[EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -155,6 +155,7 @@ def cli(
 # Check if Machine Learning and visualisation dependencies are installed,
 # and also check if current package is not a snap.
 if ml_deps_installed and visualisation_deps_installed:
+
     @cli.command(
         help="[extra] Use this command to analyse the sentiment and/or emotion distributions of posts (exported from knewkarma).",
     )
@@ -162,11 +163,11 @@ if ml_deps_installed and visualisation_deps_installed:
     @click.option("-p", "--posts", help="A file containing posts data")
     @click.pass_context
     def analyse(
-            ctx: click.Context,
-            analysis_type: Literal["sentiment", "emotion"],
-            posts: str,
-            emotion: bool,
-            sentiment: bool,
+        ctx: click.Context,
+        analysis_type: Literal["sentiment", "emotion"],
+        posts: str,
+        emotion: bool,
+        sentiment: bool,
     ):
         """
         Analyses a posts sentiment or emotion distribution and plots the output in a bar chat.
@@ -200,7 +201,7 @@ if ml_deps_installed and visualisation_deps_installed:
 
 @cli.command(
     help="Use this command to get an individual post's data including its comments, "
-         "provided the post's <id> and source <subreddit> are specified.",
+    "provided the post's <id> and source <subreddit> are specified.",
 )
 @click.argument("id")
 @click.argument("subreddit")
@@ -270,13 +271,13 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 @click.option("-r", "--rising", is_flag=True, help="Get posts from the rising listing")
 @click.pass_context
 def posts(
-        ctx: click.Context,
-        best: bool,
-        controversial: bool,
-        front_page: bool,
-        new: bool,
-        popular: bool,
-        rising: bool,
+    ctx: click.Context,
+    best: bool,
+    controversial: bool,
+    front_page: bool,
+    new: bool,
+    popular: bool,
+    rising: bool,
 ):
     """
     Retrieve various types of posts such as best, controversial, popular, new, and front-page.
@@ -420,16 +421,16 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
 @click.option("-wps", "--wiki-pages", is_flag=True, help="Get a subreddit's wiki pages")
 @click.pass_context
 def subreddit(
-        ctx: click.Context,
-        subreddit_name: str,
-        comments: bool,
-        comments_per_post: int,
-        posts: bool,
-        profile: bool,
-        search_comments: str,
-        search_post: str,
-        wiki_page: str,
-        wiki_pages: bool,
+    ctx: click.Context,
+    subreddit_name: str,
+    comments: bool,
+    comments_per_post: int,
+    posts: bool,
+    profile: bool,
+    search_comments: str,
+    search_post: str,
+    wiki_page: str,
+    wiki_pages: bool,
 ):
     """
     Retrieve data about a specific subreddit including profile, comments, posts, and wiki pages.
@@ -596,7 +597,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 
 @cli.command(
     help="Use this command to get user data, such as profile, posts, "
-         "comments, top subreddits, moderated subreddits, and more...",
+    "comments, top subreddits, moderated subreddits, and more...",
 )
 @click.argument("username")
 @click.option("-c", "--comments", is_flag=True, help="Get user's comments")
@@ -629,16 +630,16 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 )
 @click.pass_context
 def user(
-        ctx: click.Context,
-        username: str,
-        comments: bool,
-        moderated_subreddits: bool,
-        overview: bool,
-        posts: bool,
-        profile: bool,
-        search_comments: str,
-        search_posts: str,
-        top_subreddits: int,
+    ctx: click.Context,
+    username: str,
+    comments: bool,
+    moderated_subreddits: bool,
+    overview: bool,
+    posts: bool,
+    profile: bool,
+    search_comments: str,
+    search_posts: str,
+    top_subreddits: int,
 ):
     """
     Retrieve data about a specific user including profile, posts, comments, and top subreddits.
@@ -790,10 +791,10 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 
 
 async def call_method(
-        method: Callable,
-        session: aiohttp.ClientSession,
-        status: console.status,
-        **kwargs: Union[str, click.Context],
+    method: Callable,
+    session: aiohttp.ClientSession,
+    status: console.status,
+    **kwargs: Union[str, click.Context],
 ):
     """
     Calls a method with the provided arguments.
@@ -849,10 +850,10 @@ async def call_method(
 
 
 async def handle_method_calls(
-        ctx: click.Context,
-        method_map: dict,
-        export: str,
-        **kwargs: Union[str, int, bool],
+    ctx: click.Context,
+    method_map: dict,
+    export: str,
+    **kwargs: Union[str, int, bool],
 ):
     """
     Handle the method calls based on the provided arguments.
@@ -874,9 +875,9 @@ async def handle_method_calls(
             start_time: datetime = datetime.now()
             try:
                 with console.status(
-                        f"Establishing connection /w new session",
-                        spinner="dots",
-                        spinner_style=colour.yellow.strip("[,]"),
+                    f"Establishing connection /w new session{colour.yellow}...{colour.reset}",
+                    spinner="dots",
+                    spinner_style=colour.yellow.strip("[,]"),
                 ) as status:
                     async with aiohttp.ClientSession() as session:
                         await Api().check_updates(session=session, status=status)
@@ -893,7 +894,9 @@ async def handle_method_calls(
                 notify.warning("Process aborted /w CTRL+C.")
             finally:
                 elapsed_time = datetime.now() - start_time
-                notify.info(f"{elapsed_time.total_seconds():.2f} seconds elapsed.")
+                notify.info(
+                    f"DONE. {elapsed_time.total_seconds():.2f} seconds elapsed."
+                )
 
     if not is_valid_arg:
         ctx.get_usage()
@@ -905,5 +908,6 @@ def start():
     """
     console.set_window_title(f"{About.name} {Version.release}")
     cli(obj={})
+
 
 # -------------------------------- END ----------------------------------------- #

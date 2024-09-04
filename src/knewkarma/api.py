@@ -10,7 +10,7 @@ from rich.prompt import Confirm
 from .about import About
 from .tools.console import Colour, Notify
 from .tools.general import console, make_panel
-from .tools.package import is_pypi_package, update_pypi_package, is_snap_package
+from .tools.package import update_pypi_package, is_snap_package
 from .tools.timing import countdown_timer
 from .version import Version
 
@@ -35,7 +35,7 @@ class Api:
 
     @staticmethod
     def _process_response(
-            response_data: Union[dict, list], valid_key: str = None
+        response_data: Union[dict, list], valid_key: str = None
     ) -> Union[dict, list]:
         """
         Processes and validates the API response data.
@@ -66,11 +66,11 @@ class Api:
             )
 
     async def _paginate_response(
-            self,
-            limit: int,
-            session: aiohttp.ClientSession,
-            data_processor: Callable,
-            **kwargs: Union[str, console.status],
+        self,
+        limit: int,
+        session: aiohttp.ClientSession,
+        data_processor: Callable,
+        **kwargs: Union[str, console.status],
     ) -> list[dict]:
         """
         Asynchronously fetches and processes data in a paginated manner
@@ -145,8 +145,8 @@ class Api:
 
     @staticmethod
     async def make_request(
-            endpoint: str,
-            session: aiohttp.ClientSession,
+        endpoint: str,
+        session: aiohttp.ClientSession,
     ) -> Union[dict, list]:
         """
         Asynchronously sends a GET request to the specified API endpoint and returns JSON or list response.
@@ -160,11 +160,11 @@ class Api:
         """
         try:
             async with session.get(
-                    endpoint,
-                    headers={
-                        "User-Agent": f"{About.name.replace(' ', '-')}/{Version.release} "
-                                      f"(Python {python_version}; +{About.documentation})"
-                    },
+                endpoint,
+                headers={
+                    "User-Agent": f"{About.name.replace(' ', '-')}/{Version.release} "
+                    f"(Python {python_version}; +{About.documentation})"
+                },
             ) as response:
                 response.raise_for_status()
                 response_data: Union[dict, list] = await response.json()
@@ -180,7 +180,7 @@ class Api:
             return {}
 
     async def check_updates(
-            self, session: aiohttp.ClientSession, status: console.status
+        self, session: aiohttp.ClientSession, status: console.status
     ):
         """
         Asynchronously checks for updates by comparing the current local version with the remote version.
@@ -237,31 +237,29 @@ class Api:
             if update_level:
                 markdown_release_notes = Markdown(markup=markup_release_notes)
                 make_panel(
-                    title=f"{colour.bold}{update_level} update ({colour.cyan}{remote_version_str}{colour.reset}){colour.reset}",
+                    title=f"{colour.bold}{update_level} Update Available ({colour.cyan}{remote_version_str}{colour.reset}){colour.reset}",
                     content=markdown_release_notes,
                     subtitle=f"{colour.bold}{colour.italic}Thank you, for using {About.name}!{colour.reset}{colour.reset} ❤️ ",
                 )
 
                 # Skip auto-updating of the snap package
-                if is_snap_package(package=About.package):
-                    pass
-                elif is_pypi_package(package=About.package):
+                if not is_snap_package(package=About.package):
                     status.stop()
                     if Confirm.ask(
-                            f"{colour.bold}Would you like to install this update?{colour.reset}",
-                            default=False,
-                            console=console,
+                        f"{colour.bold}Would you like to get these updates?{colour.reset}",
+                        case_sensitive=False,
+                        default=False,
+                        console=console,
                     ):
-                        update_pypi_package(package=About.package)
-
-                    console.clear()
-                    status.start()
+                        update_pypi_package(package=About.package, status=status)
+                    else:
+                        status.start()
 
     async def get_entity(
-            self,
-            entity_type: Literal["post", "subreddit", "user", "wiki_page"],
-            session: aiohttp.ClientSession,
-            **kwargs: str,
+        self,
+        entity_type: Literal["post", "subreddit", "user", "wiki_page"],
+        session: aiohttp.ClientSession,
+        **kwargs: str,
     ) -> dict:
         """
         Asynchronously gets data from the specified entity.
@@ -275,7 +273,7 @@ class Api:
         # Use a dictionary for direct mapping
         entity_mapping: dict = {
             "post": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-                    f"/comments/{kwargs.get('post_id')}.json",
+            f"/comments/{kwargs.get('post_id')}.json",
             "user": f"{self._user_endpoint}/{kwargs.get('username')}/about.json",
             "subreddit": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/about.json",
             "wiki_page": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/wiki/{kwargs.get('page_name')}.json",
@@ -296,26 +294,26 @@ class Api:
         )
 
     async def get_posts(
-            self,
-            posts_type: Literal[
-                "best",
-                "controversial",
-                "front_page",
-                "new",
-                "popular",
-                "rising",
-                "subreddit_posts",
-                "search_subreddit_posts",
-                "user_posts",
-                "user_overview",
-                "user_comments",
-                "post_comments",
-            ],
-            limit: int,
-            session: aiohttp.ClientSession,
-            timeframe: TIMEFRAME = "all",
-            sort: SORT_CRITERION = "all",
-            **kwargs: Union[console.status, str],
+        self,
+        posts_type: Literal[
+            "best",
+            "controversial",
+            "front_page",
+            "new",
+            "popular",
+            "rising",
+            "subreddit_posts",
+            "search_subreddit_posts",
+            "user_posts",
+            "user_overview",
+            "user_comments",
+            "post_comments",
+        ],
+        limit: int,
+        session: aiohttp.ClientSession,
+        timeframe: TIMEFRAME = "all",
+        sort: SORT_CRITERION = "all",
+        **kwargs: Union[console.status, str],
     ) -> list[dict]:
         """
         Asynchronously gets a specified number of posts, with a specified sorting criterion, from the specified source.
@@ -345,9 +343,9 @@ class Api:
             "user_overview": f"{self._user_endpoint}/{kwargs.get('username')}/overview.json",
             "user_comments": f"{self._user_endpoint}/{kwargs.get('username')}/comments.json",
             "post_comments": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-                             f"/comments/{kwargs.get('post_id')}.json",
+            f"/comments/{kwargs.get('post_id')}.json",
             "search_subreddit_posts": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}"
-                                      f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
+            f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
         }
 
         endpoint = source_map.get(posts_type, "")
@@ -365,12 +363,12 @@ class Api:
         return posts
 
     async def get_subreddits(
-            self,
-            session: aiohttp.ClientSession,
-            subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            **kwargs: Union[str, console.status],
+        self,
+        session: aiohttp.ClientSession,
+        subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        **kwargs: Union[str, console.status],
     ) -> Union[list[dict], dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -415,12 +413,12 @@ class Api:
         return subreddits
 
     async def get_users(
-            self,
-            session: aiohttp.ClientSession,
-            users_type: Literal["all", "popular", "new"],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+        self,
+        session: aiohttp.ClientSession,
+        users_type: Literal["all", "popular", "new"],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -457,13 +455,13 @@ class Api:
         return users
 
     async def search_entities(
-            self,
-            session: aiohttp.ClientSession,
-            entity_type: Literal["users", "subreddits", "posts"],
-            query: str,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: console.status = None,
+        self,
+        session: aiohttp.ClientSession,
+        entity_type: Literal["users", "subreddits", "posts"],
+        query: str,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: console.status = None,
     ) -> list[dict]:
         """
         Asynchronously searches specified entities that match the specified query.
@@ -500,5 +498,6 @@ class Api:
         )
 
         return search_results
+
 
 # -------------------------------- END ----------------------------------------- #

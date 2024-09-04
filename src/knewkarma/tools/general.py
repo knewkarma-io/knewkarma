@@ -31,9 +31,8 @@ def make_panel(
             renderable=content,
             title=f"{colour.bold}{title}{colour.reset}",
             subtitle=(subtitle if subtitle else None),
-            expand=False,
             box=DOUBLE,
-            style=f"{colour.white.strip('[,]')} on {colour.blue.strip('[,]')}",
+            style=f"{colour.white.strip('[,]')} on black",
         )
     )
 

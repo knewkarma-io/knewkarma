@@ -17,7 +17,7 @@ notify = Notify
 
 
 def parse_comments(
-        raw_comments: Union[list[dict], dict], time_format: TIME_FORMAT
+    raw_comments: Union[list[dict], dict], time_format: TIME_FORMAT
 ) -> Union[list[SimpleNamespace], SimpleNamespace]:
     """
     Parses raw Reddit comments data and returns a simplified format.
@@ -99,7 +99,7 @@ def parse_comments(
 
 
 def parse_posts(
-        raw_posts: Union[dict, list], time_format: TIME_FORMAT
+    raw_posts: Union[dict, list], time_format: TIME_FORMAT
 ) -> Union[list[SimpleNamespace], SimpleNamespace]:
     """
     Parses raw Reddit posts data and returns a simplified format.
@@ -200,7 +200,7 @@ def parse_posts(
 
 
 def parse_subreddits(
-        raw_subreddits: Union[list[dict], dict], time_format: TIME_FORMAT
+    raw_subreddits: Union[list[dict], dict], time_format: TIME_FORMAT
 ) -> Union[list[SimpleNamespace], SimpleNamespace]:
     """
     Parses raw Reddit subreddits data and returns a simplified format.
@@ -369,7 +369,7 @@ def parse_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> SimpleNamespac
 
 
 def parse_users(
-        raw_users: Union[list[dict], dict], time_format: TIME_FORMAT
+    raw_users: Union[list[dict], dict], time_format: TIME_FORMAT
 ) -> Union[list[SimpleNamespace], SimpleNamespace]:
     """
     Parses raw Reddit user data and returns a simplified format.
@@ -430,5 +430,6 @@ def parse_users(
             TypeError,
             f"Unexpected data type ({raw_users}: {type(raw_users)}). Expected list[dict] | dict",
         )
+
 
 # -------------------------------- END ----------------------------------------- #

@@ -45,7 +45,7 @@ class Notify:
         :param message: The message to be displayed.
         :type message: str
         """
-        console.print(f"[{Colour.green}*{Colour.reset}] {message}")
+        console.print(f"{Colour.green}✱{Colour.reset} {message}")
 
     @staticmethod
     def warning(message: str):
@@ -55,7 +55,30 @@ class Notify:
         :param message: The message to be displayed.
         :type message: str
         """
-        console.print(f"[{Colour.yellow}!{Colour.reset}] {message}")
+        console.print(f"{Colour.yellow}✘{Colour.reset} {message}")
+
+    @staticmethod
+    def update_status(message: str, status: console.status):
+        """
+        Updates a console status with the specified message.
+
+        :param message: The message to be displayed.
+        :type message: str
+        :param status: An optional `console.status` object for displaying status messages.
+        :type status: rich.console.Console.status, optional
+        """
+
+        status.update(f"{message}{Colour.yellow}...{Colour.reset}")
+
+    @staticmethod
+    def ok(message: str):
+        """
+        Prints a `success` message (with a checkmark).
+
+        :param message: The message to be displayed.
+        :type message: str
+        """
+        console.print(f"{Colour.green}✔{Colour.reset} {message}")
 
     @staticmethod
     def exception(error: Exception, **kwargs: str):
@@ -82,17 +105,7 @@ class Notify:
                 f" ({Colour.italic}{exception_context}{Colour.reset})"
             )
 
-        console.log(f"[{Colour.red}✘{Colour.reset}] {formatted_exception}: {error}")
-
-    @staticmethod
-    def ok(message: str):
-        """
-        Prints a `success` message (with a checkmark).
-
-        :param message: The message to be displayed.
-        :type message: str
-        """
-        console.print(f"[{Colour.green}✔{Colour.reset}] {message}")
+        console.log(f"{Colour.red}✘{Colour.reset} {formatted_exception}: {error}")
 
     @staticmethod
     def raise_exception(base_exception: type[BaseException], message: str):
@@ -106,5 +119,6 @@ class Notify:
         :raises Exception: The specified base exception with the provided message.
         """
         raise base_exception(message)
+
 
 # -------------------------------- END ----------------------------------------- #
