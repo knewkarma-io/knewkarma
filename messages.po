@@ -1,0 +1,15 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: de\n"
+
+# This is a comment about the translation
+msgid "Hello, world!"
+msgstr "Hallo, Welt!"
+
+# Another comment for the next translation
+msgid "Goodbye!"
+msgstr "Auf Wiedersehen!"
+
+msgid "Thank you!"
+msgstr "Danke!"

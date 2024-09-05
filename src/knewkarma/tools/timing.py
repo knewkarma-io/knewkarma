@@ -5,8 +5,8 @@ import time
 from datetime import datetime, timezone
 from typing import Literal, Union
 
-from .console import Colour, Notify
 from .general import console
+from .terminal import Notify, Text
 
 __all__ = [
     "countdown_timer",
@@ -16,12 +16,12 @@ __all__ = [
     "filename_timestamp",
 ]
 
-colour = Colour
 notify = Notify
+text = Text
 
 
 async def countdown_timer(
-    status: console.status, duration: int, current_count: int, overall_count: int
+        status: console.status, duration: int, current_count: int, overall_count: int
 ):
     """
     Handles the live countdown during pagination, updating the status bar with the remaining time.
@@ -42,8 +42,8 @@ async def countdown_timer(
         remaining_milliseconds: int = int((remaining_time - remaining_seconds) * 100)
 
         notify.update_status(
-            message=f"{colour.cyan}{current_count}{colour.reset} (of {colour.cyan}{overall_count}{colour.reset}) items fetched so far. "
-            f"Resuming in {colour.cyan}{remaining_seconds}.{remaining_milliseconds:02}{colour.reset} seconds",
+            message=f"{text.cyan}{current_count}{text.reset} (of {text.cyan}{overall_count}{text.reset}) items fetched so far. "
+                    f"Resuming in {text.cyan}{remaining_seconds}.{remaining_milliseconds:02}{text.reset} seconds",
             status=status,
         )
         await asyncio.sleep(0.01)  # Sleep for 10 milliseconds
@@ -143,7 +143,7 @@ def timestamp_to_concise(timestamp: int) -> str:
 
 
 def timestamp_to_readable(
-    timestamp: float, time_format: Literal["concise", "locale"] = "locale"
+        timestamp: float, time_format: Literal["concise", "locale"] = "locale"
 ) -> Union[str, None]:
     """
     Converts a Unix timestamp into a more readable format based on the specified `time_format`.
@@ -205,6 +205,5 @@ def filename_timestamp() -> str:
         if os.name == "nt"
         else now.strftime("%d-%B-%Y-%I:%M:%S%p")
     )
-
 
 # -------------------------------- END ----------------------------------------- #

@@ -9,9 +9,9 @@ __all__ = ["console", "make_panel", "pathfinder", "ML_MODELS_DIR", "OUTPUT_PAREN
 
 
 def make_panel(
-    title: str,
-    content: Union[ConsoleRenderable, RichCast, str],
-    subtitle: str = None,
+        title: str,
+        content: Union[ConsoleRenderable, RichCast, str],
+        subtitle: str = None,
 ):
     """
     Makes a rich Panel for whatever data is needed to be placed in it.
@@ -23,16 +23,16 @@ def make_panel(
     :param subtitle: Panel subtitle.
     :type subtitle: str
     """
-    from .console import Colour
+    from .terminal import Text
 
-    colour = Colour
+    text = Text
     console.print(
         Panel(
             renderable=content,
-            title=f"{colour.bold}{title}{colour.reset}",
+            title=f"{text.bold}{title}{text.reset}",
             subtitle=(subtitle if subtitle else None),
             box=DOUBLE,
-            style=f"{colour.white.strip('[,]')} on black",
+            style=f"{text.white.strip('[,]')} on black",
         )
     )
 
@@ -46,7 +46,7 @@ def pathfinder(directories: Union[list[list[str]], str, None]):
     :type directories: list[str]
     :raise TypeError: If the data type of the specified directories is invalid.
     """
-    from .console import Notify
+    from .terminal import Notify
 
     notify = Notify
     try:

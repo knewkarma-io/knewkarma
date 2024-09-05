@@ -1,8 +1,8 @@
-__all__: list = [
-    "console",
+__all__ = [
     "data",
     "general",
     "package",
     "parsers",
+    "terminal",
     "timing",
 ]

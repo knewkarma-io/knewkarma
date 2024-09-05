@@ -23,7 +23,7 @@ except ImportError:
     ml_deps_installed = False
 
 from .tools.general import console, OUTPUT_PARENT_DIR
-from .tools.console import Notify
+from .tools.terminal import Notify
 
 __all__: list = [
     "ANALYSIS_TO_MODEL_MAP",

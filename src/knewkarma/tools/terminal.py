@@ -1,11 +1,11 @@
 from .general import console
 
-__all__ = ["Colour", "Notify"]
+__all__ = ["Notify", "Text"]
 
 
-class Colour:
+class Text:
     """
-    Provides rich formatting colour codes for styling text.
+    Provides rich formatting codes for styling console text.
 
     Attributes:
         blue (str): Rich code for blue text.
@@ -38,6 +38,16 @@ class Notify:
     """
 
     @staticmethod
+    def ok(message: str):
+        """
+        Prints a `success` message (with a checkmark).
+
+        :param message: The message to be displayed.
+        :type message: str
+        """
+        console.print(f"{Text.green}✔{Text.reset} {message}")
+
+    @staticmethod
     def info(message: str):
         """
         Prints an `informational` message to the console.
@@ -45,7 +55,7 @@ class Notify:
         :param message: The message to be displayed.
         :type message: str
         """
-        console.print(f"{Colour.green}✱{Colour.reset} {message}")
+        console.print(f"{Text.green}✱{Text.reset} {message}")
 
     @staticmethod
     def warning(message: str):
@@ -55,7 +65,7 @@ class Notify:
         :param message: The message to be displayed.
         :type message: str
         """
-        console.print(f"{Colour.yellow}✘{Colour.reset} {message}")
+        console.print(f"{Text.yellow}✘{Text.reset} {message}")
 
     @staticmethod
     def update_status(message: str, status: console.status):
@@ -68,17 +78,7 @@ class Notify:
         :type status: rich.console.Console.status, optional
         """
 
-        status.update(f"{message}{Colour.yellow}...{Colour.reset}")
-
-    @staticmethod
-    def ok(message: str):
-        """
-        Prints a `success` message (with a checkmark).
-
-        :param message: The message to be displayed.
-        :type message: str
-        """
-        console.print(f"{Colour.green}✔{Colour.reset} {message}")
+        status.update(f"{message}{Text.yellow}...{Text.reset}")
 
     @staticmethod
     def exception(error: Exception, **kwargs: str):
@@ -96,16 +96,16 @@ class Notify:
 
         # Combine the error type and location into a single formatted string
         formatted_exception: str = (
-            f"An {Colour.bold}{exception_type}{Colour.reset} error occurred"
+            f"An {Text.bold}{exception_type}{Text.reset} error occurred"
             if exception_type
             else "An error occurred"
         )
         if exception_context:
             formatted_exception += (
-                f" ({Colour.italic}{exception_context}{Colour.reset})"
+                f" ({Text.italic}{exception_context}{Text.reset})"
             )
 
-        console.log(f"{Colour.red}✘{Colour.reset} {formatted_exception}: {error}")
+        console.log(f"{Text.red}✘{Text.reset} {formatted_exception}: {error}")
 
     @staticmethod
     def raise_exception(base_exception: type[BaseException], message: str):
@@ -119,6 +119,5 @@ class Notify:
         :raises Exception: The specified base exception with the provided message.
         """
         raise base_exception(message)
-
 
 # -------------------------------- END ----------------------------------------- #
