@@ -3,7 +3,7 @@ import subprocess
 
 from rich.console import Console
 
-from .console import Notify
+from .terminal import Notify
 
 __all__ = ["is_pypi_package", "is_snap_package", "update_pypi_package"]
 

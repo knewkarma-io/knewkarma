@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 from typing import Union
 
-from .console import Notify
+from .terminal import Notify
 from .timing import timestamp_to_readable
 from ..api import TIME_FORMAT
 

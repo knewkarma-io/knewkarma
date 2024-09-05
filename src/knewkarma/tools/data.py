@@ -4,7 +4,7 @@ from typing import Union, Literal
 
 import pandas as pd
 
-from .console import Notify
+from .terminal import Notify
 
 __all__ = ["create_dataframe", "export_dataframe", "EXPORT_FORMATS"]
 
