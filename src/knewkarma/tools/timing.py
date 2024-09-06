@@ -5,8 +5,9 @@ import time
 from datetime import datetime, timezone
 from typing import Literal, Union
 
-from .general import console
-from .terminal import Notify, Text
+from rich.status import Status
+
+from .terminal import Notify, Style
 
 __all__ = [
     "countdown_timer",
@@ -17,16 +18,16 @@ __all__ = [
 ]
 
 notify = Notify
-text = Text
+style = Style
 
 
 async def countdown_timer(
-        status: console.status, duration: int, current_count: int, overall_count: int
+    status: Status, duration: int, current_count: int, overall_count: int
 ):
     """
     Handles the live countdown during pagination, updating the status bar with the remaining time.
 
-    :param status: The rich.status.Status object used to display the countdown.
+    :param status: A Status object used to display the countdown.
     :type status: rich.status.Status
     :param duration: The duration for which to run the countdown.
     :type duration: int
@@ -42,8 +43,8 @@ async def countdown_timer(
         remaining_milliseconds: int = int((remaining_time - remaining_seconds) * 100)
 
         notify.update_status(
-            message=f"{text.cyan}{current_count}{text.reset} (of {text.cyan}{overall_count}{text.reset}) items fetched so far. "
-                    f"Resuming in {text.cyan}{remaining_seconds}.{remaining_milliseconds:02}{text.reset} seconds",
+            message=f"{style.cyan}{current_count}{style.reset} (of {style.cyan}{overall_count}{style.reset}) items retrieved so far. "
+            f"Resuming in {style.cyan}{remaining_seconds}.{remaining_milliseconds:02}{style.reset} seconds",
             status=status,
         )
         await asyncio.sleep(0.01)  # Sleep for 10 milliseconds
@@ -143,7 +144,7 @@ def timestamp_to_concise(timestamp: int) -> str:
 
 
 def timestamp_to_readable(
-        timestamp: float, time_format: Literal["concise", "locale"] = "locale"
+    timestamp: float, time_format: Literal["concise", "locale"] = "locale"
 ) -> Union[str, None]:
     """
     Converts a Unix timestamp into a more readable format based on the specified `time_format`.
@@ -205,5 +206,6 @@ def filename_timestamp() -> str:
         if os.name == "nt"
         else now.strftime("%d-%B-%Y-%I:%M:%S%p")
     )
+
 
 # -------------------------------- END ----------------------------------------- #

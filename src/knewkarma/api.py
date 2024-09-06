@@ -1,23 +1,24 @@
 import asyncio
 from random import randint
 from sys import version as python_version
-from typing import Callable, Literal, Union
+from typing import Callable, Literal, Union, Optional, List, Dict, Tuple
 
 import aiohttp
 from rich.markdown import Markdown
 from rich.prompt import Confirm
+from rich.status import Status
 
 from .about import About
 from .tools.general import console, make_panel
 from .tools.package import update_pypi_package, is_snap_package
-from .tools.terminal import Notify, Text
+from .tools.terminal import Notify, Style
 from .tools.timing import countdown_timer
 from .version import Version
 
 __all__ = ["Api", "SORT_CRITERION", "TIMEFRAME", "TIME_FORMAT"]
 
 notify = Notify
-text = Text
+style = Style
 
 SORT_CRITERION = Literal["controversial", "new", "top", "best", "hot", "rising", "all"]
 TIMEFRAME = Literal["hour", "day", "week", "month", "year", "all"]
@@ -33,6 +34,12 @@ class Api:
         self._users_endpoint: str = f"{self.base_endpoint}/users"
         self.subreddit_endpoint: str = f"{self.base_endpoint}/r"
         self._subreddits_endpoint: str = f"{self.base_endpoint}/subreddits"
+        self.reddit_status_endpoint: str = (
+            "https://www.redditstatus.com/api/v2/status.json"
+        )
+        self.reddit_status_components_endpoint: str = (
+            "https://www.redditstatus.com/api/v2/components.json"
+        )
 
     @staticmethod
     def _process_response(
@@ -71,7 +78,7 @@ class Api:
             limit: int,
             session: aiohttp.ClientSession,
             data_processor: Callable,
-            **kwargs: Union[str, console.status],
+            **kwargs: Union[str, Status],
     ) -> list[dict]:
         """
         Asynchronously fetches and processes data in a paginated manner
@@ -148,7 +155,7 @@ class Api:
     async def make_request(
             endpoint: str,
             session: aiohttp.ClientSession,
-    ) -> Union[dict, list]:
+    ) -> Union[Dict, List, None]:
         """
         Asynchronously sends a GET request to the specified API endpoint and returns JSON or list response.
 
@@ -173,26 +180,76 @@ class Api:
 
         except aiohttp.ClientConnectionError as connection_error:
             notify.exception(error=connection_error, exception_type="HTTP")
-            return {}
+            return
         except aiohttp.ClientResponseError as api_error:
             notify.exception(error=api_error, exception_type="API")
         except Exception as unexpected_error:
             notify.exception(error=unexpected_error, exception_type="unexpected")
-            return {}
+            return
 
-    async def check_updates(
-            self, session: aiohttp.ClientSession, status: console.status
+    async def check_reddit_status(
+            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+    ):
+        """
+        Asynchronously checks Reddit API and infrastructure status.
+
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
+        """
+        if status:
+            notify.update_status(
+                message=f"Checking Reddit {style.bold}API & Infrastructure{style.reset} status", status=status
+            )
+
+        status_response: Dict = await self.make_request(
+            endpoint=self.reddit_status_endpoint, session=session
+        )
+        indicator: str = status_response.get("status").get("indicator")
+        description: str = status_response.get("status").get("description")
+        if description:
+            if indicator == "none" and description == "All Systems Operational":
+                notify.ok(description)
+            else:
+                notify.warning(f"{indicator}: {description}")
+                if status:
+                    notify.update_status("Getting status components", status=status)
+                status_components: Dict = await self.make_request(
+                    endpoint=self.reddit_status_components_endpoint, session=session
+                )
+                if isinstance(status_components, Dict):
+                    components: List[Dict] = status_components.get("components")
+                    if components:
+                        for component in components:
+                            component_name: str = component.get("name")
+                            component_status: str = component.get("status")
+                            component_description: str = component.get("description")
+
+                            component_summary: str = (
+                                f"  - {component_name} ({
+                                style.green if component_status == 'operational'
+                                else style.yellow}{component_status}{style.reset})"
+                                f" {'' if not component_description else f'| {component_description}'}"
+                            )
+                            if component_status == "operational":
+                                console.print(component_summary)
+
+    async def check_for_updates(
+            self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ):
         """
         Asynchronously checks for updates by comparing the current local version with the remote version.
 
         Assumes version format: major.minor.patch.prefix
 
-        :param session: A aiohttp.ClientSession to use for the request. to use for the request.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type status: Console.console.status
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         """
+        if status:
+            notify.update_status(message="Checking for updates", status=status)
         # Make a GET request to PyPI to get the project's latest release.
         response: dict = await self.make_request(
             endpoint=f"https://api.github.com/repos/{About.author[1]}/{About.package}/releases/latest",
@@ -227,27 +284,27 @@ class Api:
 
             # Check for differences in version parts
             if remote_major != local_major:
-                update_level = f"{text.red}{Version.major[1]}{text.reset}"
+                update_level = f"{style.red}{Version.major[1]}{style.reset}"
 
             elif remote_minor != local_minor:
-                update_level = f"{text.yellow}{Version.minor[1]}{text.reset}"
+                update_level = f"{style.yellow}{Version.minor[1]}{style.reset}"
 
             elif remote_patch != local_patch:
-                update_level = f"{text.green}{Version.patch[1]}{text.reset}"
+                update_level = f"{style.green}{Version.patch[1]}{style.reset}"
 
             if update_level:
                 markdown_release_notes = Markdown(markup=markup_release_notes)
                 make_panel(
-                    title=f"{text.bold}{update_level} Update Available ({text.cyan}{remote_version_str}{text.reset}){text.reset}",
+                    title=f"{style.bold}{update_level} Update Available ({style.cyan}{remote_version_str}{style.reset}){style.reset}",
                     content=markdown_release_notes,
-                    subtitle=f"{text.bold}{text.italic}Thank you, for using {About.name}!{text.reset}{text.reset} ❤️ ",
+                    subtitle=f"{style.bold}{style.italic}Thank you, for using {About.name}!{style.reset}{style.reset} ❤️ ",
                 )
 
                 # Skip auto-updating of the snap package
                 if not is_snap_package(package=About.package):
                     status.stop()
                     if Confirm.ask(
-                            f"{text.bold}Would you like to get these updates?{text.reset}",
+                            f"{style.bold}Would you like to get these updates?{style.reset}",
                             case_sensitive=False,
                             default=False,
                             console=console,
@@ -255,12 +312,14 @@ class Api:
                         update_pypi_package(package=About.package, status=status)
                     else:
                         status.start()
+            else:
+                notify.ok(message=f"Up-to-date ({Version.full})")
 
     async def get_entity(
             self,
             entity_type: Literal["post", "subreddit", "user", "wiki_page"],
             session: aiohttp.ClientSession,
-            **kwargs: str,
+            **kwargs: Union[str, Status],
     ) -> dict:
         """
         Asynchronously gets data from the specified entity.
@@ -271,14 +330,28 @@ class Api:
         :return: A dictionary containing a specified entity's data.
         :rtype: dict
         """
+        username: str = kwargs.get("username")
+        subreddit: str = kwargs.get("subreddit")
+        post_id: str = kwargs.get("post_id")
+        post_subreddit: str = kwargs.get("post_subreddit")
+
         # Use a dictionary for direct mapping
         entity_mapping: dict = {
-            "post": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-                    f"/comments/{kwargs.get('post_id')}.json",
-            "user": f"{self._user_endpoint}/{kwargs.get('username')}/about.json",
-            "subreddit": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/about.json",
-            "wiki_page": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}/wiki/{kwargs.get('page_name')}.json",
+            "post": f"{self.subreddit_endpoint}/{post_subreddit}"
+                    f"/comments/{post_id}.json",
+            "user": f"{self._user_endpoint}/{username}/about.json",
+            "subreddit": f"{self.subreddit_endpoint}/{subreddit}/about.json",
+            "wiki_page": f"{self.subreddit_endpoint}/{subreddit}/wiki/{kwargs.get('page_name')}.json",
         }
+        status: Status = kwargs.get("status")
+        if status:
+            target_entity: Union[str, Tuple] = (
+                    username or subreddit or (post_id, post_subreddit)
+            )
+            notify.update_status(
+                message=f"Retrieving {entity_type} <{style.green}{target_entity}{style.reset}> data",
+                status=status,
+            )
 
         # Get the endpoint directly from the dictionary
         endpoint: str = entity_mapping.get(entity_type, "")
@@ -289,10 +362,11 @@ class Api:
         else:
             entity_data = response
 
-        return self._process_response(
-            response_data=entity_data.get("data", {}),
-            valid_key="content_md" if entity_type == "wiki_page" else "created_utc",
-        )
+        if isinstance(entity_data, Dict):
+            return self._process_response(
+                response_data=entity_data.get("data", {}),
+                valid_key="content_md" if entity_type == "wiki_page" else "created_utc",
+            )
 
     async def get_posts(
             self,
@@ -314,7 +388,7 @@ class Api:
             session: aiohttp.ClientSession,
             timeframe: TIMEFRAME = "all",
             sort: SORT_CRITERION = "all",
-            **kwargs: Union[console.status, str],
+            **kwargs: Union[Status, str],
     ) -> list[dict]:
         """
         Asynchronously gets a specified number of posts, with a specified sorting criterion, from the specified source.
@@ -369,7 +443,7 @@ class Api:
             subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
             limit: int,
             timeframe: TIMEFRAME = "all",
-            **kwargs: Union[str, console.status],
+            **kwargs: Union[str, Status],
     ) -> Union[list[dict], dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -419,7 +493,7 @@ class Api:
             users_type: Literal["all", "popular", "new"],
             limit: int,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
+            status: Optional[Status] = None,
     ) -> list[dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -432,8 +506,8 @@ class Api:
         :type timeframe: Literal
         :param session: Aiohttp session to use for the request.
         :type session: aiohttp.ClientSession
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type status: Console.console.status
+        :param status: An instance of `rich.status.Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing user data.
         :rtype: list[dict]
         """
@@ -462,7 +536,7 @@ class Api:
             query: str,
             limit: int,
             sort: SORT_CRITERION = "all",
-            status: console.status = None,
+            status: Optional[Status] = None,
     ) -> list[dict]:
         """
         Asynchronously searches specified entities that match the specified query.
@@ -477,7 +551,7 @@ class Api:
         :type limit: int
         :param sort: Posts' sort criterion.
         :type sort: str
-        :param status: An instance of `console.status` used to display animated status messages.
+        :param status: An instance of `rich.status.Status` used to display animated status messages.
         :return: A list of dictionaries, each containing search result data.
         :rtype: list[dict]
         """

@@ -1,13 +1,13 @@
 import re
 from collections import Counter
 from types import SimpleNamespace
-from typing import Literal, Union
+from typing import Literal, Union, Optional, List
 
 import aiohttp
+from rich.status import Status
 
 from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .extras import plot_bar_chart, visualisation_deps_installed
-from .tools.general import console
 from .tools.parsers import (
     parse_comments,
     parse_subreddits,
@@ -15,7 +15,7 @@ from .tools.parsers import (
     parse_users,
     parse_wiki_page,
 )
-from .tools.terminal import Notify, Text
+from .tools.terminal import Notify, Style
 
 __all__ = [
     "Comment",
@@ -29,7 +29,7 @@ __all__ = [
 ]
 
 notify = Notify
-text = Text
+style = Style
 
 api = Api()
 
@@ -57,33 +57,20 @@ class Post:
         self._id = id
         self._subreddit = subreddit
         self._time_format = time_format
-        self._status_template: str = (
-            "Fetching {query_type} from post {post_id} in r/{post_subreddit}"
-        )
 
     async def data(
-            self, session: aiohttp.ClientSession, status: console.status = None
+            self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves data for a Reddit post, excluding comments.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A `SimpleNamespace` object containing parsed post data.
         :rtype: SimpleNamespace
         """
-        if status:
-            notify.update_status(
-                message=self._status_template.format(
-                    query_type="data",
-                    post_id=self._id,
-                    post_subreddit=self._subreddit,
-                ),
-                status=status,
-            )
-
         post_data: dict = await api.get_entity(
             post_id=self._id,
             post_subreddit=self._subreddit,
@@ -103,8 +90,8 @@ class Post:
             session: aiohttp.ClientSession,
             limit: int,
             sort: SORT_CRITERION = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves comments for a Reddit post.
 
@@ -114,22 +101,12 @@ class Post:
         :type limit: int
         :param sort: The sorting criterion for the comments. Defaults to "all".
         :type sort: SORT_CRITERION, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type=f"{text.cyan}{limit}{text.reset} comments",
-                    post_id=self._id,
-                    post_subreddit=self._subreddit,
-                ),
-            )
-
-        comments_data: list = await api.get_posts(
+        comments_data: List = await api.get_posts(
             posts_type="post_comments",
             post_id=self._id,
             post_subreddit=self._subreddit,
@@ -158,15 +135,15 @@ class Posts:
         :type time_format: Literal["concise", "locale"]
         """
         self._time_format = time_format
-        self._status_template: str = "Fetching {limit} {listing} posts"
+        self._status_template: str = "Retrieving {limit} {listing} posts"
 
     async def best(
             self,
             session: aiohttp.ClientSession,
             limit: int,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the best posts.
 
@@ -176,20 +153,20 @@ class Posts:
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
         :type timeframe: TIMEFRAME, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    listing="best", limit=f"{text.cyan}{limit}{text.reset}"
+                    listing="best", limit=f"{style.cyan}{limit}{style.reset}"
                 ),
             )
 
-        best_posts: list = await api.get_posts(
+        best_posts: List = await api.get_posts(
             posts_type="best",
             timeframe=timeframe,
             limit=limit,
@@ -205,8 +182,8 @@ class Posts:
             session: aiohttp.ClientSession,
             limit: int,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the controversial posts.
 
@@ -216,20 +193,20 @@ class Posts:
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
         :type timeframe: TIMEFRAME, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    listing="controversial", limit=f"{text.cyan}{limit}{text.reset}"
+                    listing="controversial", limit=f"{style.cyan}{limit}{style.reset}"
                 ),
             )
 
-        controversial_posts: list = await api.get_posts(
+        controversial_posts: List = await api.get_posts(
             posts_type="controversial",
             timeframe=timeframe,
             limit=limit,
@@ -248,8 +225,8 @@ class Posts:
             limit: int,
             timeframe: TIMEFRAME = "all",
             sort: SORT_CRITERION = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the front-page posts.
 
@@ -261,20 +238,20 @@ class Posts:
         :type timeframe: TIMEFRAME, optional
         :param sort: Sorting criterion for posts. Defaults to "all".
         :type sort: SORT_CRITERION, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    listing="front-page", limit=f"{text.cyan}{limit}{text.reset}"
+                    listing="front-page", limit=f"{style.cyan}{limit}{style.reset}"
                 ),
             )
 
-        front_page_posts: list = await api.get_posts(
+        front_page_posts: List = await api.get_posts(
             posts_type="front_page",
             limit=limit,
             timeframe=timeframe,
@@ -294,8 +271,8 @@ class Posts:
             limit: int,
             timeframe: TIMEFRAME = "all",
             sort: SORT_CRITERION = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the new posts.
 
@@ -307,20 +284,20 @@ class Posts:
         :type timeframe: TIMEFRAME, optional
         :param sort: Sorting criterion for posts. Defaults to "all".
         :type sort: SORT_CRITERION, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    listing="new", limit=f"{text.cyan}{limit}{text.reset}"
+                    listing="new", limit=f"{style.cyan}{limit}{style.reset}"
                 ),
             )
 
-        new_posts: list = await api.get_posts(
+        new_posts: List = await api.get_posts(
             posts_type="new",
             limit=limit,
             timeframe=timeframe,
@@ -337,8 +314,8 @@ class Posts:
             session: aiohttp.ClientSession,
             limit: int,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the popular posts.
 
@@ -348,20 +325,20 @@ class Posts:
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
         :type timeframe: TIMEFRAME, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    listing="popular", limit=f"{text.cyan}{limit}{text.reset}"
+                    listing="popular", limit=f"{style.cyan}{limit}{style.reset}"
                 ),
             )
 
-        popular_posts: list = await api.get_posts(
+        popular_posts: List = await api.get_posts(
             posts_type="popular",
             timeframe=timeframe,
             limit=limit,
@@ -377,8 +354,8 @@ class Posts:
             session: aiohttp.ClientSession,
             limit: int,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the rising posts.
 
@@ -388,20 +365,20 @@ class Posts:
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
         :type timeframe: TIMEFRAME, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    listing="rising", limit=f"{text.cyan}{limit}{text.reset}"
+                    listing="rising", limit=f"{style.cyan}{limit}{style.reset}"
                 ),
             )
 
-        rising_posts: list = await api.get_posts(
+        rising_posts: List = await api.get_posts(
             posts_type="rising",
             timeframe=timeframe,
             limit=limit,
@@ -437,33 +414,33 @@ class Search:
             session: aiohttp.ClientSession,
             limit: int,
             sort: SORT_CRITERION = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
-        Searches for posts based on the query.
+        Asynchronously retrieves posts that match with the specified query.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
-        :param sort: Sorting criterion for the results. Defaults to "all".
+        :param sort: Sorting criterion for posts. Defaults to "all".
         :type sort: SORT_CRITERION, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
                     query_type="posts",
-                    limit=f"{text.cyan}{limit}{text.reset}",
+                    limit=f"{style.cyan}{limit}{style.reset}",
                     query=self._query,
                 ),
             )
 
-        posts_results: list = await api.search_entities(
+        posts_results: List = await api.search_entities(
             query=self._query,
             entity_type="posts",
             sort=sort,
@@ -479,33 +456,33 @@ class Search:
             session: aiohttp.ClientSession,
             limit: int,
             sort: SORT_CRITERION = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
-        Searches for subreddits based on the query.
+        Asynchronously retrieves subreddits that match with the specified query.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
         :param limit: Maximum number of subreddits to retrieve.
         :type limit: int
-        :param sort: Sorting criterion for the results. Defaults to "all".
+        :param sort: Sorting criterion for subreddits. Defaults to "all".
         :type sort: SORT_CRITERION, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed subreddit data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
                     query_type="subreddits",
-                    limit=f"{text.cyan}{limit}{text.reset}",
+                    limit=f"{style.cyan}{limit}{style.reset}",
                     query=self._query,
                 ),
             )
 
-        search_subreddits: list = await api.search_entities(
+        search_subreddits: List = await api.search_entities(
             query=self._query,
             entity_type="subreddits",
             sort=sort,
@@ -524,33 +501,33 @@ class Search:
             session: aiohttp.ClientSession,
             limit: int,
             sort: SORT_CRITERION = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
-        Searches for users based on the query.
+        Asynchronously retrieves users that match with the specified query.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
         :param limit: Maximum number of users to retrieve.
         :type limit: int
-        :param sort: Sorting criterion for the results. Defaults to "all".
+        :param sort: Sorting criterion for users. Defaults to "all".
         :type sort: SORT_CRITERION, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed user data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
                     query_type="users",
-                    limit=f"{text.cyan}{limit}{text.reset}",
+                    limit=f"{style.cyan}{limit}{style.reset}",
                     query=self._query,
                 ),
             )
 
-        search_users: list[dict] = await api.search_entities(
+        search_users: List[dict] = await api.search_entities(
             query=self._query,
             entity_type="users",
             sort=sort,
@@ -579,7 +556,7 @@ class Subreddit:
         self._name = name
         self._time_format = time_format
         self._status_template: str = (
-            "Fetching {query_type} from subreddit r/{subreddit}"
+            "Retrieving {query_type} from subreddit r/{subreddit}"
         )
 
     async def comments(
@@ -589,8 +566,8 @@ class Subreddit:
             comments_per_post: int,
             sort: SORT_CRITERION = "all",
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves comments from a subreddit.
 
@@ -604,10 +581,10 @@ class Subreddit:
         :type sort: SORT_CRITERION, optional
         :param timeframe: The timeframe from which to retrieve posts and comments. Defaults to "all".
         :type timeframe: TIMEFRAME, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
         if status:
             notify.update_status(
@@ -625,14 +602,14 @@ class Subreddit:
             timeframe=timeframe,
             status=status,
         )
-        all_comments: list = []
+        all_comments: List = []
         for post in posts:
             post = Post(
                 id=post.get("id"),
                 subreddit=post.get("subreddit"),
                 time_format=self._time_format,
             )
-            post_comments: list = await post.comments(
+            post_comments: List = await post.comments(
                 session=session, limit=comments_per_post, sort=sort, status=status
             )
 
@@ -646,8 +623,8 @@ class Subreddit:
             limit: int,
             sort: SORT_CRITERION = "all",
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves posts from a subreddit.
 
@@ -659,21 +636,21 @@ class Subreddit:
         :type sort: SORT_CRITERION, optional
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
         :type timeframe: TIMEFRAME, optional
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
-        :rtype: list[SimpleNamespace]
+        :rtype: List[SimpleNamespace]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    query_type=f"{text.cyan}{limit}{text.reset} posts",
+                    query_type=f"{style.cyan}{limit}{style.reset} posts",
                     subreddit=self._name,
                 ),
             )
 
-        subreddit_posts: list = await api.get_posts(
+        subreddit_posts: List = await api.get_posts(
             posts_type="subreddit_posts",
             subreddit=self._name,
             limit=limit,
@@ -687,28 +664,18 @@ class Subreddit:
             return parse_posts(raw_posts=subreddit_posts, time_format=self._time_format)
 
     async def profile(
-            self,
-            session: aiohttp.ClientSession,
-            status: console.status = None,
+            self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves a subreddit's profile data.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
-        :param status: An optional `console.status` object for displaying status messages.
-        :type status: rich.console.Console.status, optional
+        :param status: An optional `Status` object for displaying status messages.
+        :type status: Optional[rich.status.Status]
         :return: A `SimpleNamespace` object containing the parsed subreddit profile data.
         :rtype: SimpleNamespace
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type="profile data", subreddit=self._name
-                ),
-            )
-
         subreddit_profile: dict = await api.get_entity(
             entity_type="subreddit",
             subreddit=self._name,
@@ -728,42 +695,42 @@ class Subreddit:
             comments_per_post: int,
             sort: SORT_CRITERION = "all",
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
-        Asynchronously get comments that contain the specified query string from a subreddit.
+        Asynchronously retrieves comments that contain the specified query from a subreddit.
 
-        :param session: A aiohttp.ClientSession to use for the request.
-        :type session: aiohttp.ClientSession.
+        :param session: An `aiohttp.ClientSession` for making the HTTP request.
+        :type session: aiohttp.ClientSession
         :param query: Search query.
         :type query: str
-        :param posts_limit: Maximum number of posts to get comments from.
+        :param posts_limit: Maximum number of posts to retrieve comments from.
         :type posts_limit: int
-        :param comments_per_post: A maximum number of comments to get for each post.
+        :param comments_per_post: Maximum number of comments to retrieve for each post.
         :type comments_per_post: int
-        :param sort: Sort criterion for the posts.
-        :type sort: str
-        :param timeframe: Timeframe from which to get posts.
-        :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param sort: Sorting criterion for the comments. Defaults to "all".
+        :type sort: SORT_CRITERION, optional
+        :param timeframe: The timeframe from which to retrieve comments. Defaults to "all".
+        :type timeframe: TIMEFRAME, optional
+        :param status: An instance of `Status` used to display animated status messages.
+        :type: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing comment data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
-        posts: list = await self.posts(
+        posts: List = await self.posts(
             session=session,
             limit=posts_limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
         )
-        all_comments: list = []
-        found_comments: list = []
+        all_comments: List = []
+        found_comments: List = []
         for post in posts:
             if status:
                 notify.update_status(
                     status=status,
-                    message=f"Fetching comments from post {post.get('id')}",
+                    message=f"Retrieving comments from post {post.get('id')}",
                 )
 
             post = Post(
@@ -772,7 +739,7 @@ class Subreddit:
                 time_format=self._time_format,
             )
 
-            comments: list = await post.comments(
+            comments: List = await post.comments(
                 session=session, limit=comments_per_post, status=status
             )
 
@@ -796,8 +763,8 @@ class Subreddit:
             limit: int,
             sort: SORT_CRITERION = "all",
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get posts that contain the specified query string from a subreddit.
 
@@ -811,20 +778,20 @@ class Subreddit:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    query_type=f"{text.cyan}{limit}{text.reset} posts with '{query}'",
+                    query_type=f"{style.cyan}{limit}{style.reset} posts with '{query}'",
                     subreddit=self._name,
                 ),
             )
-        found_posts: list = await api.get_posts(
+        found_posts: List = await api.get_posts(
             posts_type="search_subreddit_posts",
             subreddit=self._name,
             query=query,
@@ -839,19 +806,17 @@ class Subreddit:
             return parse_posts(raw_posts=found_posts, time_format=self._time_format)
 
     async def wiki_pages(
-            self,
-            session: aiohttp.ClientSession,
-            status: console.status = None,
-    ) -> list[str]:
+            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+    ) -> List[str]:
         """
         Asynchronously get a subreddit's wiki pages.
 
         :param session: A aiohttp.ClientSession to use for the request.
         :type session: aiohttp.ClientSession
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of strings, each representing a wiki page.
-        :rtype: list[str]
+        :rtype: List[str]
         """
         if status:
             notify.update_status(
@@ -872,7 +837,7 @@ class Subreddit:
             self,
             page_name: str,
             session: aiohttp.ClientSession,
-            status: console.status = None,
+            status: Optional[Status] = None,
     ) -> SimpleNamespace:
         """
         Asynchronously get a subreddit's specified wiki page data.
@@ -881,10 +846,10 @@ class Subreddit:
         :type page_name: str
         :param session: A aiohttp.ClientSession to use for the request.
         :type session: aiohttp.ClientSession
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of strings, each representing a wiki page.
-        :rtype: list[str]
+        :rtype: List[str]
         """
         if status:
             notify.update_status(
@@ -918,15 +883,15 @@ class Subreddits:
         :type time_format: Literal["concise", "locale"]
         """
         self._time_format = time_format
-        self._status_template: str = "Fetching {limit} {subreddits_type} subreddits"
+        self._status_template: str = "Retrieving {limit} {subreddits_type} subreddits"
 
     async def all(
             self,
             session: aiohttp.ClientSession,
             limit: int,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get all subreddits.
 
@@ -936,10 +901,10 @@ class Subreddits:
         :type limit: int
         :param timeframe: Timeframe from which to get all subreddits.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: list[dict]
+        :rtype: List[dict]
 
         Note:
             -*imitating Morphius' voice*- "the only limitation you have at this point is the matrix's rate-limit."
@@ -948,11 +913,11 @@ class Subreddits:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    subreddits_type="all", limit=f"{text.cyan}{limit}{text.reset}"
+                    subreddits_type="all", limit=f"{style.cyan}{limit}{style.reset}"
                 ),
             )
 
-        all_subreddits: list = await api.get_subreddits(
+        all_subreddits: List = await api.get_subreddits(
             subreddits_type="all",
             limit=limit,
             timeframe=timeframe,
@@ -968,8 +933,8 @@ class Subreddits:
             self,
             limit: int,
             session: aiohttp.ClientSession,
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get default subreddits.
 
@@ -977,21 +942,21 @@ class Subreddits:
         :type limit: int
         :param session: A aiohttp.ClientSession to use for the request.
         :type session: aiohttp.ClientSession
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
                     subreddits_type="default",
-                    limit=f"{text.cyan}{limit}{text.reset}",
+                    limit=f"{style.cyan}{limit}{style.reset}",
                 ),
             )
 
-        default_subreddits: list = await api.get_subreddits(
+        default_subreddits: List = await api.get_subreddits(
             subreddits_type="default",
             timeframe="all",
             limit=limit,
@@ -1006,8 +971,8 @@ class Subreddits:
             session: aiohttp.ClientSession,
             limit: int,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get new subreddits.
 
@@ -1017,20 +982,20 @@ class Subreddits:
         :type limit: int
         :param timeframe: Timeframe from which to get new subreddits.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    subreddits_type="new", limit=f"{text.cyan}{limit}{text.reset}"
+                    subreddits_type="new", limit=f"{style.cyan}{limit}{style.reset}"
                 ),
             )
 
-        new_subreddits: list = await api.get_subreddits(
+        new_subreddits: List = await api.get_subreddits(
             subreddits_type="new",
             limit=limit,
             timeframe=timeframe,
@@ -1045,8 +1010,8 @@ class Subreddits:
             session: aiohttp.ClientSession,
             limit: int,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get popular subreddits.
 
@@ -1056,21 +1021,21 @@ class Subreddits:
         :type limit: int
         :param timeframe: Timeframe from which to get popular subreddits.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
                     subreddits_type="popular",
-                    limit=f"{text.cyan}{limit}{text.reset}",
+                    limit=f"{style.cyan}{limit}{style.reset}",
                 ),
             )
 
-        popular_subreddits: list = await api.get_subreddits(
+        popular_subreddits: List = await api.get_subreddits(
             subreddits_type="popular",
             limit=limit,
             timeframe=timeframe,
@@ -1096,7 +1061,7 @@ class User:
         """
         self._name = name
         self._time_format = time_format
-        self._status_template: str = "Fetching {query_type} from user u/{username}"
+        self._status_template: str = "Retrieving {query_type} from user u/{username}"
 
     async def comments(
             self,
@@ -1104,8 +1069,8 @@ class User:
             limit: int,
             sort: SORT_CRITERION = "all",
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's comments.
 
@@ -1117,21 +1082,21 @@ class User:
         :type sort: str
         :param timeframe: Timeframe from which tyo get comments.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing comment data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    query_type=f"{text.cyan}{limit}{text.reset} comments",
+                    query_type=f"{style.cyan}{limit}{style.reset} comments",
                     username=self._name,
                 ),
             )
 
-        user_comments: list = await api.get_posts(
+        user_comments: List = await api.get_posts(
             username=self._name,
             posts_type="user_comments",
             limit=limit,
@@ -1147,19 +1112,17 @@ class User:
             )
 
     async def moderated_subreddits(
-            self,
-            session: aiohttp.ClientSession,
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get subreddits moderated by user.
 
         :param session: A aiohttp.ClientSession to use for the request.
         :type session: aiohttp.ClientSession
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing subreddit data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
@@ -1187,8 +1150,8 @@ class User:
             self,
             limit: int,
             session: aiohttp.ClientSession,
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's most recent comments.
 
@@ -1196,21 +1159,21 @@ class User:
         :type limit: int
         :param session: A aiohttp.ClientSession to use for the request.
         :type session: aiohttp.ClientSession
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing data about a recent comment.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    query_type=f"{text.cyan}{limit}{text.reset} recent comments",
+                    query_type=f"{style.cyan}{limit}{style.reset} recent comments",
                     username=self._name,
                 ),
             )
 
-        user_overview: list = await api.get_posts(
+        user_overview: List = await api.get_posts(
             username=self._name,
             posts_type="user_overview",
             limit=limit,
@@ -1227,8 +1190,8 @@ class User:
             limit: int,
             sort: SORT_CRITERION = "all",
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's posts.
 
@@ -1240,21 +1203,21 @@ class User:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    query_type=f"{text.cyan}{limit}{text.reset} posts",
+                    query_type=f"{style.cyan}{limit}{style.reset} posts",
                     username=self._name,
                 ),
             )
 
-        user_posts: list = await api.get_posts(
+        user_posts: List = await api.get_posts(
             username=self._name,
             posts_type="user_posts",
             limit=limit,
@@ -1268,28 +1231,18 @@ class User:
             return parse_posts(user_posts, time_format=self._time_format)
 
     async def profile(
-            self,
-            session: aiohttp.ClientSession,
-            status: console.status = None,
+            self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> SimpleNamespace:
         """
         Asynchronously get a user's profile data.
 
         :param session: A aiohttp.ClientSession session to use for the request.
         :type session: aiohttp.ClientSession
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A dictionary containing user profile data.
         :rtype: dict
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type="profile data", username=self._name
-                ),
-            )
-
         user_profile: dict = await api.get_entity(
             username=self._name, entity_type="user", status=status, session=session
         )
@@ -1304,8 +1257,8 @@ class User:
             session: aiohttp.ClientSession,
             sort: SORT_CRITERION = "all",
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's posts that match with the specified search query.
 
@@ -1319,16 +1272,16 @@ class User:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing post data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    query_type=f"{text.cyan}{limit}{text.reset} posts for '{query}'",
+                    query_type=f"{style.cyan}{limit}{style.reset} posts for '{query}'",
                     username=self._name,
                 ),
             )
@@ -1336,7 +1289,7 @@ class User:
         pattern: str = rf"(?i)\b{re.escape(query)}\b"
         regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
 
-        user_posts: list = await api.get_posts(
+        user_posts: List = await api.get_posts(
             posts_type="user_posts",
             username=self._name,
             limit=limit,
@@ -1345,7 +1298,7 @@ class User:
             status=status,
             session=session,
         )
-        found_posts: list = []
+        found_posts: List = []
 
         for post in user_posts:
             post_data: dict = post.get("data")
@@ -1367,8 +1320,8 @@ class User:
             session: aiohttp.ClientSession,
             sort: SORT_CRITERION = "all",
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's comments that contain the specified search query.
 
@@ -1383,16 +1336,16 @@ class User:
         :type sort: str
         :param timeframe: Timeframe from which to get comments.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing comment data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    query_type=f"{text.cyan}{limit}{text.reset} comments for '{query}'",
+                    query_type=f"{style.cyan}{limit}{style.reset} comments for '{query}'",
                     username=self._name,
                 ),
             )
@@ -1400,7 +1353,7 @@ class User:
         pattern: str = rf"(?i)\b{re.escape(query)}\b"
         regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
 
-        user_comments: list = await api.get_posts(
+        user_comments: List = await api.get_posts(
             username=self._name,
             posts_type="user_comments",
             limit=limit,
@@ -1409,7 +1362,7 @@ class User:
             status=status,
             session=session,
         )
-        found_comments: list = []
+        found_comments: List = []
 
         for comment in user_comments:
             match = regex.search(comment.get("data", {}).get("body", ""))
@@ -1426,8 +1379,8 @@ class User:
             limit: int,
             filename: str = None,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> Union[list[tuple[str, int]], None]:
+            status: Optional[Status] = None,
+    ) -> Union[List[tuple[str, int]], None]:
         """
         Asynchronously get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
 
@@ -1441,14 +1394,14 @@ class User:
         :type filename: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    query_type=f"top {text.cyan}{top_n}{text.reset}/{text.cyan}{limit}{text.reset} subreddits",
+                    query_type=f"top {style.cyan}{top_n}{style.reset}/{style.cyan}{limit}{style.reset} subreddits",
                     username=self._name,
                 ),
             )
@@ -1464,17 +1417,17 @@ class User:
 
         if posts:
             # Extract subreddit names
-            subreddits: list = [post.get("data", {}).get("subreddit") for post in posts]
+            subreddits: List = [post.get("data", {}).get("subreddit") for post in posts]
 
             # Count the occurrences of each subreddit
             subreddit_counts: Counter = Counter(subreddits)
 
             # Get the most common subreddits
-            top_subreddits: list[tuple[str, int]] = subreddit_counts.most_common(top_n)
+            top_subreddits: List[tuple[str, int]] = subreddit_counts.most_common(top_n)
 
             # Prepare data for plotting
-            subreddit_names: list = [subreddit[0] for subreddit in top_subreddits]
-            subreddit_frequencies: list = [subreddit[1] for subreddit in top_subreddits]
+            subreddit_names: List = [subreddit[0] for subreddit in top_subreddits]
+            subreddit_frequencies: List = [subreddit[1] for subreddit in top_subreddits]
 
             if visualisation_deps_installed:
                 plot_bar_chart(
@@ -1502,15 +1455,15 @@ class Users:
         :type time_format: Literal["concise", "locale"]
         """
         self._time_format = time_format
-        self._status_template: str = "Fetching {limit} {query_type} users"
+        self._status_template: str = "Retrieving {limit} {query_type} users"
 
     async def new(
             self,
             session: aiohttp.ClientSession,
             limit: int,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get new users.
 
@@ -1520,20 +1473,20 @@ class Users:
         :type limit: int
         :param timeframe: Timeframe from which to get new posts.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing a user's data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    query_type="new", limit=f"{text.cyan}{limit}{text.reset}"
+                    query_type="new", limit=f"{style.cyan}{limit}{style.reset}"
                 ),
             )
 
-        new_users: list = await api.get_users(
+        new_users: List = await api.get_users(
             users_type="new",
             limit=limit,
             timeframe=timeframe,
@@ -1549,8 +1502,8 @@ class Users:
             session: aiohttp.ClientSession,
             limit: int,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get popular users.
 
@@ -1560,20 +1513,20 @@ class Users:
         :type limit: int
         :param timeframe: Timeframe from which to get popular posts.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing a user's data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    query_type="popular", limit=f"{text.cyan}{limit}{text.reset}"
+                    query_type="popular", limit=f"{style.cyan}{limit}{style.reset}"
                 ),
             )
 
-        popular_users: list = await api.get_users(
+        popular_users: List = await api.get_users(
             users_type="popular",
             limit=limit,
             timeframe=timeframe,
@@ -1589,8 +1542,8 @@ class Users:
             session: aiohttp.ClientSession,
             limit: int,
             timeframe: TIMEFRAME = "all",
-            status: console.status = None,
-    ) -> list[SimpleNamespace]:
+            status: Optional[Status] = None,
+    ) -> List[SimpleNamespace]:
         """
         Asynchronously get all users.
 
@@ -1600,20 +1553,20 @@ class Users:
         :type session: aiohttp.ClientSession
         :param timeframe: Timeframe from which to get all posts.
         :type timeframe: Literal[str]
-        :param status: An instance of `console.status` used to display animated status messages.
-        :type: rich.console.Console.status
+        :param status: An instance of `Status` used to display animated status messages.
+        :type status: Optional[rich.status.Status]
         :return: A list of dictionaries, each containing a user's data.
-        :rtype: list[dict]
+        :rtype: List[dict]
         """
         if status:
             notify.update_status(
                 status=status,
                 message=self._status_template.format(
-                    query_type="all", limit=f"{text.cyan}{limit}{text.reset}"
+                    query_type="all", limit=f"{style.cyan}{limit}{style.reset}"
                 ),
             )
 
-        all_users: list = await api.get_users(
+        all_users: List = await api.get_users(
             users_type="all",
             limit=limit,
             timeframe=timeframe,

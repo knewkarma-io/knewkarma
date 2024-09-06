@@ -7,6 +7,7 @@ from typing import get_args, Union, Callable, Literal
 import aiohttp
 import pandas as pd
 import rich_click as click
+from rich.status import Status
 
 from ._main import Post, Posts, Search, Subreddit, Subreddits, User, Users
 from .about import About
@@ -24,15 +25,16 @@ from .tools.data import (
     EXPORT_FORMATS,
 )
 from .tools.general import console, pathfinder, OUTPUT_PARENT_DIR, ML_MODELS_DIR
-from .tools.package import is_pypi_package
-from .tools.terminal import Notify, Text
+from .tools.package import is_snap_package
+from .tools.terminal import Notify, Style
 from .tools.timing import filename_timestamp
 from .version import Version
 
 __all__ = ["start"]
 
+api = Api()
 notify = Notify
-text = Text
+style = Style
 
 
 def help_callback(ctx: click.Context, option: click.Option, value: bool):
@@ -53,7 +55,7 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
     """
     if value and not ctx.resilient_parsing:
         click.echo(ctx.get_help())
-        if is_pypi_package(package=About.package):
+        if is_snap_package(package=About.package):
             click.pause()
         ctx.exit()
 
@@ -873,13 +875,15 @@ async def handle_method_calls(
             is_valid_arg = True
             start_time: datetime = datetime.now()
             try:
-                with console.status(
-                        f"Establishing connection /w new session{text.yellow}...{text.reset}",
+                with Status(
+                        status=f"Creating a new client session...",
                         spinner="dots",
-                        spinner_style=text.yellow.strip("[,]"),
+                        spinner_style=style.yellow.strip("[,]"), console=console
                 ) as status:
                     async with aiohttp.ClientSession() as session:
-                        await Api().check_updates(session=session, status=status)
+                        notify.ok("New client session opened")
+                        await api.check_for_updates(session=session, status=status)
+                        await api.check_reddit_status(session=session, status=status)
                         await call_method(
                             method=method,
                             session=session,
