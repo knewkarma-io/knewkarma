@@ -59,7 +59,7 @@ class Post:
         self._time_format = time_format
 
     async def data(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+        self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves data for a Reddit post, excluding comments.
@@ -86,11 +86,11 @@ class Post:
             )
 
     async def comments(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves comments for a Reddit post.
@@ -138,11 +138,11 @@ class Posts:
         self._status_template: str = "Retrieving {limit} {listing} posts"
 
     async def best(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the best posts.
@@ -178,11 +178,11 @@ class Posts:
             return parse_posts(raw_posts=best_posts, time_format=self._time_format)
 
     async def controversial(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the controversial posts.
@@ -220,12 +220,12 @@ class Posts:
             )
 
     async def front_page(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the front-page posts.
@@ -266,12 +266,12 @@ class Posts:
             )
 
     async def new(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the new posts.
@@ -310,11 +310,11 @@ class Posts:
             return parse_posts(raw_posts=new_posts, time_format=self._time_format)
 
     async def popular(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the popular posts.
@@ -350,11 +350,11 @@ class Posts:
             return parse_posts(raw_posts=popular_posts, time_format=self._time_format)
 
     async def rising(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the rising posts.
@@ -410,11 +410,11 @@ class Search:
         self._status_template: str = "Searching for '{query}' in {limit} {query_type}"
 
     async def posts(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves posts that match with the specified query.
@@ -452,11 +452,11 @@ class Search:
             return parse_posts(raw_posts=posts_results, time_format=self._time_format)
 
     async def subreddits(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves subreddits that match with the specified query.
@@ -497,11 +497,11 @@ class Search:
             )
 
     async def users(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves users that match with the specified query.
@@ -560,13 +560,13 @@ class Subreddit:
         )
 
     async def comments(
-            self,
-            session: aiohttp.ClientSession,
-            posts_limit: int,
-            comments_per_post: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        posts_limit: int,
+        comments_per_post: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves comments from a subreddit.
@@ -618,12 +618,12 @@ class Subreddit:
         return all_comments
 
     async def posts(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves posts from a subreddit.
@@ -664,7 +664,7 @@ class Subreddit:
             return parse_posts(raw_posts=subreddit_posts, time_format=self._time_format)
 
     async def profile(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+        self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves a subreddit's profile data.
@@ -688,14 +688,14 @@ class Subreddit:
             )
 
     async def search_comments(
-            self,
-            session: aiohttp.ClientSession,
-            query: str,
-            posts_limit: int,
-            comments_per_post: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        query: str,
+        posts_limit: int,
+        comments_per_post: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves comments that contain the specified query from a subreddit.
@@ -757,13 +757,13 @@ class Subreddit:
             return found_comments
 
     async def search_posts(
-            self,
-            session: aiohttp.ClientSession,
-            query: str,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        query: str,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get posts that contain the specified query string from a subreddit.
@@ -806,7 +806,7 @@ class Subreddit:
             return parse_posts(raw_posts=found_posts, time_format=self._time_format)
 
     async def wiki_pages(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+        self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> List[str]:
         """
         Asynchronously get a subreddit's wiki pages.
@@ -834,10 +834,10 @@ class Subreddit:
         return pages.get("data")
 
     async def wiki_page(
-            self,
-            page_name: str,
-            session: aiohttp.ClientSession,
-            status: Optional[Status] = None,
+        self,
+        page_name: str,
+        session: aiohttp.ClientSession,
+        status: Optional[Status] = None,
     ) -> SimpleNamespace:
         """
         Asynchronously get a subreddit's specified wiki page data.
@@ -886,11 +886,11 @@ class Subreddits:
         self._status_template: str = "Retrieving {limit} {subreddits_type} subreddits"
 
     async def all(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get all subreddits.
@@ -930,10 +930,10 @@ class Subreddits:
             )
 
     async def default(
-            self,
-            limit: int,
-            session: aiohttp.ClientSession,
-            status: Optional[Status] = None,
+        self,
+        limit: int,
+        session: aiohttp.ClientSession,
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get default subreddits.
@@ -967,11 +967,11 @@ class Subreddits:
             return parse_subreddits(default_subreddits, time_format=self._time_format)
 
     async def new(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get new subreddits.
@@ -1006,11 +1006,11 @@ class Subreddits:
             return parse_subreddits(new_subreddits, time_format=self._time_format)
 
     async def popular(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get popular subreddits.
@@ -1064,12 +1064,12 @@ class User:
         self._status_template: str = "Retrieving {query_type} from user u/{username}"
 
     async def comments(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's comments.
@@ -1112,7 +1112,7 @@ class User:
             )
 
     async def moderated_subreddits(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+        self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get subreddits moderated by user.
@@ -1147,10 +1147,10 @@ class User:
             )
 
     async def overview(
-            self,
-            limit: int,
-            session: aiohttp.ClientSession,
-            status: Optional[Status] = None,
+        self,
+        limit: int,
+        session: aiohttp.ClientSession,
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's most recent comments.
@@ -1185,12 +1185,12 @@ class User:
             return parse_comments(user_overview, time_format=self._time_format)
 
     async def posts(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's posts.
@@ -1231,7 +1231,7 @@ class User:
             return parse_posts(user_posts, time_format=self._time_format)
 
     async def profile(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+        self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> SimpleNamespace:
         """
         Asynchronously get a user's profile data.
@@ -1251,13 +1251,13 @@ class User:
             return parse_users(raw_users=user_profile, time_format=self._time_format)
 
     async def search_posts(
-            self,
-            query: str,
-            limit: int,
-            session: aiohttp.ClientSession,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        query: str,
+        limit: int,
+        session: aiohttp.ClientSession,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's posts that match with the specified search query.
@@ -1314,13 +1314,13 @@ class User:
             return parse_posts(found_posts, time_format=self._time_format)
 
     async def search_comments(
-            self,
-            query: str,
-            limit: int,
-            session: aiohttp.ClientSession,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        query: str,
+        limit: int,
+        session: aiohttp.ClientSession,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's comments that contain the specified search query.
@@ -1373,13 +1373,13 @@ class User:
             return parse_comments(found_comments, time_format=self._time_format)
 
     async def top_subreddits(
-            self,
-            session: aiohttp.ClientSession,
-            top_n: int,
-            limit: int,
-            filename: str = None,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        top_n: int,
+        limit: int,
+        filename: str = None,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> Union[List[tuple[str, int]], None]:
         """
         Asynchronously get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
@@ -1458,11 +1458,11 @@ class Users:
         self._status_template: str = "Retrieving {limit} {query_type} users"
 
     async def new(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get new users.
@@ -1498,11 +1498,11 @@ class Users:
             return parse_users(new_users, time_format=self._time_format)
 
     async def popular(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get popular users.
@@ -1538,11 +1538,11 @@ class Users:
             return parse_users(popular_users, time_format=self._time_format)
 
     async def all(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get all users.
@@ -1576,5 +1576,6 @@ class Users:
 
         if all_users:
             return parse_users(all_users, time_format=self._time_format)
+
 
 # -------------------------------- END ----------------------------------------- #
