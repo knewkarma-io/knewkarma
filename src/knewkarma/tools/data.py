@@ -1,6 +1,6 @@
 import os
 from types import SimpleNamespace
-from typing import Union, Literal
+from typing import Union, Literal, List, Tuple, Dict
 
 import pandas as pd
 
@@ -35,13 +35,13 @@ def get_file_size(file_path: str) -> str:
 
 
 def create_dataframe(
-    data: Union[SimpleNamespace, list[SimpleNamespace], list[tuple]],
+    data: Union[SimpleNamespace, List[SimpleNamespace], List[Tuple]],
 ) -> pd.DataFrame:
     """
     Converts provided data into a pandas DataFrame.
 
     :param data: Data to be converted.
-    :type data: Union[dict, list[dict], list[str]]
+    :type data: Union[Dict, List[Dict], List[str]]
     :return: A pandas DataFrame constructed from the provided data. Excludes any 'raw_data'
              column from the dataframe.
     :rtype: pd.DataFrame
@@ -52,8 +52,8 @@ def create_dataframe(
         data = [{"key": key, "value": value} for key, value in data.__dict__.items()]
 
     # Convert a list of SimpleNamespace objects to a list of dictionaries
-    elif isinstance(data, list) and all(
-        isinstance(item, (SimpleNamespace, tuple)) for item in data
+    elif isinstance(data, List) and all(
+        isinstance(item, (SimpleNamespace, Tuple)) for item in data
     ):
         # Each object in the list is converted to its dictionary representation
         data = [item.__dict__ for item in data]
@@ -71,7 +71,7 @@ def export_dataframe(
     dataframe: pd.DataFrame,
     filename: str,
     directory: str,
-    formats: list[EXPORT_FORMATS],
+    formats: List[EXPORT_FORMATS],
 ):
     """
     Exports a Pandas dataframe to specified file formats.
@@ -83,9 +83,9 @@ def export_dataframe(
     :param directory: Directory to which the dataframe files will be saved.
     :type directory: str
     :param formats: A list of file formats to which the data will be exported.
-    :type formats: list[Literal]
+    :type formats: List[Literal]
     """
-    file_mapping: dict = {
+    file_mapping: Dict = {
         "csv": lambda: dataframe.to_csv(
             os.path.join(directory, "csv", f"{filename}.csv"), encoding="utf-8"
         ),

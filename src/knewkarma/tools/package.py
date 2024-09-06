@@ -1,7 +1,8 @@
 import os
 import subprocess
+from typing import Optional
 
-from rich.console import Console
+from rich.status import Status
 
 from .terminal import Notify
 
@@ -65,14 +66,14 @@ def is_pypi_package(package: str) -> bool:
         )
 
 
-def update_pypi_package(package: str, status: Console.status = None):
+def update_pypi_package(package: str, status: Optional[Status] = None):
     """
     Updates a specified pypi package.
 
     :param package: Name of the pypi package to update.
     :type package: str
-    :param status: An optional `console.status` object for displaying status messages.
-    :type status: rich.console.Console.status, optional
+    :param status: An optional `Status` object for displaying status messages.
+    :type status: .rich.status.Status, optional
 
     Usage::
 

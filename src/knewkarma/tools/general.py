@@ -1,5 +1,5 @@
 import os
-from typing import Union
+from typing import Union, List, Optional
 
 from rich.box import DOUBLE
 from rich.console import Console, ConsoleRenderable, RichCast
@@ -9,9 +9,9 @@ __all__ = ["console", "make_panel", "pathfinder", "ML_MODELS_DIR", "OUTPUT_PAREN
 
 
 def make_panel(
-        title: str,
-        content: Union[ConsoleRenderable, RichCast, str],
-        subtitle: str = None,
+    title: str,
+    content: Union[ConsoleRenderable, RichCast, str],
+    subtitle: Optional[str] = None,
 ):
     """
     Makes a rich Panel for whatever data is needed to be placed in it.
@@ -23,27 +23,27 @@ def make_panel(
     :param subtitle: Panel subtitle.
     :type subtitle: str
     """
-    from .terminal import Text
+    from .terminal import Style
 
-    text = Text
+    style = Style
     console.print(
         Panel(
             renderable=content,
-            title=f"{text.bold}{title}{text.reset}",
+            title=f"{style.bold}{title}{style.reset}",
             subtitle=(subtitle if subtitle else None),
             box=DOUBLE,
-            style=f"{text.white.strip('[,]')} on black",
+            style=f"{style.white.strip('[,]')} on black",
         )
     )
 
 
-def pathfinder(directories: Union[list[list[str]], str, None]):
+def pathfinder(directories: Union[List[List[str]], str, None]):
     """
     Creates directories for exported data (`exported`) and
     Machine Learning models (`ml_models`) in knewkarma directory of the user's home folder.
 
     :param directories: A list of directories to create
-    :type directories: list[str]
+    :type directories: List[str]
     :raise TypeError: If the data type of the specified directories is invalid.
     """
     from .terminal import Notify
@@ -61,7 +61,7 @@ def pathfinder(directories: Union[list[list[str]], str, None]):
             else:
                 notify.raise_exception(
                     TypeError,
-                    f"Unexpected data type in the `directories` param: {type(directories)}. Expected list[list[str]] | str",
+                    f"Unexpected data type in the `directories` param: {type(directories)}. Expected List[List[str]] | str",
                 )
     except Exception as unexpected_error:
         notify.exception(

@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from typing import Union
+from typing import Union, Dict, List
 
 from .terminal import Notify
 from .timing import timestamp_to_readable
@@ -17,26 +17,26 @@ notify = Notify
 
 
 def parse_comments(
-    raw_comments: Union[list[dict], dict], time_format: TIME_FORMAT
-) -> Union[list[SimpleNamespace], SimpleNamespace]:
+    raw_comments: Union[List[Dict], Dict], time_format: TIME_FORMAT
+) -> Union[List[SimpleNamespace], SimpleNamespace]:
     """
     Parses raw Reddit comments data and returns a simplified format.
 
     :param raw_comments: A list of dictionaries, each representing raw comment data, or a single dictionary.
-    :type raw_comments: Union[list[dict], dict]
+    :type raw_comments: Union[List[Dict], Dict]
     :param time_format: Specifies the time format to use in the output, e.g., 'locale' or 'concise'.
     :type time_format: TIME_FORMAT
     :return: Parsed comments data as a list of SimpleNamespace objects if the input is a list,
        or a single SimpleNamespace object if the input is a dictionary.
-    :rtype: Union[list[SimpleNamespace], SimpleNamespace]
+    :rtype: Union[List[SimpleNamespace], SimpleNamespace]
     """
 
-    def build_comment(comment_data: dict) -> SimpleNamespace:
+    def build_comment(comment_data: Dict) -> SimpleNamespace:
         """
         Parses a single raw comment dictionary and returns it in a simplified format.
 
         :param comment_data: A dictionary containing raw data for a single Reddit comment.
-        :type comment_data: dict
+        :type comment_data: Dict
         :return: A SimpleNamespace object containing parsed comment data.
         :rtype: SimpleNamespace
         """
@@ -85,39 +85,39 @@ def parse_comments(
             }
         )
 
-    if isinstance(raw_comments, list) and len(raw_comments) != 0:
+    if isinstance(raw_comments, List) and len(raw_comments) != 0:
         return [
             build_comment(comment_data=comment.get("data")) for comment in raw_comments
         ]
-    elif isinstance(raw_comments, dict):
+    elif isinstance(raw_comments, Dict):
         return build_comment(comment_data=raw_comments)
     else:
         notify.raise_exception(
             TypeError,
-            f"Unexpected data type ({raw_comments}: {type(raw_comments)}). Expected list[dict]",
+            f"Unexpected data type ({raw_comments}: {type(raw_comments)}). Expected List[Dict]",
         )
 
 
 def parse_posts(
-    raw_posts: Union[dict, list], time_format: TIME_FORMAT
-) -> Union[list[SimpleNamespace], SimpleNamespace]:
+    raw_posts: Union[Dict, List], time_format: TIME_FORMAT
+) -> Union[List[SimpleNamespace], SimpleNamespace]:
     """
     Parses raw Reddit posts data and returns a simplified format.
 
     :param raw_posts: A list of dictionaries, each representing raw post data, or a single dictionary.
-    :type raw_posts: Union[list[dict], dict]
+    :type raw_posts: Union[List[Dict], Dict]
     :param time_format: Specifies the time format to use in the output, e.g., 'locale' or 'concise'.
     :type time_format: TIME_FORMAT
     :return: Parsed post data as a list of SimpleNamespace objects if the input is a list, or a single SimpleNamespace object if the input is a dictionary.
-    :rtype: Union[list[SimpleNamespace], SimpleNamespace]
+    :rtype: Union[List[SimpleNamespace], SimpleNamespace]
     """
 
-    def build_post(post_data: dict) -> SimpleNamespace:
+    def build_post(post_data: Dict) -> SimpleNamespace:
         """
         Parses a single raw post dictionary and returns it in a simplified format.
 
         :param post_data: A dictionary containing raw data for a single Reddit post.
-        :type post_data: dict
+        :type post_data: Dict
         :return: A SimpleNamespace object containing parsed post data.
         :rtype: SimpleNamespace
         """
@@ -184,33 +184,33 @@ def parse_posts(
             }
         )
 
-    if isinstance(raw_posts, list):
+    if isinstance(raw_posts, List):
         return [
             build_post(post_data=post.get("data"))
             for post in raw_posts
             if post.get("data")
         ]
-    elif isinstance(raw_posts, dict):
+    elif isinstance(raw_posts, Dict):
         return build_post(post_data=raw_posts)
     else:
         notify.raise_exception(
             TypeError,
-            f"Unexpected data type ({raw_posts}: {type(raw_posts)}). Expected dict",
+            f"Unexpected data type ({raw_posts}: {type(raw_posts)}). Expected Dict",
         )
 
 
 def parse_subreddits(
-    raw_subreddits: Union[list[dict], dict], time_format: TIME_FORMAT
-) -> Union[list[SimpleNamespace], SimpleNamespace]:
+    raw_subreddits: Union[List[Dict], Dict], time_format: TIME_FORMAT
+) -> Union[List[SimpleNamespace], SimpleNamespace]:
     """
     Parses raw Reddit subreddits data and returns a simplified format.
 
     :param raw_subreddits: A list of dictionaries, each representing raw subreddit data, or a single dictionary.
-    :type raw_subreddits: Union[list[dict], dict]
+    :type raw_subreddits: Union[List[Dict], Dict]
     :param time_format: Specifies the time format to use in the output, e.g., 'locale' or 'concise'.
     :type time_format: TIME_FORMAT
-    :return: Parsed subreddit data as a list of SimpleNamespace objects if the input is a list, or a single SimpleNamespace object if the input is a dictionary.
-    :rtype: Union[list[SimpleNamespace], SimpleNamespace]
+    :return: Parsed subreddit data as a list of SimpleNamespace objects if the input is a list, or a single SimpleNamespace object if the input is a Dictionary.
+    :rtype: Union[List[SimpleNamespace], SimpleNamespace]
     """
 
     def build_subreddit(subreddit_data: dict) -> SimpleNamespace:
@@ -218,7 +218,7 @@ def parse_subreddits(
         Parses a single raw subreddit dictionary and returns it in a simplified format.
 
         :param subreddit_data: A dictionary containing raw data for a single subreddit.
-        :type subreddit_data: dict
+        :type subreddit_data: Dict
         :return: A SimpleNamespace object containing parsed subreddit data.
         :rtype: SimpleNamespace
         """
@@ -299,33 +299,33 @@ def parse_subreddits(
             }
         )
 
-    if isinstance(raw_subreddits, list) and len(raw_subreddits) != 0:
+    if isinstance(raw_subreddits, List) and len(raw_subreddits) != 0:
         return [
             build_subreddit(subreddit_data=subreddit.get("data"))
             for subreddit in raw_subreddits
         ]
-    elif isinstance(raw_subreddits, dict) and "subreddit_type" in raw_subreddits:
+    elif isinstance(raw_subreddits, Dict) and "subreddit_type" in raw_subreddits:
         return build_subreddit(subreddit_data=raw_subreddits)
     else:
         notify.raise_exception(
             TypeError,
-            f"Unexpected data type ({raw_subreddits}: {type(raw_subreddits)}). Expected list[dict] | dict",
+            f"Unexpected data type ({raw_subreddits}: {type(raw_subreddits)}). Expected List[Dict] | Dict",
         )
 
 
-def parse_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> SimpleNamespace:
+def parse_wiki_page(wiki_page: Dict, time_format: TIME_FORMAT) -> SimpleNamespace:
     """
     Parses raw Reddit wiki page data and returns a simplified format.
 
     :param wiki_page: A dictionary representing raw wiki page data.
-    :type wiki_page: dict
+    :type wiki_page: Dict
     :param time_format: Specifies the time format to use in the output, e.g., 'locale' or 'concise'.
     :type time_format: TIME_FORMAT
     :return: Parsed wiki page data as a SimpleNamespace object.
     :rtype: SimpleNamespace
     """
-    if isinstance(wiki_page, dict) and "revision_id" in wiki_page:
-        user: dict = wiki_page.get("revision_by").get("data")
+    if isinstance(wiki_page, Dict) and "revision_id" in wiki_page:
+        user: Dict = wiki_page.get("revision_by").get("data")
 
         return SimpleNamespace(
             **{
@@ -364,30 +364,30 @@ def parse_wiki_page(wiki_page: dict, time_format: TIME_FORMAT) -> SimpleNamespac
     else:
         notify.raise_exception(
             TypeError,
-            f"Unexpected data type ({wiki_page}: {type(wiki_page)}). Expected dict",
+            f"Unexpected data type ({wiki_page}: {type(wiki_page)}). Expected Dict",
         )
 
 
 def parse_users(
-    raw_users: Union[list[dict], dict], time_format: TIME_FORMAT
-) -> Union[list[SimpleNamespace], SimpleNamespace]:
+    raw_users: Union[List[Dict], Dict], time_format: TIME_FORMAT
+) -> Union[List[SimpleNamespace], SimpleNamespace]:
     """
     Parses raw Reddit user data and returns a simplified format.
 
     :param raw_users: A list of dictionaries, each representing raw user data, or a single dictionary.
-    :type raw_users: Union[list[dict], dict]
+    :type raw_users: Union[List[Dict], Dict]
     :param time_format: Specifies the time format to use in the output, e.g., 'locale' or 'concise'.
     :type time_format: TIME_FORMAT
     :return: Parsed user data as a list of SimpleNamespace objects if the input is a list, or a single SimpleNamespace object if the input is a dictionary.
-    :rtype: Union[list[SimpleNamespace], SimpleNamespace]
+    :rtype: Union[List[SimpleNamespace], SimpleNamespace]
     """
 
-    def build_user(user_data: dict) -> SimpleNamespace:
+    def build_user(user_data: Dict) -> SimpleNamespace:
         """
         Parses a single raw user dictionary and returns it in a simplified format.
 
         :param user_data: A dictionary containing raw data for a single Reddit user.
-        :type user_data: dict
+        :type user_data: Dict
         :return: A SimpleNamespace object containing parsed user data.
         :rtype: SimpleNamespace
         """
@@ -420,15 +420,15 @@ def parse_users(
             }
         )
 
-    if isinstance(raw_users, list) and len(raw_users) != 0:
+    if isinstance(raw_users, List) and len(raw_users) != 0:
         return [build_user(user_data=user.get("data")) for user in raw_users]
 
-    elif isinstance(raw_users, dict) and "is_employee" in raw_users:
+    elif isinstance(raw_users, Dict) and "is_employee" in raw_users:
         return build_user(user_data=raw_users)
     else:
         notify.raise_exception(
             TypeError,
-            f"Unexpected data type ({raw_users}: {type(raw_users)}). Expected list[dict] | dict",
+            f"Unexpected data type ({raw_users}: {type(raw_users)}). Expected List[Dict] | Dict",
         )
 
 
