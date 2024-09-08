@@ -85,6 +85,7 @@ if visualisation_deps_installed:
         :param figure_size: The size of the figure (width, height). Defaults to (10, 5).
         :type figure_size: tuple[int, int]
         """
+
         plt.figure(figsize=figure_size)
         plt.bar(list(data.keys()), list(data.values()), color=colours)
         plt.title(title)
@@ -122,6 +123,7 @@ if ml_deps_installed and visualisation_deps_installed:
         :return: A tuple containing the tokenizer and the pre-trained model.
         :rtype: tuple[DistilBertTokenizer, PreTrainedModel]
         """
+
         if model_type == "sentiment_analysis":
             model_path = "distilbert_base_uncased_sst2_english"
             model_name = "distilbert-base-uncased-finetuned-sst-2-english"

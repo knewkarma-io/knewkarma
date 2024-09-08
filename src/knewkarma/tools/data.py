@@ -22,6 +22,7 @@ def get_file_size(file_path: str) -> str:
     :return: A human-readable form of the file size.
     :rtype: str
     """
+
     file_size_bytes: int = os.path.getsize(file_path)
     units: list = ["B", "KB", "MB", "GB", "TB", "PB"]
 
@@ -85,6 +86,7 @@ def export_dataframe(
     :param formats: A list of file formats to which the data will be exported.
     :type formats: List[Literal]
     """
+
     file_mapping: Dict = {
         "csv": lambda: dataframe.to_csv(
             os.path.join(directory, "csv", f"{filename}.csv"), encoding="utf-8"

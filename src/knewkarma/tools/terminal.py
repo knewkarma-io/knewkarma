@@ -1,7 +1,5 @@
 from rich.status import Status
 
-from .general import console
-
 __all__ = ["Notify", "Style"]
 
 
@@ -39,48 +37,64 @@ class Notify:
     Provides static methods for printing and/or logging formatted notifications to the console.
     """
 
+    from .general import console
+
     @staticmethod
     def ok(message: str):
         """
         Prints a `success` message (with a checkmark).
 
-        :param message: The message to be displayed.
+        :param message: Message to be logged.
         :type message: str
         """
-        console.print(f"{Style.green}✔{Style.reset} {message}")
+
+        Notify.console.print(f"{Style.green}✔{Style.reset} {message}")
 
     @staticmethod
     def info(message: str):
         """
         Prints an `informational` message to the console.
 
-        :param message: The message to be displayed.
+        :param message: Message to be logged.
         :type message: str
         """
-        console.print(f"{Style.green}✱{Style.reset} {message}")
+
+        Notify.console.print(f"{Style.green}✱{Style.reset} {message}")
 
     @staticmethod
     def warning(message: str):
         """
         Prints a `warning` message to the console.
 
-        :param message: The message to be displayed.
+        :param message: Message to be logged.
         :type message: str
         """
-        console.print(f"{Style.yellow}✘{Style.reset} {message}")
+
+        Notify.console.print(f"{Style.yellow}✘{Style.reset} {message}")
 
     @staticmethod
     def update_status(message: str, status: Status):
         """
         Updates a console status with the specified message.
 
-        :param message: The message to be displayed.
+        :param message: Message to be logged.
         :type message: str
         :param status: A `Status` object for displaying status messages.
         :type status: rich.status.Status
         """
 
         status.update(f"{message}{Style.yellow}...{Style.reset}")
+
+    @staticmethod
+    def error(message: str):
+        """
+        Logs an error with the specified message to the console.
+
+        :param message: Error message to be logged.
+        :type message: str
+        """
+
+        Notify.console.log(f"{Style.yellow}✘{Style.reset} {message}")
 
     @staticmethod
     def exception(error: Exception, **kwargs: str):
@@ -93,6 +107,7 @@ class Notify:
             - error_type (str, optional): The type of error (e.g., `unexpected`, `HTTP`, `API`).
             - error_context (str, optional): The context where the error occurred (e.g., `while updating database`).
         """
+
         exception_type: str = kwargs.get("exception_type", "")
         exception_context: str = kwargs.get("exception_context", "")
 
@@ -105,20 +120,9 @@ class Notify:
         if exception_context:
             formatted_exception += f" ({Style.italic}{exception_context}{Style.reset})"
 
-        console.log(f"{Style.red}✘{Style.reset} {formatted_exception}: {error}")
-
-    @staticmethod
-    def raise_exception(base_exception: type[BaseException], message: str):
-        """
-        Raises a specified base `exception` with the provided message.
-
-        :param base_exception: Base exception class to be raised.
-        :type base_exception: type[Exception]
-        :param message: The exception message to be displayed.
-        :type message: str
-        :raises Exception: The specified base exception with the provided message.
-        """
-        raise base_exception(message)
+        Notify.console.log(
+            f"{Style.bold}{Style.red}✘{Style.reset}{Style.reset} {formatted_exception}: {error}"
+        )
 
 
 # -------------------------------- END ----------------------------------------- #

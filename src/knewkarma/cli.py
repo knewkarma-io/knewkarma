@@ -24,10 +24,15 @@ from .tools.data import (
     export_dataframe,
     EXPORT_FORMATS,
 )
-from .tools.general import console, pathfinder, OUTPUT_PARENT_DIR, ML_MODELS_DIR
+from .tools.general import (
+    console,
+    filename_timestamp,
+    pathfinder,
+    OUTPUT_PARENT_DIR,
+    ML_MODELS_DIR,
+)
 from .tools.package import is_snap_package
 from .tools.terminal import Notify, Style
-from .tools.timing import filename_timestamp
 from .version import Version
 
 __all__ = ["start"]
@@ -53,6 +58,7 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
             message is displayed and the command execution is halted.
     :type value: bool
     """
+
     if value and not ctx.resilient_parsing:
         click.echo(ctx.get_help())
         if is_snap_package(package=About.package):
@@ -146,6 +152,7 @@ def cli(
     :param export: Option to set data export file types.
     :type export: Literal[str]
     """
+
     ctx.ensure_object(dict)
     ctx.obj["timeframe"] = timeframe
     ctx.obj["sort"] = sort
@@ -225,6 +232,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     :param comments: Flag to get post comments.
     :type comments: bool
     """
+
     sort: SORT_CRITERION = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
@@ -299,6 +307,7 @@ def posts(
     :param rising: Flag to get posts from the rising listing.
     :type rising: bool
     """
+
     timeframe: TIMEFRAME = ctx.obj["timeframe"]
     sort: SORT_CRITERION = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
@@ -365,6 +374,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     :param users: Flag to search users.
     :type users: bool
     """
+
     sort: SORT_CRITERION = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
@@ -458,6 +468,7 @@ def subreddit(
     :param wiki_pages: Flag to get the subreddit's wiki pages.
     :type wiki_pages: bool
     """
+
     timeframe: TIMEFRAME = ctx.obj["timeframe"]
     sort: SORT_CRITERION = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
@@ -560,6 +571,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
     :param popular: Flag to get popular subreddits.
     :type popular: bool
     """
+
     export: str = ctx.obj["export"]
     timeframe: TIMEFRAME = ctx.obj["timeframe"]
     limit: int = ctx.obj["limit"]
@@ -762,6 +774,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     :param popular: Flag to get popular users.
     :type popular: bool
     """
+
     export: str = ctx.obj["export"]
     timeframe: TIMEFRAME = ctx.obj["timeframe"]
     limit: int = ctx.obj["limit"]
@@ -809,6 +822,7 @@ async def call_method(
     :type status: Console.console.status
     :param kwargs: Additional keyword arguments for `export: str`, `argument: str` and `ctx: click.Context` .
     """
+
     command: str = kwargs.get("ctx").command.name
     argument: str = kwargs.get("argument")
 
@@ -869,6 +883,7 @@ async def handle_method_calls(
     :param kwargs: Additional keyword arguments.
     :type kwargs: Union[str, int, bool]
     """
+
     is_valid_arg: bool = False
 
     for argument, method in method_map.items():
@@ -899,9 +914,7 @@ async def handle_method_calls(
                 notify.warning("Process aborted /w CTRL+C.")
             finally:
                 elapsed_time = datetime.now() - start_time
-                notify.info(
-                    f"DONE. {elapsed_time.total_seconds():.2f} seconds elapsed."
-                )
+                notify.ok(f"DONE. {elapsed_time.total_seconds():.2f} seconds elapsed.")
 
     if not is_valid_arg:
         ctx.get_usage()
@@ -911,6 +924,7 @@ def start():
     """
     Main entrypoint for the Knew Karma command-line interface.
     """
+
     console.set_window_title(f"{About.name} {Version.release}")
     cli(obj={})
 
