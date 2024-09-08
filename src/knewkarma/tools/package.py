@@ -10,6 +10,10 @@ __all__ = ["is_pypi_package", "is_snap_package", "update_pypi_package"]
 
 notify = Notify
 
+INVALID_PACKAGE_ERROR: str = (
+    "The provided package name is not a valid string: {package}"
+)
+
 
 def is_snap_package(package: str) -> bool:
     """
@@ -29,12 +33,11 @@ def is_snap_package(package: str) -> bool:
         >>> print(is_snap_package(package=package_name))
         >>> False # If script isn't running in a SNAP environment.
     """
+
     if package:
         return True if os.getenv("SNAP") else False
     else:
-        notify.raise_exception(
-            ValueError, "The provided package name is not a valid string."
-        )
+        notify.error(INVALID_PACKAGE_ERROR.format(package=package))
 
 
 def is_pypi_package(package: str) -> bool:
@@ -54,6 +57,7 @@ def is_pypi_package(package: str) -> bool:
         >>> print(is_pypi_package(package=package_name))
         >>> True
     """
+
     if package:
         try:
             __import__(name=package)
@@ -61,9 +65,7 @@ def is_pypi_package(package: str) -> bool:
         except ImportError:
             return False
     else:
-        notify.raise_exception(
-            ValueError, "The provided package name is not a valid string."
-        )
+        notify.error(INVALID_PACKAGE_ERROR.format(package=package))
 
 
 def update_pypi_package(package: str, status: Optional[Status] = None):
@@ -83,6 +85,7 @@ def update_pypi_package(package: str, status: Optional[Status] = None):
         >>> package_name = "src"
         >>> update_pypi_package(package=package_name)
     """
+
     if package:
         try:
             if status:
@@ -112,9 +115,7 @@ def update_pypi_package(package: str, status: Optional[Status] = None):
                 exception_context=f"while updating {package}",
             )
     else:
-        notify.raise_exception(
-            ValueError, "The provided package name is not a valid string."
-        )
+        notify.error(INVALID_PACKAGE_ERROR.format(package=package))
 
 
 # -------------------------------- END ----------------------------------------- #

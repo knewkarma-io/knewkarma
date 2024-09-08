@@ -4,17 +4,11 @@ from types import SimpleNamespace
 from typing import Literal, Union, Optional, List
 
 import aiohttp
+import karmakaze
 from rich.status import Status
 
 from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .extras import plot_bar_chart, visualisation_deps_installed
-from .tools.parsers import (
-    parse_comments,
-    parse_subreddits,
-    parse_posts,
-    parse_users,
-    parse_wiki_page,
-)
 from .tools.terminal import Notify, Style
 
 __all__ = [
@@ -54,9 +48,10 @@ class Post:
         :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
         :type time_format: Literal["concise", "locale"]
         """
+
         self._id = id
         self._subreddit = subreddit
-        self._time_format = time_format
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def data(
         self, session: aiohttp.ClientSession, status: Optional[Status] = None
@@ -71,19 +66,18 @@ class Post:
         :return: A `SimpleNamespace` object containing parsed post data.
         :rtype: SimpleNamespace
         """
-        post_data: dict = await api.get_entity(
+
+        post_data = await api.get_entity(
+            session=session,
+            status=status,
+            entity_type="post",
             post_id=self._id,
             post_subreddit=self._subreddit,
-            entity_type="post",
-            status=status,
-            session=session,
         )
 
-        if post_data:
-            return parse_posts(
-                raw_posts=post_data,
-                time_format=self._time_format,
-            )
+        parsed_post = self._parse.posts(post_data)
+
+        return parsed_post if post_data else SimpleNamespace
 
     async def comments(
         self,
@@ -106,21 +100,20 @@ class Post:
         :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
         :rtype: List[SimpleNamespace]
         """
-        comments_data: List = await api.get_posts(
+
+        comments_data = await api.get_posts(
+            session=session,
+            status=status,
             posts_type="post_comments",
             post_id=self._id,
             post_subreddit=self._subreddit,
             limit=limit,
             sort=sort,
-            status=status,
-            session=session,
         )
 
-        if comments_data:
-            return parse_comments(
-                raw_comments=comments_data,
-                time_format=self._time_format,
-            )
+        parsed_comments = self._parse.comments(comments_data)
+
+        return parsed_comments if comments_data else [SimpleNamespace]
 
 
 class Posts:
@@ -134,8 +127,7 @@ class Posts:
         :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
         :type time_format: Literal["concise", "locale"]
         """
-        self._time_format = time_format
-        self._status_template: str = "Retrieving {limit} {listing} posts"
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def best(
         self,
@@ -158,24 +150,18 @@ class Posts:
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    listing="best", limit=f"{style.cyan}{limit}{style.reset}"
-                ),
-            )
 
-        best_posts: List = await api.get_posts(
+        best_posts = await api.get_posts(
+            session=session,
+            status=status,
             posts_type="best",
             timeframe=timeframe,
             limit=limit,
-            status=status,
-            session=session,
         )
 
-        if best_posts:
-            return parse_posts(raw_posts=best_posts, time_format=self._time_format)
+        parsed_posts = self._parse.posts(best_posts)
+
+        return parsed_posts if best_posts else [SimpleNamespace]
 
     async def controversial(
         self,
@@ -198,26 +184,18 @@ class Posts:
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    listing="controversial", limit=f"{style.cyan}{limit}{style.reset}"
-                ),
-            )
 
-        controversial_posts: List = await api.get_posts(
+        controversial_posts = await api.get_posts(
+            session=session,
+            status=status,
             posts_type="controversial",
             timeframe=timeframe,
             limit=limit,
-            status=status,
-            session=session,
         )
 
-        if controversial_posts:
-            return parse_posts(
-                raw_posts=controversial_posts, time_format=self._time_format
-            )
+        parsed_posts = self._parse.posts(controversial_posts)
+
+        return parsed_posts if controversial_posts else [SimpleNamespace]
 
     async def front_page(
         self,
@@ -243,15 +221,8 @@ class Posts:
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    listing="front-page", limit=f"{style.cyan}{limit}{style.reset}"
-                ),
-            )
 
-        front_page_posts: List = await api.get_posts(
+        front_page_posts = await api.get_posts(
             posts_type="front_page",
             limit=limit,
             timeframe=timeframe,
@@ -260,10 +231,9 @@ class Posts:
             session=session,
         )
 
-        if front_page_posts:
-            return parse_posts(
-                raw_posts=front_page_posts, time_format=self._time_format
-            )
+        parsed_posts = self._parse.posts(front_page_posts)
+
+        return parsed_posts if front_page_posts else [SimpleNamespace]
 
     async def new(
         self,
@@ -289,15 +259,8 @@ class Posts:
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    listing="new", limit=f"{style.cyan}{limit}{style.reset}"
-                ),
-            )
 
-        new_posts: List = await api.get_posts(
+        new_posts = await api.get_posts(
             posts_type="new",
             limit=limit,
             timeframe=timeframe,
@@ -306,8 +269,9 @@ class Posts:
             session=session,
         )
 
-        if new_posts:
-            return parse_posts(raw_posts=new_posts, time_format=self._time_format)
+        parsed_posts = self._parse.posts(new_posts)
+
+        return parsed_posts if new_posts else [SimpleNamespace]
 
     async def popular(
         self,
@@ -330,24 +294,17 @@ class Posts:
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    listing="popular", limit=f"{style.cyan}{limit}{style.reset}"
-                ),
-            )
-
-        popular_posts: List = await api.get_posts(
+        popular_posts = await api.get_posts(
+            session=session,
+            status=status,
             posts_type="popular",
             timeframe=timeframe,
             limit=limit,
-            status=status,
-            session=session,
         )
 
-        if popular_posts:
-            return parse_posts(raw_posts=popular_posts, time_format=self._time_format)
+        parsed_posts = self._parse.posts(popular_posts)
+
+        return parsed_posts if popular_posts else [SimpleNamespace]
 
     async def rising(
         self,
@@ -370,24 +327,18 @@ class Posts:
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    listing="rising", limit=f"{style.cyan}{limit}{style.reset}"
-                ),
-            )
 
-        rising_posts: List = await api.get_posts(
+        rising_posts = await api.get_posts(
+            session=session,
+            status=status,
             posts_type="rising",
             timeframe=timeframe,
             limit=limit,
-            status=status,
-            session=session,
         )
 
-        if rising_posts:
-            return parse_posts(raw_posts=rising_posts, time_format=self._time_format)
+        parsed_posts = self._parse.posts(rising_posts)
+
+        return parsed_posts if rising_posts else [SimpleNamespace]
 
 
 class Search:
@@ -405,9 +356,9 @@ class Search:
         :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
         :type time_format: Literal["concise", "locale"]
         """
+
         self._query = query
-        self._time_format = time_format
-        self._status_template: str = "Searching for '{query}' in {limit} {query_type}"
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def posts(
         self,
@@ -430,26 +381,19 @@ class Search:
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type="posts",
-                    limit=f"{style.cyan}{limit}{style.reset}",
-                    query=self._query,
-                ),
-            )
 
-        posts_results: List = await api.search_entities(
+        search_results = await api.search_entities(
+            session=session,
+            status=status,
             query=self._query,
             entity_type="posts",
             sort=sort,
             limit=limit,
-            status=status,
-            session=session,
         )
-        if posts_results:
-            return parse_posts(raw_posts=posts_results, time_format=self._time_format)
+
+        parsed_posts = self._parse.posts(search_results)
+
+        return parsed_posts if search_results else [SimpleNamespace]
 
     async def subreddits(
         self,
@@ -472,29 +416,19 @@ class Search:
         :return: A list of `SimpleNamespace` objects, each containing parsed subreddit data.
         :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type="subreddits",
-                    limit=f"{style.cyan}{limit}{style.reset}",
-                    query=self._query,
-                ),
-            )
 
-        search_subreddits: List = await api.search_entities(
+        search_results = await api.search_entities(
+            session=session,
+            status=status,
             query=self._query,
             entity_type="subreddits",
             sort=sort,
             limit=limit,
-            status=status,
-            session=session,
         )
 
-        if search_subreddits:
-            return parse_subreddits(
-                raw_subreddits=search_subreddits, time_format=self._time_format
-            )
+        parsed_subreddits = self._parse.subreddits(search_results)
+
+        return parsed_subreddits if search_results else [SimpleNamespace]
 
     async def users(
         self,
@@ -517,27 +451,19 @@ class Search:
         :return: A list of `SimpleNamespace` objects, each containing parsed user data.
         :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type="users",
-                    limit=f"{style.cyan}{limit}{style.reset}",
-                    query=self._query,
-                ),
-            )
 
-        search_users: List[dict] = await api.search_entities(
+        search_results = await api.search_entities(
+            session=session,
+            status=status,
             query=self._query,
             entity_type="users",
             sort=sort,
             limit=limit,
-            status=status,
-            session=session,
         )
 
-        if search_users:
-            return parse_users(raw_users=search_users, time_format=self._time_format)
+        parsed_users = self._parse.users(search_results)
+
+        return parsed_users if search_results else [SimpleNamespace]
 
 
 class Subreddit:
@@ -553,11 +479,12 @@ class Subreddit:
         :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
         :type time_format: Literal["concise", "locale"]
         """
+
         self._name = name
-        self._time_format = time_format
-        self._status_template: str = (
-            "Retrieving {query_type} from subreddit r/{subreddit}"
+        self._time_format = (
+            time_format  # This will also be accessed in the comments method
         )
+        self._parse = karmakaze.Parse(time_format=self._time_format)
 
     async def comments(
         self,
@@ -586,21 +513,13 @@ class Subreddit:
         :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
         :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type=f"{comments_per_post} comments per post (of {posts_limit})",
-                    subreddit=self._name,
-                ),
-            )
 
         posts = await self.posts(
             session=session,
+            status=status,
             limit=posts_limit,
             sort=sort,
             timeframe=timeframe,
-            status=status,
         )
         all_comments: List = []
         for post in posts:
@@ -609,7 +528,7 @@ class Subreddit:
                 subreddit=post.get("subreddit"),
                 time_format=self._time_format,
             )
-            post_comments: List = await post.comments(
+            post_comments = await post.comments(
                 session=session, limit=comments_per_post, sort=sort, status=status
             )
 
@@ -641,27 +560,20 @@ class Subreddit:
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type=f"{style.cyan}{limit}{style.reset} posts",
-                    subreddit=self._name,
-                ),
-            )
 
-        subreddit_posts: List = await api.get_posts(
+        subreddit_posts = await api.get_posts(
+            session=session,
+            status=status,
             posts_type="subreddit_posts",
             subreddit=self._name,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
-            status=status,
-            session=session,
         )
 
-        if subreddit_posts:
-            return parse_posts(raw_posts=subreddit_posts, time_format=self._time_format)
+        parsed_posts = self._parse.posts(subreddit_posts)
+
+        return parsed_posts if subreddit_posts else [SimpleNamespace]
 
     async def profile(
         self, session: aiohttp.ClientSession, status: Optional[Status] = None
@@ -676,16 +588,17 @@ class Subreddit:
         :return: A `SimpleNamespace` object containing the parsed subreddit profile data.
         :rtype: SimpleNamespace
         """
-        subreddit_profile: dict = await api.get_entity(
+
+        subreddit_profile = await api.get_entity(
+            session=session,
+            status=status,
             entity_type="subreddit",
             subreddit=self._name,
-            status=status,
-            session=session,
         )
-        if subreddit_profile:
-            return parse_subreddits(
-                raw_subreddits=subreddit_profile, time_format=self._time_format
-            )
+
+        parsed_profile = self._parse.subreddits(subreddit_profile)
+
+        return parsed_profile if subreddit_profile else SimpleNamespace
 
     async def search_comments(
         self,
@@ -714,42 +627,37 @@ class Subreddit:
         :type timeframe: TIMEFRAME, optional
         :param status: An instance of `Status` used to display animated status messages.
         :type: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing comment data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing comment data.
+        :rtype: List[SimpleNamespace]
         """
-        posts: List = await self.posts(
+
+        posts = await self.posts(
             session=session,
+            status=status,
             limit=posts_limit,
             sort=sort,
             timeframe=timeframe,
-            status=status,
         )
         all_comments: List = []
         found_comments: List = []
         for post in posts:
-            if status:
-                notify.update_status(
-                    status=status,
-                    message=f"Retrieving comments from post {post.get('id')}",
-                )
-
             post = Post(
                 id=post.get("id"),
                 subreddit=self._name,
                 time_format=self._time_format,
             )
 
-            comments: List = await post.comments(
+            comments = await post.comments(
                 session=session, limit=comments_per_post, status=status
             )
 
             all_comments.extend(comments)
 
-        pattern: str = rf"(?i)\b{re.escape(query)}\b"
+        pattern = rf"(?i)\b{re.escape(query)}\b"
         regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
 
         for comment in all_comments:
-            match: re.Match = regex.search(comment.get("body", ""))
+            match: re.Match = regex.search(comment.body)
             if match:
                 found_comments.append(comment)
 
@@ -780,30 +688,24 @@ class Subreddit:
         :type timeframe: Literal[str]
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing post data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing post data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type=f"{style.cyan}{limit}{style.reset} posts with '{query}'",
-                    subreddit=self._name,
-                ),
-            )
-        found_posts: List = await api.get_posts(
+
+        search_results = await api.get_posts(
+            session=session,
+            status=status,
             posts_type="search_subreddit_posts",
             subreddit=self._name,
             query=query,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
-            status=status,
-            session=session,
         )
 
-        if found_posts:
-            return parse_posts(raw_posts=found_posts, time_format=self._time_format)
+        parsed_posts = self._parse.posts(search_results)
+
+        return parsed_posts if search_results else [SimpleNamespace]
 
     async def wiki_pages(
         self, session: aiohttp.ClientSession, status: Optional[Status] = None
@@ -818,19 +720,19 @@ class Subreddit:
         :return: A list of strings, each representing a wiki page.
         :rtype: List[str]
         """
+
         if status:
             notify.update_status(
+                message=f"Retrieving wiki pages from subreddit ({self._name})",
                 status=status,
-                message=self._status_template.format(
-                    query_type="wiki pages", subreddit=self._name
-                ),
             )
 
-        pages: dict = await api.make_request(
+        pages = await api.make_request(
             endpoint=f"{api.subreddit_endpoint}/{self._name}/wiki/pages.json",
             session=session,
         )
 
+        # TODO: Implement sanitising wiki_pages in karmakaze
         return pages.get("data")
 
     async def wiki_page(
@@ -851,24 +753,18 @@ class Subreddit:
         :return: A list of strings, each representing a wiki page.
         :rtype: List[str]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type="wiki page data", subreddit=self._name
-                ),
-            )
 
-        wiki_page: dict = await api.get_entity(
+        wiki_page = await api.get_entity(
+            session=session,
+            status=status,
             entity_type="wiki_page",
             page_name=page_name,
             subreddit=self._name,
-            status=status,
-            session=session,
         )
 
-        if wiki_page:
-            return parse_wiki_page(wiki_page=wiki_page, time_format=self._time_format)
+        parsed_wiki_page = self._parse.wiki_page(wiki_page)
+
+        return parsed_wiki_page if wiki_page else SimpleNamespace
 
 
 class Subreddits:
@@ -882,8 +778,8 @@ class Subreddits:
                         time difference, or `locale` for a localized datetime string. Defaults to `locale`.
         :type time_format: Literal["concise", "locale"]
         """
-        self._time_format = time_format
-        self._status_template: str = "Retrieving {limit} {subreddits_type} subreddits"
+
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def all(
         self,
@@ -903,31 +799,24 @@ class Subreddits:
         :type timeframe: Literal[str]
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing subreddit data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing subreddit data.
+        :rtype: List[SimpleNamespace]
 
         Note:
             -*imitating Morphius' voice*- "the only limitation you have at this point is the matrix's rate-limit."
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    subreddits_type="all", limit=f"{style.cyan}{limit}{style.reset}"
-                ),
-            )
 
-        all_subreddits: List = await api.get_subreddits(
+        all_subreddits = await api.get_subreddits(
+            session=session,
+            status=status,
             subreddits_type="all",
             limit=limit,
             timeframe=timeframe,
-            status=status,
-            session=session,
         )
-        if all_subreddits:
-            return parse_subreddits(
-                raw_subreddits=all_subreddits, time_format=self._time_format
-            )
+
+        parsed_subreddits = self._parse.subreddits(all_subreddits)
+
+        return parsed_subreddits if all_subreddits else [SimpleNamespace]
 
     async def default(
         self,
@@ -944,27 +833,21 @@ class Subreddits:
         :type session: aiohttp.ClientSession
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing subreddit data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing subreddit data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    subreddits_type="default",
-                    limit=f"{style.cyan}{limit}{style.reset}",
-                ),
-            )
 
-        default_subreddits: List = await api.get_subreddits(
+        default_subreddits = await api.get_subreddits(
+            session=session,
+            status=status,
             subreddits_type="default",
             timeframe="all",
             limit=limit,
-            status=status,
-            session=session,
         )
-        if default_subreddits:
-            return parse_subreddits(default_subreddits, time_format=self._time_format)
+
+        parsed_subreddits = self._parse.subreddits(default_subreddits)
+
+        return parsed_subreddits if default_subreddits else [SimpleNamespace]
 
     async def new(
         self,
@@ -984,26 +867,20 @@ class Subreddits:
         :type timeframe: Literal[str]
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing subreddit data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing subreddit data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    subreddits_type="new", limit=f"{style.cyan}{limit}{style.reset}"
-                ),
-            )
-
-        new_subreddits: List = await api.get_subreddits(
+        new_subreddits = await api.get_subreddits(
+            session=session,
+            status=status,
             subreddits_type="new",
             limit=limit,
             timeframe=timeframe,
-            status=status,
-            session=session,
         )
-        if new_subreddits:
-            return parse_subreddits(new_subreddits, time_format=self._time_format)
+
+        parsed_subreddits = self._parse.subreddits(new_subreddits)
+
+        return parsed_subreddits if new_subreddits else [SimpleNamespace]
 
     async def popular(
         self,
@@ -1023,27 +900,21 @@ class Subreddits:
         :type timeframe: Literal[str]
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing subreddit data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing subreddit data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    subreddits_type="popular",
-                    limit=f"{style.cyan}{limit}{style.reset}",
-                ),
-            )
 
-        popular_subreddits: List = await api.get_subreddits(
+        popular_subreddits = await api.get_subreddits(
+            session=session,
+            status=status,
             subreddits_type="popular",
             limit=limit,
             timeframe=timeframe,
-            status=status,
-            session=session,
         )
-        if popular_subreddits:
-            return parse_subreddits(popular_subreddits, time_format=self._time_format)
+
+        parsed_subreddits = self._parse.subreddits(popular_subreddits)
+
+        return parsed_subreddits if popular_subreddits else [SimpleNamespace]
 
 
 class User:
@@ -1059,9 +930,9 @@ class User:
                         time difference, or "locale" for a localized datetime string. Defaults to "locale".
         :type time_format: Literal["concise", "locale"]
         """
+
         self._name = name
-        self._time_format = time_format
-        self._status_template: str = "Retrieving {query_type} from user u/{username}"
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def comments(
         self,
@@ -1084,32 +955,23 @@ class User:
         :type timeframe: Literal[str]
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing comment data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing comment data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type=f"{style.cyan}{limit}{style.reset} comments",
-                    username=self._name,
-                ),
-            )
 
-        user_comments: List = await api.get_posts(
+        user_comments = await api.get_posts(
+            session=session,
+            status=status,
             username=self._name,
             posts_type="user_comments",
             limit=limit,
             sort=sort,
             timeframe=timeframe,
-            status=status,
-            session=session,
         )
 
-        if user_comments:
-            return parse_comments(
-                raw_comments=user_comments, time_format=self._time_format
-            )
+        parsed_comments = self._parse.comments(user_comments)
+
+        return parsed_comments if user_comments else [SimpleNamespace]
 
     async def moderated_subreddits(
         self, session: aiohttp.ClientSession, status: Optional[Status] = None
@@ -1121,30 +983,21 @@ class User:
         :type session: aiohttp.ClientSession
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing subreddit data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing subreddit data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type="moderated subreddits", username=self._name
-                ),
-            )
 
-        subreddits: dict = await api.get_subreddits(
+        subreddits = await api.get_subreddits(
+            session=session,
+            status=status,
             subreddits_type="user_moderated",
             username=self._name,
             limit=0,
-            status=status,
-            session=session,
         )
 
-        if subreddits:
-            return parse_subreddits(
-                subreddits.get("data"),
-                time_format=self._time_format,
-            )
+        parsed_subreddits = self._parse.subreddits(subreddits)
+
+        return parsed_subreddits if subreddits else [SimpleNamespace]
 
     async def overview(
         self,
@@ -1161,19 +1014,11 @@ class User:
         :type session: aiohttp.ClientSession
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing data about a recent comment.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing data about a recent comment.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type=f"{style.cyan}{limit}{style.reset} recent comments",
-                    username=self._name,
-                ),
-            )
 
-        user_overview: List = await api.get_posts(
+        user_overview = await api.get_posts(
             username=self._name,
             posts_type="user_overview",
             limit=limit,
@@ -1181,8 +1026,9 @@ class User:
             session=session,
         )
 
-        if user_overview:
-            return parse_comments(user_overview, time_format=self._time_format)
+        parsed_overview = self._parse.comments(user_overview)
+
+        return parsed_overview if user_overview else [SimpleNamespace]
 
     async def posts(
         self,
@@ -1205,30 +1051,23 @@ class User:
         :type timeframe: Literal[str]
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing post data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing post data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type=f"{style.cyan}{limit}{style.reset} posts",
-                    username=self._name,
-                ),
-            )
 
-        user_posts: List = await api.get_posts(
+        user_posts = await api.get_posts(
+            session=session,
+            status=status,
             username=self._name,
             posts_type="user_posts",
             limit=limit,
             sort=sort,
             timeframe=timeframe,
-            status=status,
-            session=session,
         )
 
-        if user_posts:
-            return parse_posts(user_posts, time_format=self._time_format)
+        parsed_posts = self._parse.posts(user_posts)
+
+        return parsed_posts if user_posts else [SimpleNamespace]
 
     async def profile(
         self, session: aiohttp.ClientSession, status: Optional[Status] = None
@@ -1240,15 +1079,17 @@ class User:
         :type session: aiohttp.ClientSession
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A dictionary containing user profile data.
-        :rtype: dict
+        :return: A SimpleNamespace object containing user profile data.
+        :rtype: SimpleNamespace
         """
-        user_profile: dict = await api.get_entity(
+
+        user_profile = await api.get_entity(
             username=self._name, entity_type="user", status=status, session=session
         )
 
-        if user_profile:
-            return parse_users(raw_users=user_profile, time_format=self._time_format)
+        parsed_profile = self._parse.users(user_profile)
+
+        return parsed_profile if user_profile else SimpleNamespace
 
     async def search_posts(
         self,
@@ -1274,34 +1115,26 @@ class User:
         :type timeframe: Literal[str]
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing post data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing post data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type=f"{style.cyan}{limit}{style.reset} posts for '{query}'",
-                    username=self._name,
-                ),
-            )
 
-        pattern: str = rf"(?i)\b{re.escape(query)}\b"
+        pattern = rf"(?i)\b{re.escape(query)}\b"
         regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
 
-        user_posts: List = await api.get_posts(
+        user_posts = await api.get_posts(
+            session=session,
+            status=status,
             posts_type="user_posts",
             username=self._name,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
-            status=status,
-            session=session,
         )
-        found_posts: List = []
+        found_posts = []
 
         for post in user_posts:
-            post_data: dict = post.get("data")
+            post_data = post.get("data")
 
             match: re.Match = regex.search(post_data.get("title", "")) or regex.search(
                 post_data.get("selftext", "")
@@ -1310,8 +1143,9 @@ class User:
             if match:
                 found_posts.append(post)
 
-        if found_posts:
-            return parse_posts(found_posts, time_format=self._time_format)
+        parsed_post = self._parse.posts(found_posts)
+
+        return parsed_post if found_posts else [SimpleNamespace]
 
     async def search_comments(
         self,
@@ -1338,39 +1172,32 @@ class User:
         :type timeframe: Literal[str]
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing comment data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing comment data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type=f"{style.cyan}{limit}{style.reset} comments for '{query}'",
-                    username=self._name,
-                ),
-            )
 
         pattern: str = rf"(?i)\b{re.escape(query)}\b"
         regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
 
-        user_comments: List = await api.get_posts(
+        user_comments = await api.get_posts(
+            session=session,
+            status=status,
             username=self._name,
             posts_type="user_comments",
             limit=limit,
             sort=sort,
             timeframe=timeframe,
-            status=status,
-            session=session,
         )
-        found_comments: List = []
+        found_comments = []
 
         for comment in user_comments:
             match = regex.search(comment.get("data", {}).get("body", ""))
             if match:
                 found_comments.append(comment)
 
-        if found_comments:
-            return parse_comments(found_comments, time_format=self._time_format)
+        parsed_comments = self._parse.comments(found_comments)
+
+        return parsed_comments if user_comments else [SimpleNamespace]
 
     async def top_subreddits(
         self,
@@ -1397,27 +1224,19 @@ class User:
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type=f"top {style.cyan}{top_n}{style.reset}/{style.cyan}{limit}{style.reset} subreddits",
-                    username=self._name,
-                ),
-            )
 
         posts = await api.get_posts(
+            session=session,
+            status=status,
             posts_type="user_posts",
             username=self._name,
             limit=limit,
             timeframe=timeframe,
-            status=status,
-            session=session,
         )
 
         if posts:
             # Extract subreddit names
-            subreddits: List = [post.get("data", {}).get("subreddit") for post in posts]
+            subreddits = [post.get("data", {}).get("subreddit") for post in posts]
 
             # Count the occurrences of each subreddit
             subreddit_counts: Counter = Counter(subreddits)
@@ -1426,8 +1245,8 @@ class User:
             top_subreddits: List[tuple[str, int]] = subreddit_counts.most_common(top_n)
 
             # Prepare data for plotting
-            subreddit_names: List = [subreddit[0] for subreddit in top_subreddits]
-            subreddit_frequencies: List = [subreddit[1] for subreddit in top_subreddits]
+            subreddit_names = [subreddit[0] for subreddit in top_subreddits]
+            subreddit_frequencies = [subreddit[1] for subreddit in top_subreddits]
 
             if visualisation_deps_installed:
                 plot_bar_chart(
@@ -1453,9 +1272,8 @@ class Users:
         :param time_format: Time format of the output data. Use `concise` for a human-readable
                         time difference, or `locale` for a localized datetime string. Defaults to `locale`.
         :type time_format: Literal["concise", "locale"]
-        """
-        self._time_format = time_format
-        self._status_template: str = "Retrieving {limit} {query_type} users"
+        """  #
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def new(
         self,
@@ -1475,27 +1293,21 @@ class Users:
         :type timeframe: Literal[str]
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing a user's data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing a user's data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type="new", limit=f"{style.cyan}{limit}{style.reset}"
-                ),
-            )
 
-        new_users: List = await api.get_users(
+        new_users = await api.get_users(
+            session=session,
+            status=status,
             users_type="new",
             limit=limit,
             timeframe=timeframe,
-            status=status,
-            session=session,
         )
 
-        if new_users:
-            return parse_users(new_users, time_format=self._time_format)
+        parsed_users = self._parse.users(new_users)
+
+        return parsed_users if new_users else [SimpleNamespace]
 
     async def popular(
         self,
@@ -1515,18 +1327,11 @@ class Users:
         :type timeframe: Literal[str]
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing a user's data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing a user's data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type="popular", limit=f"{style.cyan}{limit}{style.reset}"
-                ),
-            )
 
-        popular_users: List = await api.get_users(
+        popular_users = await api.get_users(
             users_type="popular",
             limit=limit,
             timeframe=timeframe,
@@ -1534,8 +1339,9 @@ class Users:
             session=session,
         )
 
-        if popular_users:
-            return parse_users(popular_users, time_format=self._time_format)
+        parsed_users = self._parse.users(popular_users)
+
+        return parsed_users if popular_users else [SimpleNamespace]
 
     async def all(
         self,
@@ -1555,18 +1361,11 @@ class Users:
         :type timeframe: Literal[str]
         :param status: An instance of `Status` used to display animated status messages.
         :type status: Optional[rich.status.Status]
-        :return: A list of dictionaries, each containing a user's data.
-        :rtype: List[dict]
+        :return: A list of SimpleNamespace objects, each containing a user's data.
+        :rtype: List[SimpleNamespace]
         """
-        if status:
-            notify.update_status(
-                status=status,
-                message=self._status_template.format(
-                    query_type="all", limit=f"{style.cyan}{limit}{style.reset}"
-                ),
-            )
 
-        all_users: List = await api.get_users(
+        all_users = await api.get_users(
             users_type="all",
             limit=limit,
             timeframe=timeframe,
@@ -1574,8 +1373,9 @@ class Users:
             session=session,
         )
 
-        if all_users:
-            return parse_users(all_users, time_format=self._time_format)
+        parsed_users = self._parse.users(all_users)
+
+        return parsed_users if all_users else [SimpleNamespace]
 
 
 # -------------------------------- END ----------------------------------------- #
