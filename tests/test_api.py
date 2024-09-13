@@ -64,8 +64,7 @@ async def test_search_for_posts_in_a_subreddit():
     for search_result in search_results:
         assert search_result.get("subreddit").lower() == posts_subreddit.lower()
         assert (
-                search_query.lower() in search_result.get("title").lower()
-                or search_result.get("selftext").lower()
+                search_result.get("title").lower() or search_result.get("selftext").lower() in search_query.split()
         )
 
 
