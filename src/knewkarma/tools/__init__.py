@@ -1,6 +1,6 @@
 __all__ = [
-    "data",
-    "general",
-    "package",
-    "terminal",
+    "data_utils.py",
+    "misc_utils.py",
+    "package_utils.py",
+    "terminal_utils.py",
 ]

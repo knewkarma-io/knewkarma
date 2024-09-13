@@ -1,5 +1,4 @@
 import asyncio
-import json
 import os
 from datetime import datetime
 from typing import get_args, Union, Callable, Literal
@@ -9,37 +8,28 @@ import pandas as pd
 import rich_click as click
 from rich.status import Status
 
-from ._main import Post, Posts, Search, Subreddit, Subreddits, User, Users
-from .about import About
-from .api import SORT_CRITERION, TIMEFRAME, TIME_FORMAT, Api
-from .extras import (
-    plot_analysis,
-    DISTRIBUTION_LABELS_AND_COLOURS,
-    analyse_text,
-    ml_deps_installed,
-    visualisation_deps_installed,
-)
-from .tools.data import (
-    create_dataframe,
-    export_dataframe,
-    EXPORT_FORMATS,
-)
-from .tools.general import (
+from .core import Post, Posts, Search, Subreddit, Subreddits, User, Users
+from .meta import about, version
+from .shared_imports import (
+    api,
     console,
-    filename_timestamp,
-    pathfinder,
-    OUTPUT_PARENT_DIR,
     ML_MODELS_DIR,
+    notify,
+    style,
+    SORT_CRITERION,
+    TIMEFRAME,
+    TIME_FORMAT,
+    OUTPUT_PARENT_DIR,
 )
-from .tools.package import is_snap_package
-from .tools.terminal import Notify, Style
-from .version import Version
+from .tools.data_utils import (
+    EXPORT_FORMATS,
+    make_dataframe,
+    save_dataframe,
+)
+from .tools.misc_utils import filename_timestamp, pathfinder
+from .tools.package_utils import check_for_updates, is_snap_package
 
 __all__ = ["start"]
-
-api = Api()
-notify = Notify
-style = Style
 
 
 def help_callback(ctx: click.Context, option: click.Option, value: bool):
@@ -61,17 +51,17 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
 
     if value and not ctx.resilient_parsing:
         click.echo(ctx.get_help())
-        if is_snap_package(package=About.package):
+        if is_snap_package(package=about.package):
             click.pause()
         ctx.exit()
 
 
 @click.group(
     help=f"""
-{About.summary}
+{about.summary}
 
 
-{About.description}""",
+{about.description}""",
     context_settings=dict(help_option_names=["-h", "--help"]),
 )
 @click.option(
@@ -122,19 +112,19 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
     help="Show this message and exit.",
 )
 @click.version_option(
-    Version.full,
+    version.full,
     "-v",
     "--version",
-    message=About.copyright,
+    message=about.copyright,
 )
 @click.pass_context
 def cli(
-    ctx: click.Context,
-    timeframe: TIMEFRAME,
-    sort: SORT_CRITERION,
-    limit: int,
-    time_format: str,
-    export: list[EXPORT_FORMATS],
+        ctx: click.Context,
+        timeframe: TIMEFRAME,
+        sort: SORT_CRITERION,
+        limit: int,
+        time_format: str,
+        export: list[EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -161,56 +151,9 @@ def cli(
     ctx.obj["export"] = export
 
 
-# Check if Machine Learning and visualisation dependencies are installed,
-# and also check if current package is not a snap.
-if ml_deps_installed and visualisation_deps_installed:
-
-    @cli.command(
-        help="[extra] Use this command to analyse the sentiment and/or emotion distributions of posts (exported from knewkarma).",
-    )
-    @click.argument("analysis_type", type=click.Choice(["sentiment", "emotion"]))
-    @click.option("-p", "--posts", help="A file containing posts data")
-    @click.pass_context
-    def analyse(
-        ctx: click.Context,
-        analysis_type: Literal["sentiment", "emotion"],
-        posts: str,
-        emotion: bool,
-        sentiment: bool,
-    ):
-        """
-        Analyses a posts sentiment or emotion distribution and plots the output in a bar chat.
-        """
-
-        with open(posts, "w") as file:
-            posts_data: dict = json.load(file)
-        post_texts: list[str] = [post.get("body") for post in posts_data]
-
-        sentiment_labels: list[Union[int, float, bool]] = [
-            analyse_text(
-                text=text,
-                analysis_type=analysis_type,
-            )
-            for text in post_texts
-        ]
-
-        # Convert numeric labels to their corresponding string labels
-        label_names: list[str] = DISTRIBUTION_LABELS_AND_COLOURS[analysis_type][
-            "labels"
-        ]
-        labels: list[str] = [label_names[label] for label in sentiment_labels]
-
-        plot_analysis(
-            posts=post_texts,
-            labels=labels,
-            analysis_type=analysis_type,
-            filename="test_file",
-        )
-
-
 @cli.command(
     help="Use this command to get an individual post's data including its comments, "
-    "provided the post's <id> and source <subreddit> are specified.",
+         "provided the post's <id> and source <subreddit> are specified.",
 )
 @click.argument("id")
 @click.argument("subreddit")
@@ -281,13 +224,13 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 @click.option("-r", "--rising", is_flag=True, help="Get posts from the rising listing")
 @click.pass_context
 def posts(
-    ctx: click.Context,
-    best: bool,
-    controversial: bool,
-    front_page: bool,
-    new: bool,
-    popular: bool,
-    rising: bool,
+        ctx: click.Context,
+        best: bool,
+        controversial: bool,
+        front_page: bool,
+        new: bool,
+        popular: bool,
+        rising: bool,
 ):
     """
     Retrieve various types of posts such as best, controversial, popular, new, and front-page.
@@ -433,16 +376,16 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
 @click.option("-wps", "--wiki-pages", is_flag=True, help="Get a subreddit's wiki pages")
 @click.pass_context
 def subreddit(
-    ctx: click.Context,
-    subreddit_name: str,
-    comments: bool,
-    comments_per_post: int,
-    posts: bool,
-    profile: bool,
-    search_comments: str,
-    search_post: str,
-    wiki_page: str,
-    wiki_pages: bool,
+        ctx: click.Context,
+        subreddit_name: str,
+        comments: bool,
+        comments_per_post: int,
+        posts: bool,
+        profile: bool,
+        search_comments: str,
+        search_post: str,
+        wiki_page: str,
+        wiki_pages: bool,
 ):
     """
     Retrieve data about a specific subreddit including profile, comments, posts, and wiki pages.
@@ -611,7 +554,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 
 @cli.command(
     help="Use this command to get user data, such as profile, posts, "
-    "comments, top subreddits, moderated subreddits, and more...",
+         "comments, top subreddits, moderated subreddits, and more...",
 )
 @click.argument("username")
 @click.option("-c", "--comments", is_flag=True, help="Get user's comments")
@@ -644,16 +587,16 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 )
 @click.pass_context
 def user(
-    ctx: click.Context,
-    username: str,
-    comments: bool,
-    moderated_subreddits: bool,
-    overview: bool,
-    posts: bool,
-    profile: bool,
-    search_comments: str,
-    search_posts: str,
-    top_subreddits: int,
+        ctx: click.Context,
+        username: str,
+        comments: bool,
+        moderated_subreddits: bool,
+        overview: bool,
+        posts: bool,
+        profile: bool,
+        search_comments: str,
+        search_posts: str,
+        top_subreddits: int,
 ):
     """
     Retrieve data about a specific user including profile, posts, comments, and top subreddits.
@@ -806,10 +749,10 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 
 
 async def call_method(
-    method: Callable,
-    session: aiohttp.ClientSession,
-    status: console.status,
-    **kwargs: Union[str, click.Context],
+        method: Callable,
+        session: aiohttp.ClientSession,
+        status: console.status,
+        **kwargs: Union[str, click.Context],
 ):
     """
     Calls a method with the provided arguments.
@@ -829,13 +772,13 @@ async def call_method(
     response_data: Union[list, dict, str] = await method(session=session, status=status)
 
     console.set_window_title(
-        f"Showing {len(response_data)} {command} {argument} — {About.name} {Version.release}"
+        f"Showing {len(response_data)} {command} {argument} — {about.name} {version.release}"
         if isinstance(response_data, list)
-        else f"Showing {command} {argument} — {About.name} {Version.release}"
+        else f"Showing {command} {argument} — {about.name} {version.release}"
     )
 
     if response_data:
-        dataframe: pd.DataFrame = create_dataframe(data=response_data)
+        dataframe: pd.DataFrame = make_dataframe(data=response_data)
         console.print(dataframe)
 
         if kwargs.get("export"):
@@ -857,7 +800,7 @@ async def call_method(
             )
 
             export_to_files: list = kwargs.get("export").split(",")
-            export_dataframe(
+            save_dataframe(
                 dataframe=dataframe,
                 filename=filename_timestamp(),
                 directory=output_child_dir,
@@ -866,10 +809,10 @@ async def call_method(
 
 
 async def handle_method_calls(
-    ctx: click.Context,
-    method_map: dict,
-    export: str,
-    **kwargs: Union[str, int, bool],
+        ctx: click.Context,
+        method_map: dict,
+        export: str,
+        **kwargs: Union[str, int, bool],
 ):
     """
     Handle the method calls based on the provided arguments.
@@ -883,7 +826,6 @@ async def handle_method_calls(
     :param kwargs: Additional keyword arguments.
     :type kwargs: Union[str, int, bool]
     """
-
     is_valid_arg: bool = False
 
     for argument, method in method_map.items():
@@ -892,15 +834,17 @@ async def handle_method_calls(
             start_time: datetime = datetime.now()
             try:
                 with Status(
-                    status=f"Creating a new client session...",
-                    spinner="dots",
-                    spinner_style=style.yellow.strip("[,]"),
-                    console=console,
+                        status=f"Creating a new client session...",
+                        spinner="dots",
+                        spinner_style=style.yellow.strip("[,]"),
+                        console=console,
                 ) as status:
                     async with aiohttp.ClientSession() as session:
                         notify.ok("New client session opened")
-                        await api.check_for_updates(session=session, status=status)
-                        await api.check_reddit_status(session=session, status=status)
+                        await check_for_updates(session=session, status=status)
+                        await api.check_reddit_status(
+                            session=session, notify=notify, style=style, status=status
+                        )
                         await call_method(
                             method=method,
                             session=session,
@@ -909,9 +853,12 @@ async def handle_method_calls(
                             export=export,
                             argument=argument,
                         )
-
-            except KeyboardInterrupt:
-                notify.warning("Process aborted /w CTRL+C.")
+            except aiohttp.ClientConnectionError as connection_error:
+                notify.exception(title="An HTTP error occurred", error=connection_error)
+            except aiohttp.ClientResponseError as response_error:
+                notify.exception(title="An API error occurred", error=response_error)
+            except Exception as unexpected_error:
+                notify.exception(unexpected_error)
             finally:
                 elapsed_time = datetime.now() - start_time
                 notify.ok(f"DONE. {elapsed_time.total_seconds():.2f} seconds elapsed.")
@@ -925,8 +872,7 @@ def start():
     Main entrypoint for the Knew Karma command-line interface.
     """
 
-    console.set_window_title(f"{About.name} {Version.release}")
+    console.set_window_title(f"{about.name} {version.release}")
     cli(obj={})
-
 
 # -------------------------------- END ----------------------------------------- #
