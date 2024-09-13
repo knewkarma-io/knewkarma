@@ -1,19 +1,18 @@
 from datetime import date
 
-from knewkarma.about import About
-from knewkarma.version import Version
+from knewkarma.meta import about, version
 
 # Configuration file for the Sphinx documentation builder.
 
 # -- Project information
-author_name, author_username, author_link = About.author
+author_name, author_username, author_link = about.author
 
-project = About.name
+project = about.project_name
 author = author_name
 copyright = f' {date.today().year} MIT License, <a href="{author_link}" target="_blank">{author_name}</a>'
 
-release = Version.release
-version = Version.full
+release = version.release
+version = version.full
 
 # -- General configuration
 
@@ -59,7 +58,7 @@ html_sidebars = {
 html_theme_options = {
     "show_powered_by": False,
     "github_user": author_username,
-    "github_repo": About.package,
+    "github_repo": about.package,
     "github_banner": True,
     "sidebar_collapse": True,
     "show_related": False,

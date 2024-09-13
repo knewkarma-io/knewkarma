@@ -1,29 +1,23 @@
-import asyncio
 import os
-import time
 from datetime import datetime
 from typing import Union, List, Optional
 
+from knewkarma.shared_imports import console, notify
 from rich.box import DOUBLE
-from rich.console import Console, ConsoleRenderable, RichCast
+from rich.console import ConsoleRenderable, RichCast
 from rich.panel import Panel
-from rich.status import Status
 
 __all__ = [
-    "console",
-    "countdown_timer",
     "filename_timestamp",
     "make_panel",
     "pathfinder",
-    "ML_MODELS_DIR",
-    "OUTPUT_PARENT_DIR",
 ]
 
 
 def make_panel(
-    title: str,
-    content: Union[ConsoleRenderable, RichCast, str],
-    subtitle: Optional[str] = None,
+        title: str,
+        content: Union[ConsoleRenderable, RichCast, str],
+        subtitle: Optional[str] = None,
 ):
     """
     Makes a rich Panel for whatever data is needed to be placed in it.
@@ -35,7 +29,7 @@ def make_panel(
     :param subtitle: Panel subtitle.
     :type subtitle: str
     """
-    from .terminal import Style
+    from .terminal_utils import Style
 
     console.print(
         Panel(
@@ -46,37 +40,6 @@ def make_panel(
             style=f"{Style.white.strip('[,]')} on black",
         )
     )
-
-
-async def countdown_timer(
-    status: Status, duration: int, current_count: int, overall_count: int
-):
-    """
-    Handles the live countdown during pagination, updating the status bar with the remaining time.
-
-    :param status: A Status object used to display the countdown.
-    :type status: rich.status.Status
-    :param duration: The duration for which to run the countdown.
-    :type duration: int
-    :param current_count: Current number of items fetched.
-    :type current_count: int
-    :param overall_count: Overall number of items to fetch.
-    :type overall_count: int
-    """
-    from .terminal import Notify, Style
-
-    end_time: float = time.time() + duration
-    while time.time() < end_time:
-        remaining_time: float = end_time - time.time()
-        remaining_seconds: int = int(remaining_time)
-        remaining_milliseconds: int = int((remaining_time - remaining_seconds) * 100)
-
-        Notify.update_status(
-            message=f"{Style.cyan}{current_count}{Style.reset} (of {Style.cyan}{overall_count}{Style.reset}) items retrieved so far. "
-            f"Resuming in {Style.cyan}{remaining_seconds}.{remaining_milliseconds:02}{Style.reset} seconds",
-            status=status,
-        )
-        await asyncio.sleep(0.01)  # Sleep for 10 milliseconds
 
 
 def filename_timestamp() -> str:
@@ -111,8 +74,6 @@ def pathfinder(directories: Union[List[List[str]], str, None]):
     :raise TypeError: If the data type of the specified directories is invalid.
     """
 
-    from .terminal import Notify
-
     try:
         for directory in directories:
             if isinstance(directory, List):
@@ -123,16 +84,6 @@ def pathfinder(directories: Union[List[List[str]], str, None]):
             else:
                 pass
     except Exception as unexpected_error:
-        Notify.exception(
-            error=unexpected_error,
-            exception_type="unexpected",
-            exception_context="while creating directories",
-        )
-
-
-console = Console(log_time=False)
-
-OUTPUT_PARENT_DIR: str = os.path.expanduser(os.path.join("~", "knewkarma"))
-ML_MODELS_DIR: str = os.path.join(OUTPUT_PARENT_DIR, "ml_models")
+        notify.exception(unexpected_error)
 
 # -------------------------------- END ----------------------------------------- #

@@ -4,39 +4,65 @@ from typing import Union, Literal, List, Tuple, Dict
 
 import pandas as pd
 
-from .terminal import Notify
+from ..shared_imports import notify
 
-__all__ = ["create_dataframe", "export_dataframe", "EXPORT_FORMATS"]
-
-notify = Notify
+__all__ = ["make_dataframe", "save_dataframe", "plot_bar_chart", "EXPORT_FORMATS"]
 
 EXPORT_FORMATS = Literal["csv", "html", "json", "xml"]
 
+try:
+    import matplotlib.pyplot as plt
 
-def get_file_size(file_path: str) -> str:
+    visualisation_deps_installed: bool = True
+except ImportError:
+    visualisation_deps_installed = False
+
+
+def plot_bar_chart(
+        data: Dict[str, int],
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        colours: List[str],
+        filename: str,
+        figure_size: Tuple[int, int] = (10, 5),
+):
     """
-    Gets a file size and puts it in human-readable form.
+    Plots a bar chart for the given data.
 
-    :param file_path: Path to target file.
-    :type file_path: str
-    :return: A human-readable form of the file size.
-    :rtype: str
+    :param data: A dictionary where keys are the categories and values are the counts or frequencies.
+    :type data: list[str, int]
+    :param title: The title of the plot.
+    :type title: str
+    :param xlabel: The label for the x-axis.
+    :type xlabel: str
+    :param ylabel: The label for the y-axis.
+    :type ylabel: str
+    :param colours: A list of colours to use for the bars in the chart.
+    :type colours: list[str]
+    :param filename: The name of the file where the plot will be saved.
+    :type filename: str
+    :param figure_size: The size of the figure (width, height). Defaults to (10, 5).
+    :type figure_size: tuple[int, int]
     """
 
-    file_size_bytes: int = os.path.getsize(file_path)
-    units: list = ["B", "KB", "MB", "GB", "TB", "PB"]
+    try:
+        import matplotlib.pyplot as plt
 
-    unit_index: int = 0
+        plt.figure(figsize=figure_size)
+        plt.bar(list(data.keys()), list(data.values()), color=colours)
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.savefig(f"{filename}.png")
 
-    while file_size_bytes >= 1024 and unit_index < len(units) - 1:
-        file_size_bytes /= 1024
-        unit_index += 1
-
-    return f"{file_size_bytes:.2f} {units[unit_index]}"
+        notify.ok(f"{title} saved to [link file://{filename}.png]{filename}.png")
+    except ImportError:
+        pass
 
 
-def create_dataframe(
-    data: Union[SimpleNamespace, List[SimpleNamespace], List[Tuple]],
+def make_dataframe(
+        data: Union[SimpleNamespace, List[SimpleNamespace], List[Tuple]],
 ) -> pd.DataFrame:
     """
     Converts provided data into a pandas DataFrame.
@@ -54,7 +80,7 @@ def create_dataframe(
 
     # Convert a list of SimpleNamespace objects to a list of dictionaries
     elif isinstance(data, List) and all(
-        isinstance(item, (SimpleNamespace, Tuple)) for item in data
+            isinstance(item, (SimpleNamespace, Tuple)) for item in data
     ):
         # Each object in the list is converted to its dictionary representation
         data = [item.__dict__ for item in data]
@@ -68,11 +94,11 @@ def create_dataframe(
     return dataframe.dropna(axis=1, how="all")
 
 
-def export_dataframe(
-    dataframe: pd.DataFrame,
-    filename: str,
-    directory: str,
-    formats: List[EXPORT_FORMATS],
+def save_dataframe(
+        dataframe: pd.DataFrame,
+        filename: str,
+        directory: str,
+        formats: List[EXPORT_FORMATS],
 ):
     """
     Exports a Pandas dataframe to specified file formats.
@@ -120,5 +146,26 @@ def export_dataframe(
         else:
             continue
 
+
+def get_file_size(file_path: str) -> str:
+    """
+    Gets a file size and puts it in human-readable form.
+
+    :param file_path: Path to target file.
+    :type file_path: str
+    :return: A human-readable form of the file size.
+    :rtype: str
+    """
+
+    file_size_bytes: int = os.path.getsize(file_path)
+    units: list = ["B", "KB", "MB", "GB", "TB", "PB"]
+
+    unit_index: int = 0
+
+    while file_size_bytes >= 1024 and unit_index < len(units) - 1:
+        file_size_bytes /= 1024
+        unit_index += 1
+
+    return f"{file_size_bytes:.2f} {units[unit_index]}"
 
 # -------------------------------- END ----------------------------------------- #

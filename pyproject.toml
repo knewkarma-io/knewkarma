@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "knewkarma"
-version = "6.2.0"
+version = "7.0.0"
 description = "A Reddit data analysis toolkit"
 authors = ["Richard Mwewa <rly0nheart@duck.com>"]
 readme = "README.rst"
@@ -23,15 +23,13 @@ issues = "https://github.com/rly0nheart/knewkarma/issues"
 repository = "https://github.com/rly0nheart/knewkarma"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 aiohttp = "^3.10.5"
-karmakaze = "^1.2.0"
 pandas = "^2.1.4"
 rich-click = "^1.8.3"
 matplotlib = { version = "^3.9.2", optional = true }
 tokenizers = { version = "^0.19.0", optional = true }
 transformers = { version = "^4.44.0", optional = true }
-
 
 [tool.poetry.extras]
 visualisation = ["matplotlib"]

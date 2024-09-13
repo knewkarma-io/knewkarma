@@ -3,8 +3,9 @@ from typing import List, Dict
 
 import aiohttp
 import pytest
-from knewkarma.api import Api
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
+
+from knewkarma.api import Api
 
 api = Api()
 
@@ -59,9 +60,7 @@ async def test_search_for_posts_in_a_subreddit():
 
     assert isinstance(search_results, List)
     assert len(search_results) == 50
-    assert all(
-        isinstance(post, Dict) for post in search_results
-    )
+    assert all(isinstance(post, Dict) for post in search_results)
     for search_result in search_results:
         assert search_result.get("subreddit").lower() == posts_subreddit.lower()
         assert (

@@ -1,25 +1,13 @@
 import asyncio
-from pprint import pprint
+import time
 from random import randint
-from sys import version as python_version
 from typing import Callable, Literal, Union, Optional, List, Dict, Tuple
 
 import aiohttp
 import karmakaze
-from rich.markdown import Markdown
-from rich.prompt import Confirm
 from rich.status import Status
 
-from .about import About
-from .tools.general import console, countdown_timer, make_panel
-from .tools.package import update_pypi_package, is_snap_package
-from .tools.terminal import Notify, Style
-from .version import Version
-
 __all__ = ["Api", "SORT_CRITERION", "TIMEFRAME", "TIME_FORMAT"]
-
-notify = Notify
-style = Style
 
 SORT_CRITERION = Literal["controversial", "new", "top", "best", "hot", "rising", "all"]
 TIMEFRAME = Literal["hour", "day", "week", "month", "year", "all"]
@@ -29,8 +17,7 @@ TIME_FORMAT = Literal["concise", "locale"]
 class Api:
     """Represents the Knew Karma API and provides methods for getting various data from the Reddit API."""
 
-    def __init__(self):
-        self._sanitise = karmakaze.Sanitise()
+    def __init__(self, headers: Optional[Dict] = None):
         self.base_endpoint = "https://www.reddit.com"
         self._user_endpoint = f"{self.base_endpoint}/user"
         self._users_endpoint = f"{self.base_endpoint}/users"
@@ -41,25 +28,34 @@ class Api:
             "https://www.redditstatus.com/api/v2/components.json"
         )
 
-    async def _paginate_more_items(
-            self,
-            session: aiohttp.ClientSession,
-            more_items_ids: List[str],
-            endpoint: str,
-            fetched_items: List[Dict],
-    ):
-        for more_id in more_items_ids:
-            # Construct the endpoint for each additional comment ID.
-            more_endpoint = f"{endpoint}&comment={more_id}"
-            # Make an asynchronous request to fetch the additional comments.
-            more_response = await self.make_request(
-                session=session, endpoint=more_endpoint
-            )
-            # Extract the items (comments) from the response.
-            more_items = more_response[1].get("data", {}).get("children", [])
+        self._headers = headers
+        self._sanitise = karmakaze.Sanitise()
 
-            # Add the fetched items to the main items list.
-            fetched_items.extend(more_items)
+    async def make_request(
+            self, endpoint: str, session: aiohttp.ClientSession
+    ) -> Union[Dict, List, None]:
+        """
+        Asynchronously sends a GET request to the specified API endpoint and returns JSON or list response.
+
+        :param endpoint: The API endpoint to fetch data from.
+        :type endpoint: str
+        :param session: A aiohttp.ClientSession to use for the request. to use for the request.
+        :type session: aiohttp.ClientSession
+        :return: JSON data as a dictionary or list. Returns an empty dict if fetching fails.
+        :rtype: Union[Dict, List]
+        """
+
+        try:
+            async with session.get(
+                    endpoint,
+                    headers=self._headers,
+            ) as response:
+                response.raise_for_status()
+                response_data: Union[Dict, List] = await response.json()
+                return response_data
+
+        except Exception as error:
+            raise error
 
     async def _paginate_items(
             self,
@@ -113,7 +109,7 @@ class Api:
                 for item in response[1].get("data", {}).get("children", []):
                     if item.get("kind") == "t1":
                         # If the item is a comment (kind == "t1"), add it to the items list.
-                        items.append(item)
+                        items.append(sanitiser(item))
                     elif item.get("kind") == "more":
                         # If the item is of kind "more", extract the IDs for additional comments.
                         more_items_ids.extend(item)
@@ -128,18 +124,17 @@ class Api:
                     )
             else:
                 # If not handling comments, simply extract the items from the response.
-                items = response
+                items = sanitiser(response)
 
             # If no items are found, break the loop as there's nothing more to fetch.
             if not items:
                 break
 
-            # Sanitise the fetched items using the provided sanitiser callable.
-            sanitised_items: Callable = sanitiser(items)
             # Determine how many more items are needed to reach the limit.
             items_to_limit = limit - len(all_items)
+
             # Add the processed items to the all_items list, up to the specified limit.
-            all_items.extend(sanitised_items[:items_to_limit])
+            all_items.extend(items[:items_to_limit])
 
             # Update the last_item_id to the ID of the last fetched item for pagination.
             last_item_id = (
@@ -157,7 +152,7 @@ class Api:
 
             # If a status object is provided, use it to display a countdown timer.
             if kwargs.get("status"):
-                await countdown_timer(
+                await self._countdown_timer(
                     status=kwargs.get("status"),
                     duration=sleep_duration,
                     current_count=len(all_items),
@@ -170,42 +165,58 @@ class Api:
         # Return the list of all fetched and processed items.
         return all_items
 
-    @staticmethod
-    async def make_request(
-            endpoint: str,
+    async def _paginate_more_items(
+            self,
             session: aiohttp.ClientSession,
-    ) -> Union[Dict, List, None]:
+            more_items_ids: List[str],
+            endpoint: str,
+            fetched_items: List[Dict],
+    ):
+        for more_id in more_items_ids:
+            # Construct the endpoint for each additional comment ID.
+            more_endpoint = f"{endpoint}&comment={more_id}"
+            # Make an asynchronous request to fetch the additional comments.
+            more_response = await self.make_request(
+                session=session, endpoint=more_endpoint
+            )
+            # Extract the items (comments) from the response.
+            more_items = self._sanitise.comments(response=more_response[1].get("data", {}).get("children", []))
+
+            # Add the fetched items to the main items list.
+            fetched_items.extend(more_items)
+
+    @staticmethod
+    async def _countdown_timer(
+            status: Status, duration: int, current_count: int, overall_count: int
+    ):
         """
-        Asynchronously sends a GET request to the specified API endpoint and returns JSON or list response.
+        Handles the live countdown during pagination, updating the status bar with the remaining time.
 
-        :param endpoint: The API endpoint to fetch data from.
-        :type endpoint: str
-        :param session: A aiohttp.ClientSession to use for the request. to use for the request.
-        :type session: aiohttp.ClientSession
-        :return: JSON data as a dictionary or list. Returns an empty dict if fetching fails.
-        :rtype: Union[Dict, List]
+        :param status: A Status object used to display the countdown.
+        :type status: rich.status.Status
+        :param duration: The duration for which to run the countdown.
+        :type duration: int
+        :param current_count: Current number of items fetched.
+        :type current_count: int
+        :param overall_count: Overall number of items to fetch.
+        :type overall_count: int
         """
 
-        try:
-            async with session.get(
-                    endpoint,
-                    headers={
-                        "User-Agent": f"{About.name.replace(' ', '-')}/{Version.release} "
-                                      f"(Python {python_version}; +{About.documentation})"
-                    },
-            ) as response:
-                response.raise_for_status()
-                response_data: Union[Dict, List] = await response.json()
-                return response_data
+        from .shared_imports import style
 
-        except aiohttp.ClientConnectionError as connection_error:
-            notify.exception(error=connection_error, exception_type="HTTP")
-            return
-        except aiohttp.ClientResponseError as api_error:
-            notify.exception(error=api_error, exception_type="API")
-        except Exception as unexpected_error:
-            notify.exception(error=unexpected_error, exception_type="unexpected")
-            return
+        end_time: float = time.time() + duration
+        while time.time() < end_time:
+            remaining_time: float = end_time - time.time()
+            remaining_seconds: int = int(remaining_time)
+            remaining_milliseconds: int = int(
+                (remaining_time - remaining_seconds) * 100
+            )
+
+            status.update(
+                f"{style.cyan}{current_count}{style.reset} (of {style.cyan}{overall_count}{style.reset}) items retrieved so far. "
+                f"Resuming in {style.cyan}{remaining_seconds}.{remaining_milliseconds:02}{style.reset} seconds",
+            )
+            await asyncio.sleep(0.01)  # Sleep for 10 milliseconds
 
     async def check_reddit_status(
             self, session: aiohttp.ClientSession, status: Optional[Status] = None
@@ -219,10 +230,12 @@ class Api:
         :type status: Optional[rich.status.Status]
         """
 
+        from rich import print as rich_print
+        from .shared_imports import notify, style
+
         if status:
-            notify.update_status(
-                message=f"Checking Reddit {style.bold}API & Infrastructure{style.reset} status",
-                status=status,
+            status.update(
+                f"Checking Reddit {style.bold}API & Infrastructure{style.reset} status"
             )
 
         status_response: Dict = await self.make_request(
@@ -236,7 +249,7 @@ class Api:
             else:
                 notify.warning(f"{indicator}: {description}")
                 if status:
-                    notify.update_status("Getting status components", status=status)
+                    status.update("Getting status components")
                 status_components: Dict = await self.make_request(
                     endpoint=self.reddit_status_components_endpoint, session=session
                 )
@@ -255,98 +268,21 @@ class Api:
                                 f" {'' if not component_description else f'| {component_description}'}"
                             )
                             if component_status == "operational":
-                                console.print(component_summary)
-
-    async def check_for_updates(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
-    ):
-        """
-        Asynchronously checks for updates by comparing the current local version with the remote version.
-
-        Assumes version format: major.minor.patch.prefix
-
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
-        :param status: An optional `Status` object for displaying status messages.
-        :type status: Optional[rich.status.Status]
-        """
-
-        if status:
-            notify.update_status(message="Checking for updates", status=status)
-
-        # Make a GET request to GitHub to get the project's latest release.
-        response = await self.make_request(
-            endpoint=f"https://api.github.com/repos/{About.author[1]}/{About.package}/releases/latest",
-            session=session,
-        )
-
-        if response.get("tag_name"):
-            remote_version_str = response.get("tag_name")
-            markup_release_notes = response.get("body")
-
-            # Splitting the version strings into components
-            local_version_parts = [
-                Version.major[0],
-                Version.minor[0],
-                Version.patch[0],
-            ]
-            remote_version_parts: List = remote_version_str.split(".")
-
-            local_major: int = local_version_parts[0]
-            local_minor: int = local_version_parts[1]
-            local_patch: int = local_version_parts[2]
-
-            remote_major = int(remote_version_parts[0])
-            remote_minor = int(remote_version_parts[1])
-            remote_patch = int(remote_version_parts[2])
-
-            update_level = ""
-
-            # Check for differences in version parts
-            if remote_major != local_major:
-                update_level = f"{style.red}{Version.major[1]}{style.reset}"
-
-            elif remote_minor != local_minor:
-                update_level = f"{style.yellow}{Version.minor[1]}{style.reset}"
-
-            elif remote_patch != local_patch:
-                update_level = f"{style.green}{Version.patch[1]}{style.reset}"
-
-            if update_level:
-                markdown_release_notes = Markdown(markup=markup_release_notes)
-                make_panel(
-                    title=f"{style.bold}{update_level} Update Available ({style.cyan}{remote_version_str}{style.reset}){style.reset}",
-                    content=markdown_release_notes,
-                    subtitle=f"{style.bold}{style.italic}Thank you, for using {About.name}!{style.reset}{style.reset} ❤️ ",
-                )
-
-                # Skip auto-updating of the snap package
-                if not is_snap_package(package=About.package):
-                    status.stop()
-                    if Confirm.ask(
-                            f"{style.bold}Would you like to get these updates?{style.reset}",
-                            case_sensitive=False,
-                            default=False,
-                            console=console,
-                    ):
-                        update_pypi_package(package=About.package, status=status)
-                    else:
-                        status.start()
-            else:
-                notify.ok(message=f"Up-to-date ({Version.full})")
+                                rich_print(component_summary)
 
     async def get_entity(
             self,
-            entity_type: Literal["post", "subreddit", "user", "wiki_page"],
             session: aiohttp.ClientSession,
+            entity_type: Literal["post", "subreddit", "user", "wiki_page"],
             **kwargs: Union[str, Status],
     ) -> Dict:
         """
         Asynchronously gets data from the specified entity.
 
+        :param session: A aiohttp.ClientSession to use for the request. to use for the request.
+        :type session: aiohttp.ClientSession
         :param entity_type: The type of entity to get data from
         :type entity_type: str
-        :param session: A aiohttp.ClientSession to use for the request. to use for the request.
         :return: A dictionary containing a specified entity's data.
         :rtype: Dict
         """
@@ -356,43 +292,41 @@ class Api:
         post_id = kwargs.get("post_id")
         post_subreddit = kwargs.get("post_subreddit")
 
-        # Use a dictionary for direct mapping
         entity_map = {
             "post": (
                 f"{self.subreddit_endpoint}/{post_subreddit}"
                 f"/comments/{post_id}.json",
-                lambda: self._sanitise.post,
+                lambda data: self._sanitise.posts(response=data),
             ),
             "user": (
                 f"{self._user_endpoint}/{username}/about.json",
-                lambda: self._sanitise.subreddit_or_user,
+                lambda data: self._sanitise.subreddit_or_user(response=data),
             ),
             "subreddit": (
                 f"{self.subreddit_endpoint}/{subreddit}/about.json",
-                lambda: self._sanitise.subreddit_or_user,
+                lambda data: self._sanitise.subreddit_or_user(response=data),
             ),
             "wiki_page": (
                 f"{self.subreddit_endpoint}/{subreddit}/wiki/{kwargs.get('page_name')}.json",
-                lambda: self._sanitise.wiki_page,
+                lambda data: self._sanitise.wiki_page(response=data),
             ),
         }
+
         status: Status = kwargs.get("status")
         if status:
             target_entity: Union[str, Tuple] = (
                     username or subreddit or (post_id, post_subreddit)
             )
-            notify.update_status(
-                message=f"Retrieving {entity_type} <{style.green}{target_entity}{style.reset}> data",
-                status=status,
+            status.update(
+                f"Retrieving {entity_type} ({target_entity}) data",
             )
 
-        selected_entity = entity_map.get(entity_type)
-        pprint(selected_entity)
-        for endpoint, sanitiser in selected_entity:
-            response = await self.make_request(endpoint=endpoint, session=session)
-            entity = sanitiser(response=response)
+        endpoint, sanitiser = entity_map.get(entity_type)
 
-            return entity
+        response = await self.make_request(endpoint=endpoint, session=session)
+        sanitised_response = sanitiser(response)
+
+        return sanitised_response
 
     async def get_posts(
             self,
@@ -510,7 +444,6 @@ class Api:
             )
         else:
             endpoint += f"?limit={limit}&t={timeframe}"
-
             subreddits = await self._paginate_items(
                 session=session,
                 sanitiser=self._sanitise.subreddits_or_users,
@@ -606,6 +539,11 @@ class Api:
             if entity_type == "posts"
             else self._sanitise.subreddit_or_user
         )
+
+        if status:
+            status.update(
+                f"Searching for '{query}' in {entity_type}",
+            )
 
         search_results = await self._paginate_items(
             session=session,

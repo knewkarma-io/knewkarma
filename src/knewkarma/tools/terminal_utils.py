@@ -1,4 +1,4 @@
-from rich.status import Status
+from rich.console import Console
 
 __all__ = ["Notify", "Style"]
 
@@ -37,8 +37,6 @@ class Notify:
     Provides static methods for printing and/or logging formatted notifications to the console.
     """
 
-    from .general import console
-
     @staticmethod
     def ok(message: str):
         """
@@ -48,7 +46,7 @@ class Notify:
         :type message: str
         """
 
-        Notify.console.print(f"{Style.green}✔{Style.reset} {message}")
+        console.print(f"{Style.green}✔{Style.reset} {message}")
 
     @staticmethod
     def info(message: str):
@@ -59,7 +57,7 @@ class Notify:
         :type message: str
         """
 
-        Notify.console.print(f"{Style.green}✱{Style.reset} {message}")
+        console.print(f"{Style.green}✱{Style.reset} {message}")
 
     @staticmethod
     def warning(message: str):
@@ -70,20 +68,7 @@ class Notify:
         :type message: str
         """
 
-        Notify.console.print(f"{Style.yellow}✘{Style.reset} {message}")
-
-    @staticmethod
-    def update_status(message: str, status: Status):
-        """
-        Updates a console status with the specified message.
-
-        :param message: Message to be logged.
-        :type message: str
-        :param status: A `Status` object for displaying status messages.
-        :type status: rich.status.Status
-        """
-
-        status.update(f"{message}{Style.yellow}...{Style.reset}")
+        console.print(f"{Style.yellow}✘{Style.reset} {message}")
 
     @staticmethod
     def error(message: str):
@@ -94,35 +79,22 @@ class Notify:
         :type message: str
         """
 
-        Notify.console.log(f"{Style.yellow}✘{Style.reset} {message}")
+        console.log(f"{Style.yellow}✘{Style.reset} {message}")
 
     @staticmethod
-    def exception(error: Exception, **kwargs: str):
+    def exception(error: Exception, title: str = "An unexpected error occurred"):
         """
         Logs an exception message to the console.
 
-        :param error: The exception that triggered the error.
+        :param title: Title of the error (e.g., "An exception occurred")
+        :type title: str
+        :param error: Error that triggered the exception.
         :type error: Exception
-        :param kwargs: Additional keyword arguments for optional context.
-            - error_type (str, optional): The type of error (e.g., `unexpected`, `HTTP`, `API`).
-            - error_context (str, optional): The context where the error occurred (e.g., `while updating database`).
         """
 
-        exception_type: str = kwargs.get("exception_type", "")
-        exception_context: str = kwargs.get("exception_context", "")
+        console.log(f"{Style.red}✘{Style.reset} {title}: {error}")
 
-        # Combine the error type and location into a single formatted string
-        formatted_exception: str = (
-            f"An {Style.bold}{exception_type}{Style.reset} error occurred"
-            if exception_type
-            else "An error occurred"
-        )
-        if exception_context:
-            formatted_exception += f" ({Style.italic}{exception_context}{Style.reset})"
 
-        Notify.console.log(
-            f"{Style.bold}{Style.red}✘{Style.reset}{Style.reset} {formatted_exception}: {error}"
-        )
-
+console = Console(log_time=False)
 
 # -------------------------------- END ----------------------------------------- #
