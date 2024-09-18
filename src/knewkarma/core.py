@@ -4,10 +4,10 @@ from types import SimpleNamespace
 from typing import Literal, Union, Optional, List
 
 import aiohttp
-import karmakaze
+from karmakaze import Parse
 from rich.status import Status
 
-from knewkarma.shared_imports import api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
+from .shared_imports import api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .tools.data import plot_bar_chart
 
 __all__ = [
@@ -45,10 +45,10 @@ class Post:
 
         self._id = id
         self._subreddit = subreddit
-        self._parse = karmakaze.Parse(time_format=time_format)
+        self._parse = Parse(time_format=time_format)
 
     async def data(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+        self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves data for a Reddit post, excluding comments.
@@ -74,11 +74,11 @@ class Post:
         return parsed_post if post_data else SimpleNamespace
 
     async def comments(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves comments for a Reddit post.
@@ -121,14 +121,14 @@ class Posts:
         :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
         :type time_format: Literal["concise", "locale"]
         """
-        self._parse = karmakaze.Parse(time_format=time_format)
+        self._parse = Parse(time_format=time_format)
 
     async def best(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the best posts.
@@ -158,11 +158,11 @@ class Posts:
         return parsed_posts if best_posts else [SimpleNamespace]
 
     async def controversial(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the controversial posts.
@@ -192,12 +192,12 @@ class Posts:
         return parsed_posts if controversial_posts else [SimpleNamespace]
 
     async def front_page(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the front-page posts.
@@ -230,12 +230,12 @@ class Posts:
         return parsed_posts if front_page_posts else [SimpleNamespace]
 
     async def new(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the new posts.
@@ -268,11 +268,11 @@ class Posts:
         return parsed_posts if new_posts else [SimpleNamespace]
 
     async def popular(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the popular posts.
@@ -301,11 +301,11 @@ class Posts:
         return parsed_posts if popular_posts else [SimpleNamespace]
 
     async def rising(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the rising posts.
@@ -352,14 +352,14 @@ class Search:
         """
 
         self._query = query
-        self._parse = karmakaze.Parse(time_format=time_format)
+        self._parse = Parse(time_format=time_format)
 
     async def posts(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves posts that match with the specified query.
@@ -390,11 +390,11 @@ class Search:
         return parsed_posts if search_results else [SimpleNamespace]
 
     async def subreddits(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves subreddits that match with the specified query.
@@ -425,11 +425,11 @@ class Search:
         return parsed_subreddits if search_results else [SimpleNamespace]
 
     async def users(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves users that match with the specified query.
@@ -478,16 +478,16 @@ class Subreddit:
         self._time_format = (
             time_format  # This will also be accessed in the comments method
         )
-        self._parse = karmakaze.Parse(time_format=self._time_format)
+        self._parse = Parse(time_format=self._time_format)
 
     async def comments(
-            self,
-            session: aiohttp.ClientSession,
-            posts_limit: int,
-            comments_per_post: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        posts_limit: int,
+        comments_per_post: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves comments from a subreddit.
@@ -531,12 +531,12 @@ class Subreddit:
         return all_comments
 
     async def posts(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves posts from a subreddit.
@@ -570,7 +570,7 @@ class Subreddit:
         return parsed_posts if subreddit_posts else [SimpleNamespace]
 
     async def profile(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+        self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves a subreddit's profile data.
@@ -595,14 +595,14 @@ class Subreddit:
         return parsed_profile if subreddit_profile else SimpleNamespace
 
     async def search_comments(
-            self,
-            session: aiohttp.ClientSession,
-            query: str,
-            posts_limit: int,
-            comments_per_post: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        query: str,
+        posts_limit: int,
+        comments_per_post: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves comments that contain the specified query from a subreddit.
@@ -659,13 +659,13 @@ class Subreddit:
             return found_comments
 
     async def search_posts(
-            self,
-            session: aiohttp.ClientSession,
-            query: str,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        query: str,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get posts that contain the specified query string from a subreddit.
@@ -702,7 +702,7 @@ class Subreddit:
         return parsed_posts if search_results else [SimpleNamespace]
 
     async def wiki_pages(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+        self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> List[str]:
         """
         Asynchronously get a subreddit's wiki pages.
@@ -728,10 +728,10 @@ class Subreddit:
         return pages.get("data")
 
     async def wiki_page(
-            self,
-            page_name: str,
-            session: aiohttp.ClientSession,
-            status: Optional[Status] = None,
+        self,
+        page_name: str,
+        session: aiohttp.ClientSession,
+        status: Optional[Status] = None,
     ) -> SimpleNamespace:
         """
         Asynchronously get a subreddit's specified wiki page data.
@@ -771,14 +771,14 @@ class Subreddits:
         :type time_format: Literal["concise", "locale"]
         """
 
-        self._parse = karmakaze.Parse(time_format=time_format)
+        self._parse = Parse(time_format=time_format)
 
     async def all(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get all subreddits.
@@ -811,10 +811,10 @@ class Subreddits:
         return parsed_subreddits if all_subreddits else [SimpleNamespace]
 
     async def default(
-            self,
-            limit: int,
-            session: aiohttp.ClientSession,
-            status: Optional[Status] = None,
+        self,
+        limit: int,
+        session: aiohttp.ClientSession,
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get default subreddits.
@@ -842,11 +842,11 @@ class Subreddits:
         return parsed_subreddits if default_subreddits else [SimpleNamespace]
 
     async def new(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get new subreddits.
@@ -875,11 +875,11 @@ class Subreddits:
         return parsed_subreddits if new_subreddits else [SimpleNamespace]
 
     async def popular(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get popular subreddits.
@@ -924,15 +924,15 @@ class User:
         """
 
         self._name = name
-        self._parse = karmakaze.Parse(time_format=time_format)
+        self._parse = Parse(time_format=time_format)
 
     async def comments(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's comments.
@@ -966,7 +966,7 @@ class User:
         return parsed_comments if user_comments else [SimpleNamespace]
 
     async def moderated_subreddits(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+        self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get subreddits moderated by user.
@@ -992,10 +992,10 @@ class User:
         return parsed_subreddits if subreddits else [SimpleNamespace]
 
     async def overview(
-            self,
-            limit: int,
-            session: aiohttp.ClientSession,
-            status: Optional[Status] = None,
+        self,
+        limit: int,
+        session: aiohttp.ClientSession,
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's most recent comments.
@@ -1023,12 +1023,12 @@ class User:
         return parsed_overview if user_overview else [SimpleNamespace]
 
     async def posts(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's posts.
@@ -1062,7 +1062,7 @@ class User:
         return parsed_posts if user_posts else [SimpleNamespace]
 
     async def profile(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+        self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ) -> SimpleNamespace:
         """
         Asynchronously get a user's profile data.
@@ -1084,13 +1084,13 @@ class User:
         return parsed_profile if user_profile else SimpleNamespace
 
     async def search_posts(
-            self,
-            query: str,
-            limit: int,
-            session: aiohttp.ClientSession,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        query: str,
+        limit: int,
+        session: aiohttp.ClientSession,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's posts that match with the specified search query.
@@ -1140,13 +1140,13 @@ class User:
         return parsed_post if found_posts else [SimpleNamespace]
 
     async def search_comments(
-            self,
-            query: str,
-            limit: int,
-            session: aiohttp.ClientSession,
-            sort: SORT_CRITERION = "all",
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        query: str,
+        limit: int,
+        session: aiohttp.ClientSession,
+        sort: SORT_CRITERION = "all",
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's comments that contain the specified search query.
@@ -1192,13 +1192,13 @@ class User:
         return parsed_comments if user_comments else [SimpleNamespace]
 
     async def top_subreddits(
-            self,
-            session: aiohttp.ClientSession,
-            top_n: int,
-            limit: int,
-            filename: str = None,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        top_n: int,
+        limit: int,
+        filename: str = None,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> Union[List[tuple[str, int]], None]:
         """
         Asynchronously get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
@@ -1263,14 +1263,14 @@ class Users:
                         time difference, or `locale` for a localized datetime string. Defaults to `locale`.
         :type time_format: Literal["concise", "locale"]
         """  #
-        self._parse = karmakaze.Parse(time_format=time_format)
+        self._parse = Parse(time_format=time_format)
 
     async def new(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get new users.
@@ -1300,11 +1300,11 @@ class Users:
         return parsed_users if new_users else [SimpleNamespace]
 
     async def popular(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get popular users.
@@ -1334,11 +1334,11 @@ class Users:
         return parsed_users if popular_users else [SimpleNamespace]
 
     async def all(
-            self,
-            session: aiohttp.ClientSession,
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get all users.
@@ -1366,5 +1366,6 @@ class Users:
         parsed_users = self._parse.users(all_users)
 
         return parsed_users if all_users else [SimpleNamespace]
+
 
 # -------------------------------- END ----------------------------------------- #

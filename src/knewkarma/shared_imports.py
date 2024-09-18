@@ -3,9 +3,9 @@ from platform import python_version, platform
 
 from rich.console import Console
 
-from knewkarma.api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
-from knewkarma.meta import about, version
-from knewkarma.tools.terminal import Notify, Style
+from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
+from .meta import about, version
+from .tools.terminal import Notify, Style
 
 __all__ = [
     "api",

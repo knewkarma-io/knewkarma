@@ -7,7 +7,7 @@ from rich.markdown import Markdown
 from rich.prompt import Confirm
 from rich.status import Status
 
-from .miscellaneous import make_panel
+from .misc import make_panel
 from ..meta import about, version
 from ..shared_imports import api, console, notify, style
 
@@ -77,7 +77,7 @@ def is_pypi_package(package: str) -> bool:
 
 
 async def check_for_updates(
-        session: aiohttp.ClientSession, status: Optional[Status] = None
+    session: aiohttp.ClientSession, status: Optional[Status] = None
 ):
     """
     Asynchronously checks for updates by comparing the current local version with the remote version.
@@ -143,10 +143,10 @@ async def check_for_updates(
             if not is_snap_package(package=about.package):
                 status.stop()
                 if Confirm.ask(
-                        f"{style.bold}Would you like to get these updates?{style.reset}",
-                        case_sensitive=False,
-                        default=False,
-                        console=console,
+                    f"{style.bold}Would you like to get these updates?{style.reset}",
+                    case_sensitive=False,
+                    default=False,
+                    console=console,
                 ):
                     update_package(package=about.package, status=status)
                 else:
@@ -199,5 +199,6 @@ def update_package(package: str, status: Optional[Status] = None):
             notify.exception(unexpected_error)
     else:
         notify.error(INVALID_PACKAGE_ERROR.format(package=package))
+
 
 # -------------------------------- END ----------------------------------------- #
