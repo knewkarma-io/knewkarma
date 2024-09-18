@@ -2,10 +2,11 @@ import os
 from datetime import datetime
 from typing import Union, List, Optional
 
-from knewkarma.shared_imports import console, notify
 from rich.box import DOUBLE
 from rich.console import ConsoleRenderable, RichCast
 from rich.panel import Panel
+
+from ..shared_imports import console, notify
 
 __all__ = [
     "filename_timestamp",
@@ -15,9 +16,9 @@ __all__ = [
 
 
 def make_panel(
-        title: str,
-        content: Union[ConsoleRenderable, RichCast, str],
-        subtitle: Optional[str] = None,
+    title: str,
+    content: Union[ConsoleRenderable, RichCast, str],
+    subtitle: Optional[str] = None,
 ):
     """
     Makes a rich Panel for whatever data is needed to be placed in it.
@@ -29,7 +30,7 @@ def make_panel(
     :param subtitle: Panel subtitle.
     :type subtitle: str
     """
-    from .terminal_utils import Style
+    from .terminal import Style
 
     console.print(
         Panel(
@@ -85,5 +86,6 @@ def pathfinder(directories: Union[List[List[str]], str, None]):
                 pass
     except Exception as unexpected_error:
         notify.exception(unexpected_error)
+
 
 # -------------------------------- END ----------------------------------------- #

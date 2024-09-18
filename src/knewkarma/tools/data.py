@@ -19,13 +19,13 @@ except ImportError:
 
 
 def plot_bar_chart(
-        data: Dict[str, int],
-        title: str,
-        xlabel: str,
-        ylabel: str,
-        colours: List[str],
-        filename: str,
-        figure_size: Tuple[int, int] = (10, 5),
+    data: Dict[str, int],
+    title: str,
+    xlabel: str,
+    ylabel: str,
+    colours: List[str],
+    filename: str,
+    figure_size: Tuple[int, int] = (10, 5),
 ):
     """
     Plots a bar chart for the given data.
@@ -62,7 +62,7 @@ def plot_bar_chart(
 
 
 def make_dataframe(
-        data: Union[SimpleNamespace, List[SimpleNamespace], List[Tuple]],
+    data: Union[SimpleNamespace, List[SimpleNamespace], List[Tuple]],
 ) -> pd.DataFrame:
     """
     Converts provided data into a pandas DataFrame.
@@ -80,7 +80,7 @@ def make_dataframe(
 
     # Convert a list of SimpleNamespace objects to a list of dictionaries
     elif isinstance(data, List) and all(
-            isinstance(item, (SimpleNamespace, Tuple)) for item in data
+        isinstance(item, (SimpleNamespace, Tuple)) for item in data
     ):
         # Each object in the list is converted to its dictionary representation
         data = [item.__dict__ for item in data]
@@ -95,10 +95,10 @@ def make_dataframe(
 
 
 def save_dataframe(
-        dataframe: pd.DataFrame,
-        filename: str,
-        directory: str,
-        formats: List[EXPORT_FORMATS],
+    dataframe: pd.DataFrame,
+    filename: str,
+    directory: str,
+    formats: List[EXPORT_FORMATS],
 ):
     """
     Exports a Pandas dataframe to specified file formats.
@@ -167,5 +167,6 @@ def get_file_size(file_path: str) -> str:
         unit_index += 1
 
     return f"{file_size_bytes:.2f} {units[unit_index]}"
+
 
 # -------------------------------- END ----------------------------------------- #

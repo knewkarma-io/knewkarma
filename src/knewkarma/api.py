@@ -32,7 +32,7 @@ class Api:
         self._sanitise = karmakaze.Sanitise()
 
     async def make_request(
-            self, endpoint: str, session: aiohttp.ClientSession
+        self, endpoint: str, session: aiohttp.ClientSession
     ) -> Union[Dict, List, None]:
         """
         Asynchronously sends a GET request to the specified API endpoint and returns JSON or list response.
@@ -47,8 +47,8 @@ class Api:
 
         try:
             async with session.get(
-                    endpoint,
-                    headers=self._headers,
+                endpoint,
+                headers=self._headers,
             ) as response:
                 response.raise_for_status()
                 response_data: Union[Dict, List] = await response.json()
@@ -58,11 +58,12 @@ class Api:
             raise error
 
     async def _paginate_items(
-            self,
-            session: aiohttp.ClientSession,
-            sanitiser: Callable,
-            limit: int,
-            **kwargs: Union[str, Status],
+        self,
+        session: aiohttp.ClientSession,
+        sanitiser: Callable,
+        limit: int,
+        status: Optional[Status] = None,
+        **kwargs: Union[str, Status],
     ) -> List[Dict]:
         """
         Asynchronously fetches and processes data in a paginated manner
@@ -108,8 +109,9 @@ class Api:
                 # Iterate over the children in the response to extract comments or "more" items.
                 for item in response[1].get("data", {}).get("children", []):
                     if item.get("kind") == "t1":
+                        sanitised_item, _ = sanitiser(item)
                         # If the item is a comment (kind == "t1"), add it to the items list.
-                        items.append(sanitiser(item))
+                        items.append(sanitised_item)
                     elif item.get("kind") == "more":
                         # If the item is of kind "more", extract the IDs for additional comments.
                         more_items_ids.extend(item)
@@ -122,9 +124,9 @@ class Api:
                         more_items_ids=more_items_ids,
                         endpoint=kwargs.get("endpoint"),
                     )
-            else:
-                # If not handling comments, simply extract the items from the response.
-                items = sanitiser(response)
+
+            # If not handling comments, simply extract the items from the response.
+            items = sanitiser(response)
 
             # If no items are found, break the loop as there's nothing more to fetch.
             if not items:
@@ -138,9 +140,9 @@ class Api:
 
             # Update the last_item_id to the ID of the last fetched item for pagination.
             last_item_id = (
-                response[1].get("data").get("after")
+                self._sanitise.pagination_id(response=response[1])
                 if kwargs.get("posts_type") == "post_comments"
-                else response.get("data").get("after")
+                else self._sanitise.pagination_id(response=response)
             )
 
             # If we've reached the specified limit, break the loop.
@@ -151,9 +153,9 @@ class Api:
             sleep_duration = randint(1, 5)
 
             # If a status object is provided, use it to display a countdown timer.
-            if kwargs.get("status"):
-                await self._countdown_timer(
-                    status=kwargs.get("status"),
+            if status:
+                await self._pagination_countdown_timer(
+                    status=status,
                     duration=sleep_duration,
                     current_count=len(all_items),
                     overall_count=limit,
@@ -166,11 +168,11 @@ class Api:
         return all_items
 
     async def _paginate_more_items(
-            self,
-            session: aiohttp.ClientSession,
-            more_items_ids: List[str],
-            endpoint: str,
-            fetched_items: List[Dict],
+        self,
+        session: aiohttp.ClientSession,
+        more_items_ids: List[str],
+        endpoint: str,
+        fetched_items: List[Dict],
     ):
         for more_id in more_items_ids:
             # Construct the endpoint for each additional comment ID.
@@ -180,14 +182,16 @@ class Api:
                 session=session, endpoint=more_endpoint
             )
             # Extract the items (comments) from the response.
-            more_items = self._sanitise.comments(response=more_response[1].get("data", {}).get("children", []))
+            more_items, _ = self._sanitise.comments(
+                response=more_response[1].get("data", {}).get("children", [])
+            )
 
             # Add the fetched items to the main items list.
             fetched_items.extend(more_items)
 
     @staticmethod
-    async def _countdown_timer(
-            status: Status, duration: int, current_count: int, overall_count: int
+    async def _pagination_countdown_timer(
+        status: Status, duration: int, current_count: int, overall_count: int
     ):
         """
         Handles the live countdown during pagination, updating the status bar with the remaining time.
@@ -202,7 +206,7 @@ class Api:
         :type overall_count: int
         """
 
-        from .shared_imports import style
+        from knewkarma.shared_imports import style
 
         end_time: float = time.time() + duration
         while time.time() < end_time:
@@ -219,7 +223,7 @@ class Api:
             await asyncio.sleep(0.01)  # Sleep for 10 milliseconds
 
     async def check_reddit_status(
-            self, session: aiohttp.ClientSession, status: Optional[Status] = None
+        self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ):
         """
         Asynchronously checks Reddit API and infrastructure status.
@@ -231,7 +235,7 @@ class Api:
         """
 
         from rich import print as rich_print
-        from .shared_imports import notify, style
+        from knewkarma.shared_imports import notify, style
 
         if status:
             status.update(
@@ -244,7 +248,7 @@ class Api:
         indicator = status_response.get("status").get("indicator")
         description = status_response.get("status").get("description")
         if description:
-            if indicator == "none" and description == "All Systems Operational":
+            if indicator == "none":
                 notify.ok(description)
             else:
                 notify.warning(f"{indicator}: {description}")
@@ -271,10 +275,10 @@ class Api:
                                 rich_print(component_summary)
 
     async def get_entity(
-            self,
-            session: aiohttp.ClientSession,
-            entity_type: Literal["post", "subreddit", "user", "wiki_page"],
-            **kwargs: Union[str, Status],
+        self,
+        session: aiohttp.ClientSession,
+        entity_type: Literal["post", "subreddit", "user", "wiki_page"],
+        **kwargs: Union[str, Status],
     ) -> Dict:
         """
         Asynchronously gets data from the specified entity.
@@ -315,7 +319,7 @@ class Api:
         status: Status = kwargs.get("status")
         if status:
             target_entity: Union[str, Tuple] = (
-                    username or subreddit or (post_id, post_subreddit)
+                username or subreddit or (post_id, post_subreddit)
             )
             status.update(
                 f"Retrieving {entity_type} ({target_entity}) data",
@@ -329,26 +333,26 @@ class Api:
         return sanitised_response
 
     async def get_posts(
-            self,
-            session: aiohttp.ClientSession,
-            posts_type: Literal[
-                "best",
-                "controversial",
-                "front_page",
-                "new",
-                "popular",
-                "rising",
-                "subreddit_posts",
-                "search_subreddit_posts",
-                "user_posts",
-                "user_overview",
-                "user_comments",
-                "post_comments",
-            ],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            sort: SORT_CRITERION = "all",
-            **kwargs: Union[Status, str],
+        self,
+        session: aiohttp.ClientSession,
+        posts_type: Literal[
+            "best",
+            "controversial",
+            "front_page",
+            "new",
+            "popular",
+            "rising",
+            "subreddit_posts",
+            "search_subreddit_posts",
+            "user_posts",
+            "user_overview",
+            "user_comments",
+            "post_comments",
+        ],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        sort: SORT_CRITERION = "all",
+        **kwargs: Union[Status, str],
     ) -> List[Dict]:
         """
         Asynchronously gets a specified number of posts, with a specified sorting criterion, from the specified source.
@@ -379,9 +383,9 @@ class Api:
             "user_overview": f"{self._user_endpoint}/{kwargs.get('username')}/overview.json",
             "user_comments": f"{self._user_endpoint}/{kwargs.get('username')}/comments.json",
             "post_comments": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-                             f"/comments/{kwargs.get('post_id')}.json",
+            f"/comments/{kwargs.get('post_id')}.json",
             "search_subreddit_posts": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}"
-                                      f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
+            f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
         }
 
         endpoint = posts_map.get(posts_type, "")
@@ -405,12 +409,12 @@ class Api:
         return posts
 
     async def get_subreddits(
-            self,
-            session: aiohttp.ClientSession,
-            subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            **kwargs: Union[str, Status],
+        self,
+        session: aiohttp.ClientSession,
+        subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        **kwargs: Union[str, Status],
     ) -> Union[List[Dict], Dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -455,12 +459,12 @@ class Api:
         return subreddits
 
     async def get_users(
-            self,
-            session: aiohttp.ClientSession,
-            users_type: Literal["all", "popular", "new"],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        users_type: Literal["all", "popular", "new"],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[Dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -499,13 +503,13 @@ class Api:
         return users
 
     async def search_entities(
-            self,
-            session: aiohttp.ClientSession,
-            entity_type: Literal["users", "subreddits", "posts"],
-            query: str,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: aiohttp.ClientSession,
+        entity_type: Literal["users", "subreddits", "posts"],
+        query: str,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[Dict]:
         """
         Asynchronously searches specified entities that match the specified query.
@@ -537,7 +541,7 @@ class Api:
         sanitiser = (
             self._sanitise.posts
             if entity_type == "posts"
-            else self._sanitise.subreddit_or_user
+            else self._sanitise.subreddits_or_users
         )
 
         if status:
@@ -547,12 +551,13 @@ class Api:
 
         search_results = await self._paginate_items(
             session=session,
+            status=status,
             sanitiser=sanitiser,
             limit=limit,
-            status=status,
             endpoint=endpoint,
         )
 
         return search_results
+
 
 # -------------------------------- END ----------------------------------------- #
