@@ -82,9 +82,9 @@ class Api:
         """
 
         # Initialise an empty list to store all items across paginated requests.
-        all_items = []
+        all_items: List = []
         # Initialise the ID of the last item fetched to None (used for pagination).
-        last_item_id = None
+        last_item_id: str = ""
 
         # Continue fetching data until the limit is reached or no more items are available.
         while len(all_items) < limit:
