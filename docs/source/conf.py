@@ -7,7 +7,7 @@ from knewkarma.meta import about, version
 # -- Project information
 author_name, author_username, author_link = about.author
 
-project = about.project_name
+project = about.name
 author = author_name
 copyright = f' {date.today().year} MIT License, <a href="{author_link}" target="_blank">{author_name}</a>'
 

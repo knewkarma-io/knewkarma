@@ -34,11 +34,13 @@ class Style:
 
 class Notify:
     """
-    Provides static methods for printing and/or logging formatted notifications to the console.
+    Provides methods for printing and/or logging formatted notifications to the console.
     """
 
-    @staticmethod
-    def ok(message: str):
+    def __init__(self, console: Console):
+        self._console = console
+
+    def ok(self, message: str):
         """
         Prints a `success` message (with a checkmark).
 
@@ -46,10 +48,9 @@ class Notify:
         :type message: str
         """
 
-        console.print(f"{Style.green}✔{Style.reset} {message}")
+        self._console.print(f"{Style.green}✔{Style.reset} {message}")
 
-    @staticmethod
-    def info(message: str):
+    def info(self, message: str):
         """
         Prints an `informational` message to the console.
 
@@ -57,10 +58,9 @@ class Notify:
         :type message: str
         """
 
-        console.print(f"{Style.green}✱{Style.reset} {message}")
+        self._console.print(f"{Style.green}✱{Style.reset} {message}")
 
-    @staticmethod
-    def warning(message: str):
+    def warning(self, message: str):
         """
         Prints a `warning` message to the console.
 
@@ -68,10 +68,9 @@ class Notify:
         :type message: str
         """
 
-        console.print(f"{Style.yellow}✘{Style.reset} {message}")
+        self._console.print(f"{Style.yellow}✘{Style.reset} {message}")
 
-    @staticmethod
-    def error(message: str):
+    def error(self, message: str):
         """
         Logs an error with the specified message to the console.
 
@@ -79,10 +78,9 @@ class Notify:
         :type message: str
         """
 
-        console.log(f"{Style.yellow}✘{Style.reset} {message}")
+        self._console.log(f"{Style.yellow}✘{Style.reset} {message}")
 
-    @staticmethod
-    def exception(error: Exception, title: str = "An unexpected error occurred"):
+    def exception(self, error: Exception, title: str = "An unexpected error occurred"):
         """
         Logs an exception message to the console.
 
@@ -92,9 +90,7 @@ class Notify:
         :type error: Exception
         """
 
-        console.log(f"{Style.red}✘{Style.reset} {title}: {error}")
+        self._console.log(f"{Style.red}✘{Style.reset} {title}: {error}")
 
-
-console = Console(log_time=False)
 
 # -------------------------------- END ----------------------------------------- #

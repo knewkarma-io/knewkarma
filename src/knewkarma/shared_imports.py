@@ -1,11 +1,11 @@
 import os
-from sys import version as python_version
+from platform import python_version, platform
 
 from rich.console import Console
 
-from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
-from .meta import about, version
-from .tools.terminal_utils import Notify, Style
+from knewkarma.api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
+from knewkarma.meta import about, version
+from knewkarma.tools.terminal import Notify, Style
 
 __all__ = [
     "api",
@@ -22,13 +22,13 @@ __all__ = [
 api = Api(
     headers={
         "User-Agent": f"{about.name.replace(' ', '-')}/{version.release} "
-        f"(Python {python_version}; +{about.documentation})"
+        f"(Python {python_version} on {platform}; +{about.documentation})"
     },
 )
 
 console = Console(log_time=False)
 
-notify = Notify
+notify = Notify(console=console)
 style = Style
 
 OUTPUT_PARENT_DIR: str = os.path.expanduser(os.path.join("~", "knewkarma"))

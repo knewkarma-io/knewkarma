@@ -1,12 +1,12 @@
-from knewkarma.meta.version import full as full_version
+from .version import full as full_version
 
 __all__ = [
     "author",
     "copyright",
     "description",
     "documentation",
-    "project_name",
-    "package_name",
+    "name",
+    "package",
     "sponsor",
     "summary",
 ]
