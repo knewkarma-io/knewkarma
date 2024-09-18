@@ -32,7 +32,7 @@ class Api:
         self._sanitise = karmakaze.Sanitise()
 
     async def make_request(
-        self, endpoint: str, session: aiohttp.ClientSession
+            self, endpoint: str, session: aiohttp.ClientSession
     ) -> Union[Dict, List, None]:
         """
         Asynchronously sends a GET request to the specified API endpoint and returns JSON or list response.
@@ -47,8 +47,8 @@ class Api:
 
         try:
             async with session.get(
-                endpoint,
-                headers=self._headers,
+                    endpoint,
+                    headers=self._headers,
             ) as response:
                 response.raise_for_status()
                 response_data: Union[Dict, List] = await response.json()
@@ -58,12 +58,12 @@ class Api:
             raise error
 
     async def _paginate_items(
-        self,
-        session: aiohttp.ClientSession,
-        sanitiser: Callable,
-        limit: int,
-        status: Optional[Status] = None,
-        **kwargs: Union[str, Status],
+            self,
+            session: aiohttp.ClientSession,
+            sanitiser: Callable,
+            limit: int,
+            status: Optional[Status] = None,
+            **kwargs: Union[str, Status],
     ) -> List[Dict]:
         """
         Asynchronously fetches and processes data in a paginated manner
@@ -168,11 +168,11 @@ class Api:
         return all_items
 
     async def _paginate_more_items(
-        self,
-        session: aiohttp.ClientSession,
-        more_items_ids: List[str],
-        endpoint: str,
-        fetched_items: List[Dict],
+            self,
+            session: aiohttp.ClientSession,
+            more_items_ids: List[str],
+            endpoint: str,
+            fetched_items: List[Dict],
     ):
         for more_id in more_items_ids:
             # Construct the endpoint for each additional comment ID.
@@ -191,7 +191,7 @@ class Api:
 
     @staticmethod
     async def _pagination_countdown_timer(
-        status: Status, duration: int, current_count: int, overall_count: int
+            status: Status, duration: int, current_count: int, overall_count: int
     ):
         """
         Handles the live countdown during pagination, updating the status bar with the remaining time.
@@ -223,7 +223,7 @@ class Api:
             await asyncio.sleep(0.01)  # Sleep for 10 milliseconds
 
     async def check_reddit_status(
-        self, session: aiohttp.ClientSession, status: Optional[Status] = None
+            self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ):
         """
         Asynchronously checks Reddit API and infrastructure status.
@@ -239,7 +239,7 @@ class Api:
 
         if status:
             status.update(
-                f"Checking Reddit {style.bold}API & Infrastructure{style.reset} status"
+                f"Checking Reddit {style.bold}API & Infrastructure{style.reset} status..."
             )
 
         status_response: Dict = await self.make_request(
@@ -275,10 +275,10 @@ class Api:
                                 rich_print(component_summary)
 
     async def get_entity(
-        self,
-        session: aiohttp.ClientSession,
-        entity_type: Literal["post", "subreddit", "user", "wiki_page"],
-        **kwargs: Union[str, Status],
+            self,
+            session: aiohttp.ClientSession,
+            entity_type: Literal["post", "subreddit", "user", "wiki_page"],
+            **kwargs: Union[str, Status],
     ) -> Dict:
         """
         Asynchronously gets data from the specified entity.
@@ -319,7 +319,7 @@ class Api:
         status: Status = kwargs.get("status")
         if status:
             target_entity: Union[str, Tuple] = (
-                username or subreddit or (post_id, post_subreddit)
+                    username or subreddit or (post_id, post_subreddit)
             )
             status.update(
                 f"Retrieving {entity_type} ({target_entity}) data",
@@ -333,26 +333,26 @@ class Api:
         return sanitised_response
 
     async def get_posts(
-        self,
-        session: aiohttp.ClientSession,
-        posts_type: Literal[
-            "best",
-            "controversial",
-            "front_page",
-            "new",
-            "popular",
-            "rising",
-            "subreddit_posts",
-            "search_subreddit_posts",
-            "user_posts",
-            "user_overview",
-            "user_comments",
-            "post_comments",
-        ],
-        limit: int,
-        timeframe: TIMEFRAME = "all",
-        sort: SORT_CRITERION = "all",
-        **kwargs: Union[Status, str],
+            self,
+            session: aiohttp.ClientSession,
+            posts_type: Literal[
+                "best",
+                "controversial",
+                "front_page",
+                "new",
+                "popular",
+                "rising",
+                "subreddit_posts",
+                "search_subreddit_posts",
+                "user_posts",
+                "user_overview",
+                "user_comments",
+                "post_comments",
+            ],
+            limit: int,
+            timeframe: TIMEFRAME = "all",
+            sort: SORT_CRITERION = "all",
+            **kwargs: Union[Status, str],
     ) -> List[Dict]:
         """
         Asynchronously gets a specified number of posts, with a specified sorting criterion, from the specified source.
@@ -383,10 +383,13 @@ class Api:
             "user_overview": f"{self._user_endpoint}/{kwargs.get('username')}/overview.json",
             "user_comments": f"{self._user_endpoint}/{kwargs.get('username')}/comments.json",
             "post_comments": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-            f"/comments/{kwargs.get('post_id')}.json",
+                             f"/comments/{kwargs.get('post_id')}.json",
             "search_subreddit_posts": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}"
-            f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
+                                      f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
         }
+        status: Status = kwargs.get("status")
+        if status:
+            status.update(f"Retrieving {limit} {posts_type} posts...")
 
         endpoint = posts_map.get(posts_type, "")
         endpoint += f"?limit={limit}&sort={sort}&t={timeframe}&raw_json=1"
@@ -409,12 +412,12 @@ class Api:
         return posts
 
     async def get_subreddits(
-        self,
-        session: aiohttp.ClientSession,
-        subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
-        limit: int,
-        timeframe: TIMEFRAME = "all",
-        **kwargs: Union[str, Status],
+            self,
+            session: aiohttp.ClientSession,
+            subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
+            limit: int,
+            timeframe: TIMEFRAME = "all",
+            **kwargs: Union[str, Status],
     ) -> Union[List[Dict], Dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -459,12 +462,12 @@ class Api:
         return subreddits
 
     async def get_users(
-        self,
-        session: aiohttp.ClientSession,
-        users_type: Literal["all", "popular", "new"],
-        limit: int,
-        timeframe: TIMEFRAME = "all",
-        status: Optional[Status] = None,
+            self,
+            session: aiohttp.ClientSession,
+            users_type: Literal["all", "popular", "new"],
+            limit: int,
+            timeframe: TIMEFRAME = "all",
+            status: Optional[Status] = None,
     ) -> List[Dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -503,13 +506,13 @@ class Api:
         return users
 
     async def search_entities(
-        self,
-        session: aiohttp.ClientSession,
-        entity_type: Literal["users", "subreddits", "posts"],
-        query: str,
-        limit: int,
-        sort: SORT_CRITERION = "all",
-        status: Optional[Status] = None,
+            self,
+            session: aiohttp.ClientSession,
+            entity_type: Literal["users", "subreddits", "posts"],
+            query: str,
+            limit: int,
+            sort: SORT_CRITERION = "all",
+            status: Optional[Status] = None,
     ) -> List[Dict]:
         """
         Asynchronously searches specified entities that match the specified query.
@@ -558,6 +561,5 @@ class Api:
         )
 
         return search_results
-
 
 # -------------------------------- END ----------------------------------------- #
