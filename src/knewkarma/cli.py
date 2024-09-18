@@ -834,13 +834,13 @@ async def handle_method_calls(
             start_time: datetime = datetime.now()
             try:
                 with Status(
-                        status=f"Opening a new client session...",
+                        status=f"Opening a new client session",
                         spinner="dots",
                         spinner_style=style.yellow.strip("[,]"),
                         console=console,
                 ) as status:
                     async with aiohttp.ClientSession() as session:
-                        notify.ok("New client session opened.")
+                        notify.ok("New client session opened")
                         await check_for_updates(session=session, status=status)
                         await api.check_reddit_status(session=session, status=status)
                         await call_method(

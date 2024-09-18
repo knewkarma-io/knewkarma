@@ -239,7 +239,7 @@ class Api:
 
         if status:
             status.update(
-                f"Checking Reddit {style.bold}API & Infrastructure{style.reset} status..."
+                f"Checking Reddit {style.bold}API & Infrastructure{style.reset} status"
             )
 
         status_response: Dict = await self.make_request(
@@ -389,7 +389,7 @@ class Api:
         }
         status: Status = kwargs.get("status")
         if status:
-            status.update(f"Retrieving {limit} {posts_type} posts...")
+            status.update(f"Retrieving {limit} {posts_type} posts")
 
         endpoint = posts_map.get(posts_type, "")
         endpoint += f"?limit={limit}&sort={sort}&t={timeframe}&raw_json=1"
