@@ -91,7 +91,7 @@ async def check_for_updates(
     """
 
     if status:
-        status.update("Checking for updates...")
+        status.update("Checking for updates")
 
     # Make a GET request to GitHub to get the project's latest release.
     response = await api.make_request(
