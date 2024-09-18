@@ -63,7 +63,7 @@ class Api:
             sanitiser: Callable,
             limit: int,
             status: Optional[Status] = None,
-            **kwargs: Union[str, Status],
+            **kwargs: Union[str, Status, bool],
     ) -> List[Dict]:
         """
         Asynchronously fetches and processes data in a paginated manner
@@ -141,7 +141,7 @@ class Api:
             # Update the last_item_id to the ID of the last fetched item for pagination.
             last_item_id = (
                 self._sanitise.pagination_id(response=response[1])
-                if kwargs.get("posts_type") == "post_comments"
+                if kwargs.get("is_post_comments")
                 else self._sanitise.pagination_id(response=response)
             )
 
@@ -404,7 +404,7 @@ class Api:
             session=session,
             sanitiser=sanitiser,
             limit=limit,
-            posts_type=posts_type,
+            is_post_comments=True,
             status=kwargs.get("status"),
             endpoint=endpoint,
         )
