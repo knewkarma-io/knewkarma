@@ -1049,13 +1049,13 @@ trio = ["async_generator", "trio"]
 
 [[package]]
 name = "karmakaze"
-version = "1.3.0"
+version = "1.3.1"
 description = "Data sanitation engine for Knew Karma"
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "karmakaze-1.3.0-py3-none-any.whl", hash = "sha256:216924ad89d9979f43e97e9de4260991f7d456fae33f0b708a693c9c2ba8a3bc"},
-    {file = "karmakaze-1.3.0.tar.gz", hash = "sha256:707f90b71f82a25f031f71b50b30208f43b878475aad05e380c6fe91e1b9da9a"},
+    {file = "karmakaze-1.3.1-py3-none-any.whl", hash = "sha256:aadd89eb87992adcbe3163dd504ef33e04b829e4f68e1d1b27def7488cc95423"},
+    {file = "karmakaze-1.3.1.tar.gz", hash = "sha256:8ca8c9ca8c92276e4ca8c95105567ed2992a67645552eec6a370c7f5901948a7"},
 ]
 
 [[package]]
