@@ -32,14 +32,6 @@ def is_snap_package(package: str) -> bool:
     :type package: str
     :return: True if the specified package is installed as a snap package, otherwise False.
     :rtype: bool
-
-    Usage::
-
-        >>> from knewkarma.tools.package import is_snap_package
-
-        >>> package_name = "src"
-        >>> print(is_snap_package(package=package_name))
-        >>> False # If script isn't running in a SNAP environment.
     """
 
     if package:
@@ -56,14 +48,6 @@ def is_pypi_package(package: str) -> bool:
     :type package: str
     :return: True if the specified package is installed as a pypi package, otherwise False.
     :rtype: bool
-
-    Usage::
-
-        >>> from knewkarma.tools.package import is_pypi_package
-
-        >>> package_name = "src"
-        >>> print(is_pypi_package(package=package_name))
-        >>> True
     """
 
     if package:
@@ -77,7 +61,7 @@ def is_pypi_package(package: str) -> bool:
 
 
 async def check_for_updates(
-    session: aiohttp.ClientSession, status: Optional[Status] = None
+        session: aiohttp.ClientSession, status: Optional[Status] = None
 ):
     """
     Asynchronously checks for updates by comparing the current local version with the remote version.
@@ -143,10 +127,10 @@ async def check_for_updates(
             if not is_snap_package(package=about.package):
                 status.stop()
                 if Confirm.ask(
-                    f"{style.bold}Would you like to get these updates?{style.reset}",
-                    case_sensitive=False,
-                    default=False,
-                    console=console,
+                        f"{style.bold}Would you like to get these updates?{style.reset}",
+                        case_sensitive=False,
+                        default=False,
+                        console=console,
                 ):
                     update_package(package=about.package, status=status)
                 else:
@@ -163,14 +147,6 @@ def update_package(package: str, status: Optional[Status] = None):
     :type package: str
     :param status: An optional `Status` object for displaying status messages.
     :type status: rich.status.Status
-
-    Usage::
-
-        >>> from knewkarma.tools.package import update_pypi_package
-
-        >>> # This will update the pypi package
-        >>> package_name = "src"
-        >>> update_pypi_package(package=package_name)
     """
 
     if package:
@@ -199,6 +175,5 @@ def update_package(package: str, status: Optional[Status] = None):
             notify.exception(unexpected_error)
     else:
         notify.error(INVALID_PACKAGE_ERROR.format(package=package))
-
 
 # -------------------------------- END ----------------------------------------- #
