@@ -32,7 +32,7 @@ class Api:
         self._sanitise = Sanitise()
 
     async def make_request(
-        self, endpoint: str, session: aiohttp.ClientSession
+            self, endpoint: str, session: aiohttp.ClientSession
     ) -> Union[Dict, List, None]:
         """
         Asynchronously sends a GET request to the specified API endpoint and returns JSON or list response.
@@ -47,8 +47,8 @@ class Api:
 
         try:
             async with session.get(
-                url=endpoint,
-                headers=self._headers,
+                    url=endpoint,
+                    headers=self._headers,
             ) as response:
                 response.raise_for_status()
                 response_data: Union[Dict, List] = await response.json()
@@ -58,12 +58,12 @@ class Api:
             raise error
 
     async def _paginate_items(
-        self,
-        session: aiohttp.ClientSession,
-        sanitiser: Callable,
-        limit: int,
-        status: Optional[Status] = None,
-        **kwargs: Union[str, bool],
+            self,
+            session: aiohttp.ClientSession,
+            sanitiser: Callable,
+            limit: int,
+            status: Optional[Status] = None,
+            **kwargs: Union[str, bool],
     ) -> List[Dict]:
         """
         Asynchronously fetches and processes data in a paginated manner
@@ -107,12 +107,12 @@ class Api:
                 more_items_ids = []  # Initialise a list to store IDs from "more" items.
 
                 # Iterate over the children in the response to extract comments or "more" items.
-                for item in response[1].get("data", {}).get("children", []):
-                    if item.get("kind") == "t1":
+                for item in sanitiser(response[1]):
+                    if self._sanitise.kind(item) == "t1":
                         sanitised_item = sanitiser(item)
                         # If the item is a comment (kind == "t1"), add it to the items list.
                         items.append(sanitised_item)
-                    elif item.get("kind") == "more":
+                    elif self._sanitise.kind(item) == "more":
                         # If the item is of kind "more", extract the IDs for additional comments.
                         more_items_ids.extend(item)
 
@@ -168,11 +168,11 @@ class Api:
         return all_items
 
     async def _paginate_more_items(
-        self,
-        session: aiohttp.ClientSession,
-        more_items_ids: List[str],
-        endpoint: str,
-        fetched_items: List[Dict],
+            self,
+            session: aiohttp.ClientSession,
+            more_items_ids: List[str],
+            endpoint: str,
+            fetched_items: List[Dict],
     ):
         for more_id in more_items_ids:
             # Construct the endpoint for each additional comment ID.
@@ -191,7 +191,7 @@ class Api:
 
     @staticmethod
     async def _pagination_countdown_timer(
-        status: Status, duration: int, current_count: int, overall_count: int
+            status: Status, duration: int, current_count: int, overall_count: int
     ):
         """
         Handles the live countdown during pagination, updating the status bar with the remaining time.
@@ -223,7 +223,7 @@ class Api:
             await asyncio.sleep(0.01)  # Sleep for 10 milliseconds
 
     async def check_reddit_status(
-        self, session: aiohttp.ClientSession, status: Optional[Status] = None
+            self, session: aiohttp.ClientSession, status: Optional[Status] = None
     ):
         """
         Asynchronously checks Reddit API and infrastructure status.
@@ -292,11 +292,11 @@ class Api:
                         console.print(table)
 
     async def get_entity(
-        self,
-        session: aiohttp.ClientSession,
-        entity_type: Literal["post", "subreddit", "user", "wiki_page"],
-        status: Optional[Status] = None,
-        **kwargs: str,
+            self,
+            session: aiohttp.ClientSession,
+            entity_type: Literal["post", "subreddit", "user", "wiki_page"],
+            status: Optional[Status] = None,
+            **kwargs: str,
     ) -> Dict:
         """
         Asynchronously gets data from the specified entity.
@@ -305,6 +305,8 @@ class Api:
         :type session: aiohttp.ClientSession
         :param entity_type: The type of entity to get data from
         :type entity_type: str
+        :param status: An instance of `rich.status.Status` used to display animated status messages.
+        :type status: rich.status.Status
         :return: A dictionary containing a specified entity's data.
         :rtype: Dict
         """
@@ -347,27 +349,27 @@ class Api:
         return sanitised_response
 
     async def get_posts(
-        self,
-        session: aiohttp.ClientSession,
-        posts_type: Literal[
-            "best",
-            "controversial",
-            "front_page",
-            "new",
-            "popular",
-            "rising",
-            "subreddit",
-            "search_subreddit",
-            "user",
-            "user_overview",
-            "user_comments",
-            "post_comments",
-        ],
-        limit: int,
-        timeframe: TIMEFRAME = "all",
-        sort: SORT_CRITERION = "all",
-        status: Optional[Status] = None,
-        **kwargs: str,
+            self,
+            session: aiohttp.ClientSession,
+            posts_type: Literal[
+                "best",
+                "controversial",
+                "front_page",
+                "new",
+                "popular",
+                "rising",
+                "subreddit",
+                "search_subreddit",
+                "user",
+                "user_overview",
+                "user_comments",
+                "post_comments",
+            ],
+            limit: int,
+            timeframe: TIMEFRAME = "all",
+            sort: SORT_CRITERION = "all",
+            status: Optional[Status] = None,
+            **kwargs: str,
     ) -> List[Dict]:
         """
         Asynchronously gets a specified number of posts, with a specified sorting criterion, from the specified source.
@@ -382,6 +384,8 @@ class Api:
         :type sort: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: Literal
+        :param status: An instance of `rich.status.Status` used to display animated status messages.
+        :type status: rich.status.Status
         :return: A list of dictionaries, each containing post data.
         :rtype: List[Dict]
         """
@@ -398,9 +402,9 @@ class Api:
             "user_overview": f"{self._user_endpoint}/{kwargs.get('username')}/overview.json",
             "user_comments": f"{self._user_endpoint}/{kwargs.get('username')}/comments.json",
             "post_comments": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-            f"/comments/{kwargs.get('post_id')}.json",
+                             f"/comments/{kwargs.get('post_id')}.json",
             "search_subreddit": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}"
-            f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
+                                f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
         }
 
         if status:
@@ -427,13 +431,13 @@ class Api:
         return posts
 
     async def get_subreddits(
-        self,
-        session: aiohttp.ClientSession,
-        subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
-        limit: int,
-        timeframe: TIMEFRAME = "all",
-        status: Optional[Status] = None,
-        **kwargs: str,
+            self,
+            session: aiohttp.ClientSession,
+            subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
+            limit: int,
+            timeframe: TIMEFRAME = "all",
+            status: Optional[Status] = None,
+            **kwargs: str,
     ) -> Union[List[Dict], Dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -446,6 +450,8 @@ class Api:
         :type limit: int
         :param timeframe: Timeframe from which to get subreddits.
         :type timeframe: Literal
+        :param status: An instance of `rich.status.Status` used to display animated status messages.
+        :type status: rich.status.Status
         :return: A list of dictionaries, each containing subreddit data,
             or a single dictionary containing subreddit data.
         :rtype: Union[List[Dict], Dict]
@@ -481,12 +487,12 @@ class Api:
         return subreddits
 
     async def get_users(
-        self,
-        session: aiohttp.ClientSession,
-        users_type: Literal["all", "popular", "new"],
-        limit: int,
-        timeframe: TIMEFRAME = "all",
-        status: Optional[Status] = None,
+            self,
+            session: aiohttp.ClientSession,
+            users_type: Literal["all", "popular", "new"],
+            limit: int,
+            timeframe: TIMEFRAME = "all",
+            status: Optional[Status] = None,
     ) -> List[Dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -528,13 +534,13 @@ class Api:
         return users
 
     async def search_entities(
-        self,
-        session: aiohttp.ClientSession,
-        entity_type: Literal["users", "subreddits", "posts"],
-        query: str,
-        limit: int,
-        sort: SORT_CRITERION = "all",
-        status: Optional[Status] = None,
+            self,
+            session: aiohttp.ClientSession,
+            entity_type: Literal["users", "subreddits", "posts"],
+            query: str,
+            limit: int,
+            sort: SORT_CRITERION = "all",
+            status: Optional[Status] = None,
     ) -> List[Dict]:
         """
         Asynchronously searches specified entities that match the specified query.
@@ -550,6 +556,7 @@ class Api:
         :param sort: Posts' sort criterion.
         :type sort: str
         :param status: An instance of `rich.status.Status` used to display animated status messages.
+        :type status: rich.status.Status
         :return: A list of dictionaries, each containing search result data.
         :rtype: List[Dict]
         """
@@ -583,6 +590,5 @@ class Api:
         )
 
         return search_results
-
 
 # -------------------------------- END ----------------------------------------- #
