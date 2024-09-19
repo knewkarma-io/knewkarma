@@ -860,7 +860,7 @@ async def handle_method_calls(
             finally:
                 elapsed_time = datetime.now() - start_time
                 notify.ok(
-                    f"Session closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
+                    f"Client session closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
                 )
 
     if not is_valid_arg:
