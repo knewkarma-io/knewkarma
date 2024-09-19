@@ -27,7 +27,7 @@ from .tools.data import (
     save_dataframe,
 )
 from .tools.misc import filename_timestamp, pathfinder
-from .tools.package import check_for_updates, is_snap_package
+from .tools.package import is_snap_package
 
 __all__ = ["start"]
 
@@ -841,7 +841,7 @@ async def handle_method_calls(
                 ) as status:
                     async with aiohttp.ClientSession() as session:
                         notify.ok("New client session opened")
-                        await check_for_updates(session=session, status=status)
+                        # await check_for_updates(session=session, status=status)
                         await api.check_reddit_status(session=session, status=status)
                         await call_method(
                             method=method,
