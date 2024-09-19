@@ -107,7 +107,7 @@ class Api:
                 more_items_ids = []  # Initialise a list to store IDs from "more" items.
 
                 # Iterate over the children in the response to extract comments or "more" items.
-                for item in sanitiser(response[1]):
+                for item in response[1].get("data").get("children"):
                     if self._sanitise.kind(item) == "t1":
                         sanitised_item = sanitiser(item)
                         # If the item is a comment (kind == "t1"), add it to the items list.
