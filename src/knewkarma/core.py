@@ -558,7 +558,7 @@ class Subreddit:
         subreddit_posts = await api.get_posts(
             session=session,
             status=status,
-            posts_type="subreddit_posts",
+            posts_type="subreddit",
             subreddit=self._name,
             limit=limit,
             sort=sort,
@@ -689,7 +689,7 @@ class Subreddit:
         search_results = await api.get_posts(
             session=session,
             status=status,
-            posts_type="search_subreddit_posts",
+            posts_type="search_subreddit",
             subreddit=self._name,
             query=query,
             limit=limit,
@@ -1051,7 +1051,7 @@ class User:
             session=session,
             status=status,
             username=self._name,
-            posts_type="user_posts",
+            posts_type="user",
             limit=limit,
             sort=sort,
             timeframe=timeframe,
