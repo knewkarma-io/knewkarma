@@ -5,19 +5,7 @@ import aiohttp
 import pytest
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
-from knewkarma.api import Api
-from knewkarma.meta import about
-
-api = Api(
-    headers={
-        "User-Agent": f"{about.name.replace(' ', '-')}/Test-1.0 "
-        f"(PyTest {pytest.__version__}; +{about.documentation})"
-    }
-)
-
-TEST_USERNAME: str = "AutoModerator"
-TEST_SUBREDDIT_1: str = "AskScience"
-TEST_SUBREDDIT_2: str = "AskReddit"
+from conftest import api, TEST_USERNAME, TEST_SUBREDDIT_2, TEST_SUBREDDIT_1
 
 
 @retry(
