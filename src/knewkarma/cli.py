@@ -841,8 +841,8 @@ async def handle_method_calls(
                 ) as status:
                     async with aiohttp.ClientSession() as session:
                         notify.ok("New client session opened")
-                        await check_for_updates(session=session, status=status)
                         await api.check_reddit_status(session=session, status=status)
+                        await check_for_updates(session=session, status=status)
                         await call_method(
                             method=method,
                             session=session,
