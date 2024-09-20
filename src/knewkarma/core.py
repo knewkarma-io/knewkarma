@@ -11,7 +11,6 @@ from .shared_imports import api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .tools.data import plot_bar_chart
 
 __all__ = [
-    "Comment",
     "Post",
     "Posts",
     "Search",
