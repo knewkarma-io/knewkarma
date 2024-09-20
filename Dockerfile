@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:latest
+FROM python:3.10-slim
 
 LABEL maintainer="Richard Mwewa <https://gravatar.com/rly0nheart>"
 LABEL description="A Reddit data analysis toolkit."
