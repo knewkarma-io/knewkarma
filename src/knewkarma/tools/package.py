@@ -1,4 +1,3 @@
-import os
 import subprocess
 from typing import Optional, List
 
@@ -21,6 +20,18 @@ __all__ = [
 INVALID_PACKAGE_ERROR: str = (
     "The provided package name is not a valid string: {package}"
 )
+
+import os
+
+
+def is_docker_container() -> bool:
+    """
+    Determines if the program is running inside a Docker container.
+
+    :return: True if running inside a Docker container, otherwise False.
+    :rtype: bool
+    """
+    return True if os.path.exists("/.dockerenv") else False
 
 
 def is_snap_package(package: str) -> bool:
@@ -61,7 +72,7 @@ def is_pypi_package(package: str) -> bool:
 
 
 async def check_for_updates(
-    session: aiohttp.ClientSession, status: Optional[Status] = None
+        session: aiohttp.ClientSession, status: Optional[Status] = None
 ):
     """
     Asynchronously checks for updates by comparing the current local version with the remote version.
@@ -123,14 +134,14 @@ async def check_for_updates(
                 subtitle=f"{style.bold}{style.italic}Thank you, for using {about.name}!{style.reset}{style.reset} ❤️ ",
             )
 
-            # Skip auto-updating of the snap package
-            if not is_snap_package(package=about.package):
+            # Skip auto-updating of the snap package and containerised variants.
+            if not is_snap_package(package=about.package) or not is_docker_container():
                 status.stop()
                 if Confirm.ask(
-                    f"{style.bold}Would you like to get these updates?{style.reset}",
-                    case_sensitive=False,
-                    default=False,
-                    console=console,
+                        f"{style.bold}Would you like to get these updates?{style.reset}",
+                        case_sensitive=False,
+                        default=False,
+                        console=console,
                 ):
                     update_package(package=about.package, status=status)
                 else:
@@ -175,6 +186,5 @@ def update_package(package: str, status: Optional[Status] = None):
             notify.exception(unexpected_error)
     else:
         notify.error(INVALID_PACKAGE_ERROR.format(package=package))
-
 
 # -------------------------------- END ----------------------------------------- #
