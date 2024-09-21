@@ -1,10 +1,9 @@
 import asyncio
 import os
 from datetime import datetime
-from typing import get_args, Union, Callable, Literal
+from typing import get_args, Union, Callable, Literal, List, Dict
 
 import aiohttp
-import pandas as pd
 import rich_click as click
 from rich.status import Status
 
@@ -22,9 +21,9 @@ from .shared_imports import (
     OUTPUT_PARENT_DIR,
 )
 from .tools.data import (
+    create_dataframe,
+    export_dataframe,
     EXPORT_FORMATS,
-    make_dataframe,
-    save_dataframe,
 )
 from .tools.misc import filename_timestamp, pathfinder
 from .tools.package import check_for_updates, is_snap_package
@@ -119,12 +118,12 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
 )
 @click.pass_context
 def cli(
-        ctx: click.Context,
-        timeframe: TIMEFRAME,
-        sort: SORT_CRITERION,
-        limit: int,
-        time_format: str,
-        export: list[EXPORT_FORMATS],
+    ctx: click.Context,
+    timeframe: TIMEFRAME,
+    sort: SORT_CRITERION,
+    limit: int,
+    time_format: str,
+    export: List[EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -143,7 +142,7 @@ def cli(
     :type export: Literal[str]
     """
 
-    ctx.ensure_object(dict)
+    ctx.ensure_object(Dict)
     ctx.obj["timeframe"] = timeframe
     ctx.obj["sort"] = sort
     ctx.obj["limit"] = limit
@@ -153,7 +152,7 @@ def cli(
 
 @cli.command(
     help="Use this command to get an individual post's data including its comments, "
-         "provided the post's <id> and source <subreddit> are specified.",
+    "provided the post's <id> and source <subreddit> are specified.",
 )
 @click.argument("id")
 @click.argument("subreddit")
@@ -182,7 +181,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     time_format: TIME_FORMAT = ctx.obj["time_format"]
 
     post_instance = Post(id=id, subreddit=subreddit, time_format=time_format)
-    method_map: dict = {
+    method_map: Dict = {
         "comments": lambda session, status=None: post_instance.comments(
             limit=limit, sort=sort, status=status, session=session
         ),
@@ -224,13 +223,13 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 @click.option("-r", "--rising", is_flag=True, help="Get posts from the rising listing")
 @click.pass_context
 def posts(
-        ctx: click.Context,
-        best: bool,
-        controversial: bool,
-        front_page: bool,
-        new: bool,
-        popular: bool,
-        rising: bool,
+    ctx: click.Context,
+    best: bool,
+    controversial: bool,
+    front_page: bool,
+    new: bool,
+    popular: bool,
+    rising: bool,
 ):
     """
     Retrieve various types of posts such as best, controversial, popular, new, and front-page.
@@ -258,7 +257,7 @@ def posts(
     time_format: TIME_FORMAT = ctx.obj["time_format"]
 
     posts_instance = Posts(time_format=time_format)
-    method_map: dict = {
+    method_map: Dict = {
         "best": lambda session, status=None: posts_instance.best(
             timeframe=timeframe, limit=limit, status=status, session=session
         ),
@@ -324,7 +323,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     time_format: TIME_FORMAT = ctx.obj["time_format"]
 
     search_instance = Search(query=query, time_format=time_format)
-    method_map: dict = {
+    method_map: Dict = {
         "posts": lambda session, status=None: search_instance.posts(
             sort=sort, limit=limit, status=status, session=session
         ),
@@ -376,16 +375,16 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
 @click.option("-wps", "--wiki-pages", is_flag=True, help="Get a subreddit's wiki pages")
 @click.pass_context
 def subreddit(
-        ctx: click.Context,
-        subreddit_name: str,
-        comments: bool,
-        comments_per_post: int,
-        posts: bool,
-        profile: bool,
-        search_comments: str,
-        search_post: str,
-        wiki_page: str,
-        wiki_pages: bool,
+    ctx: click.Context,
+    subreddit_name: str,
+    comments: bool,
+    comments_per_post: int,
+    posts: bool,
+    profile: bool,
+    search_comments: str,
+    search_post: str,
+    wiki_page: str,
+    wiki_pages: bool,
 ):
     """
     Retrieve data about a specific subreddit including profile, comments, posts, and wiki pages.
@@ -419,7 +418,7 @@ def subreddit(
     time_format: TIME_FORMAT = ctx.obj["time_format"]
 
     subreddit_instance = Subreddit(name=subreddit_name, time_format=time_format)
-    method_map: dict = {
+    method_map: Dict = {
         "comments": lambda session, status=None: subreddit_instance.comments(
             session=session,
             posts_limit=limit,
@@ -521,7 +520,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
     time_format: TIME_FORMAT = ctx.obj["time_format"]
 
     subreddits_instance = Subreddits(time_format=time_format)
-    method_map: dict = {
+    method_map: Dict = {
         "all": lambda session, status=None: subreddits_instance.all(
             limit=limit,
             session=session,
@@ -554,7 +553,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 
 @cli.command(
     help="Use this command to get user data, such as profile, posts, "
-         "comments, top subreddits, moderated subreddits, and more...",
+    "comments, top subreddits, moderated subreddits, and more...",
 )
 @click.argument("username")
 @click.option("-c", "--comments", is_flag=True, help="Get user's comments")
@@ -587,16 +586,16 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 )
 @click.pass_context
 def user(
-        ctx: click.Context,
-        username: str,
-        comments: bool,
-        moderated_subreddits: bool,
-        overview: bool,
-        posts: bool,
-        profile: bool,
-        search_comments: str,
-        search_posts: str,
-        top_subreddits: int,
+    ctx: click.Context,
+    username: str,
+    comments: bool,
+    moderated_subreddits: bool,
+    overview: bool,
+    posts: bool,
+    profile: bool,
+    search_comments: str,
+    search_posts: str,
+    top_subreddits: int,
 ):
     """
     Retrieve data about a specific user including profile, posts, comments, and top subreddits.
@@ -629,7 +628,7 @@ def user(
     time_format: TIME_FORMAT = ctx.obj["time_format"]
 
     user_instance: User = User(name=username, time_format=time_format)
-    method_map: dict = {
+    method_map: Dict = {
         "comments": lambda session, status=None: user_instance.comments(
             session=session, limit=limit, sort=sort, timeframe=timeframe, status=status
         ),
@@ -724,7 +723,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     time_format: TIME_FORMAT = ctx.obj["time_format"]
 
     users_instance = Users(time_format=time_format)
-    method_map: dict = {
+    method_map: Dict = {
         "all": lambda session, status=None: users_instance.all(
             session=session, limit=limit, timeframe=timeframe, status=status
         ),
@@ -749,10 +748,10 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 
 
 async def call_method(
-        method: Callable,
-        session: aiohttp.ClientSession,
-        status: console.status,
-        **kwargs: Union[str, click.Context],
+    method: Callable,
+    session: aiohttp.ClientSession,
+    status: console.status,
+    **kwargs: Union[str, click.Context],
 ):
     """
     Calls a method with the provided arguments.
@@ -769,16 +768,16 @@ async def call_method(
     command: str = kwargs.get("ctx").command.name
     argument: str = kwargs.get("argument")
 
-    response_data: Union[list, dict, str] = await method(session=session, status=status)
+    response_data: Union[List, Dict, str] = await method(session=session, status=status)
 
     console.set_window_title(
         f"Showing {len(response_data)} {command} {argument} — {about.name} {version.release}"
-        if isinstance(response_data, list)
+        if isinstance(response_data, List)
         else f"Showing {command} {argument} — {about.name} {version.release}"
     )
 
     if response_data:
-        dataframe: pd.DataFrame = make_dataframe(data=response_data)
+        dataframe = create_dataframe(data=response_data)
         console.print(dataframe)
 
         if kwargs.get("export"):
@@ -799,20 +798,20 @@ async def call_method(
                 ]
             )
 
-            export_to_files: list = kwargs.get("export").split(",")
-            save_dataframe(
+            export_to: List = kwargs.get("export").split(",")
+            export_dataframe(
                 dataframe=dataframe,
                 filename=filename_timestamp(),
                 directory=output_child_dir,
-                formats=export_to_files,
+                formats=export_to,
             )
 
 
 async def handle_method_calls(
-        ctx: click.Context,
-        method_map: dict,
-        export: str,
-        **kwargs: Union[str, int, bool],
+    ctx: click.Context,
+    method_map: Dict,
+    export: str,
+    **kwargs: Union[str, int, bool],
 ):
     """
     Handle the method calls based on the provided arguments.
@@ -820,7 +819,7 @@ async def handle_method_calls(
     :param ctx: The Click context object.
     :type ctx: click.Context
     :param method_map: Dictionary mapping method names to their corresponding functions.
-    :type method_map: dict
+    :type method_map: Dict
     :param export: The export format.
     :type export: str
     :param kwargs: Additional keyword arguments.
@@ -834,10 +833,10 @@ async def handle_method_calls(
             start_time: datetime = datetime.now()
             try:
                 with Status(
-                        status=f"Opening a new client session",
-                        spinner="dots",
-                        spinner_style=style.yellow.strip("[,]"),
-                        console=console,
+                    status=f"Opening new client session",
+                    spinner="dots",
+                    spinner_style=style.yellow.strip("[,]"),
+                    console=console,
                 ) as status:
                     async with aiohttp.ClientSession() as session:
                         notify.ok("New client session opened")
@@ -856,7 +855,7 @@ async def handle_method_calls(
             except aiohttp.ClientResponseError as response_error:
                 notify.exception(title="An API error occurred", error=response_error)
             except Exception as unexpected_error:
-                notify.exception(unexpected_error)
+                notify.exception(error=unexpected_error)
             finally:
                 elapsed_time = datetime.now() - start_time
                 notify.ok(
@@ -874,5 +873,6 @@ def start():
 
     console.set_window_title(f"{about.name} {version.release}")
     cli(obj={})
+
 
 # -------------------------------- END ----------------------------------------- #
