@@ -6,26 +6,32 @@ import pandas as pd
 
 from ..shared_imports import notify
 
-__all__ = ["make_dataframe", "save_dataframe", "plot_bar_chart", "EXPORT_FORMATS"]
+__all__ = [
+    "create_dataframe",
+    "export_dataframe",
+    "plot_bar_chart",
+    "EXPORT_FORMATS",
+    "visualisation_dependency_installed",
+]
 
 EXPORT_FORMATS = Literal["csv", "html", "json", "xml"]
 
 try:
     import matplotlib.pyplot as plt
 
-    visualisation_deps_installed: bool = True
+    visualisation_dependency_installed: bool = True
 except ImportError:
-    visualisation_deps_installed = False
+    visualisation_dependency_installed = False
 
 
 def plot_bar_chart(
-        data: Dict[str, int],
-        title: str,
-        xlabel: str,
-        ylabel: str,
-        colours: List[str],
-        filename: str,
-        figure_size: Tuple[int, int] = (10, 5),
+    data: Dict[str, int],
+    title: str,
+    xlabel: str,
+    ylabel: str,
+    colours: List[str],
+    filename: str,
+    figure_size: Tuple[int, int] = (10, 5),
 ):
     """
     Plots a bar chart for the given data.
@@ -46,7 +52,7 @@ def plot_bar_chart(
     :type figure_size: tuple[int, int]
     """
 
-    if visualisation_deps_installed:
+    if visualisation_dependency_installed:
         plt.figure(figsize=figure_size)
         plt.bar(list(data.keys()), list(data.values()), color=colours)
         plt.title(title)
@@ -57,14 +63,14 @@ def plot_bar_chart(
         notify.ok(f"{title} saved to [link file://{filename}.png]{filename}.png")
 
 
-def make_dataframe(
-        data: Union[SimpleNamespace, List[SimpleNamespace], List[Tuple]],
+def create_dataframe(
+    data: Union[SimpleNamespace, List[SimpleNamespace], List[Tuple[str, int]]],
 ) -> pd.DataFrame:
     """
-    Converts provided data into a pandas DataFrame.
+    Makes a Pandas dataframe from the provided data.
 
     :param data: Data to be converted.
-    :type data: Union[Dict, List[Dict], List[str]]
+    :type data: Union[SimpleNamespace, List[SimpleNamespace], List[Tuple[str, int]]]
     :return: A pandas DataFrame constructed from the provided data. Excludes any 'raw_data'
              column from the dataframe.
     :rtype: pd.DataFrame
@@ -72,29 +78,33 @@ def make_dataframe(
 
     if isinstance(data, SimpleNamespace):
         # Transform each attribute of the object into a dictionary entry
-        data = [{"key": key, "value": value} for key, value in data.__dict__.items()]
+        transformed_data = [
+            {"key": key, "value": value} for key, value in data.__dict__.items()
+        ]
 
     # Convert a list of SimpleNamespace objects to a list of dictionaries
     elif isinstance(data, List) and all(
-            isinstance(item, (SimpleNamespace, Tuple)) for item in data
+        isinstance(item, SimpleNamespace) for item in data
     ):
-        # Each object in the list is converted to its dictionary representation
-        data = [item.__dict__ for item in data]
+        # Each object in the list is transformed to its dictionary representation
+        transformed_data = [item.__dict__ for item in data]
+    else:
+        transformed_data = data
 
     # Set pandas display option to show all rows
     pd.set_option("display.max_rows", None)
 
-    # Create a DataFrame from the processed data
-    dataframe = pd.DataFrame(data)
+    # Create a DataFrame from the transformed data
+    dataframe = pd.DataFrame(transformed_data)
 
     return dataframe.dropna(axis=1, how="all")
 
 
-def save_dataframe(
-        dataframe: pd.DataFrame,
-        filename: str,
-        directory: str,
-        formats: List[EXPORT_FORMATS],
+def export_dataframe(
+    dataframe: pd.DataFrame,
+    filename: str,
+    directory: str,
+    formats: List[EXPORT_FORMATS],
 ):
     """
     Exports a Pandas dataframe to specified file formats.
@@ -163,5 +173,6 @@ def get_file_size(file_path: str) -> str:
         unit_index += 1
 
     return f"{file_size_bytes:.2f} {units[unit_index]}"
+
 
 # -------------------------------- END ----------------------------------------- #
