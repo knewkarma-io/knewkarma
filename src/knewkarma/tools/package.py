@@ -1,3 +1,4 @@
+import os
 import subprocess
 from typing import Optional, List
 
@@ -20,8 +21,6 @@ __all__ = [
 INVALID_PACKAGE_ERROR: str = (
     "The provided package name is not a valid string: {package}"
 )
-
-import os
 
 
 def is_docker_container() -> bool:
