@@ -11,7 +11,7 @@ knewkarma --help
 ```
 
 ```shell
-docker run -t my-knewkarma-container --help
+docker run -t knewkarma --help
 ```
 
 You can further view individual module usages by calling `knewkarma` with a module name and
