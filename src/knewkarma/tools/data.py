@@ -1,12 +1,10 @@
 import os
-from typing import Union, Literal, List, Tuple, Dict, TYPE_CHECKING
+from types import SimpleNamespace
+from typing import Union, Literal, List, Tuple, Dict
 
 import pandas as pd
 
 from ..shared_imports import notify
-
-if TYPE_CHECKING:
-    from types import SimpleNamespace
 
 __all__ = [
     "create_dataframe",

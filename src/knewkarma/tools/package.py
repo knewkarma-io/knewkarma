@@ -1,7 +1,8 @@
 import os
 import subprocess
-from typing import Optional, List, TYPE_CHECKING
+from typing import Optional, List
 
+import aiohttp
 from rich.markdown import Markdown
 from rich.prompt import Confirm
 from rich.status import Status
@@ -10,10 +11,8 @@ from .misc import make_panel
 from ..meta import about, version
 from ..shared_imports import api, console, notify, style
 
-if TYPE_CHECKING:
-    import aiohttp
-
 __all__ = [
+    "auto_update_status",
     "check_for_updates",
     "is_pypi_package",
     "is_snap_package",
@@ -25,51 +24,30 @@ INVALID_PACKAGE_ERROR: str = (
 )
 
 
-def is_docker_container() -> bool:
+def auto_update_status():
     """
-    Determines if the program is running inside a Docker container.
-
-    :return: True if running inside a Docker container, otherwise False.
-    :rtype: bool
-    """
-    return True if os.path.exists("/.dockerenv") else False
-
-
-def is_snap_package(package: str) -> bool:
-    """
-    Checks if a specified package name is installed as a snap package
-    by checking if it's running inside a SNAP environment.
-
-    :param package: Name of the package to check.
-    :type package: str
-    :return: True if the specified package is installed as a snap package, otherwise False.
-    :rtype: bool
+    Checks and prints the currently running variant of knewkarma.
     """
 
-    if package:
-        return True if os.getenv("SNAP") else False
+    package: str = about.package
+
+    if (
+        is_pypi_package(package=package)
+        and not is_snap_package(package=package)
+        and not is_docker_container()
+    ):
+        auto_update_indicator = "Enabled"
     else:
-        notify.error(INVALID_PACKAGE_ERROR.format(package=package))
+        auto_update_indicator = "Disabled"
 
-
-def is_pypi_package(package: str) -> bool:
-    """
-    Checks if a specified package name is installed as a pypi package.
-
-    :param package: Name of the package to check.
-    :type package: str
-    :return: True if the specified package is installed as a pypi package, otherwise False.
-    :rtype: bool
-    """
-
-    if package:
-        try:
-            __import__(name=package)
-            return True
-        except ImportError:
-            return False
-    else:
-        notify.error(INVALID_PACKAGE_ERROR.format(package=package))
+    message = f"Auto-Update: {style.green
+    if auto_update_indicator == 'Enabled'
+    else style.yellow}{auto_update_indicator}{style.reset}"
+    (
+        notify.ok(message)
+        if auto_update_indicator == "Enabled"
+        else notify.warning(message)
+    )
 
 
 async def check_for_updates(
@@ -135,8 +113,10 @@ async def check_for_updates(
                 subtitle=f"{style.bold}{style.italic}Thank you, for using {about.name}!{style.reset}{style.reset} ❤️ ",
             )
 
-            # Skip auto-updating of the snap package and containerised variants.
-            if not is_snap_package(package=about.package) or not is_docker_container():
+            # Skip auto-updating of the snap package and containerised variant.
+            if is_docker_container() or is_snap_package(package=about.package):
+                pass
+            else:
                 status.stop()
                 if Confirm.ask(
                     f"{style.bold}Would you like to get these updates?{style.reset}",
@@ -149,6 +129,53 @@ async def check_for_updates(
                     status.start()
         else:
             notify.ok(message=f"Up-to-date ({version.full})")
+
+
+def is_docker_container() -> bool:
+    """
+    Determines if the program is running inside a Docker container.
+
+    :return: True if running inside a Docker container, otherwise False.
+    :rtype: bool
+    """
+    return os.environ.get("IS_DOCKER_CONTAINER") == "1"
+
+
+def is_snap_package(package: str) -> bool:
+    """
+    Checks if a specified package name is installed as a snap package
+    by checking if it's running inside a SNAP environment.
+
+    :param package: Name of the package to check.
+    :type package: str
+    :return: True if the specified package is installed as a snap package, otherwise False.
+    :rtype: bool
+    """
+
+    if package:
+        return True if os.getenv("SNAP") else False
+    else:
+        notify.error(INVALID_PACKAGE_ERROR.format(package=package))
+
+
+def is_pypi_package(package: str) -> bool:
+    """
+    Checks if a specified package name is installed as a pypi package.
+
+    :param package: Name of the package to check.
+    :type package: str
+    :return: True if the specified package is installed as a pypi package, otherwise False.
+    :rtype: bool
+    """
+
+    if package:
+        try:
+            __import__(name=package)
+            return True
+        except ImportError:
+            return False
+    else:
+        notify.error(INVALID_PACKAGE_ERROR.format(package=package))
 
 
 def update_package(package: str, status: Optional[Status] = None):

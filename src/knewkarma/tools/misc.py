@@ -1,14 +1,12 @@
 import os
 from datetime import datetime
-from typing import Union, List, Optional, TYPE_CHECKING
+from typing import Union, List, Optional
 
 from rich.box import DOUBLE
+from rich.console import ConsoleRenderable, RichCast
 from rich.panel import Panel
 
 from ..shared_imports import console, notify
-
-if TYPE_CHECKING:
-    from rich.console import ConsoleRenderable, RichCast
 
 __all__ = [
     "filename_timestamp",
