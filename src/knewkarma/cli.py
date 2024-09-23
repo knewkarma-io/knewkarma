@@ -26,7 +26,7 @@ from .tools.data import (
     EXPORT_FORMATS,
 )
 from .tools.misc import filename_timestamp, pathfinder
-from .tools.package import check_for_updates, is_snap_package
+from .tools.package import auto_update_status, check_for_updates, is_snap_package
 
 __all__ = ["start"]
 
@@ -841,6 +841,7 @@ async def handle_method_calls(
                     async with aiohttp.ClientSession() as session:
                         notify.ok("New client session opened")
                         await api.check_reddit_status(session=session, status=status)
+                        auto_update_status()
                         await check_for_updates(session=session, status=status)
                         await call_method(
                             method=method,

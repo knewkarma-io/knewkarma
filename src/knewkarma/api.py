@@ -281,11 +281,15 @@ class Api:
                             component_description = component.get("description")
                             component_update_date = component.get("updated_at")
 
+                            component_colour = (
+                                style.green
+                                if component_status == "operational"
+                                else style.red
+                            )
                             table.add_row(
                                 component_name,
                                 component_description,
-                                f"{style.green if component_status == 'operational'
-                                else style.yellow}{component_status}{style.reset}",
+                                f"{component_colour}{component_status}{style.reset}",
                                 component_update_date,
                             )
 
