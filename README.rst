@@ -53,9 +53,6 @@ If you find Knew Karma useful and would like to support its development, you can
 
 Your sponsorship will help cover the **costs of ongoing maintenance**, **new feature development**, and **overall project sustainability**.
 
-.. image:: https://github.com/user-attachments/assets/30519732-91ba-477a-8a6d-0e23a158ea67
-   :alt: sponsorship
-
 How to Sponsor
 --------------
 
