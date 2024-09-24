@@ -7,9 +7,9 @@ from rich.markdown import Markdown
 from rich.prompt import Confirm
 from rich.status import Status
 
-from .misc import make_panel
+from .misc_utils import make_panel
+from .shared_utils import api, console, notify, style
 from ..meta import about, version
-from ..shared import api, console, notify, style
 
 __all__ = [
     "check_for_updates",
