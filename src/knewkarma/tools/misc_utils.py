@@ -76,11 +76,13 @@ def pathfinder(directories: Union[List[str], str]):
     """
 
     try:
-        if isinstance(directories, List):
+        if isinstance(directories, List) and all(
+                isinstance(directory, str) for directory in directories
+        ):
             for directory in directories:
-                os.makedirs(directory, exist_ok=True)
+                os.makedirs(name=directory, exist_ok=True)
         elif isinstance(directories, str):
-            os.makedirs(directories, exist_ok=True)
+            os.makedirs(name=directories, exist_ok=True)
     except Exception as unexpected_error:
         notify.exception(unexpected_error)
 
