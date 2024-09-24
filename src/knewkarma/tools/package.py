@@ -9,7 +9,7 @@ from rich.status import Status
 
 from .misc import make_panel
 from ..meta import about, version
-from ..shared_imports import api, console, notify, style
+from ..shared import api, console, notify, style
 
 __all__ = [
     "check_for_updates",

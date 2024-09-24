@@ -6,7 +6,7 @@ from rich.box import DOUBLE
 from rich.console import ConsoleRenderable, RichCast
 from rich.panel import Panel
 
-from ..shared_imports import console, notify
+from ..shared import console, notify
 
 __all__ = [
     "filename_timestamp",
@@ -16,9 +16,9 @@ __all__ = [
 
 
 def make_panel(
-    title: str,
-    content: Union[ConsoleRenderable, RichCast, str],
-    subtitle: Optional[str] = None,
+        title: str,
+        content: Union[ConsoleRenderable, RichCast, str],
+        subtitle: Optional[str] = None,
 ):
     """
     Makes a rich Panel for whatever data is needed to be placed in it.
@@ -86,6 +86,5 @@ def pathfinder(directories: Union[List[List[str]], str, None]):
                 pass
     except Exception as unexpected_error:
         notify.exception(unexpected_error)
-
 
 # -------------------------------- END ----------------------------------------- #

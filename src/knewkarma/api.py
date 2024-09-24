@@ -207,7 +207,7 @@ class Api:
         :type overall_count: int
         """
 
-        from knewkarma.shared_imports import style
+        from .shared import style
 
         end_time: float = time.time() + duration
         while time.time() < end_time:
@@ -237,7 +237,7 @@ class Api:
 
         from rich.table import Table
         from rich import box
-        from .shared_imports import console, notify, style
+        from .shared import console, notify, style
 
         if status:
             status.update(
