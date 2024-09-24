@@ -65,7 +65,7 @@ def filename_timestamp() -> str:
     )
 
 
-def pathfinder(directories: Union[List[List[str]], str, None]):
+def pathfinder(directories: Union[List[str], str]):
     """
     Creates directories for exported data (`exported`) and
     Machine Learning models (`ml_models`) in knewkarma directory of the user's home folder.
@@ -76,14 +76,11 @@ def pathfinder(directories: Union[List[List[str]], str, None]):
     """
 
     try:
-        for directory in directories:
-            if isinstance(directory, List):
-                for child_dir in directory:
-                    os.makedirs(child_dir, exist_ok=True)
-            elif isinstance(directory, str):
+        if isinstance(directories, List):
+            for directory in directories:
                 os.makedirs(directory, exist_ok=True)
-            else:
-                pass
+        elif isinstance(directories, str):
+            os.makedirs(directories, exist_ok=True)
     except Exception as unexpected_error:
         notify.exception(unexpected_error)
 
