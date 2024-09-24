@@ -15,9 +15,14 @@ pip install knewkarma
 
 ## Snap Package
 
-If you prefer installing Knew Karma from the Snap Store instead, you can either run `snap install knewkarma`, or Open
-the Ubuntu
-Software desktop app (assuming snap is already installed), and search for "Knew Karma", then proceed to install the
+If you prefer installing Knew Karma from the Snap Store instead, you can either run
+
+```commandline
+snap install knewkarma
+```
+
+Or, open the Snap Store desktop app (assuming snap is already installed), and search for "Knew Karma", then proceed to
+install the
 package.
 
 ## Docker Image
