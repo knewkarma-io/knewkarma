@@ -67,12 +67,11 @@ def filename_timestamp() -> str:
 
 def pathfinder(directories: Union[List[str], str]):
     """
-    Creates directories for exported data (`exported`) and
-    Machine Learning models (`ml_models`) in knewkarma directory of the user's home folder.
+    Creates directories for exported data (`exported`).
 
-    :param directories: A list of directories to create
-    :type directories: List[str]
-    :raise TypeError: If the data type of the specified directories is invalid.
+    :param directories: A list of directories or a directory name to create
+    :type directories: Union[List[str], str]
+    :raise Exception: If any was encountered.
     """
 
     try:
