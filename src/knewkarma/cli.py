@@ -19,7 +19,7 @@ from .tools.package_utils import check_for_updates, is_snap_package
 from .tools.shared_utils import (
     api,
     console,
-    ML_MODELS_DIR,
+    # ML_MODELS_DIR,
     notify,
     style,
     SORT_CRITERION,
@@ -790,7 +790,6 @@ async def call_method(
 
             pathfinder(
                 directories=[
-                    ML_MODELS_DIR if argument == "analyse" else None,
                     [
                         os.path.join(output_child_dir, extension)
                         for extension in ["csv", "html", "json", "xml"]
