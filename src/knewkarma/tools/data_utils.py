@@ -4,7 +4,7 @@ from typing import Union, Literal, List, Tuple, Dict
 
 import pandas as pd
 
-from ..shared import notify
+from .shared_utils import notify
 
 __all__ = [
     "create_dataframe",

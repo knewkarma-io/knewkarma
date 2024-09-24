@@ -207,7 +207,7 @@ class Api:
         :type overall_count: int
         """
 
-        from .shared import style
+        from .tools.shared_utils import style
 
         end_time: float = time.time() + duration
         while time.time() < end_time:
@@ -237,7 +237,7 @@ class Api:
 
         from rich.table import Table
         from rich import box
-        from .shared import console, notify, style
+        from .tools.shared_utils import console, notify, style
 
         if status:
             status.update(

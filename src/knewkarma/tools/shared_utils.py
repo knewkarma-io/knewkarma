@@ -3,9 +3,9 @@ from platform import python_version, platform
 
 from rich.console import Console
 
-from .api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
-from .meta import about, version
-from .tools.terminal import Notify, Style
+from .terminal_utils import Notify, Style
+from ..api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
+from ..meta import about, version
 
 __all__ = [
     "api",
@@ -22,7 +22,7 @@ __all__ = [
 api = Api(
     headers={
         "User-Agent": f"{about.name.replace(' ', '-')}/{version.release} "
-        f"(Python {python_version} on {platform}; +{about.documentation})"
+                      f"(Python {python_version} on {platform}; +{about.documentation})"
     },
 )
 

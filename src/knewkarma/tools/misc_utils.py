@@ -6,7 +6,7 @@ from rich.box import DOUBLE
 from rich.console import ConsoleRenderable, RichCast
 from rich.panel import Panel
 
-from ..shared import console, notify
+from .shared_utils import console, notify
 
 __all__ = [
     "filename_timestamp",
@@ -30,7 +30,7 @@ def make_panel(
     :param subtitle: Panel subtitle.
     :type subtitle: str
     """
-    from .terminal import Style
+    from .terminal_utils import Style
 
     console.print(
         Panel(
