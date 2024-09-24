@@ -583,7 +583,7 @@ class Api:
 
         if status:
             status.update(
-                f"Searching for '{query}' in {entity_type}",
+                f"Searching for '{query}' in {limit} {entity_type}"
             )
 
         search_results = await self._paginate_items(
