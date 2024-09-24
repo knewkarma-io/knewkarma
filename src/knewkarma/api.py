@@ -41,8 +41,9 @@ class Api:
         :type endpoint: str
         :param session: A aiohttp.ClientSession to use for the request. to use for the request.
         :type session: aiohttp.ClientSession
-        :return: JSON data as a dictionary or list. Returns an empty dict if fetching fails.
+        :return: JSON data as a dictionary or list. Raises an exception if fetching fails.
         :rtype: Union[Dict, List]
+        :raise Exception: If any is encountered.
         """
 
         try:
