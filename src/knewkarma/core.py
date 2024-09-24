@@ -7,7 +7,7 @@ from aiohttp import ClientSession
 from karmakaze import Parse
 from rich.status import Status
 
-from .shared_imports import api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
+from .shared import api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from .tools.data import plot_bar_chart, visualisation_dependency_installed
 
 __all__ = [
