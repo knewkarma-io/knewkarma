@@ -12,7 +12,6 @@ from ..meta import about, version
 from ..shared_imports import api, console, notify, style
 
 __all__ = [
-    "auto_update_status",
     "check_for_updates",
     "is_pypi_package",
     "is_snap_package",
@@ -22,32 +21,6 @@ __all__ = [
 INVALID_PACKAGE_ERROR: str = (
     "The provided package name is not a valid string: {package}"
 )
-
-
-def auto_update_status():
-    """
-    Checks and prints the currently running variant of knewkarma.
-    """
-
-    package: str = about.package
-
-    if (
-        is_pypi_package(package=package)
-        and not is_snap_package(package=package)
-        and not is_docker_container()
-    ):
-        auto_update_indicator = "Enabled"
-    else:
-        auto_update_indicator = "Disabled"
-
-    message = f"Auto-Update: {style.green
-    if auto_update_indicator == 'Enabled'
-    else style.yellow}{auto_update_indicator}{style.reset}"
-    (
-        notify.ok(message)
-        if auto_update_indicator == "Enabled"
-        else notify.warning(message)
-    )
 
 
 async def check_for_updates(
