@@ -31,7 +31,7 @@ class Api:
         self._headers = headers
         self._sanitise = Sanitise()
 
-    async def make_request(
+    async def send_request(
             self, endpoint: str, session: ClientSession
     ) -> Union[Dict, List, None]:
         """
@@ -98,7 +98,7 @@ class Api:
             )
 
             # Make an asynchronous request to the constructed endpoint.
-            response = await self.make_request(
+            response = await self.send_request(
                 session=session, endpoint=paginated_endpoint
             )
 
@@ -179,7 +179,7 @@ class Api:
             # Construct the endpoint for each additional comment ID.
             more_endpoint = f"{endpoint}&comment={more_id}"
             # Make an asynchronous request to fetch the additional comments.
-            more_response = await self.make_request(
+            more_response = await self.send_request(
                 session=session, endpoint=more_endpoint
             )
             # Extract the items (comments) from the response.
@@ -244,7 +244,7 @@ class Api:
                 f"Checking Reddit {style.bold}API/Infrastructure{style.reset} status"
             )
 
-        status_response: Dict = await self.make_request(
+        status_response: Dict = await self.send_request(
             endpoint=self.reddit_status_endpoint, session=session
         )
         indicator = status_response.get("status").get("indicator")
@@ -258,7 +258,7 @@ class Api:
                 )
                 if status:
                     status.update("Getting status components")
-                status_components: Dict = await self.make_request(
+                status_components: Dict = await self.send_request(
                     endpoint=self.reddit_status_components_endpoint, session=session
                 )
 
@@ -348,7 +348,7 @@ class Api:
 
         endpoint, sanitiser = entity_map.get(entity_type)
 
-        response = await self.make_request(endpoint=endpoint, session=session)
+        response = await self.send_request(endpoint=endpoint, session=session)
         sanitised_response = sanitiser(response)
 
         return sanitised_response
@@ -475,7 +475,7 @@ class Api:
 
         endpoint = subreddits_mapping.get(subreddits_type, "")
         if subreddits_type == "user_moderated":
-            subreddits = await self.make_request(
+            subreddits = await self.send_request(
                 endpoint=endpoint,
                 session=session,
             )

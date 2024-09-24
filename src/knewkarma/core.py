@@ -719,7 +719,7 @@ class Subreddit:
                 f"Retrieving wiki pages from subreddit ({self._name})",
             )
 
-        pages = await api.make_request(
+        pages = await api.send_request(
             endpoint=f"{api.subreddit_endpoint}/{self._name}/wiki/pages.json",
             session=session,
         )
