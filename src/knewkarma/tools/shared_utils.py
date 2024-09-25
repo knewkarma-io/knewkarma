@@ -22,7 +22,7 @@ __all__ = [
 api = Api(
     headers={
         "User-Agent": f"{about.name.replace(' ', '-')}/{version.release} "
-                      f"(Python {python_version} on {platform}; +{about.documentation})"
+        f"(Python {python_version} on {platform}; +{about.documentation})"
     },
 )
 

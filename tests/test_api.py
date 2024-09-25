@@ -46,7 +46,7 @@ async def test_search_for_posts_in_a_subreddit():
     posts_subreddit: str = "AdultSwim"
     search_results = await fetch_with_retry(
         api.get_posts,
-        posts_type="search_subreddit_posts",
+        posts_type="search_subreddit",
         query=search_query,
         subreddit=posts_subreddit,
         limit=50,
@@ -135,7 +135,7 @@ async def test_get_posts_from_a_subreddit():
     """Tests getting posts from a subreddit."""
     subreddit_posts: List = await fetch_with_retry(
         api.get_posts,
-        posts_type="subreddit_posts",
+        posts_type="subreddit",
         subreddit=TEST_SUBREDDIT_1,
         limit=50,
     )
@@ -154,7 +154,7 @@ async def test_get_posts_from_a_user():
     username: str = "AutoModerator"
     user_posts: List = await fetch_with_retry(
         api.get_posts,
-        posts_type="user_posts",
+        posts_type="user",
         username=username,
         limit=100,
     )
