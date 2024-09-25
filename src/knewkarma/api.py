@@ -32,7 +32,7 @@ class Api:
         self._sanitise = Sanitise()
 
     async def send_request(
-            self, endpoint: str, session: ClientSession
+        self, endpoint: str, session: ClientSession
     ) -> Union[Dict, List, None]:
         """
         Asynchronously sends a GET request to the specified API endpoint and returns JSON or list response.
@@ -48,8 +48,8 @@ class Api:
 
         try:
             async with session.get(
-                    url=endpoint,
-                    headers=self._headers,
+                url=endpoint,
+                headers=self._headers,
             ) as response:
                 response.raise_for_status()
                 response_data: Union[Dict, List] = await response.json()
@@ -59,12 +59,12 @@ class Api:
             raise error
 
     async def _paginate_items(
-            self,
-            session: ClientSession,
-            sanitiser: Callable,
-            limit: int,
-            status: Optional[Status] = None,
-            **kwargs: Union[str, bool],
+        self,
+        session: ClientSession,
+        sanitiser: Callable,
+        limit: int,
+        status: Optional[Status] = None,
+        **kwargs: Union[str, bool],
     ) -> List[Dict]:
         """
         Asynchronously fetches and processes data in a paginated manner
@@ -169,11 +169,11 @@ class Api:
         return all_items
 
     async def _paginate_more_items(
-            self,
-            session: ClientSession,
-            more_items_ids: List[str],
-            endpoint: str,
-            fetched_items: List[Dict],
+        self,
+        session: ClientSession,
+        more_items_ids: List[str],
+        endpoint: str,
+        fetched_items: List[Dict],
     ):
         for more_id in more_items_ids:
             # Construct the endpoint for each additional comment ID.
@@ -192,7 +192,7 @@ class Api:
 
     @staticmethod
     async def _pagination_countdown_timer(
-            status: Status, duration: int, current_count: int, overall_count: int
+        status: Status, duration: int, current_count: int, overall_count: int
     ):
         """
         Handles the live countdown during pagination, updating the status bar with the remaining time.
@@ -224,7 +224,7 @@ class Api:
             await asyncio.sleep(0.01)  # Sleep for 10 milliseconds
 
     async def check_reddit_status(
-            self, session: ClientSession, status: Optional[Status] = None
+        self, session: ClientSession, status: Optional[Status] = None
     ):
         """
         Asynchronously checks Reddit API and infrastructure status.
@@ -297,11 +297,11 @@ class Api:
                         console.print(table)
 
     async def get_entity(
-            self,
-            session: ClientSession,
-            entity_type: Literal["post", "subreddit", "user", "wiki_page"],
-            status: Optional[Status] = None,
-            **kwargs: str,
+        self,
+        session: ClientSession,
+        entity_type: Literal["post", "subreddit", "user", "wiki_page"],
+        status: Optional[Status] = None,
+        **kwargs: str,
     ) -> Dict:
         """
         Asynchronously gets data from the specified entity.
@@ -354,27 +354,27 @@ class Api:
         return sanitised_response
 
     async def get_posts(
-            self,
-            session: ClientSession,
-            posts_type: Literal[
-                "best",
-                "controversial",
-                "front_page",
-                "new",
-                "popular",
-                "rising",
-                "subreddit",
-                "search_subreddit",
-                "user",
-                "user_overview",
-                "user_comments",
-                "post_comments",
-            ],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
-            **kwargs: str,
+        self,
+        session: ClientSession,
+        posts_type: Literal[
+            "best",
+            "controversial",
+            "front_page",
+            "new",
+            "popular",
+            "rising",
+            "subreddit",
+            "search_subreddit",
+            "user",
+            "user_overview",
+            "user_comments",
+            "post_comments",
+        ],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
+        **kwargs: str,
     ) -> List[Dict]:
         """
         Asynchronously gets a specified number of posts, with a specified sorting criterion, from the specified source.
@@ -407,9 +407,9 @@ class Api:
             "user_overview": f"{self._user_endpoint}/{kwargs.get('username')}/overview.json",
             "user_comments": f"{self._user_endpoint}/{kwargs.get('username')}/comments.json",
             "post_comments": f"{self.subreddit_endpoint}/{kwargs.get('post_subreddit')}"
-                             f"/comments/{kwargs.get('post_id')}.json",
+            f"/comments/{kwargs.get('post_id')}.json",
             "search_subreddit": f"{self.subreddit_endpoint}/{kwargs.get('subreddit')}"
-                                f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
+            f"/search.json?q={kwargs.get('query')}&restrict_sr=1",
         }
 
         if status:
@@ -436,13 +436,13 @@ class Api:
         return posts
 
     async def get_subreddits(
-            self,
-            session: ClientSession,
-            subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
-            **kwargs: str,
+        self,
+        session: ClientSession,
+        subreddits_type: Literal["all", "default", "new", "popular", "user_moderated"],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
+        **kwargs: str,
     ) -> Union[List[Dict], Dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -492,12 +492,12 @@ class Api:
         return subreddits
 
     async def get_users(
-            self,
-            session: ClientSession,
-            users_type: Literal["all", "popular", "new"],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: ClientSession,
+        users_type: Literal["all", "popular", "new"],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[Dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -539,13 +539,13 @@ class Api:
         return users
 
     async def search_entities(
-            self,
-            session: ClientSession,
-            entity_type: Literal["users", "subreddits", "posts"],
-            query: str,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: ClientSession,
+        entity_type: Literal["users", "subreddits", "posts"],
+        query: str,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[Dict]:
         """
         Asynchronously searches specified entities that match the specified query.
@@ -582,9 +582,7 @@ class Api:
         )
 
         if status:
-            status.update(
-                f"Searching for '{query}' in {limit} {entity_type}"
-            )
+            status.update(f"Searching for '{query}' in {limit} {entity_type}")
 
         search_results = await self._paginate_items(
             session=session,
@@ -595,5 +593,6 @@ class Api:
         )
 
         return search_results
+
 
 # -------------------------------- END ----------------------------------------- #
