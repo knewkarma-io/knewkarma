@@ -15,7 +15,7 @@ from .tools.data_utils import (
     EXPORT_FORMATS,
 )
 from .tools.misc_utils import filename_timestamp, pathfinder
-from .tools.package_utils import check_for_updates, is_snap_package
+from .tools.package_utils import is_snap_package
 from .tools.shared_utils import (
     api,
     console,
@@ -94,7 +94,7 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
     help=f"<bulk/semi-bulk> Timeframe to get data from",
 )
 @click.option(
-    "-tfm",
+    "-tf",
     "--time-format",
     default="locale",
     show_default=True,
@@ -156,8 +156,8 @@ def cli(
 )
 @click.argument("id")
 @click.argument("subreddit")
-@click.option("-d", "--data", is_flag=True, help="Get post data")
-@click.option("-c", "--comments", is_flag=True, help="Get post comments")
+@click.option("--data", is_flag=True, help="Get post data")
+@click.option("--comments", is_flag=True, help="Get post comments")
 @click.pass_context
 def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool):
     """
@@ -200,27 +200,24 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 @cli.command(
     help="Use this command get best, controversial, front-page, new, popular, and/or rising posts.",
 )
-@click.option("-b", "--best", is_flag=True, help="Get posts from the best listing")
+@click.option("--best", is_flag=True, help="Get posts from the best listing")
 @click.option(
-    "-c",
     "--controversial",
     is_flag=True,
     help="Get posts from the controversial listing",
 )
 @click.option(
-    "-f",
     "--front-page",
     is_flag=True,
     help="Get posts from the reddit front-page",
 )
-@click.option("-n", "--new", is_flag=True, help="Get new posts")
+@click.option("--new", is_flag=True, help="Get new posts")
 @click.option(
-    "-p",
     "--popular",
     is_flag=True,
     help="Get posts from the popular listing",
 )
-@click.option("-r", "--rising", is_flag=True, help="Get posts from the rising listing")
+@click.option("--rising", is_flag=True, help="Get posts from the rising listing")
 @click.pass_context
 def posts(
     ctx: click.Context,
@@ -297,9 +294,9 @@ def posts(
     help="Use this command for search/discovery of users, subreddits, and posts.",
 )
 @click.argument("query")
-@click.option("-p", "--posts", is_flag=True, help="Search posts")
-@click.option("-s", "--subreddits", is_flag=True, help="Search subreddits")
-@click.option("-u", "--users", is_flag=True, help="Search users")
+@click.option("--posts", is_flag=True, help="Search posts")
+@click.option("--subreddits", is_flag=True, help="Search subreddits")
+@click.option("--users", is_flag=True, help="Search users")
 @click.pass_context
 def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users: bool):
     """
@@ -352,27 +349,23 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
 )
 @click.argument("subreddit_name")
 @click.option(
-    "-c",
     "--comments",
     is_flag=True,
     help="Get a subreddit's comments (beta)",
 )
 @click.option(
-    "-cpp",
     "--comments-per-post",
     type=int,
-    help="To be used when getting comments with `-c/--comments`",
+    help="To be used when getting comments with `--comments`",
 )
-@click.option("-p", "--profile", is_flag=True, help="Get a subreddit's profile")
-@click.option("-pp", "--posts", is_flag=True, help="Get a subreddit's posts")
+@click.option("--profile", is_flag=True, help="Get a subreddit's profile")
+@click.option("--posts", is_flag=True, help="Get a subreddit's posts")
+@click.option("--search-comments", type=str, help="Search comments in a subreddit")
+@click.option("--search-post", type=str, help="Search posts in a subreddit")
 @click.option(
-    "-sc", "--search-comments", type=str, help="Search comments in a subreddit"
+    "--wiki-page", type=str, help="Get a subreddit's specified wiki page data"
 )
-@click.option("-sp", "--search-post", type=str, help="Search posts in a subreddit")
-@click.option(
-    "-wp", "--wiki-page", type=str, help="Get a subreddit's specified wiki page data"
-)
-@click.option("-wps", "--wiki-pages", is_flag=True, help="Get a subreddit's wiki pages")
+@click.option("--wiki-pages", is_flag=True, help="Get a subreddit's wiki pages")
 @click.pass_context
 def subreddit(
     ctx: click.Context,
@@ -478,21 +471,18 @@ def subreddit(
 @cli.command(
     help="Use this command to get all, default, new, and/or popular subreddits.",
 )
-@click.option("-a", "--all", is_flag=True, help="Get all subreddits")
+@click.option("--all", is_flag=True, help="Get all subreddits")
 @click.option(
-    "-d",
     "--default",
     is_flag=True,
     help="Get default subreddits",
 )
 @click.option(
-    "-n",
     "--new",
     is_flag=True,
     help="Get new subreddits",
 )
 @click.option(
-    "-p",
     "--popular",
     is_flag=True,
     help="Get popular subreddits",
@@ -556,33 +546,34 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
     "comments, top subreddits, moderated subreddits, and more...",
 )
 @click.argument("username")
-@click.option("-c", "--comments", is_flag=True, help="Get user's comments")
+@click.option("--comments", is_flag=True, help="Get user's comments")
 @click.option(
-    "-ms",
     "--moderated-subreddits",
     is_flag=True,
     help="Get user's moderated subreddits",
 )
-@click.option("-o", "--overview", is_flag=True, help="Get user's most recent comments")
-@click.option("-ps", "--posts", is_flag=True, help="Get user's posts")
-@click.option("-p", "--profile", is_flag=True, help="Get user's profile")
+@click.option("--overview", is_flag=True, help="Get user's most recent comments")
+@click.option("--posts", is_flag=True, help="Get user's posts")
+@click.option("--profile", is_flag=True, help="Get user's profile")
 @click.option(
-    "-sc",
     "--search-comments",
     type=str,
     help="Search user's comments that contains a specified query string",
 )
 @click.option(
-    "-sp",
     "--search-posts",
     type=str,
     help="Search user's posts that contains a specified query string",
 )
 @click.option(
-    "-ts",
     "--top-subreddits",
     type=int,
     help="Get user's top n subreddits",
+)
+@click.option(
+    "--username-available",
+    is_flag=True,
+    help="Check if the given username is available or taken.",
 )
 @click.pass_context
 def user(
@@ -596,6 +587,7 @@ def user(
     search_comments: str,
     search_posts: str,
     top_subreddits: int,
+    username_available: bool,
 ):
     """
     Retrieve data about a specific user including profile, posts, comments, and top subreddits.
@@ -620,6 +612,8 @@ def user(
     :type search_posts: str
     :param top_subreddits: Number of top subreddits to retrieve.
     :type top_subreddits: int
+    :param username_available: Flag to check if the given username is available of taken.
+    :type username_available: bool
     """
     timeframe: TIMEFRAME = ctx.obj["timeframe"]
     sort: SORT_CRITERION = ctx.obj["sort"]
@@ -667,6 +661,9 @@ def user(
             timeframe=timeframe,
             status=status,
         ),
+        "username_available": lambda session, status=None: user_instance.username_available(
+            session=session, status=status
+        ),
     }
 
     asyncio.run(
@@ -682,6 +679,7 @@ def user(
             search_comments=search_comments,
             search_posts=search_posts,
             top_subreddits=top_subreddits,
+            username_available=username_available,
         )
     )
 
@@ -689,15 +687,13 @@ def user(
 @cli.command(
     help="Use this command to get all, new, and/or popular users.",
 )
-@click.option("-a", "--all", is_flag=True, help="Get all users")
+@click.option("--all", is_flag=True, help="Get all users")
 @click.option(
-    "-n",
     "--new",
     is_flag=True,
     help="Get new users",
 )
 @click.option(
-    "-p",
     "--popular",
     is_flag=True,
     help="Get popular users",
@@ -768,42 +764,41 @@ async def call_method(
     command: str = kwargs.get("ctx").command.name
     argument: str = kwargs.get("argument")
 
-    response_data: Union[List, Dict, str] = await method(session=session, status=status)
-
-    console.set_window_title(
-        f"Showing {len(response_data)} {command} {argument} — {about.name} {version.release}"
-        if isinstance(response_data, List)
-        else f"Showing {command} {argument} — {about.name} {version.release}"
+    response_data: Union[List, Dict, str, bool] = await method(
+        session=session, status=status
     )
+    if argument == "username_available" and (response_data, bool):
+        if response_data:
+            notify.ok(message="Username is available.")
+        else:
+            notify.warning("Username is already taken.")
+    else:
+        if response_data:
+            dataframe = create_dataframe(data=response_data)
+            console.print(dataframe)
 
-    if response_data:
-        dataframe = create_dataframe(data=response_data)
-        console.print(dataframe)
+            if kwargs.get("export"):
+                output_child_dir: str = os.path.join(
+                    OUTPUT_PARENT_DIR,
+                    "exports",
+                    command,
+                    argument,
+                )
 
-        if kwargs.get("export"):
-            output_child_dir: str = os.path.join(
-                OUTPUT_PARENT_DIR,
-                "exports",
-                command,
-                argument,
-            )
-
-            pathfinder(
-                directories=[
-                    [
+                pathfinder(
+                    directories=[
                         os.path.join(output_child_dir, extension)
                         for extension in ["csv", "html", "json", "xml"]
                     ],
-                ]
-            )
+                )
 
-            export_to: List = kwargs.get("export").split(",")
-            export_dataframe(
-                dataframe=dataframe,
-                filename=filename_timestamp(),
-                directory=output_child_dir,
-                formats=export_to,
-            )
+                export_to: List = kwargs.get("export").split(",")
+                export_dataframe(
+                    dataframe=dataframe,
+                    filename=filename_timestamp(),
+                    directory=output_child_dir,
+                    formats=export_to,
+                )
 
 
 async def handle_method_calls(
@@ -840,7 +835,7 @@ async def handle_method_calls(
                     async with aiohttp.ClientSession() as session:
                         notify.ok("New client session opened")
                         await api.check_reddit_status(session=session, status=status)
-                        await check_for_updates(session=session, status=status)
+                        # await check_for_updates(session=session, status=status)
                         await call_method(
                             method=method,
                             session=session,
