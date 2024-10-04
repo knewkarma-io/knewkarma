@@ -15,7 +15,7 @@ from .tools.data_utils import (
     EXPORT_FORMATS,
 )
 from .tools.misc_utils import filename_timestamp, pathfinder
-from .tools.package_utils import is_snap_package
+from .tools.package_utils import check_for_updates, is_snap_package
 from .tools.shared_utils import (
     api,
     console,
@@ -118,12 +118,12 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
 )
 @click.pass_context
 def cli(
-    ctx: click.Context,
-    timeframe: TIMEFRAME,
-    sort: SORT_CRITERION,
-    limit: int,
-    time_format: str,
-    export: List[EXPORT_FORMATS],
+        ctx: click.Context,
+        timeframe: TIMEFRAME,
+        sort: SORT_CRITERION,
+        limit: int,
+        time_format: str,
+        export: List[EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -152,7 +152,7 @@ def cli(
 
 @cli.command(
     help="Use this command to get an individual post's data including its comments, "
-    "provided the post's <id> and source <subreddit> are specified.",
+         "provided the post's <id> and source <subreddit> are specified.",
 )
 @click.argument("id")
 @click.argument("subreddit")
@@ -220,13 +220,13 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 @click.option("--rising", is_flag=True, help="Get posts from the rising listing")
 @click.pass_context
 def posts(
-    ctx: click.Context,
-    best: bool,
-    controversial: bool,
-    front_page: bool,
-    new: bool,
-    popular: bool,
-    rising: bool,
+        ctx: click.Context,
+        best: bool,
+        controversial: bool,
+        front_page: bool,
+        new: bool,
+        popular: bool,
+        rising: bool,
 ):
     """
     Retrieve various types of posts such as best, controversial, popular, new, and front-page.
@@ -368,16 +368,16 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
 @click.option("--wiki-pages", is_flag=True, help="Get a subreddit's wiki pages")
 @click.pass_context
 def subreddit(
-    ctx: click.Context,
-    subreddit_name: str,
-    comments: bool,
-    comments_per_post: int,
-    posts: bool,
-    profile: bool,
-    search_comments: str,
-    search_post: str,
-    wiki_page: str,
-    wiki_pages: bool,
+        ctx: click.Context,
+        subreddit_name: str,
+        comments: bool,
+        comments_per_post: int,
+        posts: bool,
+        profile: bool,
+        search_comments: str,
+        search_post: str,
+        wiki_page: str,
+        wiki_pages: bool,
 ):
     """
     Retrieve data about a specific subreddit including profile, comments, posts, and wiki pages.
@@ -543,7 +543,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 
 @cli.command(
     help="Use this command to get user data, such as profile, posts, "
-    "comments, top subreddits, moderated subreddits, and more...",
+         "comments, top subreddits, moderated subreddits, and more...",
 )
 @click.argument("username")
 @click.option("--comments", is_flag=True, help="Get user's comments")
@@ -577,17 +577,17 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 )
 @click.pass_context
 def user(
-    ctx: click.Context,
-    username: str,
-    comments: bool,
-    moderated_subreddits: bool,
-    overview: bool,
-    posts: bool,
-    profile: bool,
-    search_comments: str,
-    search_posts: str,
-    top_subreddits: int,
-    username_available: bool,
+        ctx: click.Context,
+        username: str,
+        comments: bool,
+        moderated_subreddits: bool,
+        overview: bool,
+        posts: bool,
+        profile: bool,
+        search_comments: str,
+        search_posts: str,
+        top_subreddits: int,
+        username_available: bool,
 ):
     """
     Retrieve data about a specific user including profile, posts, comments, and top subreddits.
@@ -744,10 +744,10 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 
 
 async def call_method(
-    method: Callable,
-    session: aiohttp.ClientSession,
-    status: console.status,
-    **kwargs: Union[str, click.Context],
+        method: Callable,
+        session: aiohttp.ClientSession,
+        status: console.status,
+        **kwargs: Union[str, click.Context],
 ):
     """
     Calls a method with the provided arguments.
@@ -802,10 +802,10 @@ async def call_method(
 
 
 async def handle_method_calls(
-    ctx: click.Context,
-    method_map: Dict,
-    export: str,
-    **kwargs: Union[str, int, bool],
+        ctx: click.Context,
+        method_map: Dict,
+        export: str,
+        **kwargs: Union[str, int, bool],
 ):
     """
     Handle the method calls based on the provided arguments.
@@ -827,15 +827,15 @@ async def handle_method_calls(
             start_time: datetime = datetime.now()
             try:
                 with Status(
-                    status=f"Opening new client session",
-                    spinner="dots",
-                    spinner_style=style.yellow.strip("[,]"),
-                    console=console,
+                        status=f"Opening new client session",
+                        spinner="dots",
+                        spinner_style=style.yellow.strip("[,]"),
+                        console=console,
                 ) as status:
                     async with aiohttp.ClientSession() as session:
                         notify.ok("New client session opened")
                         await api.check_reddit_status(session=session, status=status)
-                        # await check_for_updates(session=session, status=status)
+                        await check_for_updates(session=session, status=status)
                         await call_method(
                             method=method,
                             session=session,
@@ -867,6 +867,5 @@ def start():
 
     console.set_window_title(f"{about.name} {version.release}")
     cli(obj={})
-
 
 # -------------------------------- END ----------------------------------------- #
