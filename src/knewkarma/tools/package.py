@@ -7,8 +7,8 @@ from rich.markdown import Markdown
 from rich.prompt import Confirm
 from rich.status import Status
 
-from .misc_utils import make_panel
-from .shared_utils import api, console, notify, style
+from .miscellaneous import make_panel
+from .shared import api, console, notify, style
 from ..meta import about, version
 
 __all__ = [
@@ -24,7 +24,7 @@ INVALID_PACKAGE_ERROR: str = (
 
 
 async def check_for_updates(
-    session: aiohttp.ClientSession, status: Optional[Status] = None
+        session: aiohttp.ClientSession, status: Optional[Status] = None
 ):
     """
     Asynchronously checks for updates by comparing the current local version with the remote version.
@@ -92,10 +92,10 @@ async def check_for_updates(
             else:
                 status.stop()
                 if Confirm.ask(
-                    f"{style.bold}Would you like to get these updates?{style.reset}",
-                    case_sensitive=False,
-                    default=False,
-                    console=console,
+                        f"{style.bold}Would you like to get these updates?{style.reset}",
+                        case_sensitive=False,
+                        default=False,
+                        console=console,
                 ):
                     update_package(package=about.package, status=status)
                 else:
@@ -187,6 +187,5 @@ def update_package(package: str, status: Optional[Status] = None):
             notify.exception(unexpected_error)
     else:
         notify.error(INVALID_PACKAGE_ERROR.format(package=package))
-
 
 # -------------------------------- END ----------------------------------------- #
