@@ -1,13 +1,12 @@
 import pytest
 
 from knewkarma.api import Api
-from knewkarma.meta import about
-from knewkarma.meta import version
+from knewkarma.meta import about, version
 
 api = Api(
     headers={
-        "User-Agent": f"{about.name.replace(' ', '-')}/Test-{version.release} "
-        f"(PyTest {pytest.__version__}; +{about.documentation})"
+        "User-Agent": f"{about.name.replace(' ', '-')}/Testing-{version.release} "
+                      f"(PyTest {pytest.__version__}; +{about.documentation})"
     }
 )
 
