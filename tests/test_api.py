@@ -45,8 +45,8 @@ async def test_search_for_posts():
     assert len(search_posts) == 100
     for post_result in search_posts:
         assert (
-                search_posts_query.lower() in post_result.get("selftext").lower()
-                or post_result.get("title").lower()
+            search_posts_query.lower() in post_result.get("selftext").lower()
+            or post_result.get("title").lower()
         )
 
 
@@ -69,8 +69,8 @@ async def test_search_for_posts_in_a_subreddit():
     for search_result in search_results:
         assert search_result.get("subreddit").lower() == posts_subreddit.lower()
         assert (
-                search_result.get("title").lower()
-                or search_result.get("selftext").lower() in search_query.split()
+            search_result.get("title").lower()
+            or search_result.get("selftext").lower() in search_query.split()
         )
 
 
@@ -90,9 +90,9 @@ async def test_search_for_subreddits():
     assert all(isinstance(subreddit, Dict) for subreddit in search_subreddits)
     for subreddit_result in search_subreddits:
         assert (
-                search_subreddits_query.lower()
-                in subreddit_result.get("public_description").lower()
-                or subreddit_result.get("display_name").lower()
+            search_subreddits_query.lower()
+            in subreddit_result.get("public_description").lower()
+            or subreddit_result.get("display_name").lower()
         )
 
 
@@ -193,7 +193,7 @@ async def test_get_new_posts():
             new_post.get("created"), timezone.utc
         )
         assert (
-                now - timedelta(days=1) < created_timestamp
+            now - timedelta(days=1) < created_timestamp
         ), f"Post {new_post.get('id')} was not created recently."
 
 
@@ -217,7 +217,7 @@ async def test_get_new_users():
             new_user.get("created"), timezone.utc
         )
         assert (
-                now - timedelta(days=7) < created_timestamp
+            now - timedelta(days=7) < created_timestamp
         ), f"User {new_user.get('name')} was not created recently."
 
 
@@ -240,7 +240,8 @@ async def test_get_new_subreddits():
             new_subreddit.get("created"), timezone.utc
         )
         assert (
-                now - timedelta(days=1) < created_timestamp
+            now - timedelta(days=1) < created_timestamp
         ), f"Subreddit {new_subreddit.get('display_name')} was not created recently."
+
 
 # -------------------------------- END ----------------------------------------- #
