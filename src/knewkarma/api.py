@@ -23,16 +23,16 @@ class Api:
 
     @staticmethod
     def endpoint(
-            kind: Literal[
-                "base",
-                "user",
-                "users",
-                "subreddit",
-                "subreddits",
-                "reddit_status",
-                "reddit_status_components",
-                "username_available",
-            ]
+        kind: Literal[
+            "base",
+            "user",
+            "users",
+            "subreddit",
+            "subreddits",
+            "reddit_status",
+            "reddit_status_components",
+            "username_available",
+        ]
     ) -> str:
         """
         A static method that contains endpoints for the specified `kind` of data.
@@ -57,7 +57,7 @@ class Api:
         return endpoint_map.get(kind)
 
     async def send_request(
-            self, session: ClientSession, endpoint: str, params: Optional[Dict] = None
+        self, session: ClientSession, endpoint: str, params: Optional[Dict] = None
     ) -> Union[Dict, List, bool, None]:
         """
         Asynchronously sends a GET request to the specified API endpoint and returns JSON or list response.
@@ -75,7 +75,7 @@ class Api:
 
         try:
             async with session.get(
-                    url=endpoint, headers=self._headers, params=params
+                url=endpoint, headers=self._headers, params=params
             ) as response:
                 response.raise_for_status()
                 response_data: Union[Dict, List] = await response.json()
@@ -85,12 +85,12 @@ class Api:
             raise error
 
     async def _paginate_items(
-            self,
-            session: ClientSession,
-            sanitiser: Callable,
-            limit: int,
-            status: Optional[Status] = None,
-            **kwargs: Union[str, bool, Dict],
+        self,
+        session: ClientSession,
+        sanitiser: Callable,
+        limit: int,
+        status: Optional[Status] = None,
+        **kwargs: Union[str, bool, Dict],
     ) -> List[Dict]:
         """
         Asynchronously fetches and processes data in a paginated manner
@@ -195,11 +195,11 @@ class Api:
         return all_items
 
     async def _paginate_more_items(
-            self,
-            session: ClientSession,
-            more_items_ids: List[str],
-            endpoint: str,
-            fetched_items: List[Dict],
+        self,
+        session: ClientSession,
+        more_items_ids: List[str],
+        endpoint: str,
+        fetched_items: List[Dict],
     ):
         for more_id in more_items_ids:
             # Construct the endpoint for each additional comment ID.
@@ -218,7 +218,7 @@ class Api:
 
     @staticmethod
     async def _pagination_countdown_timer(
-            status: Status, duration: int, current_count: int, overall_count: int
+        status: Status, duration: int, current_count: int, overall_count: int
     ):
         """
         A static method handles the live countdown during pagination, updating the status bar with the remaining time.
@@ -250,7 +250,7 @@ class Api:
             await asyncio.sleep(0.01)  # Sleep for 10 milliseconds
 
     async def check_reddit_status(
-            self, session: ClientSession, status: Optional[Status] = None
+        self, session: ClientSession, status: Optional[Status] = None
     ):
         """
         Asynchronously checks Reddit API and infrastructure status.
@@ -325,11 +325,11 @@ class Api:
                         console.print(table)
 
     async def get_entity(
-            self,
-            session: ClientSession,
-            kind: Literal["comment", "post", "subreddit", "user", "wikipage"],
-            status: Optional[Status] = None,
-            **kwargs: str,
+        self,
+        session: ClientSession,
+        kind: Literal["comment", "post", "subreddit", "user", "wikipage"],
+        status: Optional[Status] = None,
+        **kwargs: str,
     ) -> Dict:
         """
         Asynchronously gets data from the specified entity.
@@ -358,7 +358,7 @@ class Api:
             """
             "post": {
                 "endpoint": f"{self.endpoint(kind='subreddit')}/{subreddit}"
-                            f"/comments/{post_id}.json",
+                f"/comments/{post_id}.json",
                 "sanitiser": lambda data: self._sanitise.post(data),
             },
             "user": {
@@ -389,27 +389,27 @@ class Api:
         return sanitised_response
 
     async def get_posts_or_comments(
-            self,
-            session: ClientSession,
-            kind: Literal[
-                "best",
-                "controversial",
-                "front_page",
-                "new",
-                "popular",
-                "rising",
-                "posts_from_a_subreddit",
-                "search_from_a_subreddit",
-                "posts_from_a_user",
-                "overview_of_a_user",
-                "comments_from_a_user",
-                "comments_from_a_post",
-            ],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
-            **kwargs: str,
+        self,
+        session: ClientSession,
+        kind: Literal[
+            "best",
+            "controversial",
+            "front_page",
+            "new",
+            "popular",
+            "rising",
+            "posts_from_a_subreddit",
+            "search_from_a_subreddit",
+            "posts_from_a_user",
+            "overview_of_a_user",
+            "comments_from_a_user",
+            "comments_from_a_post",
+        ],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
+        **kwargs: str,
     ) -> List[Dict]:
         """
         Asynchronously gets a specified number of posts or comments, with a specified sorting criterion, from the specified source.
@@ -445,9 +445,9 @@ class Api:
             "overview_of_a_user": f"{self.endpoint(kind='user')}/{username}/overview.json",
             "comments_from_a_user": f"{self.endpoint(kind='user')}/{username}/comments.json",
             "comments_from_a_post": f"{self.endpoint(kind='subreddit')}/{subreddit}"
-                                    f"/comments/{kwargs.get('id')}.json",
+            f"/comments/{kwargs.get('id')}.json",
             "search_from_a_subreddit": f"{self.endpoint(kind='subreddit')}/{subreddit}"
-                                       f"/search.json",
+            f"/search.json",
         }
 
         if status:
@@ -480,13 +480,13 @@ class Api:
         return posts
 
     async def get_subreddits(
-            self,
-            session: ClientSession,
-            kind: Literal["all", "default", "new", "popular", "user_moderated"],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
-            **kwargs: str,
+        self,
+        session: ClientSession,
+        kind: Literal["all", "default", "new", "popular", "user_moderated"],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
+        **kwargs: str,
     ) -> Union[List[Dict], Dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -539,12 +539,12 @@ class Api:
         return subreddits
 
     async def get_users(
-            self,
-            session: ClientSession,
-            kind: Literal["all", "popular", "new"],
-            limit: int,
-            timeframe: TIMEFRAME = "all",
-            status: Optional[Status] = None,
+        self,
+        session: ClientSession,
+        kind: Literal["all", "popular", "new"],
+        limit: int,
+        timeframe: TIMEFRAME = "all",
+        status: Optional[Status] = None,
     ) -> List[Dict]:
         """
         Asynchronously gets the specified type of subreddits.
@@ -590,13 +590,13 @@ class Api:
         return users
 
     async def search_entities(
-            self,
-            session: ClientSession,
-            kind: Literal["users", "subreddits", "posts"],
-            query: str,
-            limit: int,
-            sort: SORT_CRITERION = "all",
-            status: Optional[Status] = None,
+        self,
+        session: ClientSession,
+        kind: Literal["users", "subreddits", "posts"],
+        query: str,
+        limit: int,
+        sort: SORT_CRITERION = "all",
+        status: Optional[Status] = None,
     ) -> List[Dict]:
         """
         Asynchronously searches specified entities that match the specified query.
@@ -646,5 +646,6 @@ class Api:
         )
 
         return search_results
+
 
 # -------------------------------- END ----------------------------------------- #
