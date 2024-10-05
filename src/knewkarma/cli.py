@@ -19,7 +19,6 @@ from .tools.package import check_for_updates, is_snap_package
 from .tools.shared import (
     api,
     console,
-    # ML_MODELS_DIR,
     notify,
     style,
     SORT_CRITERION,
