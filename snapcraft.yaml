@@ -7,7 +7,7 @@ description: |
   functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
   **Application Programming Interface (API)** to enable an easy integration in other Python Projects. Refer to the documentation (https://knewkarma.readthedocs.io) for the **usage** and **integration** guide.
 license: MIT
-version: "0.1" # Placeholder; this will be overridden
+version: "0.1"
 
 base: core22
 grade: stable
