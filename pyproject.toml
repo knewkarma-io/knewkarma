@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "knewkarma"
-version = "7.0.2"
+version = "7.0.1"
 description = "A Reddit data analysis toolkit"
 authors = ["Richard Mwewa <rly0nheart@duck.com>"]
 readme = "README.md"
