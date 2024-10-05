@@ -17,7 +17,7 @@ PATCH="${VERSION_PARTS[2]}"
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 # Define absolute file paths
-VERSION_PY="$SCRIPT_DIR/src/knewkarma/version.py"
+VERSION_PY="$SCRIPT_DIR/src/knewkarma/meta/version.py"
 PYPROJECT_TOML="$SCRIPT_DIR/pyproject.toml"
 
 # Check if files exist
