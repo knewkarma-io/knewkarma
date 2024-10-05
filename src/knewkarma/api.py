@@ -445,7 +445,7 @@ class Api:
             "overview_of_a_user": f"{self.endpoint(kind='user')}/{username}/overview.json",
             "comments_from_a_user": f"{self.endpoint(kind='user')}/{username}/comments.json",
             "comments_from_a_post": f"{self.endpoint(kind='subreddit')}/{subreddit}"
-                                    f"/comments/{kwargs.get("id")}.json",
+                                    f"/comments/{kwargs.get('id')}.json",
             "search_from_a_subreddit": f"{self.endpoint(kind='subreddit')}/{subreddit}"
                                        f"/search.json",
         }
