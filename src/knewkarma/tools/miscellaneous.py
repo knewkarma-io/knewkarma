@@ -16,9 +16,9 @@ __all__ = [
 
 
 def make_panel(
-        title: str,
-        content: Union[ConsoleRenderable, RichCast, str],
-        subtitle: Optional[str] = None,
+    title: str,
+    content: Union[ConsoleRenderable, RichCast, str],
+    subtitle: Optional[str] = None,
 ):
     """
     Makes a rich Panel for whatever data is needed to be placed in it.
@@ -76,7 +76,7 @@ def pathfinder(directories: Union[List[str], str]):
 
     try:
         if isinstance(directories, List) and all(
-                isinstance(directory, str) for directory in directories
+            isinstance(directory, str) for directory in directories
         ):
             for directory in directories:
                 os.makedirs(name=directory, exist_ok=True)
@@ -84,5 +84,6 @@ def pathfinder(directories: Union[List[str], str]):
             os.makedirs(name=directories, exist_ok=True)
     except Exception as unexpected_error:
         notify.exception(unexpected_error)
+
 
 # -------------------------------- END ----------------------------------------- #

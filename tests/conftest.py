@@ -6,7 +6,7 @@ from knewkarma.meta import about, version
 api = Api(
     headers={
         "User-Agent": f"{about.name.replace(' ', '-')}/Testing-{version.release} "
-                      f"(PyTest {pytest.__version__}; +{about.documentation})"
+        f"(PyTest {pytest.__version__}; +{about.documentation})"
     }
 )
 
