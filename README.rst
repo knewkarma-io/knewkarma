@@ -14,15 +14,6 @@
 
 ~~~~
 
-Table of Contents
-=================
-
-- `Documentation <#documentation>`_
-- `Sponsorship <#sponsorship>`_
-   - `How to Sponsor <#how-to-sponsor>`_
-- `Star History <#star-history>`_
-- `License <#license>`_
-
 Documentation
 =============
 
