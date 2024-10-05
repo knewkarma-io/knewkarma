@@ -46,4 +46,3 @@ rm "${VERSION_PY}.bak"
 rm "${PYPROJECT_TOML}.bak"
 
 echo "Version updated to $VERSION in $VERSION_PY and $PYPROJECT_TOML"
-
