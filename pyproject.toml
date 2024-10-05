@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "knewkarma"
-version = "7.0.0"
+version = "7.0.1"
 description = "A Reddit data analysis toolkit"
 authors = ["Richard Mwewa <rly0nheart@duck.com>"]
-readme = "README.rst"
+readme = "README.md"
 license = "MIT License"
 keywords = ["reddit", "reddit-api", "reddit-data-analysis"]
 classifiers = [
@@ -29,12 +29,9 @@ karmakaze = "^1.3.0"
 pandas = "^2.1.4"
 rich-click = "^1.8.3"
 matplotlib = { version = "^3.9.2", optional = true }
-# tokenizers = { version = "^0.19.0", optional = true }
-# transformers = { version = "^4.44.0", optional = true }
 
 [tool.poetry.extras]
 visualisation = ["matplotlib"]
-# analysis = ["tokenizers", "transformers"]
 
 
 [tool.poetry.group.dev.dependencies]
