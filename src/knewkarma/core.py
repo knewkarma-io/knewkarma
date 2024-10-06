@@ -94,7 +94,7 @@ class Post:
         :rtype: List[SimpleNamespace]
         """
 
-        comments_data = await api.get_posts(
+        comments_data = await api.get_posts_or_comments(
             session=session,
             kind="comments_from_a_post",
             status=status,
@@ -144,7 +144,7 @@ class Posts:
         :rtype: List[SimpleNamespace]
         """
 
-        best_posts = await api.get_posts(
+        best_posts = await api.get_posts_or_comments(
             session=session,
             kind="best",
             status=status,
@@ -178,7 +178,7 @@ class Posts:
         :rtype: List[SimpleNamespace]
         """
 
-        controversial_posts = await api.get_posts(
+        controversial_posts = await api.get_posts_or_comments(
             session=session,
             kind="controversial",
             status=status,
@@ -215,7 +215,7 @@ class Posts:
         :rtype: List[SimpleNamespace]
         """
 
-        front_page_posts = await api.get_posts(
+        front_page_posts = await api.get_posts_or_comments(
             session=session,
             kind="front_page",
             status=status,
@@ -253,7 +253,7 @@ class Posts:
         :rtype: List[SimpleNamespace]
         """
 
-        new_posts = await api.get_posts(
+        new_posts = await api.get_posts_or_comments(
             session=session,
             kind="new",
             status=status,
@@ -287,7 +287,7 @@ class Posts:
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
-        popular_posts = await api.get_posts(
+        popular_posts = await api.get_posts_or_comments(
             session=session,
             kind="popular",
             status=status,
@@ -321,7 +321,7 @@ class Posts:
         :rtype: List[SimpleNamespace]
         """
 
-        rising_posts = await api.get_posts(
+        rising_posts = await api.get_posts_or_comments(
             session=session,
             kind="rising",
             status=status,
@@ -554,7 +554,7 @@ class Subreddit:
         :rtype: List[SimpleNamespace]
         """
 
-        subreddit_posts = await api.get_posts(
+        subreddit_posts = await api.get_posts_or_comments(
             session=session,
             kind="posts_from_a_subreddit",
             subreddit=self._name,
@@ -685,7 +685,7 @@ class Subreddit:
         :rtype: List[SimpleNamespace]
         """
 
-        search_results = await api.get_posts(
+        search_results = await api.get_posts_or_comments(
             session=session,
             kind="search_from_a_subreddit",
             status=status,
@@ -950,7 +950,7 @@ class User:
         :rtype: List[SimpleNamespace]
         """
 
-        user_comments = await api.get_posts(
+        user_comments = await api.get_posts_or_comments(
             session=session,
             kind="comments_from_a_user",
             status=status,
@@ -1009,7 +1009,7 @@ class User:
         :rtype: List[SimpleNamespace]
         """
 
-        user_overview = await api.get_posts(
+        user_overview = await api.get_posts_or_comments(
             session=session,
             kind="overview_of_a_user",
             status=status,
@@ -1046,7 +1046,7 @@ class User:
         :rtype: List[SimpleNamespace]
         """
 
-        user_posts = await api.get_posts(
+        user_posts = await api.get_posts_or_comments(
             session=session,
             kind="posts_from_a_user",
             status=status,
@@ -1113,7 +1113,7 @@ class User:
         pattern = rf"(?i)\b{re.escape(query)}\b"
         regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
 
-        user_posts = await api.get_posts(
+        user_posts = await api.get_posts_or_comments(
             session=session,
             kind="posts_from_a_user",
             status=status,
@@ -1170,7 +1170,7 @@ class User:
         pattern: str = rf"(?i)\b{re.escape(query)}\b"
         regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
 
-        user_comments = await api.get_posts(
+        user_comments = await api.get_posts_or_comments(
             session=session,
             kind="comments_from_a_user",
             status=status,
@@ -1216,7 +1216,7 @@ class User:
         :type status: Optional[rich.status.Status]
         """
 
-        posts = await api.get_posts(
+        posts = await api.get_posts_or_comments(
             session=session,
             kind="posts_from_a_user",
             status=status,
