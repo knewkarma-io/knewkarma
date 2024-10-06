@@ -1,6 +1,5 @@
-.. raw:: html
-
-   <h1 align="center"> A Reddit Data Analysis Toolkit.</h1>
+A Reddit Data Analysis Toolkit.
+===============================
 
 .. raw:: html
 
