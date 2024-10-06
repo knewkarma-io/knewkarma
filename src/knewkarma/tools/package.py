@@ -42,7 +42,7 @@ async def check_for_updates(
 
     # Make a GET request to GitHub to get the project's latest release.
     response = await api.send_request(
-        endpoint=f"https://api.github.com/repos/{about.author[1]}/{about.package}/releases/latest",
+        endpoint=f"https://api.github.com/repos/knewkarma-io/{about.package}/releases/latest",
         session=session,
     )
 
