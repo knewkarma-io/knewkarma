@@ -8,7 +8,7 @@ import rich_click as click
 from rich.status import Status
 
 from .core import Post, Posts, Search, Subreddit, Subreddits, User, Users
-from .meta import about, version
+from .meta import about, license, version
 from .tools.data import (
     create_dataframe,
     export_dataframe,
@@ -54,6 +54,24 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
         ctx.exit()
 
 
+@click.command(
+    name="license", help="Use this command to get licen[cs]e related information."
+)
+@click.option("-c", "--conditions", is_flag=True, help="Get licen[cs]e warranty.")
+@click.option("-w", "--warranty", is_flag=True, help="Get licen[cs]e conditions.")
+@click.pass_context
+def show_license(ctx: click.Context, conditions: bool, warranty: bool):
+    """
+    Callback function for the `--license` flag.
+    """
+    if conditions:
+        click.echo(license.conditions)
+    elif warranty:
+        click.echo(license.warranty)
+    else:
+        click.echo(ctx.command.get_usage(ctx=ctx))
+
+
 @click.group(
     help=f"""
 {about.summary}
@@ -63,13 +81,11 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
     context_settings=dict(help_option_names=["-h", "--help"]),
 )
 @click.option(
-    "-e",
     "--export",
     type=str,
     help="A comma-separated list (no whitespaces) of file types to export the output to <supported: csv,html,json,xml>",
 )
 @click.option(
-    "-l",
     "--limit",
     default=100,
     show_default=True,
@@ -77,7 +93,6 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
     help=f"<bulk/semi-bulk> Maximum data output limit",
 )
 @click.option(
-    "-s",
     "--sort",
     default="all",
     show_default=True,
@@ -85,7 +100,6 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
     help=f"<bulk/semi-bulk> Sort criterion",
 )
 @click.option(
-    "-t",
     "--timeframe",
     default="all",
     show_default=True,
@@ -93,7 +107,6 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
     help=f"<bulk/semi-bulk> Timeframe to get data from",
 )
 @click.option(
-    "-tf",
     "--time-format",
     default="locale",
     show_default=True,
@@ -147,6 +160,9 @@ def cli(
     ctx.obj["limit"] = limit
     ctx.obj["time_format"] = time_format
     ctx.obj["export"] = export
+
+
+cli.add_command(cmd=show_license, name="license")
 
 
 @cli.command(
@@ -825,6 +841,7 @@ async def handle_method_calls(
             is_valid_arg = True
             start_time: datetime = datetime.now()
             try:
+                console.print(license.notice)
                 with Status(
                     status=f"Opening new client session",
                     spinner="dots",
@@ -856,7 +873,7 @@ async def handle_method_calls(
                 )
 
     if not is_valid_arg:
-        ctx.get_usage()
+        ctx.command.get_usage(ctx=ctx)
 
 
 def start():
