@@ -1,5 +1,5 @@
 major: tuple[int, str] = 7, "MAJOR"
 minor: tuple[int, str] = 0, "MINOR"
-patch: tuple[int, str] = 2, "PATCH"
+patch: tuple[int, str] = 3, "PATCH"
 full: str = f"{major[0]}.{minor[0]}.{patch[0]}"
 release: str = f"{major[0]}.{minor[0]}"
