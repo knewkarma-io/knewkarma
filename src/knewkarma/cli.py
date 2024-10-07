@@ -6,28 +6,39 @@ from typing import get_args, Union, Callable, Literal, List, Dict
 import aiohttp
 import rich_click as click
 from rich.status import Status
-
-from .core import Post, Posts, Search, Subreddit, Subreddits, User, Users
-from .meta import about, license, version
-from .tools.data import (
-    create_dataframe,
-    export_dataframe,
+from toolbox.data import (
+    Data,
     EXPORT_FORMATS,
+    EXPORTS_PARENT_DIR,
 )
-from .tools.miscellaneous import filename_timestamp, pathfinder
-from .tools.package import check_for_updates, is_snap_package
-from .tools.shared import (
-    api,
+from toolbox.package import Package
+from toolbox.terminal import (
     console,
     notify,
     style,
+)
+
+from .core import (
+    Post,
+    Posts,
+    Search,
+    Subreddit,
+    Subreddits,
+    User,
+    Users,
+    api,
     SORT_CRITERION,
     TIMEFRAME,
     TIME_FORMAT,
-    OUTPUT_PARENT_DIR,
 )
+from .meta import about, license, version
 
 __all__ = ["start"]
+
+data = Data()
+package = Package(
+    name=about.package, version_module=version, requester=api.send_request
+)
 
 
 def help_callback(ctx: click.Context, option: click.Option, value: bool):
@@ -49,7 +60,7 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
 
     if value and not ctx.resilient_parsing:
         click.echo(ctx.get_help())
-        if is_snap_package(package=about.package):
+        if package.is_snap_package():
             click.pause()
         ctx.exit()
 
@@ -784,34 +795,35 @@ async def call_method(
     )
     if argument == "username_available" and (response_data, bool):
         if response_data:
-            notify.ok(message="Username is available.")
+            notify.ok("Username is available.")
         else:
             notify.warning("Username is already taken.")
     else:
         if response_data:
-            dataframe = create_dataframe(data=response_data)
+            dataframe = data.create_dataframe(data=response_data)
             console.print(dataframe)
 
             if kwargs.get("export"):
-                output_child_dir: str = os.path.join(
-                    OUTPUT_PARENT_DIR,
+
+                exports_child_dir: str = os.path.join(
+                    EXPORTS_PARENT_DIR,
                     "exports",
                     command,
                     argument,
                 )
 
-                pathfinder(
+                data.pathfinder(
                     directories=[
-                        os.path.join(output_child_dir, extension)
+                        os.path.join(exports_child_dir, extension)
                         for extension in ["csv", "html", "json", "xml"]
                     ],
                 )
 
                 export_to: List = kwargs.get("export").split(",")
-                export_dataframe(
+                data.export_dataframe(
                     dataframe=dataframe,
-                    filename=filename_timestamp(),
-                    directory=output_child_dir,
+                    filename=data.filename_timestamp(),
+                    directory=exports_child_dir,
                     formats=export_to,
                 )
 
@@ -850,8 +862,13 @@ async def handle_method_calls(
                 ) as status:
                     async with aiohttp.ClientSession() as session:
                         notify.ok("New client session opened")
-                        await api.check_reddit_status(session=session, status=status)
-                        await check_for_updates(session=session, status=status)
+                        await api.check_reddit_status(
+                            session=session, status=status, notify=notify
+                        )
+                        await package.check_updates(
+                            session=session,
+                            status=status,
+                        )
                         await call_method(
                             method=method,
                             session=session,
@@ -869,7 +886,7 @@ async def handle_method_calls(
             finally:
                 elapsed_time = datetime.now() - start_time
                 notify.ok(
-                    f"Session closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
+                    message=f"Session closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
                 )
 
     if not is_valid_arg:
