@@ -865,10 +865,10 @@ async def handle_method_calls(
                         await api.check_reddit_status(
                             session=session, status=status, notify=notify
                         )
-                        """await package.check_updates(
+                        await package.check_updates(
                             session=session,
                             status=status,
-                        )"""
+                        )
                         await call_method(
                             method=method,
                             session=session,
