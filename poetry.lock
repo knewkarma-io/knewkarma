@@ -2786,6 +2786,24 @@ files = [
 ]
 
 [[package]]
+name = "toolbox"
+version = "0.1.0"
+description = "Toolbox component for Knew Karma"
+optional = false
+python-versions = "^3.10"
+files = []
+develop = false
+
+[package.dependencies]
+rich = "^13.9.2"
+
+[package.source]
+type = "git"
+url = "https://github.com/knewkarma-io/toolbox.git"
+reference = "master"
+resolved_reference = "1e4716c4998984d9b5388e91dec8ff11630a8e0e"
+
+[[package]]
 name = "trove-classifiers"
 version = "2024.9.12"
 description = "Canonical source for classifiers on PyPI (pypi.org)."
@@ -3059,4 +3077,4 @@ visualisation = ["matplotlib"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "cebb2692c34a0f49f351c9ac40c78cc85b011a74653cf49c479f6d867a9bb437"
+content-hash = "972ad724aa4a360acdc0bffe34e6b569923aabf8c3cab2f95e7474b7965ec711"
