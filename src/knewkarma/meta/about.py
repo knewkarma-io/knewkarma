@@ -18,7 +18,7 @@ author: tuple[str, str, str] = (
     "rly0nheart",
     "https://gravatar.com/rly0nheart",
 )
-sponsor: str = f"https://opencollective.com/{name}"
+sponsor: str = f"https://opencollective.com/{package}"
 copyright: str = f"{name} {full_version} © {author[0]}. All rights reserved."
 documentation: str = "https://knewkarma.readthedocs.io"
 summary: str = f"A Reddit data analysis toolkit — by {author[0]} <{author[2]}>"
