@@ -10,7 +10,7 @@ from karmakaze import Parse
 from rich.status import Status
 from toolbox.data import Data
 
-from knewkarma.meta import about, version
+from .meta import about, version
 
 __all__ = [
     "api",
