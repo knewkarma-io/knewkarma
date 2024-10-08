@@ -10,7 +10,7 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python :: 3",
     "Intended Audience :: Developers",
-    "Intended Audience :: Information Technology",
+    "Intended Audience :: Education",
     "Operating System :: OS Independent",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English"
