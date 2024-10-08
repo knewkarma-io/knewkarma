@@ -37,11 +37,11 @@ projects and/or the work put into this project in particular, any sponsorship ti
 
 # Star History
 
-<a href="https://star-history.com/#rly0nheart/knewkarma&Date">
+<a href="https://star-history.com/#knewkarma-io/knewkarma&Date">
    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=rly0nheart/knewkarma&type=Date&theme=dark" />
-      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=rly0nheart/knewkarma&type=Date" />
-      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=rly0nheart/knewkarma&type=Date" />
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date" />
+      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date" />
    </picture>
 </a>
 
