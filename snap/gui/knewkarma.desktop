@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Knew Karma
 Comment=A Reddit data analysis toolkit
-Icon=${SNAP}/snap/gui/icon.png
+Icon=${SNAP}/snap/gui/icon512x512.png
 Exec=sh "--help"
 Terminal=true
 Type=Application
