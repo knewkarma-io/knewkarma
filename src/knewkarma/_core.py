@@ -2,15 +2,17 @@ import re
 from collections import Counter
 from platform import python_version, platform
 from types import SimpleNamespace
-from typing import Literal, Union, Optional, List
+from typing import Literal, Union, Optional, List, TYPE_CHECKING
 
-from aiohttp import ClientSession
 from api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from karmakaze import Parse
 from rich.status import Status
 from toolbox.data import Data
 
 from .meta import about, version
+
+if TYPE_CHECKING:
+    from aiohttp import ClientSession
 
 __all__ = [
     "api",
