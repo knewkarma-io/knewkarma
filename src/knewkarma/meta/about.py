@@ -21,7 +21,7 @@ author: tuple[str, str, str] = (
 sponsor: str = f"https://opencollective.com/{package}"
 copyright: str = f"{name} {full_version} © {author[0]}. All rights reserved."
 documentation: str = "https://knewkarma.readthedocs.io"
-summary: str = f"A Reddit data analysis toolkit — by {author[0]} <{author[2]}>"
+summary: str = f"A Reddit data analysis toolkit — by {author[0]}"
 description: str = f"""
 {name} (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
 functionalities for exploring and analysing Reddit data. It includes a Command-Line Interface (CLI), and an
