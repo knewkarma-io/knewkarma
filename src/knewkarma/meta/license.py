@@ -1,9 +1,9 @@
-from .about import name, author
 from datetime import date
 
+from .about import name, author
 
 notice: str = f"""
-                {name} Copyright © {date.today().year} {author[0]}
+{name} Copyright © {date.today().year} {author[0]}
 
 This program comes with ABSOLUTELY NO WARRANTY; for details, use `knewkarma licence -w/--warranty`.
 This is free software, and you are welcome to redistribute it
@@ -565,19 +565,19 @@ copy of the Program in return for a fee.
 """
 
 warranty: str = f"""
-    A Reddit data analysis toolkit
-    Copyright © {date.today().year}  {author[0]}
+A Reddit data analysis toolkit
+Copyright © {date.today().year}  {author[0]}
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """

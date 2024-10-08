@@ -76,9 +76,9 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
     Callback function for the `--license` flag.
     """
     if conditions:
-        click.echo(license.conditions)
+        console.print(license.conditions, justify="center")
     elif warranty:
-        click.echo(license.warranty)
+        console.print(license.warranty, justify="center")
     else:
         click.echo(ctx.command.get_usage(ctx=ctx))
 
@@ -853,7 +853,7 @@ async def handle_method_calls(
             is_valid_arg = True
             start_time: datetime = datetime.now()
             try:
-                console.print(license.notice)
+                console.print(license.notice, justify="center")
                 with Status(
                     status=f"Opening new client session",
                     spinner="dots",
@@ -865,10 +865,10 @@ async def handle_method_calls(
                         await api.check_reddit_status(
                             session=session, status=status, notify=notify
                         )
-                        await package.check_updates(
+                        """await package.check_updates(
                             session=session,
                             status=status,
-                        )
+                        )"""
                         await call_method(
                             method=method,
                             session=session,
