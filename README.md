@@ -47,7 +47,7 @@ projects and/or the work put into this project in particular, any sponsorship ti
 
 # License
 
-MIT License © [Richard Mwewa](https://gravatar.com/rly0nheart)
+GPL-3.0 License © [Richard Mwewa](https://gravatar.com/rly0nheart)
 
 ***
 <a href="https://gravatar.com/rly0nheart">
