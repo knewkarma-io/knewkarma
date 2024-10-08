@@ -18,7 +18,7 @@ from toolbox.terminal import (
     style,
 )
 
-from .core import (
+from ._core import (
     Post,
     Posts,
     Search,
