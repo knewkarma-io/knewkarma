@@ -137,7 +137,6 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
     version.full,
     "-v",
     "--version",
-    message=about.copyright,
 )
 @click.pass_context
 def cli(
