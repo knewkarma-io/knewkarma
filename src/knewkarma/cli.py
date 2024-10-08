@@ -217,7 +217,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx, method_map=method_map, export=export, data=data, comments=comments
         )
     )
@@ -302,7 +302,7 @@ def posts(
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -359,7 +359,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -478,7 +478,7 @@ def subreddit(
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -554,7 +554,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -693,7 +693,7 @@ def user(
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -758,7 +758,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -828,7 +828,7 @@ async def call_method(
                 )
 
 
-async def handle_method_calls(
+async def method_call_handler(
     ctx: click.Context,
     method_map: Dict,
     export: str,
