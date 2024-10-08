@@ -1,16 +1,22 @@
 import re
 from collections import Counter
+from platform import python_version, platform
 from types import SimpleNamespace
 from typing import Literal, Union, Optional, List
 
 from aiohttp import ClientSession
+from api import Api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
 from karmakaze import Parse
 from rich.status import Status
+from toolbox.data import Data
 
-from .tools.data import plot_bar_chart, visualisation_dependency_installed
-from .tools.shared import api, SORT_CRITERION, TIMEFRAME, TIME_FORMAT
+from .meta import about, version
 
 __all__ = [
+    "api",
+    "SORT_CRITERION",
+    "TIMEFRAME",
+    "TIME_FORMAT",
     "Post",
     "Posts",
     "Search",
@@ -19,6 +25,14 @@ __all__ = [
     "User",
     "Users",
 ]
+
+api = Api(
+    headers={
+        "User-Agent": f"{about.name.replace(' ', '-')}/{version.release} "
+        f"(Python {python_version} on {platform}; +{about.documentation})"
+    },
+)
+data = Data()
 
 
 class Comment:
@@ -720,7 +734,7 @@ class Subreddit:
             )
 
         pages = await api.send_request(
-            endpoint=f"{api.subreddit_endpoint}/{self._name}/wiki/pages.json",
+            endpoint=f"{api.endpoint('subreddit')}/{self._name}/wiki/pages.json",
             session=session,
         )
 
@@ -1239,8 +1253,8 @@ class User:
             subreddit_names = [subreddit[0] for subreddit in top_subreddits]
             subreddit_frequencies = [subreddit[1] for subreddit in top_subreddits]
 
-            if visualisation_dependency_installed:
-                plot_bar_chart(
+            if data.is_matplotlib_installed():
+                data.plot_bar_chart(
                     data=dict(zip(subreddit_names, subreddit_frequencies)),
                     title=f"top {top_n}/{limit} subreddits analysis",
                     xlabel="Subreddits",

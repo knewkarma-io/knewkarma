@@ -6,28 +6,39 @@ from typing import get_args, Union, Callable, Literal, List, Dict
 import aiohttp
 import rich_click as click
 from rich.status import Status
-
-from .core import Post, Posts, Search, Subreddit, Subreddits, User, Users
-from .meta import about, version
-from .tools.data import (
-    create_dataframe,
-    export_dataframe,
+from toolbox.data import (
+    Data,
     EXPORT_FORMATS,
+    EXPORTS_PARENT_DIR,
 )
-from .tools.miscellaneous import filename_timestamp, pathfinder
-from .tools.package import check_for_updates, is_snap_package
-from .tools.shared import (
-    api,
+from toolbox.package import Package
+from toolbox.terminal import (
     console,
     notify,
     style,
+)
+
+from ._core import (
+    Post,
+    Posts,
+    Search,
+    Subreddit,
+    Subreddits,
+    User,
+    Users,
+    api,
     SORT_CRITERION,
     TIMEFRAME,
     TIME_FORMAT,
-    OUTPUT_PARENT_DIR,
 )
+from .meta import about, license, version
 
 __all__ = ["start"]
+
+data = Data()
+package = Package(
+    name=about.package, version_module=version, requester=api.send_request
+)
 
 
 def help_callback(ctx: click.Context, option: click.Option, value: bool):
@@ -49,9 +60,27 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
 
     if value and not ctx.resilient_parsing:
         click.echo(ctx.get_help())
-        if is_snap_package(package=about.package):
+        if package.is_snap_package():
             click.pause()
         ctx.exit()
+
+
+@click.command(
+    name="license", help="Use this command to get licen[cs]e related information."
+)
+@click.option("-c", "--conditions", is_flag=True, help="Get licen[cs]e warranty.")
+@click.option("-w", "--warranty", is_flag=True, help="Get licen[cs]e conditions.")
+@click.pass_context
+def show_license(ctx: click.Context, conditions: bool, warranty: bool):
+    """
+    Callback function for the `--license` flag.
+    """
+    if conditions:
+        console.print(license.conditions, justify="center")
+    elif warranty:
+        console.print(license.warranty, justify="center")
+    else:
+        click.echo(ctx.command.get_usage(ctx=ctx))
 
 
 @click.group(
@@ -63,13 +92,11 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
     context_settings=dict(help_option_names=["-h", "--help"]),
 )
 @click.option(
-    "-e",
     "--export",
     type=str,
     help="A comma-separated list (no whitespaces) of file types to export the output to <supported: csv,html,json,xml>",
 )
 @click.option(
-    "-l",
     "--limit",
     default=100,
     show_default=True,
@@ -77,7 +104,6 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
     help=f"<bulk/semi-bulk> Maximum data output limit",
 )
 @click.option(
-    "-s",
     "--sort",
     default="all",
     show_default=True,
@@ -85,7 +111,6 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
     help=f"<bulk/semi-bulk> Sort criterion",
 )
 @click.option(
-    "-t",
     "--timeframe",
     default="all",
     show_default=True,
@@ -93,7 +118,6 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
     help=f"<bulk/semi-bulk> Timeframe to get data from",
 )
 @click.option(
-    "-tf",
     "--time-format",
     default="locale",
     show_default=True,
@@ -149,6 +173,9 @@ def cli(
     ctx.obj["export"] = export
 
 
+cli.add_command(cmd=show_license, name="license")
+
+
 @cli.command(
     help="Use this command to get an individual post's data including its comments, "
     "provided the post's <id> and source <subreddit> are specified.",
@@ -190,7 +217,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx, method_map=method_map, export=export, data=data, comments=comments
         )
     )
@@ -275,7 +302,7 @@ def posts(
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -332,7 +359,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -451,7 +478,7 @@ def subreddit(
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -527,7 +554,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -666,7 +693,7 @@ def user(
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -731,7 +758,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     }
 
     asyncio.run(
-        handle_method_calls(
+        method_call_handler(
             ctx=ctx,
             method_map=method_map,
             export=export,
@@ -768,39 +795,40 @@ async def call_method(
     )
     if argument == "username_available" and (response_data, bool):
         if response_data:
-            notify.ok(message="Username is available.")
+            notify.ok("Username is available.")
         else:
             notify.warning("Username is already taken.")
     else:
         if response_data:
-            dataframe = create_dataframe(data=response_data)
+            dataframe = data.create_dataframe(data=response_data)
             console.print(dataframe)
 
             if kwargs.get("export"):
-                output_child_dir: str = os.path.join(
-                    OUTPUT_PARENT_DIR,
+
+                exports_child_dir: str = os.path.join(
+                    EXPORTS_PARENT_DIR,
                     "exports",
                     command,
                     argument,
                 )
 
-                pathfinder(
+                data.pathfinder(
                     directories=[
-                        os.path.join(output_child_dir, extension)
+                        os.path.join(exports_child_dir, extension)
                         for extension in ["csv", "html", "json", "xml"]
                     ],
                 )
 
                 export_to: List = kwargs.get("export").split(",")
-                export_dataframe(
+                data.export_dataframe(
                     dataframe=dataframe,
-                    filename=filename_timestamp(),
-                    directory=output_child_dir,
+                    filename=data.filename_timestamp(),
+                    directory=exports_child_dir,
                     formats=export_to,
                 )
 
 
-async def handle_method_calls(
+async def method_call_handler(
     ctx: click.Context,
     method_map: Dict,
     export: str,
@@ -825,6 +853,7 @@ async def handle_method_calls(
             is_valid_arg = True
             start_time: datetime = datetime.now()
             try:
+                console.print(license.notice, justify="center")
                 with Status(
                     status=f"Opening new client session",
                     spinner="dots",
@@ -833,8 +862,13 @@ async def handle_method_calls(
                 ) as status:
                     async with aiohttp.ClientSession() as session:
                         notify.ok("New client session opened")
-                        await api.check_reddit_status(session=session, status=status)
-                        await check_for_updates(session=session, status=status)
+                        await api.check_reddit_status(
+                            session=session, status=status, notify=notify
+                        )
+                        await package.check_updates(
+                            session=session,
+                            status=status,
+                        )
                         await call_method(
                             method=method,
                             session=session,
@@ -852,11 +886,11 @@ async def handle_method_calls(
             finally:
                 elapsed_time = datetime.now() - start_time
                 notify.ok(
-                    f"Session closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
+                    message=f"Session closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
                 )
 
     if not is_valid_arg:
-        ctx.get_usage()
+        ctx.command.get_usage(ctx=ctx)
 
 
 def start():
