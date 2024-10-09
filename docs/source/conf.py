@@ -9,7 +9,7 @@ author_name, _, author_link = about.author
 
 project = about.name
 author = author_name
-copyright = f' {date.today().year} GPL-3.0 License, <a href="{author_link}" target="_blank">{author_name}</a>'
+copyright = f' {date.today().year} GPL-3.0+ License, <a href="{author_link}" target="_blank">{author_name}</a>'
 
 release = version.release
 version = version.full
