@@ -4,7 +4,7 @@ version = "7.0.3"
 description = "A Reddit data analysis toolkit"
 authors = ["Richard Mwewa <rly0nheart@duck.com>"]
 readme = "README.md"
-license = "GPL-3.0"
+license = "GPL-3.0+"
 keywords = ["reddit", "data-analysis"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
