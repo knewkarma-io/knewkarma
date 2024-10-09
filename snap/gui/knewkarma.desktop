@@ -5,4 +5,4 @@ Icon=${SNAP}/snap/gui/icon512x512.png
 Exec=sh "--help"
 Terminal=true
 Type=Application
-Categories=Utility;Development;
+Categories=Development;Education;
