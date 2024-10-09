@@ -12,7 +12,7 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
     "Operating System :: OS Independent",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Natural Language :: English"
 ]
 
@@ -44,9 +44,9 @@ sphinx = "^7.4.7"
 sphinx-rtd-theme = "^2.0.0"
 tenacity = "^8.3.0"
 
+[tool.poetry.scripts]
+knewkarma = "knewkarma._cli:start"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-knewkarma = "knewkarma._cli:start"
