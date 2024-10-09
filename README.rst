@@ -55,7 +55,7 @@ Star History
 License
 =======
 
-GPL-3.0 License © `Richard Mwewa <https://gravatar.com/rly0nheart>`_
+GPL-3.0+ License © `Richard Mwewa <https://gravatar.com/rly0nheart>`_
 
 ~~~~
 
