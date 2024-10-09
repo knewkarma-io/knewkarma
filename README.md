@@ -15,7 +15,7 @@
 Refer to the [documentation](https://knewkarma.readthedocs.io) for **Feature Overview**, **Installation**, **API
 Integration**, and **Usage** instructions.
 
-![docs](https://github.com/user-attachments/assets/1cfd097c-e5fa-4fe0-98f8-a7dd9d37c555 "docs")
+![docs](https://github.com/user-attachments/assets/9f4b455e-237a-4f86-a20f-e7b487965776)
 
 # Sponsorship
 
