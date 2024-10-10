@@ -3,7 +3,7 @@ from datetime import date
 from .about import name, author
 
 notice: str = f"""
-{name} Copyright © {date.today().year} {author[0]}
+{name} Copyright (C) {date.today().year} {author[0]}
 
 This program comes with ABSOLUTELY NO WARRANTY; for details, use `knewkarma licence -w/--warranty`.
 This is free software, and you are welcome to redistribute it
@@ -566,7 +566,7 @@ END OF TERMS AND CONDITIONS
 
 warranty: str = f"""
 A Reddit data analysis toolkit
-Copyright © {date.today().year}  {author[0]}
+Copyright (C) {date.today().year}  {author[0]}
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
