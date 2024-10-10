@@ -1,16 +1,17 @@
 from datetime import date
 
-from .about import name, author
+from .about import Author, Project
 
-notice: str = f"""
-{name} Copyright (C) {date.today().year} {author[0]}
+__all__ = ["License"]
 
-This program comes with [bold]ABSOLUTELY NO WARRANTY[/]; for details, use 'knewkarma licence -w/--warranty'.
-This is free software, and you are welcome to redistribute it
-[bold]UNDER CERTAIN CONDITIONS[/]; use 'knewkarma license -c/--conditions' for details.
-"""
+_current_year: int = date.today().year
 
-conditions: str = """
+author = Author()
+project = Project()
+
+
+class License:
+    conditions: str = """
 [bold]TERMS AND CONDITIONS[/]
 
 0. Definitions.
@@ -531,18 +532,18 @@ conditions: str = """
 
 15. Disclaimer of Warranty.
 
-    THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+    [bold]THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
     APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
     HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY
     OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
     THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
     PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
     IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
-    ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+    ALL NECESSARY SERVICING, REPAIR OR CORRECTION.[/]
 
 16. Limitation of Liability.
 
-    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    [bold]IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
     WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS
     THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY
     GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
@@ -550,7 +551,7 @@ conditions: str = """
     DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD
     PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS),
     EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-    SUCH DAMAGES.
+    SUCH DAMAGES.[/]
 
 17. Interpretation of Sections 15 and 16.
 
@@ -564,9 +565,17 @@ conditions: str = """
 [bold]END OF TERMS AND CONDITIONS[/]
 """
 
-warranty: str = f"""
+    notice: str = f"""
+{project.name} Copyright (C) {_current_year} {author.name}
+
+This program comes with [bold]ABSOLUTELY NO WARRANTY[/]; for details, use 'knewkarma licence -w/--warranty'.
+This is free software, and you are welcome to redistribute it
+[bold]UNDER CERTAIN CONDITIONS[/]; use 'knewkarma license -c/--conditions' for details.
+"""
+
+    warranty: str = f"""
 A Reddit data analysis toolkit
-Copyright (C) {date.today().year}  {author[0]}
+Copyright (C) {_current_year}  {author.name}
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -574,10 +583,13 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+but [bold]WITHOUT ANY WARRANTY[/]; without even the implied warranty of
+[bold]MERCHANTABILITY[/] or [bold]FITNESS FOR A PARTICULAR PURPOSE[/].  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+
+
+# -------------------------------- END ----------------------------------------- #
