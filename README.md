@@ -24,18 +24,13 @@ async def subreddit_posts(subreddit_name, posts_limit):
     subreddit = Subreddit(subreddit_name)
 
     async with aiohttp.ClientSession() as session:
-        posts = await subreddit.posts(session=session, limit=posts_limit)
+        posts = await subreddit.posts(session, posts_limit)
 
         for post in posts:
             print(post.title)
 
 
-asyncio.run(
-    subreddit_posts(
-        subreddit_name="AskScience",
-        posts_limit=200
-    )
-)
+asyncio.run(subreddit_posts("AskScience", 200))
 ```
 
 # Documentation
