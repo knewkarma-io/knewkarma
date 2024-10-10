@@ -6,8 +6,8 @@ __all__ = ["License"]
 
 _current_year: int = date.today().year
 
-author = Author()
-project = Project()
+_author = Author
+_project = Project
 
 
 class License:
@@ -566,7 +566,7 @@ class License:
 """
 
     notice: str = f"""
-{project.name} Copyright (C) {_current_year} {author.name}
+{_project.name} Copyright (C) {_current_year} {_author.name}
 
 This program comes with [bold]ABSOLUTELY NO WARRANTY[/]; for details, use 'knewkarma licence -w/--warranty'.
 This is free software, and you are welcome to redistribute it
@@ -575,7 +575,7 @@ This is free software, and you are welcome to redistribute it
 
     warranty: str = f"""
 A Reddit data analysis toolkit
-Copyright (C) {_current_year}  {author.name}
+Copyright (C) {_current_year}  {_author.name}
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
