@@ -10,12 +10,33 @@
 
 ***
 
+```shell
+knewkarma subreddit AskScience --posts
+```
+
+```python
+import aiohttp
+import asyncio
+from knewkarma import Subreddit
+
+
+async def subreddit_posts(subreddit_name, posts_limit):
+    subreddit = Subreddit(subreddit_name)
+
+    async with aiohttp.ClientSession() as session:
+        posts = await subreddit.posts(session, posts_limit)
+
+        for post in posts:
+            print(post.title)
+
+
+asyncio.run(subreddit_posts("AskScience", 200))
+```
+
 # Documentation
 
 Refer to the [documentation](https://knewkarma.readthedocs.io) for **Feature Overview**, **Installation**, **API
 Integration**, and **Usage** instructions.
-
-![docs](https://github.com/user-attachments/assets/9f4b455e-237a-4f86-a20f-e7b487965776)
 
 # Sponsorship
 

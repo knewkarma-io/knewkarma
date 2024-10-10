@@ -18,7 +18,7 @@ from toolbox.terminal import (
     style,
 )
 
-from ._core import (
+from ._main import (
     Post,
     Posts,
     Search,
@@ -42,9 +42,7 @@ license = License
 version = Version
 
 data = Data()
-package = Package(
-    name=project.package, version_module=version, requester=api.send_request
-)
+package = Package(name=project.package, version=version, requester=api.send_request)
 
 
 def help_callback(ctx: click.Context, option: click.Option, value: bool):

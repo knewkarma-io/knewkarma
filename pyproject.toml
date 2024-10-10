@@ -24,14 +24,15 @@ repository = "https://github.com/knewkarma-io/knewkarma"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+api = { git = "https://github.com/knewkarma-io/api.git", branch = "master", optional = true }
+toolbox = { git = "https://github.com/knewkarma-io/toolbox.git", branch = "master", optional = true }
 aiohttp = "^3.10.9"
-api = { git = "https://github.com/knewkarma-io/api.git", branch = "master" }
-toolbox = { git = "https://github.com/knewkarma-io/toolbox.git", branch = "master" }
 matplotlib = { version = "^3.9.2", optional = true }
 pandas = "^2.1.4"
 rich-click = "^1.8.3"
 
 [tool.poetry.extras]
+core = ["api", "toolbox"]
 visualisation = ["matplotlib"]
 
 [tool.poetry.group.dev.dependencies]
