@@ -30,7 +30,7 @@ async def subreddit_posts(subreddit_name, posts_limit):
             print(post.title)
 
 
-asyncio.run(subreddit_posts("AskScience", 200))
+asyncio.run(subreddit_posts(subreddit_name="AskScience", posts_limit=200))
 ```
 
 # Documentation
