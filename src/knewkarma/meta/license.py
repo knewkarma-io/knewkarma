@@ -6,8 +6,8 @@ __all__ = ["License"]
 
 _current_year: int = date.today().year
 
-author = Author()
-project = Project()
+author = Author
+project = Project
 
 
 class License:
