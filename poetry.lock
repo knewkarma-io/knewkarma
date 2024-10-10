@@ -152,7 +152,7 @@ files = [
 name = "api"
 version = "0.1.0"
 description = "API component for Knew Karma"
-optional = false
+optional = true
 python-versions = "^3.10"
 files = []
 develop = false
@@ -1109,7 +1109,7 @@ i18n = ["Babel (>=2.7)"]
 name = "karmakaze"
 version = "1.4.0"
 description = "Data sanitation engine for Knew Karma"
-optional = false
+optional = true
 python-versions = "<4.0,>=3.10"
 files = [
     {file = "karmakaze-1.4.0-py3-none-any.whl", hash = "sha256:cbf37546bcc72c9366fa44206c620805537cc8f362ef45f28fcd29e970188d51"},
@@ -2804,7 +2804,7 @@ files = [
 name = "toolbox"
 version = "0.1.0"
 description = "Toolbox component for Knew Karma"
-optional = false
+optional = true
 python-versions = "^3.10"
 files = []
 develop = false
@@ -3087,9 +3087,10 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 type = ["pytest-mypy"]
 
 [extras]
+core = ["api", "toolbox"]
 visualisation = ["matplotlib"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "972ad724aa4a360acdc0bffe34e6b569923aabf8c3cab2f95e7474b7965ec711"
+content-hash = "cee4fd44bddd2b53129779231ae4d7c2d38081114a1e714d8d5e83c0a25ed5ad"

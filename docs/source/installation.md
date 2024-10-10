@@ -9,15 +9,29 @@ You'll need to have Python 3.10 or later installed on your system in order to in
 
 You can install it by running the following command:
 
-```commandline
-pip install knewkarma
+```shell
+pip install knewkarma[core]
+```
+
+The installation command structure will vary based on the current shell, so if the above command fails, you can try
+running:
+
+```shell
+pip install knewkarma\[core\]
+```
+
+or
+
+```shell
+pip install "knewkarma[core]"
+
 ```
 
 ## Snap Package
 
 If you prefer installing Knew Karma from the Snap Store instead, you can either run
 
-```commandline
+```shell
 snap install knewkarma
 ```
 
@@ -29,6 +43,6 @@ package.
 
 If you prefer a containerised variant of Knew Karma, you can pull the official image from dockerhub by running:
 
-```commandline
+```shell
 docker pull rly0nheart/knewkarma
 ```
