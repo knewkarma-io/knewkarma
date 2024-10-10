@@ -31,13 +31,19 @@ from ._core import (
     TIMEFRAME,
     TIME_FORMAT,
 )
-from .meta import about, license, version
+from .meta.about import Project
+from .meta.license import License
+from .meta.version import Version
 
 __all__ = ["start"]
 
+project = Project
+license = License
+version = Version
+
 data = Data()
 package = Package(
-    name=about.package, version_module=version, requester=api.send_request
+    name=project.package, version_module=version, requester=api.send_request
 )
 
 
@@ -85,10 +91,10 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
 
 @click.group(
     help=f"""
-{about.summary}
+{project.summary}
 
 
-{about.description}""",
+{project.description}""",
     context_settings=dict(help_option_names=["-h", "--help"]),
 )
 @click.option(
@@ -134,7 +140,7 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
     help="Show this message and exit.",
 )
 @click.version_option(
-    version.full,
+    version.full_version,
     "-v",
     "--version",
 )
@@ -897,7 +903,7 @@ def start():
     Main entrypoint for the Knew Karma command-line interface.
     """
 
-    console.set_window_title(f"{about.name} {version.release}")
+    console.set_window_title(f"{project.name} {version.release}")
     cli(obj={})
 
 
