@@ -38,6 +38,16 @@ asyncio.run(subreddit_posts("AskScience", 200))
 Refer to the [documentation](https://knewkarma.readthedocs.io) for **Feature Overview**, **Installation**, **API
 Integration**, and **Usage** instructions.
 
+## Star History
+
+<a href="https://star-history.com/#knewkarma-io/knewkarma&Date">
+   <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date" />
+      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date" />
+   </picture>
+</a>
+
 ## Sponsorship
 
 If you find Knew Karma useful and would like to support its development, you can sponsor the project through **Open
@@ -55,16 +65,6 @@ Whether you're a company that relies on Knew Karma for data analysis or an indiv
 projects and/or the work put into this project in particular, any sponsorship tier is greatly appreciated.
 
 [Become a Sponsor](https://opencollective.com/knewkarma)
-
-## Star History
-
-<a href="https://star-history.com/#knewkarma-io/knewkarma&Date">
-   <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date&theme=dark" />
-      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date" />
-      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date" />
-   </picture>
-</a>
 
 ## License
 
