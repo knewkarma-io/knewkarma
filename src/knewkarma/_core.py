@@ -10,7 +10,8 @@ from karmakaze import Parse
 from rich.status import Status
 from toolbox.data import Data
 
-from .meta import about, version
+from .meta.about import Project
+from .meta.version import Version
 
 __all__ = [
     "api",
@@ -26,13 +27,16 @@ __all__ = [
     "Users",
 ]
 
+project = Project
+version = Version
+
+data = Data()
 api = Api(
     headers={
-        "User-Agent": f"{about.name.replace(' ', '-')}/{version.release} "
-        f"(Python {python_version} on {platform}; +{about.documentation})"
+        "User-Agent": f"{project.name.replace(' ', '-')}/{version.release} "
+        f"(Python {python_version} on {platform}; +{project.documentation})"
     },
 )
-data = Data()
 
 
 class Comment:
