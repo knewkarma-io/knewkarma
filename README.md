@@ -33,12 +33,12 @@ async def subreddit_posts(subreddit_name, posts_limit):
 asyncio.run(subreddit_posts("AskScience", 200))
 ```
 
-# Documentation
+## Documentation
 
 Refer to the [documentation](https://knewkarma.readthedocs.io) for **Feature Overview**, **Installation**, **API
 Integration**, and **Usage** instructions.
 
-# Sponsorship
+## Sponsorship
 
 If you find Knew Karma useful and would like to support its development, you can sponsor the project through **Open
 Collective**.
@@ -46,7 +46,7 @@ Collective**.
 Your sponsorship will help cover the **costs of ongoing maintenance**, **new feature development**, and **overall
 project sustainability**.
 
-## How to Sponsor
+### How to Sponsor
 
 You can sponsor the project by visiting Knew Karma's [Open Collective page](https://opencollective.com/knewkarma) and
 choosing a sponsorship tier that fits your budget.
@@ -56,7 +56,7 @@ projects and/or the work put into this project in particular, any sponsorship ti
 
 [Become a Sponsor](https://opencollective.com/knewkarma)
 
-# Star History
+## Star History
 
 <a href="https://star-history.com/#knewkarma-io/knewkarma&Date">
    <picture>
@@ -66,7 +66,7 @@ projects and/or the work put into this project in particular, any sponsorship ti
    </picture>
 </a>
 
-# License
+## License
 
 GPL-3.0+ License © [Richard Mwewa](https://gravatar.com/rly0nheart)
 
