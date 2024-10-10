@@ -5,13 +5,13 @@ from .about import name, author
 notice: str = f"""
 {name} Copyright (C) {date.today().year} {author[0]}
 
-This program comes with ABSOLUTELY NO WARRANTY; for details, use `knewkarma licence -w/--warranty`.
+This program comes with [bold]ABSOLUTELY NO WARRANTY[/]; for details, use 'knewkarma licence -w/--warranty'.
 This is free software, and you are welcome to redistribute it
-UNDER CERTAIN CONDITIONS; use `knewkarma license -c/--conditions` for details.
+[bold]UNDER CERTAIN CONDITIONS[/]; use 'knewkarma license -c/--conditions' for details.
 """
 
 conditions: str = """
-TERMS AND CONDITIONS
+[bold]TERMS AND CONDITIONS[/]
 
 0. Definitions.
 
@@ -561,7 +561,7 @@ TERMS AND CONDITIONS
     Program, unless a warranty or assumption of liability accompanies a
     copy of the Program in return for a fee.
 
-END OF TERMS AND CONDITIONS
+[bold]END OF TERMS AND CONDITIONS[/]
 """
 
 warranty: str = f"""
