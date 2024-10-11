@@ -33,7 +33,7 @@ parts:
       snapcraftctl build
       pip3 install --upgrade pip
       pip3 install poetry
-      poetry install --extras core visualisation
+      poetry install --extras core
 
       # Ensure all commit history is available
       git fetch --unshallow || true
