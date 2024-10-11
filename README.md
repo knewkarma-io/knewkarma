@@ -35,8 +35,8 @@ asyncio.run(subreddit_posts("AskScience", 200))
 
 ## Documentation
 
-Refer to the [documentation](https://knewkarma.readthedocs.io) for **Feature Overview**, **Installation**, **API
-Integration**, and **Usage** instructions.
+Refer to the [documentation](https://knewkarma.readthedocs.io) for *Feature Overview*, *Installation*, *API
+Integration*, and *Usage* instructions.
 
 ## Sponsorship
 
