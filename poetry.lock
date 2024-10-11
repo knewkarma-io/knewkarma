@@ -2802,7 +2802,7 @@ files = [
 
 [[package]]
 name = "toolbox"
-version = "0.1.0"
+version = "0.2.0"
 description = "Toolbox component for Knew Karma"
 optional = true
 python-versions = "^3.10"
@@ -2816,7 +2816,7 @@ rich = "^13.9.2"
 type = "git"
 url = "https://github.com/knewkarma-io/toolbox.git"
 reference = "master"
-resolved_reference = "1e4716c4998984d9b5388e91dec8ff11630a8e0e"
+resolved_reference = "99be738727702756ff9fc84484fc63bd7fba3f52"
 
 [[package]]
 name = "trove-classifiers"
