@@ -10,7 +10,7 @@
 
 ***
 
-```shell
+```commandline
 knewkarma subreddit AskScience --posts
 ```
 
