@@ -32,6 +32,6 @@ ENV PATH="/home/knewkarmauser/.local/bin:${PATH}"
 RUN pip install --user --upgrade pip poetry
 
 # Install project dependencies via Poetry as the non-root user
-RUN poetry install --extras core
+RUN poetry install --extras core visualisation
 
 ENTRYPOINT ["poetry", "run", "knewkarma"]
