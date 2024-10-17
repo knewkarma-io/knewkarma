@@ -10,20 +10,27 @@ You'll need to have Python 3.10 or later installed on your system in order to in
 You can install it by running the following command:
 
 ```shell
-pip install knewkarma[core]
+pip install knewkarma
 ```
 
-The installation command structure will vary based on the current shell, so if the above command fails, you can try
-running:
+[!Tip]
+To install the CLI also, you should run:
 
 ```shell
-pip install knewkarma\[core\]
+pip install knewkarma[cli]
+```
+
+> The installation command structure will vary based on the current shell, so if the above command fails, you can try
+> running:
+
+```shell
+pip install knewkarma\[cli\]
 ```
 
 or
 
 ```shell
-pip install "knewkarma[core]"
+pip install "knewkarma[cli]"
 
 ```
 
