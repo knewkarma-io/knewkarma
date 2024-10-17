@@ -5,13 +5,13 @@ from typing import get_args, Union, Callable, Literal, List, Dict
 
 import aiohttp
 import rich_click as click
-from knwkrma_utils.data import (
-    Data,
+from karmakrate.miscellaneous import (
+    Miscellaneous,
     EXPORT_FORMATS,
     EXPORTS_PARENT_DIR,
 )
-from knwkrma_utils.package import Package
-from knwkrma_utils.terminal import (
+from karmakrate.package import Package
+from karmakrate.terminal import (
     console,
     notify,
     style,
@@ -24,10 +24,10 @@ from ._main import (
     Search,
     Subreddit,
     Subreddits,
+    reddit,
     User,
     Users,
-    api,
-    SORT_CRITERION,
+    SORT,
     TIMEFRAME,
     TIME_FORMAT,
 )
@@ -41,8 +41,8 @@ project = Project
 license = License
 version = Version
 
-data = Data()
-package = Package(name=project.package, version=version, requester=api.send_request)
+miscellaneous = Miscellaneous()
+package = Package(name=project.package, version=version, requester=reddit.send_request)
 
 
 def help_callback(ctx: click.Context, option: click.Option, value: bool):
@@ -89,10 +89,10 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
 
 @click.group(
     help=f"""
-{project.summary}
-
-
-{project.description}""",
+    {project.summary}
+    
+    
+    {project.description}""",
     context_settings=dict(help_option_names=["-h", "--help"]),
 )
 @click.option(
@@ -111,7 +111,7 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
     "--sort",
     default="all",
     show_default=True,
-    type=click.Choice(get_args(SORT_CRITERION)),
+    type=click.Choice(get_args(SORT)),
     help=f"<bulk/semi-bulk> Sort criterion",
 )
 @click.option(
@@ -146,7 +146,7 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
 def cli(
     ctx: click.Context,
     timeframe: TIMEFRAME,
-    sort: SORT_CRITERION,
+    sort: SORT,
     limit: int,
     time_format: str,
     export: List[EXPORT_FORMATS],
@@ -204,7 +204,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     :type comments: bool
     """
 
-    sort: SORT_CRITERION = ctx.obj["sort"]
+    sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
     time_format: TIME_FORMAT = ctx.obj["time_format"]
@@ -221,7 +221,11 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 
     asyncio.run(
         method_call_handler(
-            ctx=ctx, method_map=method_map, export=export, data=data, comments=comments
+            ctx=ctx,
+            method_map=method_map,
+            export=export,
+            data=data,
+            comments=comments,
         )
     )
 
@@ -277,7 +281,7 @@ def posts(
     """
 
     timeframe: TIMEFRAME = ctx.obj["timeframe"]
-    sort: SORT_CRITERION = ctx.obj["sort"]
+    sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
     time_format: TIME_FORMAT = ctx.obj["time_format"]
@@ -343,7 +347,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     :type users: bool
     """
 
-    sort: SORT_CRITERION = ctx.obj["sort"]
+    sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
     time_format: TIME_FORMAT = ctx.obj["time_format"]
@@ -434,7 +438,7 @@ def subreddit(
     """
 
     timeframe: TIMEFRAME = ctx.obj["timeframe"]
-    sort: SORT_CRITERION = ctx.obj["sort"]
+    sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
     time_format: TIME_FORMAT = ctx.obj["time_format"]
@@ -450,7 +454,11 @@ def subreddit(
             status=status,
         ),
         "posts": lambda session, status=None: subreddit_instance.posts(
-            limit=limit, sort=sort, timeframe=timeframe, status=status, session=session
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
+            status=status,
+            session=session,
         ),
         "profile": lambda session, status=None: subreddit_instance.profile(
             status=status, session=session
@@ -645,7 +653,7 @@ def user(
     :type username_available: bool
     """
     timeframe: TIMEFRAME = ctx.obj["timeframe"]
-    sort: SORT_CRITERION = ctx.obj["sort"]
+    sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
     time_format: TIME_FORMAT = ctx.obj["time_format"]
@@ -653,7 +661,11 @@ def user(
     user_instance: User = User(name=username, time_format=time_format)
     method_map: Dict = {
         "comments": lambda session, status=None: user_instance.comments(
-            session=session, limit=limit, sort=sort, timeframe=timeframe, status=status
+            session=session,
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
+            status=status,
         ),
         "moderated_subreddits": lambda session, status=None: user_instance.moderated_subreddits(
             session=session, status=status
@@ -662,7 +674,11 @@ def user(
             limit=limit, session=session, status=status
         ),
         "posts": lambda session, status=None: user_instance.posts(
-            session=session, limit=limit, sort=sort, timeframe=timeframe, status=status
+            session=session,
+            limit=limit,
+            sort=sort,
+            timeframe=timeframe,
+            status=status,
         ),
         "profile": lambda session, status=None: user_instance.profile(
             session=session, status=status
@@ -803,7 +819,7 @@ async def call_method(
             notify.warning("Username is already taken.")
     else:
         if response_data:
-            dataframe = data.create_dataframe(data=response_data)
+            dataframe = miscellaneous.create_dataframe(data=response_data)
             console.print(dataframe)
 
             if kwargs.get("export"):
@@ -815,7 +831,7 @@ async def call_method(
                     argument,
                 )
 
-                data.pathfinder(
+                miscellaneous.pathfinder(
                     directories=[
                         os.path.join(exports_child_dir, extension)
                         for extension in ["csv", "html", "json", "xml"]
@@ -823,9 +839,9 @@ async def call_method(
                 )
 
                 export_to: List = kwargs.get("export").split(",")
-                data.export_dataframe(
+                miscellaneous.export_dataframe(
                     dataframe=dataframe,
-                    filename=data.filename_timestamp(),
+                    filename=miscellaneous.filename_timestamp(),
                     directory=exports_child_dir,
                     formats=export_to,
                 )
@@ -865,7 +881,7 @@ async def method_call_handler(
                 ) as status:
                     async with aiohttp.ClientSession() as session:
                         notify.ok("New client session opened")
-                        await api.check_reddit_status(
+                        await reddit.infrastructure_status(
                             session=session, status=status, notify=notify
                         )
                         await package.check_updates(
