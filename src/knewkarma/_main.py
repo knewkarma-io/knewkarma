@@ -5,8 +5,9 @@ from types import SimpleNamespace
 from typing import Literal, Union, Optional, List
 
 from aiohttp import ClientSession
-from karmakaze import Parse
-from karmakraft import Reddit, SORT, TIMEFRAME, TIME_FORMAT
+from karmakaze.parse import Parse
+from karmakraft.api import Reddit
+from karmakraft.endpoints import Endpoints
 from karmakrate.miscellaneous import Miscellaneous
 from rich.status import Status
 
@@ -14,10 +15,7 @@ from .meta.about import Project
 from .meta.version import Version
 
 __all__ = [
-    "reddit",
-    "SORT",
-    "TIMEFRAME",
-    "TIME_FORMAT",
+    "api",
     "Post",
     "Posts",
     "Search",
@@ -27,14 +25,11 @@ __all__ = [
     "Users",
 ]
 
-project = Project
-version = Version
 
-miscellaneous = Miscellaneous()
-reddit = Reddit(
+api = Reddit(
     headers={
-        "User-Agent": f"{project.name.replace(' ', '-')}/{version.release} "
-        f"(Python {python_version} on {platform}; +{project.documentation})"
+        "User-Agent": f"{Project.name.replace(' ', '-')}/{Version.release} "
+        f"(Python {python_version} on {platform}; +{Project.documentation})"
     },
 )
 
@@ -48,7 +43,9 @@ class Comment:
 class Post:
     """Represents a Reddit post and provides methods for fetching post data and comments."""
 
-    def __init__(self, id: str, subreddit: str, time_format: TIME_FORMAT = "locale"):
+    def __init__(
+        self, id: str, subreddit: str, time_format: api.TIME_FORMAT = "locale"
+    ):
         """
         Initialises a `Post` instance to fetch the post's data and comments.
 
@@ -78,7 +75,7 @@ class Post:
         :rtype: SimpleNamespace
         """
 
-        post_data = await reddit.entity(
+        post_data = await api.entity(
             session=session,
             kind="post",
             status=status,
@@ -94,7 +91,7 @@ class Post:
         self,
         session: ClientSession,
         limit: int,
-        sort: SORT = "all",
+        sort: api.SORT = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -112,7 +109,7 @@ class Post:
         :rtype: List[SimpleNamespace]
         """
 
-        comments_data = await reddit.posts_or_comments(
+        comments_data = await api.posts_or_comments(
             session=session,
             kind="comments_from_a_post",
             status=status,
@@ -130,7 +127,7 @@ class Post:
 class Posts:
     """Represents Reddit posts and provides methods for retrieving posts from various sources."""
 
-    def __init__(self, time_format: TIME_FORMAT = "locale"):
+    def __init__(self, time_format: api.TIME_FORMAT = "locale"):
         """
         Initialises a `Posts` instance for retrieving posts such as 'best', 'controversial',
         'front-page', 'new', 'popular', and 'rising'.
@@ -144,7 +141,7 @@ class Posts:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -155,14 +152,14 @@ class Posts:
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
-        :type timeframe: TIMEFRAME, optional
+        :type timeframe: api.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
 
-        best_posts = await reddit.posts_or_comments(
+        best_posts = await api.posts_or_comments(
             session=session,
             kind="best",
             status=status,
@@ -178,7 +175,7 @@ class Posts:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -189,14 +186,14 @@ class Posts:
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
-        :type timeframe: TIMEFRAME, optional
+        :type timeframe: api.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
 
-        controversial_posts = await reddit.posts_or_comments(
+        controversial_posts = await api.posts_or_comments(
             session=session,
             kind="controversial",
             status=status,
@@ -212,8 +209,8 @@ class Posts:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
-        sort: SORT = "all",
+        timeframe: api.TIMEFRAME = "all",
+        sort: api.SORT = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -224,7 +221,7 @@ class Posts:
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
-        :type timeframe: TIMEFRAME, optional
+        :type timeframe: api.TIMEFRAME, optional
         :param sort: Sorting criterion for posts. Defaults to "all".
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
@@ -233,7 +230,7 @@ class Posts:
         :rtype: List[SimpleNamespace]
         """
 
-        front_page_posts = await reddit.posts_or_comments(
+        front_page_posts = await api.posts_or_comments(
             session=session,
             kind="front_page",
             status=status,
@@ -250,8 +247,8 @@ class Posts:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
-        sort: SORT = "all",
+        timeframe: api.TIMEFRAME = "all",
+        sort: api.SORT = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -262,7 +259,7 @@ class Posts:
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
-        :type timeframe: TIMEFRAME, optional
+        :type timeframe: api.TIMEFRAME, optional
         :param sort: Sorting criterion for posts. Defaults to "all".
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
@@ -271,7 +268,7 @@ class Posts:
         :rtype: List[SimpleNamespace]
         """
 
-        new_posts = await reddit.posts_or_comments(
+        new_posts = await api.posts_or_comments(
             session=session,
             kind="new",
             status=status,
@@ -288,7 +285,7 @@ class Posts:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -299,13 +296,13 @@ class Posts:
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
-        :type timeframe: TIMEFRAME, optional
+        :type timeframe: api.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
-        popular_posts = await reddit.posts_or_comments(
+        popular_posts = await api.posts_or_comments(
             session=session,
             kind="popular",
             status=status,
@@ -321,7 +318,7 @@ class Posts:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -332,14 +329,14 @@ class Posts:
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
-        :type timeframe: TIMEFRAME, optional
+        :type timeframe: api.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
 
-        rising_posts = await reddit.posts_or_comments(
+        rising_posts = await api.posts_or_comments(
             session=session,
             kind="rising",
             status=status,
@@ -358,7 +355,7 @@ class Search:
     from different entities.
     """
 
-    def __init__(self, query: str, time_format: TIME_FORMAT = "locale"):
+    def __init__(self, query: str, time_format: api.TIME_FORMAT = "locale"):
         """
         Initialises the `Search` instance for searching posts, subreddits, and users.
 
@@ -375,7 +372,7 @@ class Search:
         self,
         session: ClientSession,
         limit: int,
-        sort: SORT = "all",
+        sort: api.SORT = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -393,7 +390,7 @@ class Search:
         :rtype: List[SimpleNamespace]
         """
 
-        search_results = await reddit.search(
+        search_results = await api.search(
             session=session,
             kind="posts",
             status=status,
@@ -410,7 +407,7 @@ class Search:
         self,
         session: ClientSession,
         limit: int,
-        sort: SORT = "all",
+        sort: api.SORT = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -428,7 +425,7 @@ class Search:
         :rtype: List[SimpleNamespace]
         """
 
-        search_results = await reddit.search(
+        search_results = await api.search(
             session=session,
             kind="subreddits",
             status=status,
@@ -445,7 +442,7 @@ class Search:
         self,
         session: ClientSession,
         limit: int,
-        sort: SORT = "all",
+        sort: api.SORT = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -463,7 +460,7 @@ class Search:
         :rtype: List[SimpleNamespace]
         """
 
-        search_results = await reddit.search(
+        search_results = await api.search(
             session=session,
             kind="users",
             status=status,
@@ -480,7 +477,7 @@ class Search:
 class Subreddit:
     """Represents a Reddit community (subreddit) and provides methods for retrieving its data."""
 
-    def __init__(self, name: str, time_format: TIME_FORMAT = "locale"):
+    def __init__(self, name: str, time_format: api.TIME_FORMAT = "locale"):
         """
         Initialises a `Subreddit` instance to get a subreddit's profile, wiki pages, and posts data,
         and to search for posts containing a specified query.
@@ -502,12 +499,12 @@ class Subreddit:
         session: ClientSession,
         posts_limit: int,
         comments_per_post: int,
-        sort: SORT = "all",
-        timeframe: TIMEFRAME = "all",
+        sort: api.SORT = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
-        Asynchronously retrieves comments from a subreddit.
+        Asynchronously retrieves comments from a subapi.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
@@ -518,7 +515,7 @@ class Subreddit:
         :param sort: Sorting criterion for the posts and comments. Defaults to "all".
         :type sort: SORT, optional
         :param timeframe: The timeframe from which to retrieve posts and comments. Defaults to "all".
-        :type timeframe: TIMEFRAME, optional
+        :type timeframe: api.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
@@ -551,12 +548,12 @@ class Subreddit:
         self,
         session: ClientSession,
         limit: int,
-        sort: SORT = "all",
-        timeframe: TIMEFRAME = "all",
+        sort: api.SORT = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
-        Asynchronously retrieves posts from a subreddit.
+        Asynchronously retrieves posts from a subapi.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
@@ -565,14 +562,14 @@ class Subreddit:
         :param sort: Sorting criterion for the posts. Defaults to "all".
         :type sort: SORT, optional
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
-        :type timeframe: TIMEFRAME, optional
+        :type timeframe: api.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
 
-        subreddit_posts = await reddit.posts_or_comments(
+        subreddit_posts = await api.posts_or_comments(
             session=session,
             kind="posts_from_a_subreddit",
             subreddit=self._name,
@@ -600,7 +597,7 @@ class Subreddit:
         :rtype: SimpleNamespace
         """
 
-        subreddit_profile = await reddit.entity(
+        subreddit_profile = await api.entity(
             session=session,
             status=status,
             kind="subreddit",
@@ -617,12 +614,12 @@ class Subreddit:
         query: str,
         posts_limit: int,
         comments_per_post: int,
-        sort: SORT = "all",
-        timeframe: TIMEFRAME = "all",
+        sort: api.SORT = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
-        Asynchronously retrieves comments that contain the specified query from a subreddit.
+        Asynchronously retrieves comments that contain the specified query from a subapi.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
@@ -635,7 +632,7 @@ class Subreddit:
         :param sort: Sorting criterion for the comments. Defaults to "all".
         :type sort: SORT, optional
         :param timeframe: The timeframe from which to retrieve comments. Defaults to "all".
-        :type timeframe: TIMEFRAME, optional
+        :type timeframe: api.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type: Optional[rich.status.Status]
         :return: A list of `SimpleNamespace` objects, each containing comment data.
@@ -680,12 +677,12 @@ class Subreddit:
         session: ClientSession,
         query: str,
         limit: int,
-        sort: SORT = "all",
-        timeframe: TIMEFRAME = "all",
+        sort: api.SORT = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
-        Asynchronously get posts that contain the specified query string from a subreddit.
+        Asynchronously get posts that contain the specified query string from a subapi.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
@@ -703,7 +700,7 @@ class Subreddit:
         :rtype: List[SimpleNamespace]
         """
 
-        search_results = await reddit.posts_or_comments(
+        search_results = await api.posts_or_comments(
             session=session,
             kind="search_from_a_subreddit",
             status=status,
@@ -737,8 +734,8 @@ class Subreddit:
                 f"Retrieving wiki pages from subreddit ({self._name})",
             )
 
-        pages = await reddit.send_request(
-            endpoint=f"{reddit.endpoint('subreddit')}/{self._name}/wiki/pages.json",
+        pages = await api.send_request(
+            endpoint=f"{Endpoints.subreddit}/{self._name}/wiki/pages.json",
             session=session,
         )
 
@@ -763,7 +760,7 @@ class Subreddit:
         :rtype: SimpleNamespace
         """
 
-        wiki_page = await reddit.entity(
+        wiki_page = await api.entity(
             session=session,
             kind="wikipage",
             status=status,
@@ -779,7 +776,7 @@ class Subreddit:
 class Subreddits:
     """Represents Reddit subreddits and provides methods for getting related data."""
 
-    def __init__(self, time_format: TIME_FORMAT = "locale"):
+    def __init__(self, time_format: api.TIME_FORMAT = "locale"):
         """
         Initialises the `Subreddits()` instance for getting `all`, `default`, `new` and `popular` subreddits.
 
@@ -794,7 +791,7 @@ class Subreddits:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -815,7 +812,7 @@ class Subreddits:
             Items will most likely be limited to 1000, per Reddit's API policy.
         """
 
-        all_subreddits = await reddit.subreddits(
+        all_subreddits = await api.subreddits(
             session=session,
             kind="all",
             status=status,
@@ -846,7 +843,7 @@ class Subreddits:
         :rtype: List[SimpleNamespace]
         """
 
-        default_subreddits = await reddit.subreddits(
+        default_subreddits = await api.subreddits(
             session=session,
             kind="default",
             status=status,
@@ -862,7 +859,7 @@ class Subreddits:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -879,7 +876,7 @@ class Subreddits:
         :return: A list of `SimpleNamespace` objects, each containing subreddit data.
         :rtype: List[SimpleNamespace]
         """
-        new_subreddits = await reddit.subreddits(
+        new_subreddits = await api.subreddits(
             session=session,
             status=status,
             kind="new",
@@ -895,7 +892,7 @@ class Subreddits:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -913,7 +910,7 @@ class Subreddits:
         :rtype: List[SimpleNamespace]
         """
 
-        popular_subreddits = await reddit.subreddits(
+        popular_subreddits = await api.subreddits(
             session=session,
             kind="popular",
             status=status,
@@ -929,7 +926,7 @@ class Subreddits:
 class User:
     """Represents a Reddit user and provides methods for getting data from the specified user."""
 
-    def __init__(self, name: str, time_format: TIME_FORMAT = "locale"):
+    def __init__(self, name: str, time_format: api.TIME_FORMAT = "locale"):
         """
         Initialises a `User()` instance for getting a user's `profile`, `posts` and `comments` data.
 
@@ -947,8 +944,8 @@ class User:
         self,
         session: ClientSession,
         limit: int,
-        sort: SORT = "all",
-        timeframe: TIMEFRAME = "all",
+        sort: api.SORT = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -968,7 +965,7 @@ class User:
         :rtype: List[SimpleNamespace]
         """
 
-        user_comments = await reddit.posts_or_comments(
+        user_comments = await api.posts_or_comments(
             session=session,
             kind="comments_from_a_user",
             status=status,
@@ -996,7 +993,7 @@ class User:
         :rtype: List[SimpleNamespace]
         """
 
-        subreddits = await reddit.subreddits(
+        subreddits = await api.subreddits(
             session=session,
             kind="user_moderated",
             status=status,
@@ -1027,7 +1024,7 @@ class User:
         :rtype: List[SimpleNamespace]
         """
 
-        user_overview = await reddit.posts_or_comments(
+        user_overview = await api.posts_or_comments(
             session=session,
             kind="overview_of_a_user",
             status=status,
@@ -1043,8 +1040,8 @@ class User:
         self,
         session: ClientSession,
         limit: int,
-        sort: SORT = "all",
-        timeframe: TIMEFRAME = "all",
+        sort: api.SORT = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -1064,7 +1061,7 @@ class User:
         :rtype: List[SimpleNamespace]
         """
 
-        user_posts = await reddit.posts_or_comments(
+        user_posts = await api.posts_or_comments(
             session=session,
             kind="posts_from_a_user",
             status=status,
@@ -1092,7 +1089,7 @@ class User:
         :rtype: SimpleNamespace
         """
 
-        user_profile = await reddit.entity(
+        user_profile = await api.entity(
             username=self._name, kind="user", status=status, session=session
         )
 
@@ -1105,8 +1102,8 @@ class User:
         query: str,
         limit: int,
         session: ClientSession,
-        sort: SORT = "all",
-        timeframe: TIMEFRAME = "all",
+        sort: api.SORT = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -1131,7 +1128,7 @@ class User:
         pattern = rf"(?i)\b{re.escape(query)}\b"
         regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
 
-        user_posts = await reddit.posts_or_comments(
+        user_posts = await api.posts_or_comments(
             session=session,
             kind="posts_from_a_user",
             status=status,
@@ -1161,8 +1158,8 @@ class User:
         query: str,
         limit: int,
         session: ClientSession,
-        sort: SORT = "all",
-        timeframe: TIMEFRAME = "all",
+        sort: api.SORT = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -1188,7 +1185,7 @@ class User:
         pattern: str = rf"(?i)\b{re.escape(query)}\b"
         regex: re.Pattern = re.compile(pattern, re.IGNORECASE)
 
-        user_comments = await reddit.posts_or_comments(
+        user_comments = await api.posts_or_comments(
             session=session,
             kind="comments_from_a_user",
             status=status,
@@ -1214,7 +1211,7 @@ class User:
         top_n: int,
         limit: int,
         filename: str = None,
-        timeframe: TIMEFRAME = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> Union[List[tuple[str, int]], None]:
         """
@@ -1234,7 +1231,7 @@ class User:
         :type status: Optional[rich.status.Status]
         """
 
-        posts = await reddit.posts_or_comments(
+        posts = await api.posts_or_comments(
             session=session,
             kind="posts_from_a_user",
             status=status,
@@ -1257,8 +1254,8 @@ class User:
             subreddit_names = [subreddit[0] for subreddit in top_subreddits]
             subreddit_frequencies = [subreddit[1] for subreddit in top_subreddits]
 
-            if miscellaneous.is_matplotlib_installed():
-                miscellaneous.plot_bar_chart(
+            if Miscellaneous.is_matplotlib_installed():
+                Miscellaneous.plot_bar_chart(
                     data=dict(zip(subreddit_names, subreddit_frequencies)),
                     title=f"top {top_n}/{limit} subreddits analysis",
                     xlabel="Subreddits",
@@ -1287,9 +1284,9 @@ class User:
         if status:
             status.update(f"Checking username availability: {self._name}")
 
-        response: bool = await reddit.send_request(
+        response: bool = await api.send_request(
             session=session,
-            endpoint=reddit.endpoint("username_available"),
+            endpoint=Endpoints.username_available,
             params={"user": self._name},
         )
 
@@ -1299,7 +1296,7 @@ class User:
 class Users:
     """Represents Reddit users and provides methods for getting related data."""
 
-    def __init__(self, time_format: TIME_FORMAT = "locale"):
+    def __init__(self, time_format: api.TIME_FORMAT = "locale"):
         """
         Initialises the `Users()` instance for getting `new`, `popular` and `all` users.
 
@@ -1313,7 +1310,7 @@ class Users:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -1331,7 +1328,7 @@ class Users:
         :rtype: List[SimpleNamespace]
         """
 
-        new_users = await reddit.users(
+        new_users = await api.users(
             session=session,
             status=status,
             kind="new",
@@ -1347,7 +1344,7 @@ class Users:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -1365,7 +1362,7 @@ class Users:
         :rtype: List[SimpleNamespace]
         """
 
-        popular_users = await reddit.users(
+        popular_users = await api.users(
             session=session,
             kind="popular",
             status=status,
@@ -1381,7 +1378,7 @@ class Users:
         self,
         session: ClientSession,
         limit: int,
-        timeframe: TIMEFRAME = "all",
+        timeframe: api.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -1399,7 +1396,7 @@ class Users:
         :rtype: List[SimpleNamespace]
         """
 
-        all_users = await reddit.users(
+        all_users = await api.users(
             session=session,
             kind="all",
             status=status,
