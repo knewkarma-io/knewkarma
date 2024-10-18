@@ -75,10 +75,10 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
 
 @click.group(
     help=f"""
-    {Project.summary}
+{Project.summary}
     
     
-    {Project.description}""",
+{Project.description}""",
     context_settings=dict(help_option_names=["-h", "--help"]),
 )
 @click.option(
