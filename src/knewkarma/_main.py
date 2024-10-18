@@ -3,9 +3,9 @@ from platform import python_version, platform
 from types import SimpleNamespace
 from typing import Literal, Union, Optional, List
 
+import karmakaze
 import kraw
 from aiohttp import ClientSession
-from karmakaze.parse import Parse
 from rich.status import Status
 
 from .meta.about import Project
@@ -57,7 +57,7 @@ class Post:
 
         self._id = id
         self._subreddit = subreddit
-        self._parse = Parse(time_format=time_format)
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def data(
         self, session: ClientSession, status: Optional[Status] = None
@@ -132,7 +132,7 @@ class Posts:
         :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
         :type time_format: Literal["concise", "locale"]
         """
-        self._parse = Parse(time_format=time_format)
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def best(
         self,
@@ -363,7 +363,7 @@ class Search:
         """
 
         self._query = query
-        self._parse = Parse(time_format=time_format)
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def posts(
         self,
@@ -489,7 +489,7 @@ class Subreddit:
         self._time_format = (
             time_format  # This will also be accessed in the comments method
         )
-        self._parse = Parse(time_format=self._time_format)
+        self._parse = karmakaze.Parse(time_format=self._time_format)
 
     async def comments(
         self,
@@ -718,7 +718,7 @@ class Subreddits:
         :type time_format: Literal["concise", "locale"]
         """
 
-        self._parse = Parse(time_format=time_format)
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def all(
         self,
@@ -871,7 +871,7 @@ class User:
         """
 
         self._name = name
-        self._parse = Parse(time_format=time_format)
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def comments(
         self,
@@ -1129,7 +1129,7 @@ class Users:
                         time difference, or `locale` for a localized datetime string. Defaults to `locale`.
         :type time_format: Literal["concise", "locale"]
         """  #
-        self._parse = Parse(time_format=time_format)
+        self._parse = karmakaze.Parse(time_format=time_format)
 
     async def new(
         self,
