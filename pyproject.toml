@@ -24,8 +24,7 @@ repository = "https://github.com/knewkarma-io/knewkarma"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-karmakraft = "^3.0.0"
-karmakrate = "^2.1.0"
+kraw = "^0.2.1"
 matplotlib = { version = "^3.9.2", optional = true }
 pandas = "^2.1.4"
 rich-click = "^1.8.3"
