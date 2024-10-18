@@ -15,13 +15,14 @@ knewkarma subreddit AskScience --posts
 ```
 
 ```python
-import aiohttp
 import asyncio
-from knewkarma import Subreddit
+
+import aiohttp
+import knewkarma
 
 
 async def subreddit_posts(subreddit_name, posts_limit):
-    subreddit = Subreddit(subreddit_name)
+    subreddit = knewkarma.Subreddit(subreddit_name)
 
     async with aiohttp.ClientSession() as session:
         posts = await subreddit.posts(session, posts_limit)
