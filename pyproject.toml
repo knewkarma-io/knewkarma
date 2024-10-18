@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "knewkarma"
-version = "7.0.7"
+version = "7.0.8"
 description = "A Reddit data analysis toolkit"
 authors = ["Richard Mwewa <rly0nheart@duck.com>", "Knew Karma IO <redacted@redacted.com>"]
 readme = "README.md"
@@ -24,8 +24,7 @@ repository = "https://github.com/knewkarma-io/knewkarma"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-knwkrma-api = "^1.0.3"
-knwkrma-utils = "^1.0.0"
+kraw = "^0.2.2"
 matplotlib = { version = "^3.9.2", optional = true }
 pandas = "^2.1.4"
 rich-click = "^1.8.3"
