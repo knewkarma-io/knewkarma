@@ -5,11 +5,7 @@ from typing import get_args, Union, Callable, Literal, List, Dict
 
 import aiohttp
 import rich_click as click
-from karmakrate.miscellaneous import (
-    Miscellaneous,
-    EXPORT_FORMATS,
-    EXPORTS_PARENT_DIR,
-)
+from karmakrate.miscellaneous import Miscellaneous
 from karmakrate.package import Package
 from karmakrate.terminal import (
     console,
@@ -19,17 +15,14 @@ from karmakrate.terminal import (
 from rich.status import Status
 
 from ._main import (
+    api,
     Post,
     Posts,
     Search,
     Subreddit,
     Subreddits,
-    reddit,
     User,
     Users,
-    SORT,
-    TIMEFRAME,
-    TIME_FORMAT,
 )
 from .meta.about import Project
 from .meta.license import License
@@ -37,12 +30,7 @@ from .meta.version import Version
 
 __all__ = ["start"]
 
-project = Project
-license = License
-version = Version
-
-miscellaneous = Miscellaneous()
-package = Package(name=project.package, version=version, requester=reddit.send_request)
+package = Package(name=Project.package, version=Version, requester=api.send_request)
 
 
 def help_callback(ctx: click.Context, option: click.Option, value: bool):
@@ -80,19 +68,19 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
     Callback function for the `--license` flag.
     """
     if conditions:
-        console.print(license.conditions, justify="center")
+        console.print(License.conditions, justify="center")
     elif warranty:
-        console.print(license.warranty, justify="center")
+        console.print(License.warranty, justify="center")
     else:
         click.echo(ctx.command.get_usage(ctx=ctx))
 
 
 @click.group(
     help=f"""
-    {project.summary}
+    {Project.summary}
     
     
-    {project.description}""",
+    {Project.description}""",
     context_settings=dict(help_option_names=["-h", "--help"]),
 )
 @click.option(
@@ -111,14 +99,14 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
     "--sort",
     default="all",
     show_default=True,
-    type=click.Choice(get_args(SORT)),
+    type=click.Choice(get_args(api.SORT)),
     help=f"<bulk/semi-bulk> Sort criterion",
 )
 @click.option(
     "--timeframe",
     default="all",
     show_default=True,
-    type=click.Choice(get_args(TIMEFRAME)),
+    type=click.Choice(get_args(api.TIMEFRAME)),
     help=f"<bulk/semi-bulk> Timeframe to get data from",
 )
 @click.option(
@@ -138,18 +126,18 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
     help="Show this message and exit.",
 )
 @click.version_option(
-    version.full_version,
+    Version.full_version,
     "-v",
     "--version",
 )
 @click.pass_context
 def cli(
     ctx: click.Context,
-    timeframe: TIMEFRAME,
-    sort: SORT,
+    timeframe: api.TIMEFRAME,
+    sort: api.SORT,
     limit: int,
     time_format: str,
-    export: List[EXPORT_FORMATS],
+    export: List[Miscellaneous.EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -207,7 +195,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: TIME_FORMAT = ctx.obj["time_format"]
+    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
 
     post_instance = Post(id=id, subreddit=subreddit, time_format=time_format)
     method_map: Dict = {
@@ -280,11 +268,11 @@ def posts(
     :type rising: bool
     """
 
-    timeframe: TIMEFRAME = ctx.obj["timeframe"]
-    sort: SORT = ctx.obj["sort"]
+    timeframe: api.TIMEFRAME = ctx.obj["timeframe"]
+    sort: api.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: TIME_FORMAT = ctx.obj["time_format"]
+    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
 
     posts_instance = Posts(time_format=time_format)
     method_map: Dict = {
@@ -347,10 +335,10 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     :type users: bool
     """
 
-    sort: SORT = ctx.obj["sort"]
+    sort: api.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: TIME_FORMAT = ctx.obj["time_format"]
+    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
 
     search_instance = Search(query=query, time_format=time_format)
     method_map: Dict = {
@@ -437,11 +425,11 @@ def subreddit(
     :type wiki_pages: bool
     """
 
-    timeframe: TIMEFRAME = ctx.obj["timeframe"]
-    sort: SORT = ctx.obj["sort"]
+    timeframe: api.TIMEFRAME = ctx.obj["timeframe"]
+    sort: api.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: TIME_FORMAT = ctx.obj["time_format"]
+    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
 
     subreddit_instance = Subreddit(name=subreddit_name, time_format=time_format)
     method_map: Dict = {
@@ -542,9 +530,9 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
     """
 
     export: str = ctx.obj["export"]
-    timeframe: TIMEFRAME = ctx.obj["timeframe"]
+    timeframe: api.TIMEFRAME = ctx.obj["timeframe"]
     limit: int = ctx.obj["limit"]
-    time_format: TIME_FORMAT = ctx.obj["time_format"]
+    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
 
     subreddits_instance = Subreddits(time_format=time_format)
     method_map: Dict = {
@@ -652,11 +640,11 @@ def user(
     :param username_available: Flag to check if the given username is available of taken.
     :type username_available: bool
     """
-    timeframe: TIMEFRAME = ctx.obj["timeframe"]
-    sort: SORT = ctx.obj["sort"]
+    timeframe: api.TIMEFRAME = ctx.obj["timeframe"]
+    sort: api.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: TIME_FORMAT = ctx.obj["time_format"]
+    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
 
     user_instance: User = User(name=username, time_format=time_format)
     method_map: Dict = {
@@ -759,9 +747,9 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     """
 
     export: str = ctx.obj["export"]
-    timeframe: TIMEFRAME = ctx.obj["timeframe"]
+    timeframe: api.TIMEFRAME = ctx.obj["timeframe"]
     limit: int = ctx.obj["limit"]
-    time_format: TIME_FORMAT = ctx.obj["time_format"]
+    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
 
     users_instance = Users(time_format=time_format)
     method_map: Dict = {
@@ -819,19 +807,19 @@ async def call_method(
             notify.warning("Username is already taken.")
     else:
         if response_data:
-            dataframe = miscellaneous.create_dataframe(data=response_data)
+            dataframe = Miscellaneous.create_dataframe(data=response_data)
             console.print(dataframe)
 
             if kwargs.get("export"):
 
                 exports_child_dir: str = os.path.join(
-                    EXPORTS_PARENT_DIR,
+                    Miscellaneous.EXPORTS_PARENT_DIR,
                     "exports",
                     command,
                     argument,
                 )
 
-                miscellaneous.pathfinder(
+                Miscellaneous.pathfinder(
                     directories=[
                         os.path.join(exports_child_dir, extension)
                         for extension in ["csv", "html", "json", "xml"]
@@ -839,9 +827,9 @@ async def call_method(
                 )
 
                 export_to: List = kwargs.get("export").split(",")
-                miscellaneous.export_dataframe(
+                Miscellaneous.export_dataframe(
                     dataframe=dataframe,
-                    filename=miscellaneous.filename_timestamp(),
+                    filename=Miscellaneous.filename_timestamp(),
                     directory=exports_child_dir,
                     formats=export_to,
                 )
@@ -872,7 +860,7 @@ async def method_call_handler(
             is_valid_arg = True
             start_time: datetime = datetime.now()
             try:
-                console.print(license.notice, justify="center")
+                console.print(License.notice, justify="center")
                 with Status(
                     status=f"Opening new client session",
                     spinner="dots",
@@ -881,7 +869,7 @@ async def method_call_handler(
                 ) as status:
                     async with aiohttp.ClientSession() as session:
                         notify.ok("New client session opened")
-                        await reddit.infrastructure_status(
+                        await api.infra_status(
                             session=session, status=status, notify=notify
                         )
                         await package.check_updates(
@@ -917,7 +905,7 @@ def start():
     Main entrypoint for the Knew Karma command-line interface.
     """
 
-    console.set_window_title(f"{project.name} {version.release}")
+    console.set_window_title(f"{Project.name} {Version.release}")
     cli(obj={})
 
 
