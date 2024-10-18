@@ -5,17 +5,10 @@ from typing import get_args, Union, Callable, Literal, List, Dict
 
 import aiohttp
 import rich_click as click
-from karmakrate.miscellaneous import Miscellaneous
-from karmakrate.package import Package
-from karmakrate.terminal import (
-    console,
-    notify,
-    style,
-)
 from rich.status import Status
 
 from ._main import (
-    api,
+    reddit,
     Post,
     Posts,
     Search,
@@ -27,10 +20,15 @@ from ._main import (
 from .meta.about import Project
 from .meta.license import License
 from .meta.version import Version
+from .utils.general import General
+from .utils.package import Package
+from .utils.terminal import console, Message, Style
 
 __all__ = ["start"]
 
-package = Package(name=Project.package, version=Version, requester=api.send_request)
+package = Package(
+    name=Project.package, version=Version, requester=reddit.connection.send_request
+)
 
 
 def help_callback(ctx: click.Context, option: click.Option, value: bool):
@@ -99,14 +97,14 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
     "--sort",
     default="all",
     show_default=True,
-    type=click.Choice(get_args(api.SORT)),
+    type=click.Choice(get_args(reddit.SORT)),
     help=f"<bulk/semi-bulk> Sort criterion",
 )
 @click.option(
     "--timeframe",
     default="all",
     show_default=True,
-    type=click.Choice(get_args(api.TIMEFRAME)),
+    type=click.Choice(get_args(reddit.TIMEFRAME)),
     help=f"<bulk/semi-bulk> Timeframe to get data from",
 )
 @click.option(
@@ -133,11 +131,11 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
 @click.pass_context
 def cli(
     ctx: click.Context,
-    timeframe: api.TIMEFRAME,
-    sort: api.SORT,
+    timeframe: reddit.TIMEFRAME,
+    sort: reddit.SORT,
     limit: int,
     time_format: str,
-    export: List[Miscellaneous.EXPORT_FORMATS],
+    export: List[General.EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -195,7 +193,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
+    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     post_instance = Post(id=id, subreddit=subreddit, time_format=time_format)
     method_map: Dict = {
@@ -268,11 +266,11 @@ def posts(
     :type rising: bool
     """
 
-    timeframe: api.TIMEFRAME = ctx.obj["timeframe"]
-    sort: api.SORT = ctx.obj["sort"]
+    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
+    sort: reddit.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
+    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     posts_instance = Posts(time_format=time_format)
     method_map: Dict = {
@@ -335,10 +333,10 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     :type users: bool
     """
 
-    sort: api.SORT = ctx.obj["sort"]
+    sort: reddit.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
+    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     search_instance = Search(query=query, time_format=time_format)
     method_map: Dict = {
@@ -425,11 +423,11 @@ def subreddit(
     :type wiki_pages: bool
     """
 
-    timeframe: api.TIMEFRAME = ctx.obj["timeframe"]
-    sort: api.SORT = ctx.obj["sort"]
+    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
+    sort: reddit.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
+    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     subreddit_instance = Subreddit(name=subreddit_name, time_format=time_format)
     method_map: Dict = {
@@ -530,9 +528,9 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
     """
 
     export: str = ctx.obj["export"]
-    timeframe: api.TIMEFRAME = ctx.obj["timeframe"]
+    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
     limit: int = ctx.obj["limit"]
-    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
+    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     subreddits_instance = Subreddits(time_format=time_format)
     method_map: Dict = {
@@ -640,11 +638,11 @@ def user(
     :param username_available: Flag to check if the given username is available of taken.
     :type username_available: bool
     """
-    timeframe: api.TIMEFRAME = ctx.obj["timeframe"]
-    sort: api.SORT = ctx.obj["sort"]
+    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
+    sort: reddit.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
+    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     user_instance: User = User(name=username, time_format=time_format)
     method_map: Dict = {
@@ -747,9 +745,9 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     """
 
     export: str = ctx.obj["export"]
-    timeframe: api.TIMEFRAME = ctx.obj["timeframe"]
+    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
     limit: int = ctx.obj["limit"]
-    time_format: api.TIME_FORMAT = ctx.obj["time_format"]
+    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     users_instance = Users(time_format=time_format)
     method_map: Dict = {
@@ -802,24 +800,24 @@ async def call_method(
     )
     if argument == "username_available" and (response_data, bool):
         if response_data:
-            notify.ok("Username is available.")
+            Message.ok("Username is available.")
         else:
-            notify.warning("Username is already taken.")
+            Message.warning("Username is already taken.")
     else:
         if response_data:
-            dataframe = Miscellaneous.create_dataframe(data=response_data)
+            dataframe = General.create_dataframe(data=response_data)
             console.print(dataframe)
 
             if kwargs.get("export"):
 
                 exports_child_dir: str = os.path.join(
-                    Miscellaneous.EXPORTS_PARENT_DIR,
+                    General.EXPORTS_PARENT_DIR,
                     "exports",
                     command,
                     argument,
                 )
 
-                Miscellaneous.pathfinder(
+                General.pathfinder(
                     directories=[
                         os.path.join(exports_child_dir, extension)
                         for extension in ["csv", "html", "json", "xml"]
@@ -827,9 +825,9 @@ async def call_method(
                 )
 
                 export_to: List = kwargs.get("export").split(",")
-                Miscellaneous.export_dataframe(
+                General.export_dataframe(
                     dataframe=dataframe,
-                    filename=Miscellaneous.filename_timestamp(),
+                    filename=General.filename_timestamp(),
                     directory=exports_child_dir,
                     formats=export_to,
                 )
@@ -864,13 +862,13 @@ async def method_call_handler(
                 with Status(
                     status=f"Opening new client session",
                     spinner="dots",
-                    spinner_style=style.yellow.strip("[,]"),
+                    spinner_style=Style.yellow.strip("[,]"),
                     console=console,
                 ) as status:
                     async with aiohttp.ClientSession() as session:
-                        notify.ok("New client session opened")
-                        await api.infra_status(
-                            session=session, status=status, notify=notify
+                        Message.ok("New client session opened")
+                        await reddit.infra_status(
+                            session=session, status=status, message=Message
                         )
                         await package.check_updates(
                             session=session,
@@ -885,15 +883,17 @@ async def method_call_handler(
                             argument=argument,
                         )
             except aiohttp.ClientConnectionError as connection_error:
-                notify.exception(title="An HTTP error occurred", error=connection_error)
+                Message.exception(
+                    title="An HTTP error occurred", error=connection_error
+                )
             except aiohttp.ClientResponseError as response_error:
-                notify.exception(title="An API error occurred", error=response_error)
+                Message.exception(title="An API error occurred", error=response_error)
             except Exception as unexpected_error:
-                notify.exception(error=unexpected_error)
+                Message.exception(error=unexpected_error)
             finally:
                 elapsed_time = datetime.now() - start_time
-                notify.ok(
-                    message=f"Session closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
+                Message.ok(
+                    f"Session closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
                 )
 
     if not is_valid_arg:
