@@ -594,11 +594,10 @@ class Subreddit:
         :rtype: SimpleNamespace
         """
 
-        subreddit_profile = await reddit.entity(
+        subreddit_profile = await reddit.subreddit(
             session=session,
             status=status,
-            kind="subreddit",
-            subreddit=self._name,
+            name=self._name,
         )
 
         parsed_profile = self._parse.subreddit(subreddit_profile)
@@ -693,11 +692,10 @@ class Subreddit:
         :rtype: SimpleNamespace
         """
 
-        wiki_page = await reddit.entity(
+        wiki_page = await reddit.wiki_page(
             session=session,
-            kind="wikipage",
             status=status,
-            page_name=page_name,
+            name=page_name,
             subreddit=self._name,
         )
 
@@ -1022,8 +1020,10 @@ class User:
         :rtype: SimpleNamespace
         """
 
-        user_profile = await reddit.entity(
-            username=self._name, kind="user", status=status, session=session
+        user_profile = await reddit.user(
+            session=session,
+            status=status,
+            name=self._name,
         )
 
         parsed_profile = self._parse.user(user_profile)
