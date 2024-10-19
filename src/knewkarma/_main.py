@@ -89,6 +89,7 @@ class Post:
         session: ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
+        timeframe: reddit.TIMEFRAME = "all",
         status: Optional[Status] = None,
     ) -> List[SimpleNamespace]:
         """
@@ -114,6 +115,7 @@ class Post:
             subreddit=self._subreddit,
             limit=limit,
             sort=sort,
+            timeframe=timeframe,
         )
 
         parsed_comments = self._parse.comments(comments_data)
@@ -960,6 +962,7 @@ class User:
             status=status,
             kind="user_overview",
             limit=limit,
+            timeframe="all",
             username=self._name,
         )
 
