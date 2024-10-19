@@ -1246,13 +1246,13 @@ files = [
 
 [[package]]
 name = "kraw"
-version = "0.2.3"
+version = "0.2.4"
 description = "Reddit API wrapper for Knew Karma"
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "kraw-0.2.3-py3-none-any.whl", hash = "sha256:b2a845eeca222521f11a1bda80c7fcb5bd82573272566f0c1a462a2d38868fa7"},
-    {file = "kraw-0.2.3.tar.gz", hash = "sha256:899f50308b6f8809b2a815d122ddd36bdd8592f8cc6801b410ef43af3afac6f9"},
+    {file = "kraw-0.2.4-py3-none-any.whl", hash = "sha256:439f2c1ae0a07395c86293296262a947b329e96b4ef16592ebcf42d39ff0d759"},
+    {file = "kraw-0.2.4.tar.gz", hash = "sha256:1bf6759f2e63d4f96bc7f772fd459db1e1595099069d9bca213f3fc758d78fd2"},
 ]
 
 [package.dependencies]
@@ -3056,4 +3056,4 @@ visualisation = ["matplotlib"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "0b8c88d154c520ad48f31c25e10b36f860fd61a1c232a79ef678aa0ce45bcbb2"
+content-hash = "fba84936b790bc473b3f7109a9e6e7c142f6d64eaa4a309821e42645929586e2"
