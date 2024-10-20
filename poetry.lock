@@ -1089,13 +1089,13 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "karmakaze"
-version = "2.0.0"
-description = "Data sanitation engine for Knew Karma"
+version = "3.0.0"
+description = "Response sanitation & parsing engine for KRAW"
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "karmakaze-2.0.0-py3-none-any.whl", hash = "sha256:9ee148b39fdbffcd4784717c9720f0474d3c3e157dda2995058ba2cd3f26111e"},
-    {file = "karmakaze-2.0.0.tar.gz", hash = "sha256:b14b404fd79f5c99474a94c7f253bd32891bd22305fa5e4a72decb0bc32f6304"},
+    {file = "karmakaze-3.0.0-py3-none-any.whl", hash = "sha256:69aecc8a0c2862c537aa890d63f3d41328fe079dfa8d9cc25a27dc9e0a3b56f4"},
+    {file = "karmakaze-3.0.0.tar.gz", hash = "sha256:f33d2980834cfecf0083eb06f5f336257ec349ce22fbc092a1f05a59335fee7a"},
 ]
 
 [[package]]
@@ -1246,18 +1246,18 @@ files = [
 
 [[package]]
 name = "kraw"
-version = "0.2.4"
+version = "0.2.5"
 description = "Reddit API wrapper for Knew Karma"
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "kraw-0.2.4-py3-none-any.whl", hash = "sha256:439f2c1ae0a07395c86293296262a947b329e96b4ef16592ebcf42d39ff0d759"},
-    {file = "kraw-0.2.4.tar.gz", hash = "sha256:1bf6759f2e63d4f96bc7f772fd459db1e1595099069d9bca213f3fc758d78fd2"},
+    {file = "kraw-0.2.5-py3-none-any.whl", hash = "sha256:7368845a8ef5f71ca25fd62bccfd9a7e7f75ae5d936c0b4ace0ee5906af5a7a0"},
+    {file = "kraw-0.2.5.tar.gz", hash = "sha256:feeb4a537b6204614cd2add8ae042a48e15119aa8c8e657708370a9b0143ad25"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.10.10,<4.0.0"
-karmakaze = ">=2.0.0,<3.0.0"
+karmakaze = ">=3.0.0,<4.0.0"
 
 [[package]]
 name = "markdown-it-py"
@@ -3056,4 +3056,4 @@ visualisation = ["matplotlib"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "fba84936b790bc473b3f7109a9e6e7c142f6d64eaa4a309821e42645929586e2"
+content-hash = "f8add52c7e06473350e6ec18aa1bc4d7867bff1e5622eae09217d6dae2f7b364"
