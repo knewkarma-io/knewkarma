@@ -876,10 +876,10 @@ async def method_call_handler(
                         await reddit.infra_status(
                             session=session, status=status, message=Message
                         )
-                        # await package.check_updates(
-                        #    session=session,
-                        #    status=status,
-                        # )
+                        await package.check_updates(
+                            session=session,
+                            status=status,
+                         )
                         await call_method(
                             method=method,
                             session=session,
