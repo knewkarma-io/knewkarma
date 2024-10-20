@@ -195,7 +195,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     export: str = ctx.obj["export"]
     time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
-    post_instance = Post(id=id, subreddit=subreddit, time_format=time_format)
+    post_instance = Post(id=id, subreddit=subreddit)
     method_map: Dict = {
         "comments": lambda session, status=None: post_instance.comments(
             limit=limit, sort=sort, status=status, session=session
@@ -272,7 +272,7 @@ def posts(
     export: str = ctx.obj["export"]
     time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
-    posts_instance = Posts(time_format=time_format)
+    posts_instance = Posts()
     method_map: Dict = {
         "best": lambda session, status=None: posts_instance.best(
             timeframe=timeframe, limit=limit, status=status, session=session
@@ -338,7 +338,9 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     export: str = ctx.obj["export"]
     time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
-    search_instance = Search(query=query, time_format=time_format)
+    search_instance = Search(
+        query=query,
+    )
     method_map: Dict = {
         "posts": lambda session, status=None: search_instance.posts(
             sort=sort, limit=limit, status=status, session=session
@@ -429,7 +431,9 @@ def subreddit(
     export: str = ctx.obj["export"]
     time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
-    subreddit_instance = Subreddit(name=subreddit_name, time_format=time_format)
+    subreddit_instance = Subreddit(
+        name=subreddit_name,
+    )
     method_map: Dict = {
         "comments": lambda session, status=None: subreddit_instance.comments(
             session=session,
@@ -532,7 +536,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
     limit: int = ctx.obj["limit"]
     time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
-    subreddits_instance = Subreddits(time_format=time_format)
+    subreddits_instance = Subreddits()
     method_map: Dict = {
         "all": lambda session, status=None: subreddits_instance.all(
             limit=limit,
@@ -644,7 +648,9 @@ def user(
     export: str = ctx.obj["export"]
     time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
-    user_instance: User = User(name=username, time_format=time_format)
+    user_instance: User = User(
+        name=username,
+    )
     method_map: Dict = {
         "comments": lambda session, status=None: user_instance.comments(
             session=session,
@@ -749,7 +755,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     limit: int = ctx.obj["limit"]
     time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
-    users_instance = Users(time_format=time_format)
+    users_instance = Users()
     method_map: Dict = {
         "all": lambda session, status=None: users_instance.all(
             session=session, limit=limit, timeframe=timeframe, status=status
@@ -870,10 +876,10 @@ async def method_call_handler(
                         await reddit.infra_status(
                             session=session, status=status, message=Message
                         )
-                        await package.check_updates(
-                            session=session,
-                            status=status,
-                        )
+                        # await package.check_updates(
+                        #    session=session,
+                        #    status=status,
+                        # )
                         await call_method(
                             method=method,
                             session=session,
@@ -888,8 +894,7 @@ async def method_call_handler(
                 )
             except aiohttp.ClientResponseError as response_error:
                 Message.exception(title="An API error occurred", error=response_error)
-            except Exception as unexpected_error:
-                Message.exception(error=unexpected_error)
+
             finally:
                 elapsed_time = datetime.now() - start_time
                 Message.ok(
