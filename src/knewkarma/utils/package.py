@@ -4,11 +4,10 @@ from typing import Optional, List
 
 import aiohttp
 from rich.markdown import Markdown
-from rich.prompt import Confirm
 from rich.status import Status
 
 from .general import General
-from .terminal import console, Message, Style
+from .terminal import Message, Style
 
 __all__ = ["Package"]
 
@@ -27,6 +26,7 @@ class Package:
         self,
         session: aiohttp.ClientSession,
         status: Optional[Status] = None,
+        install_if_available: bool = False,
     ):
         """
         Asynchronously checks for updates by comparing the current local version with the remote version.
@@ -88,22 +88,10 @@ class Package:
                     subtitle=f"{Style.bold}{Style.italic}Thank you, for using Knew Karma!{Style.reset}{Style.reset} ❤️ ",
                 )
 
-                # Skip auto-updating of the snap package and containerised variant.
-                if self.is_docker_container() or self.is_snap_package():
-                    pass
-                else:
-                    status.stop()
-                    if Confirm.ask(
-                        f"{Style.bold}Would you like to get these updates?{Style.reset}",
-                        case_sensitive=False,
-                        default=False,
-                        console=console,
-                    ):
-                        self.update_package(status=status)
-                    else:
-                        status.start()
+                if install_if_available:
+                    self.update_package(status=status)
             else:
-                Message.ok(message=f"Up-to-date ({self._version.full_version})")
+                Message.ok(message=f"No new releases")
 
     @staticmethod
     def is_docker_container() -> bool:
@@ -157,8 +145,8 @@ class Package:
         if self._package:
             try:
                 if status:
-                    status.start()
-                    status.update("Downloading updates. Please wait")
+                    status.stop()
+                    # status.update("Downloading updates. Please wait")
                 subprocess.run(
                     [
                         "pip",
@@ -167,8 +155,6 @@ class Package:
                         f"{self._package}[core]",
                     ],
                     check=True,
-                    stdout=subprocess.DEVNULL if status else None,
-                    stderr=subprocess.STDOUT if status else None,
                 )
                 Message.ok(f"DONE. The updates will be installed on next run.")
             except subprocess.CalledProcessError as called_process_error:

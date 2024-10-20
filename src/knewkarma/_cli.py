@@ -61,9 +61,9 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
 @click.option("-c", "--conditions", is_flag=True, help="Get licen[cs]e warranty.")
 @click.option("-w", "--warranty", is_flag=True, help="Get licen[cs]e conditions.")
 @click.pass_context
-def show_license(ctx: click.Context, conditions: bool, warranty: bool):
+def license(ctx: click.Context, conditions: bool, warranty: bool):
     """
-    Callback function for the `--license` flag.
+    Callback function for the `license` command.
     """
     if conditions:
         console.print(License.conditions, justify="center")
@@ -71,6 +71,43 @@ def show_license(ctx: click.Context, conditions: bool, warranty: bool):
         console.print(License.warranty, justify="center")
     else:
         click.echo(ctx.command.get_usage(ctx=ctx))
+
+
+@click.command(name="updates", help="Use this command to check for or install updates.")
+@click.option("-c", "--check", is_flag=True, help="Check for updates.")
+@click.option(
+    "-i", "--install", is_flag=True, help="Install updates, if any are available."
+)
+@click.pass_context
+def updates(ctx: click.Context, check: bool, install: bool):
+    """
+    Check for, or install updates if any are available.
+
+    :param ctx: The Click context object.
+    :type ctx: click.Context
+    :param check: Option to check for updates.
+    :type check: bool
+    :param install: Option to install updates.
+    :type install: bool
+    """
+    method_map = {
+        "check": lambda session, status=None: package.check_updates(
+            session=session, status=status
+        ),
+        "install": lambda session, status=None: package.check_updates(
+            session=session, status=status, install_if_available=True
+        ),
+    }
+
+    asyncio.run(
+        method_call_handler(
+            ctx=ctx,
+            method_map=method_map,
+            export=None,
+            check=check,
+            install=install,
+        )
+    )
 
 
 @click.group(
@@ -162,7 +199,8 @@ def cli(
     ctx.obj["export"] = export
 
 
-cli.add_command(cmd=show_license, name="license")
+cli.add_command(cmd=license, name="license")
+cli.add_command(cmd=updates, name="updates")
 
 
 @cli.command(
@@ -782,9 +820,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 
 async def call_method(
     method: Callable,
-    session: aiohttp.ClientSession,
-    status: console.status,
-    **kwargs: Union[str, click.Context],
+    **kwargs: Union[str, click.Context, aiohttp.ClientSession, Status],
 ):
     """
     Calls a method with the provided arguments.
@@ -797,6 +833,9 @@ async def call_method(
     :type status: Console.console.status
     :param kwargs: Additional keyword arguments for `export: str`, `argument: str` and `ctx: click.Context` .
     """
+
+    session = kwargs.get("session")
+    status = kwargs.get("status")
 
     command: str = kwargs.get("ctx").command.name
     argument: str = kwargs.get("argument")
@@ -857,6 +896,7 @@ async def method_call_handler(
     :param kwargs: Additional keyword arguments.
     :type kwargs: Union[str, int, bool]
     """
+
     is_valid_arg: bool = False
 
     for argument, method in method_map.items():
@@ -876,10 +916,7 @@ async def method_call_handler(
                         await reddit.infra_status(
                             session=session, status=status, message=Message
                         )
-                        await package.check_updates(
-                            session=session,
-                            status=status,
-                         )
+
                         await call_method(
                             method=method,
                             session=session,
