@@ -26,7 +26,7 @@ async def subreddit_posts(subreddit_name, posts_limit):
         posts = await subreddit.posts(session=session, limit=posts_limit)
 
         for post in posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(subreddit_posts(subreddit_name="AskScience", posts_limit=200))
