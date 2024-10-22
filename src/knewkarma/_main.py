@@ -3,14 +3,12 @@ from platform import python_version, platform
 from types import SimpleNamespace
 from typing import Literal, Union, Optional, List
 
+import aiohttp
 import kraw
-from aiohttp import ClientSession
-from rich.status import Status
 
 from .meta.about import Project
 from .meta.version import Version
 from .utils.general import General
-from .utils.terminal import Message
 
 __all__ = [
     "reddit",
@@ -57,7 +55,12 @@ class Post:
         self._subreddit = subreddit
 
     async def data(
-        self, session: ClientSession, status: Optional[Status] = None
+        self,
+        session: aiohttp.ClientSession,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves data for a Reddit post, excluding comments.
@@ -72,6 +75,8 @@ class Post:
 
         post_data = await reddit.post(
             session=session,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
             status=status,
             id=self._id,
             subreddit=self._subreddit,
@@ -81,11 +86,14 @@ class Post:
 
     async def comments(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves comments for a Reddit post.
@@ -104,7 +112,9 @@ class Post:
 
         comments_data = await reddit.comments(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="post",
             id=self._id,
@@ -122,10 +132,13 @@ class Posts:
 
     @staticmethod
     async def best(
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the best posts.
@@ -144,7 +157,9 @@ class Posts:
 
         best_posts = await reddit.posts(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="best",
             limit=limit,
@@ -155,10 +170,13 @@ class Posts:
 
     @staticmethod
     async def controversial(
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the controversial posts.
@@ -177,7 +195,9 @@ class Posts:
 
         controversial_posts = await reddit.posts(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="controversial",
             limit=limit,
@@ -188,11 +208,14 @@ class Posts:
 
     @staticmethod
     async def front_page(
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         sort: reddit.SORT = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the front-page posts.
@@ -213,7 +236,9 @@ class Posts:
 
         front_page_posts = await reddit.posts(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="front_page",
             limit=limit,
@@ -225,11 +250,14 @@ class Posts:
 
     @staticmethod
     async def new(
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         sort: reddit.SORT = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the new posts.
@@ -250,7 +278,9 @@ class Posts:
 
         new_posts = await reddit.posts(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="new",
             limit=limit,
@@ -262,10 +292,12 @@ class Posts:
 
     @staticmethod
     async def popular(
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the popular posts.
@@ -283,7 +315,9 @@ class Posts:
         """
         popular_posts = await reddit.posts(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="popular",
             limit=limit,
@@ -294,10 +328,12 @@ class Posts:
 
     @staticmethod
     async def rising(
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves the rising posts.
@@ -316,7 +352,9 @@ class Posts:
 
         rising_posts = await reddit.posts(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="rising",
             limit=limit,
@@ -346,10 +384,12 @@ class Search:
 
     async def posts(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves posts that match with the specified query.
@@ -368,7 +408,9 @@ class Search:
 
         search_results = await reddit.search(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="posts",
             query=self._query,
@@ -380,10 +422,12 @@ class Search:
 
     async def subreddits(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves subreddits that match with the specified query.
@@ -402,7 +446,9 @@ class Search:
 
         search_results = await reddit.search(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="subreddits",
             query=self._query,
@@ -414,10 +460,12 @@ class Search:
 
     async def users(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves users that match with the specified query.
@@ -436,7 +484,9 @@ class Search:
 
         search_results = await reddit.search(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="users",
             query=self._query,
@@ -465,12 +515,14 @@ class Subreddit:
 
     async def comments(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         posts_limit: int,
         comments_per_post: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves comments from a subreddit.
@@ -493,7 +545,9 @@ class Subreddit:
 
         posts = await self.posts(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             limit=posts_limit,
             sort=sort,
@@ -506,7 +560,12 @@ class Subreddit:
                 subreddit=post.get("subreddit"),
             )
             post_comments = await post.comments(
-                session=session, limit=comments_per_post, sort=sort, status=status
+                session=session,
+                proxy=proxy,
+                proxy_auth=proxy_auth,
+                limit=comments_per_post,
+                sort=sort,
+                status=status,
             )
 
             all_comments.extend(post_comments)
@@ -515,11 +574,14 @@ class Subreddit:
 
     async def posts(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously retrieves posts from a subreddit.
@@ -540,7 +602,9 @@ class Subreddit:
 
         subreddit_posts = await reddit.posts(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="subreddit",
             subreddit=self._name,
@@ -552,7 +616,12 @@ class Subreddit:
         return subreddit_posts
 
     async def profile(
-        self, session: ClientSession, status: Optional[Status] = None
+        self,
+        session: aiohttp.ClientSession,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves a subreddit's profile data.
@@ -567,7 +636,8 @@ class Subreddit:
 
         subreddit_profile = await reddit.subreddit(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
             status=status,
             name=self._name,
         )
@@ -576,12 +646,14 @@ class Subreddit:
 
     async def search(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         query: str,
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get posts that contain the specified query string from a subreddit.
@@ -604,7 +676,9 @@ class Subreddit:
 
         search_results = await reddit.posts(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="search_subreddit",
             subreddit=self._name,
@@ -617,7 +691,12 @@ class Subreddit:
         return search_results
 
     async def wikipages(
-        self, session: ClientSession, status: Optional[Status] = None
+        self,
+        session: aiohttp.ClientSession,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[str]:
         """
         Asynchronously get a subreddit's wiki pages.
@@ -638,6 +717,8 @@ class Subreddit:
         pages = await reddit.connection.send_request(
             endpoint=f"{reddit.connection.endpoints.subreddit}/{self._name}/wiki/pages.json",
             session=session,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
         )
 
         return pages.get("data")
@@ -645,8 +726,10 @@ class Subreddit:
     async def wikipage(
         self,
         page_name: str,
-        session: ClientSession,
-        status: Optional[Status] = None,
+        session: aiohttp.ClientSession,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> SimpleNamespace:
         """
         Asynchronously get a subreddit's specified wiki page data.
@@ -663,6 +746,8 @@ class Subreddit:
 
         wiki_page = await reddit.wiki_page(
             session=session,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
             status=status,
             name=page_name,
             subreddit=self._name,
@@ -685,10 +770,12 @@ class Subreddits:
 
     async def all(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get all subreddits.
@@ -710,7 +797,9 @@ class Subreddits:
 
         all_subreddits = await reddit.subreddits(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="all",
             limit=limit,
@@ -722,8 +811,10 @@ class Subreddits:
     async def default(
         self,
         limit: int,
-        session: ClientSession,
-        status: Optional[Status] = None,
+        session: aiohttp.ClientSession,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get default subreddits.
@@ -740,7 +831,9 @@ class Subreddits:
 
         default_subreddits = await reddit.subreddits(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="default",
             timeframe="all",
@@ -751,10 +844,12 @@ class Subreddits:
 
     async def new(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get new subreddits.
@@ -772,7 +867,9 @@ class Subreddits:
         """
         new_subreddits = await reddit.subreddits(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="new",
             limit=limit,
@@ -783,10 +880,12 @@ class Subreddits:
 
     async def popular(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get popular subreddits.
@@ -805,7 +904,9 @@ class Subreddits:
 
         popular_subreddits = await reddit.subreddits(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="popular",
             limit=limit,
@@ -833,11 +934,13 @@ class User:
 
     async def comments(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's comments.
@@ -858,7 +961,9 @@ class User:
 
         user_comments = await reddit.comments(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="user",
             username=self._name,
@@ -870,7 +975,10 @@ class User:
         return user_comments
 
     async def moderated_subreddits(
-        self, session: ClientSession, status: Optional[Status] = None
+        self,
+        session: aiohttp.ClientSession,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get subreddits moderated by user.
@@ -885,7 +993,9 @@ class User:
 
         subreddits = await reddit.subreddits(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="user_moderated",
             username=self._name,
@@ -897,8 +1007,10 @@ class User:
     async def overview(
         self,
         limit: int,
-        session: ClientSession,
-        status: Optional[Status] = None,
+        session: aiohttp.ClientSession,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's most recent comments.
@@ -915,7 +1027,9 @@ class User:
 
         user_overview = await reddit.comments(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="user_overview",
             limit=limit,
@@ -927,11 +1041,13 @@ class User:
 
     async def posts(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get a user's posts.
@@ -952,7 +1068,9 @@ class User:
 
         user_posts = await reddit.posts(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="user",
             limit=limit,
@@ -964,7 +1082,12 @@ class User:
         return user_posts
 
     async def profile(
-        self, session: ClientSession, status: Optional[Status] = None
+        self,
+        session: aiohttp.ClientSession,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> SimpleNamespace:
         """
         Asynchronously get a user's profile data.
@@ -979,6 +1102,8 @@ class User:
 
         user_profile = await reddit.user(
             session=session,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
             status=status,
             name=self._name,
         )
@@ -987,12 +1112,14 @@ class User:
 
     async def top_subreddits(
         self,
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         top_n: int,
         limit: int,
         filename: str = None,
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> Union[List[tuple[str, int]], None]:
         """
         Asynchronously get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
@@ -1013,7 +1140,9 @@ class User:
 
         posts = await reddit.posts(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="user",
             limit=limit,
@@ -1049,7 +1178,10 @@ class User:
                 return top_subreddits
 
     async def username_available(
-        self, session: ClientSession, status: Optional[Status] = None
+        self,
+        session: aiohttp.ClientSession,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> bool:
         """
         Checks if the given username is available or taken.
@@ -1067,6 +1199,8 @@ class User:
 
         response: bool = await reddit.connection.send_request(
             session=session,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
             endpoint=reddit.connection.endpoints.username_available,
             params={"user": self._name},
         )
@@ -1079,10 +1213,12 @@ class Users:
 
     @staticmethod
     async def new(
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get new users.
@@ -1101,7 +1237,9 @@ class Users:
 
         new_users = await reddit.users(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="new",
             limit=limit,
@@ -1112,10 +1250,12 @@ class Users:
 
     @staticmethod
     async def popular(
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get popular users.
@@ -1134,7 +1274,9 @@ class Users:
 
         popular_users = await reddit.users(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="popular",
             limit=limit,
@@ -1145,10 +1287,13 @@ class Users:
 
     @staticmethod
     async def all(
-        session: ClientSession,
+        session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: Optional[Status] = None,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
+        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
         """
         Asynchronously get all users.
@@ -1167,7 +1312,9 @@ class Users:
 
         all_users = await reddit.users(
             session=session,
-            message=Message,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            message=message,
             status=status,
             kind="all",
             limit=limit,

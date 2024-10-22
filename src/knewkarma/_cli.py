@@ -91,11 +91,11 @@ def updates(ctx: click.Context, check: bool, install: bool):
     :type install: bool
     """
     method_map = {
-        "check": lambda session, status=None: package.check_updates(
+        "check": lambda session, status=None, message=None: package.check_updates(
             session=session, status=status
         ),
-        "install": lambda session, status=None: package.check_updates(
-            session=session, status=status, install_if_available=True
+        "install": lambda session, status=None, message=None: package.check_updates(
+            session=session, status=status, message=message, install_if_available=True
         ),
     }
 
@@ -235,10 +235,10 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 
     post_instance = Post(id=id, subreddit=subreddit)
     method_map: Dict = {
-        "comments": lambda session, status=None: post_instance.comments(
-            limit=limit, sort=sort, status=status, session=session
+        "comments": lambda session, status=None, message=None: post_instance.comments(
+            limit=limit, sort=sort, status=status, message=message, session=session
         ),
-        "data": lambda session, status=None: post_instance.data(
+        "data": lambda session, status=None, message=None: post_instance.data(
             session=session, status=status
         ),
     }
@@ -312,23 +312,35 @@ def posts(
 
     posts_instance = Posts()
     method_map: Dict = {
-        "best": lambda session, status=None: posts_instance.best(
-            timeframe=timeframe, limit=limit, status=status, session=session
+        "best": lambda session, status=None, message=None: posts_instance.best(
+            timeframe=timeframe,
+            limit=limit,
+            status=status,
+            message=message,
+            session=session,
         ),
-        "controversial": lambda session, status=None: posts_instance.controversial(
-            timeframe=timeframe, limit=limit, status=status, session=session
+        "controversial": lambda session, status=None, message=None: posts_instance.controversial(
+            timeframe=timeframe,
+            limit=limit,
+            status=status,
+            message=message,
+            session=session,
         ),
-        "front_page": lambda session, status=None: posts_instance.front_page(
-            limit=limit, sort=sort, status=status, session=session
+        "front_page": lambda session, status=None, message=None: posts_instance.front_page(
+            limit=limit, sort=sort, status=status, message=message, session=session
         ),
-        "new": lambda session, status=None: posts_instance.new(
-            limit=limit, sort=sort, status=status, session=session
+        "new": lambda session, status=None, message=None: posts_instance.new(
+            limit=limit, sort=sort, status=status, message=message, session=session
         ),
-        "popular": lambda session, status=None: posts_instance.popular(
-            timeframe=timeframe, limit=limit, status=status, session=session
+        "popular": lambda session, status=None, message=None: posts_instance.popular(
+            timeframe=timeframe,
+            limit=limit,
+            status=status,
+            message=message,
+            session=session,
         ),
-        "rising": lambda session, status=None: posts_instance.rising(
-            limit=limit, status=status, session=session
+        "rising": lambda session, status=None, message=None: posts_instance.rising(
+            limit=limit, status=status, message=message, session=session
         ),
     }
 
@@ -380,14 +392,14 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
         query=query,
     )
     method_map: Dict = {
-        "posts": lambda session, status=None: search_instance.posts(
-            sort=sort, limit=limit, status=status, session=session
+        "posts": lambda session, status=None, message=None: search_instance.posts(
+            sort=sort, limit=limit, status=status, message=message, session=session
         ),
-        "subreddits": lambda session, status=None: search_instance.subreddits(
+        "subreddits": lambda session, status=None, message=None: search_instance.subreddits(
             sort=sort, limit=limit, session=session
         ),
-        "users": lambda session, status=None: search_instance.users(
-            sort=sort, limit=limit, status=status, session=session
+        "users": lambda session, status=None, message=None: search_instance.users(
+            sort=sort, limit=limit, status=status, message=message, session=session
         ),
     }
 
@@ -473,46 +485,50 @@ def subreddit(
         name=subreddit_name,
     )
     method_map: Dict = {
-        "comments": lambda session, status=None: subreddit_instance.comments(
+        "comments": lambda session, status=None, message=None: subreddit_instance.comments(
             session=session,
             posts_limit=limit,
             comments_per_post=comments_per_post,
             sort=sort,
             timeframe=timeframe,
             status=status,
+            message=message,
         ),
-        "posts": lambda session, status=None: subreddit_instance.posts(
+        "posts": lambda session, status=None, message=None: subreddit_instance.posts(
             limit=limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
+            message=message,
             session=session,
         ),
-        "profile": lambda session, status=None: subreddit_instance.profile(
-            status=status, session=session
+        "profile": lambda session, status=None, message=None: subreddit_instance.profile(
+            status=status, message=message, session=session
         ),
-        "search_comments": lambda session, status=None: subreddit_instance.search_comments(
+        "search_comments": lambda session, status=None, message=None: subreddit_instance.search_comments(
             query=search_comments,
             posts_limit=limit,
             comments_per_post=comments_per_post,
             sort=sort,
             timeframe=timeframe,
             status=status,
+            message=message,
             session=session,
         ),
-        "search_post": lambda session, status=None: subreddit_instance.search_posts(
+        "search_post": lambda session, status=None, message=None: subreddit_instance.search_posts(
             query=search_post,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
+            message=message,
             session=session,
         ),
-        "wiki_pages": lambda session, status=None: subreddit_instance.wiki_pages(
-            status=status, session=session
+        "wiki_pages": lambda session, status=None, message=None: subreddit_instance.wiki_pages(
+            status=status, message=message, session=session
         ),
-        "wiki_page": lambda session, status=None: subreddit_instance.wiki_page(
-            page_name=wiki_page, status=status, session=session
+        "wiki_page": lambda session, status=None, message=None: subreddit_instance.wiki_page(
+            page_name=wiki_page, status=status, message=message, session=session
         ),
     }
 
@@ -576,18 +592,19 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 
     subreddits_instance = Subreddits()
     method_map: Dict = {
-        "all": lambda session, status=None: subreddits_instance.all(
+        "all": lambda session, status=None, message=None: subreddits_instance.all(
             limit=limit,
             session=session,
             status=status,
+            message=message,
         ),
-        "default": lambda session, status=None: subreddits_instance.default(
+        "default": lambda session, status=None, message=None: subreddits_instance.default(
             limit=limit, session=session, status=status
         ),
-        "new": lambda session, status=None: subreddits_instance.new(
+        "new": lambda session, status=None, message=None: subreddits_instance.new(
             limit=limit, session=session, status=status
         ),
-        "popular": lambda session, status=None: subreddits_instance.popular(
+        "popular": lambda session, status=None, message=None: subreddits_instance.popular(
             limit=limit, session=session, status=status
         ),
     }
@@ -690,53 +707,58 @@ def user(
         name=username,
     )
     method_map: Dict = {
-        "comments": lambda session, status=None: user_instance.comments(
+        "comments": lambda session, status=None, message=None: user_instance.comments(
             session=session,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
+            message=message,
         ),
-        "moderated_subreddits": lambda session, status=None: user_instance.moderated_subreddits(
+        "moderated_subreddits": lambda session, status=None, message=None: user_instance.moderated_subreddits(
             session=session, status=status
         ),
-        "overview": lambda session, status=None: user_instance.overview(
+        "overview": lambda session, status=None, message=None: user_instance.overview(
             limit=limit, session=session, status=status
         ),
-        "posts": lambda session, status=None: user_instance.posts(
+        "posts": lambda session, status=None, message=None: user_instance.posts(
             session=session,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
+            message=message,
         ),
-        "profile": lambda session, status=None: user_instance.profile(
+        "profile": lambda session, status=None, message=None: user_instance.profile(
             session=session, status=status
         ),
-        "search_comments": lambda session, status=None: user_instance.search_comments(
+        "search_comments": lambda session, status=None, message=None: user_instance.search_comments(
             query=search_comments,
             limit=limit,
             session=session,
             sort=sort,
             timeframe=timeframe,
             status=status,
+            message=message,
         ),
-        "search_posts": lambda session, status=None: user_instance.search_posts(
+        "search_posts": lambda session, status=None, message=None: user_instance.search_posts(
             query=search_posts,
             limit=limit,
             session=session,
             sort=sort,
             timeframe=timeframe,
             status=status,
+            message=message,
         ),
-        "top_subreddits": lambda session, status=None: user_instance.top_subreddits(
+        "top_subreddits": lambda session, status=None, message=None: user_instance.top_subreddits(
             session=session,
             top_n=top_subreddits,
             limit=limit,
             timeframe=timeframe,
             status=status,
+            message=message,
         ),
-        "username_available": lambda session, status=None: user_instance.username_available(
+        "username_available": lambda session, status=None, message=None: user_instance.username_available(
             session=session, status=status
         ),
     }
@@ -795,13 +817,13 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 
     users_instance = Users()
     method_map: Dict = {
-        "all": lambda session, status=None: users_instance.all(
+        "all": lambda session, status=None, message=None: users_instance.all(
             session=session, limit=limit, timeframe=timeframe, status=status
         ),
-        "new": lambda session, status=None: users_instance.new(
+        "new": lambda session, status=None, message=None: users_instance.new(
             session=session, limit=limit, timeframe=timeframe, status=status
         ),
-        "popular": lambda session, status=None: users_instance.popular(
+        "popular": lambda session, status=None, message=None: users_instance.popular(
             session=session, limit=limit, timeframe=timeframe, status=status
         ),
     }
@@ -836,12 +858,15 @@ async def call_method(
 
     session = kwargs.get("session")
     status = kwargs.get("status")
+    message = kwargs.get("message")
 
     command: str = kwargs.get("ctx").command.name
     argument: str = kwargs.get("argument")
 
     response_data: Union[List, Dict, str, bool] = await method(
-        session=session, status=status
+        session=session,
+        status=status,
+        message=Message,
     )
     if argument == "username_available" and (response_data, bool):
         if response_data:
@@ -914,7 +939,9 @@ async def method_call_handler(
                     async with aiohttp.ClientSession() as session:
                         Message.ok("New client session opened")
                         await reddit.infra_status(
-                            session=session, status=status, message=Message
+                            session=session,
+                            status=status,
+                            message=Message,
                         )
 
                         await call_method(
@@ -931,7 +958,6 @@ async def method_call_handler(
                 )
             except aiohttp.ClientResponseError as response_error:
                 Message.exception(title="An API error occurred", error=response_error)
-
             finally:
                 elapsed_time = datetime.now() - start_time
                 Message.ok(
