@@ -76,7 +76,10 @@ def license(ctx: click.Context, conditions: bool, warranty: bool):
 @click.command(name="updates", help="Use this command to check for or install updates.")
 @click.option("-c", "--check", is_flag=True, help="Check for updates.")
 @click.option(
-    "-i", "--install", is_flag=True, help="Install updates, if any are available."
+    "-i",
+    "--install",
+    is_flag=True,
+    help="Install updates, if any are available [Non-Snap Packages only]",
 )
 @click.pass_context
 def updates(ctx: click.Context, check: bool, install: bool):
