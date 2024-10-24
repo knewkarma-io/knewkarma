@@ -142,30 +142,33 @@ class Package:
         :type status: rich.status.Status
         """
 
-        if self._package:
-            try:
-                if status:
-                    status.stop()
-                    # status.update("Downloading updates. Please wait")
-                subprocess.run(
-                    [
-                        "pip",
-                        "install",
-                        "--upgrade",
-                        f"{self._package}[core]",
-                    ],
-                    check=True,
-                )
-                Message.ok(f"DONE. The updates will be installed on next run.")
-            except subprocess.CalledProcessError as called_process_error:
-                Message.exception(
-                    title=f"An error occurred ({Style.italic}while updating package{Style.reset})",
-                    error=called_process_error,
-                )
-            except Exception as unexpected_error:
-                Message.exception(unexpected_error)
+        if self.is_snap_package():
+            Message.warning("Run 'snap refresh knewkarma' to update the snap package.")
         else:
-            Message.error(self._invalid_package_error)
+            if self._package:
+                try:
+                    if status:
+                        status.stop()
+                        # status.update("Downloading updates. Please wait")
+                    subprocess.run(
+                        [
+                            "pip",
+                            "install",
+                            "--upgrade",
+                            f"{self._package}[core]",
+                        ],
+                        check=True,
+                    )
+                    Message.ok(f"DONE. The updates will be installed on next run.")
+                except subprocess.CalledProcessError as called_process_error:
+                    Message.exception(
+                        title=f"An error occurred ({Style.italic}while updating package{Style.reset})",
+                        error=called_process_error,
+                    )
+                except Exception as unexpected_error:
+                    Message.exception(unexpected_error)
+            else:
+                Message.error(self._invalid_package_error)
 
 
 # -------------------------------- END ----------------------------------------- #
