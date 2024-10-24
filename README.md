@@ -8,8 +8,6 @@
   <!--<a href="https://opencollective.com/knewkarma"><img alt="Open Collective backers and sponsors" src="https://img.shields.io/opencollective/all/knewkarma?logo=open-collective"></a>-->
 </p>
 
-***
-
 ```commandline
 knewkarma subreddit AskScience --posts
 ```
@@ -28,7 +26,7 @@ async def subreddit_posts(subreddit_name, posts_limit):
         posts = await subreddit.posts(session=session, limit=posts_limit)
 
         for post in posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(subreddit_posts(subreddit_name="AskScience", posts_limit=200))
@@ -70,8 +68,3 @@ projects and/or the work put into this project in particular, any sponsorship ti
 ## License
 
 GPL-3.0+ License © [Richard Mwewa](https://gravatar.com/rly0nheart)
-
-***
-<a href="https://gravatar.com/rly0nheart">
-   <img src="https://github.com/user-attachments/assets/5b29ee58-ea36-4ec0-aea3-4b2f9f7999fb" alt="richard-mwewa">
-</a>

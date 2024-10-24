@@ -87,7 +87,8 @@ class General:
         if isinstance(data, SimpleNamespace):
             # Transform each attribute of the object into a dictionary entry
             transformed_data = [
-                {"key": key, "value": value} for key, value in data.__dict__.items()
+                {"key": key, "value": value}
+                for key, value in data.data.__dict__.items()
             ]
 
         # Convert a list of SimpleNamespace objects to a list of dictionaries
@@ -95,7 +96,7 @@ class General:
             isinstance(item, SimpleNamespace) for item in data
         ):
             # Each object in the list is transformed to its dictionary representation
-            transformed_data = [item.__dict__ for item in data]
+            transformed_data = [item.data.__dict__ for item in data]
         else:
             transformed_data = data
 
