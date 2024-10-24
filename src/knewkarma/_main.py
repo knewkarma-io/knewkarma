@@ -296,6 +296,7 @@ class Posts:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -332,6 +333,7 @@ class Posts:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -388,6 +390,7 @@ class Search:
         limit: int,
         sort: reddit.SORT = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -426,6 +429,7 @@ class Search:
         limit: int,
         sort: reddit.SORT = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -464,6 +468,7 @@ class Search:
         limit: int,
         sort: reddit.SORT = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -521,6 +526,7 @@ class Subreddit:
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -652,6 +658,7 @@ class Subreddit:
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -728,6 +735,7 @@ class Subreddit:
         page_name: str,
         session: aiohttp.ClientSession,
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> SimpleNamespace:
@@ -774,6 +782,7 @@ class Subreddits:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -813,6 +822,7 @@ class Subreddits:
         limit: int,
         session: aiohttp.ClientSession,
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -848,6 +858,7 @@ class Subreddits:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -884,6 +895,7 @@ class Subreddits:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -939,6 +951,7 @@ class User:
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -1009,6 +1022,7 @@ class User:
         limit: int,
         session: aiohttp.ClientSession,
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -1046,6 +1060,7 @@ class User:
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -1118,6 +1133,7 @@ class User:
         filename: str = None,
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> Union[List[tuple[str, int]], None]:
@@ -1217,6 +1233,7 @@ class Users:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -1254,6 +1271,7 @@ class Users:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
