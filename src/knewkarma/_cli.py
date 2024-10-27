@@ -94,11 +94,11 @@ def updates(ctx: click.Context, check: bool, install: bool):
     :type install: bool
     """
     method_map = {
-        "check": lambda session, status=None, message=None: package.check_updates(
+        "check": lambda session, status=None, message=Message: package.check_updates(
             session=session, status=status
         ),
-        "install": lambda session, status=None, message=None: package.check_updates(
-            session=session, status=status, message=message, install_if_available=True
+        "install": lambda session, status=None,: package.check_updates(
+            session=session, status=status, install_if_available=True
         ),
     }
 
@@ -106,7 +106,7 @@ def updates(ctx: click.Context, check: bool, install: bool):
         method_call_handler(
             ctx=ctx,
             method_map=method_map,
-            export=None,
+            export="",
             check=check,
             install=install,
         )
@@ -148,13 +148,6 @@ def updates(ctx: click.Context, check: bool, install: bool):
     help=f"<bulk/semi-bulk> Timeframe to get data from",
 )
 @click.option(
-    "--time-format",
-    default="locale",
-    show_default=True,
-    type=click.Choice(["concise", "locale"]),
-    help=f"Determines the format of the output time",
-)
-@click.option(
     "-h",
     "--help",
     is_flag=True,
@@ -174,7 +167,6 @@ def cli(
     timeframe: reddit.TIMEFRAME,
     sort: reddit.SORT,
     limit: int,
-    time_format: str,
     export: List[General.EXPORT_FORMATS],
 ):
     """
@@ -188,8 +180,6 @@ def cli(
     :type sort: Literal[str]
     :param limit: Option to set output data limit.
     :type limit: int
-    :param time_format: Option to set the output's time format.
-    :type time_format: Literal[str]
     :param export: Option to set data export file types.
     :type export: Literal[str]
     """
@@ -198,7 +188,7 @@ def cli(
     ctx.obj["timeframe"] = timeframe
     ctx.obj["sort"] = sort
     ctx.obj["limit"] = limit
-    ctx.obj["time_format"] = time_format
+
     ctx.obj["export"] = export
 
 
@@ -231,17 +221,16 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     :type comments: bool
     """
 
-    sort: SORT = ctx.obj["sort"]
+    sort: reddit.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     post_instance = Post(id=id, subreddit=subreddit)
     method_map: Dict = {
-        "comments": lambda session, status=None, message=None: post_instance.comments(
+        "comments": lambda session, status=None, message=Message: post_instance.comments(
             limit=limit, sort=sort, status=status, message=message, session=session
         ),
-        "data": lambda session, status=None, message=None: post_instance.data(
+        "data": lambda session, status=None, message=Message: post_instance.data(
             session=session, status=status
         ),
     }
@@ -311,38 +300,37 @@ def posts(
     sort: reddit.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     posts_instance = Posts()
     method_map: Dict = {
-        "best": lambda session, status=None, message=None: posts_instance.best(
+        "best": lambda session, status=None, message=Message: posts_instance.best(
             timeframe=timeframe,
             limit=limit,
             status=status,
             message=message,
             session=session,
         ),
-        "controversial": lambda session, status=None, message=None: posts_instance.controversial(
+        "controversial": lambda session, status=None, message=Message: posts_instance.controversial(
             timeframe=timeframe,
             limit=limit,
             status=status,
             message=message,
             session=session,
         ),
-        "front_page": lambda session, status=None, message=None: posts_instance.front_page(
+        "front_page": lambda session, status=None, message=Message: posts_instance.front_page(
             limit=limit, sort=sort, status=status, message=message, session=session
         ),
-        "new": lambda session, status=None, message=None: posts_instance.new(
+        "new": lambda session, status=None, message=Message: posts_instance.new(
             limit=limit, sort=sort, status=status, message=message, session=session
         ),
-        "popular": lambda session, status=None, message=None: posts_instance.popular(
+        "popular": lambda session, status=None, message=Message: posts_instance.popular(
             timeframe=timeframe,
             limit=limit,
             status=status,
             message=message,
             session=session,
         ),
-        "rising": lambda session, status=None, message=None: posts_instance.rising(
+        "rising": lambda session, status=None, message=Message: posts_instance.rising(
             limit=limit, status=status, message=message, session=session
         ),
     }
@@ -389,19 +377,18 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     sort: reddit.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     search_instance = Search(
         query=query,
     )
     method_map: Dict = {
-        "posts": lambda session, status=None, message=None: search_instance.posts(
+        "posts": lambda session, status=None, message=Message: search_instance.posts(
             sort=sort, limit=limit, status=status, message=message, session=session
         ),
-        "subreddits": lambda session, status=None, message=None: search_instance.subreddits(
+        "subreddits": lambda session, status=None, message=Message: search_instance.subreddits(
             sort=sort, limit=limit, session=session
         ),
-        "users": lambda session, status=None, message=None: search_instance.users(
+        "users": lambda session, status=None, message=Message: search_instance.users(
             sort=sort, limit=limit, status=status, message=message, session=session
         ),
     }
@@ -434,12 +421,8 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
 )
 @click.option("--profile", is_flag=True, help="Get a subreddit's profile")
 @click.option("--posts", is_flag=True, help="Get a subreddit's posts")
-@click.option("--search-comments", type=str, help="Search comments in a subreddit")
-@click.option("--search-post", type=str, help="Search posts in a subreddit")
-@click.option(
-    "--wiki-page", type=str, help="Get a subreddit's specified wiki page data"
-)
-@click.option("--wiki-pages", is_flag=True, help="Get a subreddit's wiki pages")
+@click.option("--wikipage", type=str, help="Get a subreddit's specified wiki page data")
+@click.option("--wikipages", is_flag=True, help="Get a subreddit's wiki pages")
 @click.pass_context
 def subreddit(
     ctx: click.Context,
@@ -448,10 +431,8 @@ def subreddit(
     comments_per_post: int,
     posts: bool,
     profile: bool,
-    search_comments: str,
-    search_post: str,
-    wiki_page: str,
-    wiki_pages: bool,
+    wikipage: str,
+    wikipages: bool,
 ):
     """
     Retrieve data about a specific subreddit including profile, comments, posts, and wiki pages.
@@ -468,27 +449,22 @@ def subreddit(
     :type posts: bool
     :param profile: Flag to get the subreddit's profile.
     :type profile: bool
-    :param search_comments: Query to search comments in the subreddit.
-    :type search_comments: str
-    :param search_post: Query to search posts in the subreddit.
-    :type search_post: str
-    :param wiki_page: The name of the wiki page to retrieve.
-    :type wiki_page: str
-    :param wiki_pages: Flag to get the subreddit's wiki pages.
-    :type wiki_pages: bool
+    :param wikipage: The name of the wiki page to retrieve.
+    :type wikipage: str
+    :param wikipages: Flag to get the subreddit's wiki pages.
+    :type wikipages: bool
     """
 
     timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
     sort: reddit.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     subreddit_instance = Subreddit(
         name=subreddit_name,
     )
     method_map: Dict = {
-        "comments": lambda session, status=None, message=None: subreddit_instance.comments(
+        "comments": lambda session, status=None, message=Message: subreddit_instance.comments(
             session=session,
             posts_limit=limit,
             comments_per_post=comments_per_post,
@@ -497,7 +473,7 @@ def subreddit(
             status=status,
             message=message,
         ),
-        "posts": lambda session, status=None, message=None: subreddit_instance.posts(
+        "posts": lambda session, status=None, message=Message: subreddit_instance.posts(
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -505,21 +481,11 @@ def subreddit(
             message=message,
             session=session,
         ),
-        "profile": lambda session, status=None, message=None: subreddit_instance.profile(
-            status=status, message=message, session=session
+        "profile": lambda session, status=None: subreddit_instance.profile(
+            status=status, session=session
         ),
-        "search_comments": lambda session, status=None, message=None: subreddit_instance.search_comments(
-            query=search_comments,
-            posts_limit=limit,
-            comments_per_post=comments_per_post,
-            sort=sort,
-            timeframe=timeframe,
-            status=status,
-            message=message,
-            session=session,
-        ),
-        "search_post": lambda session, status=None, message=None: subreddit_instance.search_posts(
-            query=search_post,
+        "search": lambda session, status=None, message=Message: subreddit_instance.search(
+            query=search,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -527,11 +493,11 @@ def subreddit(
             message=message,
             session=session,
         ),
-        "wiki_pages": lambda session, status=None, message=None: subreddit_instance.wiki_pages(
-            status=status, message=message, session=session
+        "wikipages": lambda session, status=None, message=Message: subreddit_instance.wikipages(
+            status=status, session=session
         ),
-        "wiki_page": lambda session, status=None, message=None: subreddit_instance.wiki_page(
-            page_name=wiki_page, status=status, message=message, session=session
+        "wikipage": lambda session, status=None, message=Message: subreddit_instance.wikipage(
+            page_name=wikipage, status=status, session=session
         ),
     }
 
@@ -544,10 +510,8 @@ def subreddit(
             comments=comments,
             comments_per_post=comments_per_post,
             posts=posts,
-            search_comments=search_comments,
-            search_post=search_post,
-            wiki_pages=wiki_pages,
-            wiki_page=wiki_page,
+            wikipages=wikipages,
+            wikipage=wikipage,
         )
     )
 
@@ -591,23 +555,22 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
     export: str = ctx.obj["export"]
     timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
     limit: int = ctx.obj["limit"]
-    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     subreddits_instance = Subreddits()
     method_map: Dict = {
-        "all": lambda session, status=None, message=None: subreddits_instance.all(
+        "all": lambda session, status=None, message=Message: subreddits_instance.all(
             limit=limit,
             session=session,
             status=status,
             message=message,
         ),
-        "default": lambda session, status=None, message=None: subreddits_instance.default(
+        "default": lambda session, status=None, message=Message: subreddits_instance.default(
             limit=limit, session=session, status=status
         ),
-        "new": lambda session, status=None, message=None: subreddits_instance.new(
+        "new": lambda session, status=None, message=Message: subreddits_instance.new(
             limit=limit, session=session, status=status
         ),
-        "popular": lambda session, status=None, message=None: subreddits_instance.popular(
+        "popular": lambda session, status=None, message=Message: subreddits_instance.popular(
             limit=limit, session=session, status=status
         ),
     }
@@ -641,16 +604,6 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 @click.option("--posts", is_flag=True, help="Get user's posts")
 @click.option("--profile", is_flag=True, help="Get user's profile")
 @click.option(
-    "--search-comments",
-    type=str,
-    help="Search user's comments that contains a specified query string",
-)
-@click.option(
-    "--search-posts",
-    type=str,
-    help="Search user's posts that contains a specified query string",
-)
-@click.option(
     "--top-subreddits",
     type=int,
     help="Get user's top n subreddits",
@@ -669,8 +622,6 @@ def user(
     overview: bool,
     posts: bool,
     profile: bool,
-    search_comments: str,
-    search_posts: str,
     top_subreddits: int,
     username_available: bool,
 ):
@@ -691,10 +642,6 @@ def user(
     :type posts: bool
     :param profile: Flag to get user's profile.
     :type profile: bool
-    :param search_comments: Query to search user's comments.
-    :type search_comments: str
-    :param search_posts: Query to search user's posts.
-    :type search_posts: str
     :param top_subreddits: Number of top subreddits to retrieve.
     :type top_subreddits: int
     :param username_available: Flag to check if the given username is available of taken.
@@ -704,13 +651,12 @@ def user(
     sort: reddit.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     user_instance: User = User(
         name=username,
     )
     method_map: Dict = {
-        "comments": lambda session, status=None, message=None: user_instance.comments(
+        "comments": lambda session, status=None, message=Message: user_instance.comments(
             session=session,
             limit=limit,
             sort=sort,
@@ -718,13 +664,13 @@ def user(
             status=status,
             message=message,
         ),
-        "moderated_subreddits": lambda session, status=None, message=None: user_instance.moderated_subreddits(
+        "moderated_subreddits": lambda session, status=None, message=Message: user_instance.moderated_subreddits(
             session=session, status=status
         ),
-        "overview": lambda session, status=None, message=None: user_instance.overview(
+        "overview": lambda session, status=None, message=Message: user_instance.overview(
             limit=limit, session=session, status=status
         ),
-        "posts": lambda session, status=None, message=None: user_instance.posts(
+        "posts": lambda session, status=None, message=Message: user_instance.posts(
             session=session,
             limit=limit,
             sort=sort,
@@ -732,28 +678,10 @@ def user(
             status=status,
             message=message,
         ),
-        "profile": lambda session, status=None, message=None: user_instance.profile(
+        "profile": lambda session, status=None,: user_instance.profile(
             session=session, status=status
         ),
-        "search_comments": lambda session, status=None, message=None: user_instance.search_comments(
-            query=search_comments,
-            limit=limit,
-            session=session,
-            sort=sort,
-            timeframe=timeframe,
-            status=status,
-            message=message,
-        ),
-        "search_posts": lambda session, status=None, message=None: user_instance.search_posts(
-            query=search_posts,
-            limit=limit,
-            session=session,
-            sort=sort,
-            timeframe=timeframe,
-            status=status,
-            message=message,
-        ),
-        "top_subreddits": lambda session, status=None, message=None: user_instance.top_subreddits(
+        "top_subreddits": lambda session, status=None, message=Message: user_instance.top_subreddits(
             session=session,
             top_n=top_subreddits,
             limit=limit,
@@ -761,7 +689,7 @@ def user(
             status=status,
             message=message,
         ),
-        "username_available": lambda session, status=None, message=None: user_instance.username_available(
+        "username_available": lambda session, status=None, message=Message: user_instance.username_available(
             session=session, status=status
         ),
     }
@@ -776,8 +704,6 @@ def user(
             overview=overview,
             posts=posts,
             profile=profile,
-            search_comments=search_comments,
-            search_posts=search_posts,
             top_subreddits=top_subreddits,
             username_available=username_available,
         )
@@ -816,17 +742,16 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     export: str = ctx.obj["export"]
     timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
     limit: int = ctx.obj["limit"]
-    time_format: reddit.TIME_FORMAT = ctx.obj["time_format"]
 
     users_instance = Users()
     method_map: Dict = {
-        "all": lambda session, status=None, message=None: users_instance.all(
+        "all": lambda session, status=None, message=Message: users_instance.all(
             session=session, limit=limit, timeframe=timeframe, status=status
         ),
-        "new": lambda session, status=None, message=None: users_instance.new(
+        "new": lambda session, status=None, message=Message: users_instance.new(
             session=session, limit=limit, timeframe=timeframe, status=status
         ),
-        "popular": lambda session, status=None, message=None: users_instance.popular(
+        "popular": lambda session, status=None, message=Message: users_instance.popular(
             session=session, limit=limit, timeframe=timeframe, status=status
         ),
     }
@@ -852,16 +777,13 @@ async def call_method(
 
     :param method: A method to call.
     :type method: Callable
-    :param session: A aiohttp.ClientSession to use for the method's requests.
-    :type session: aiohttp.ClientSession
-    :param status: An instance of `console.status` used to display animated status messages inside the method.
-    :type status: Console.console.status
-    :param kwargs: Additional keyword arguments for `export: str`, `argument: str` and `ctx: click.Context` .
+    :param kwargs: Additional keyword arguments for `export: str`,
+    `status: rich.status.Status`, `session: aiohttp.ClientSession`,
+    `argument: str` and `ctx: click.Context` .
     """
 
     session = kwargs.get("session")
     status = kwargs.get("status")
-    message = kwargs.get("message")
 
     command: str = kwargs.get("ctx").command.name
     argument: str = kwargs.get("argument")
@@ -869,41 +791,34 @@ async def call_method(
     response_data: Union[List, Dict, str, bool] = await method(
         session=session,
         status=status,
-        message=Message,
     )
-    if argument == "username_available" and (response_data, bool):
-        if response_data:
-            Message.ok("Username is available.")
-        else:
-            Message.warning("Username is already taken.")
-    else:
-        if response_data:
-            dataframe = General.create_dataframe(data=response_data)
-            console.print(dataframe)
+    if response_data:
+        dataframe = General.create_dataframe(data=response_data)
+        console.print(dataframe)
 
-            if kwargs.get("export"):
+        if kwargs.get("export"):
 
-                exports_child_dir: str = os.path.join(
-                    General.EXPORTS_PARENT_DIR,
-                    "exports",
-                    command,
-                    argument,
-                )
+            exports_child_dir: str = os.path.join(
+                General.EXPORTS_PARENT_DIR,
+                "exports",
+                command,
+                argument,
+            )
 
-                General.pathfinder(
-                    directories=[
-                        os.path.join(exports_child_dir, extension)
-                        for extension in ["csv", "html", "json", "xml"]
-                    ],
-                )
+            General.pathfinder(
+                directories=[
+                    os.path.join(exports_child_dir, extension)
+                    for extension in ["csv", "html", "json", "xml"]
+                ],
+            )
 
-                export_to: List = kwargs.get("export").split(",")
-                General.export_dataframe(
-                    dataframe=dataframe,
-                    filename=General.filename_timestamp(),
-                    directory=exports_child_dir,
-                    formats=export_to,
-                )
+            export_to: List = kwargs.get("export").split(",")
+            General().export_dataframe(
+                dataframe=dataframe,
+                filename=General.filename_timestamp(),
+                directory=exports_child_dir,
+                formats=export_to,
+            )
 
 
 async def method_call_handler(
