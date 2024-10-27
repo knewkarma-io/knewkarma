@@ -87,7 +87,7 @@ class General:
         if isinstance(data, SimpleNamespace):
             # Transform each attribute of the object into a dictionary entry
             transformed_data = [
-                {"key": key, "value": value}
+                {"attribute": key, "value": value}
                 for key, value in data.data.__dict__.items()
             ]
 

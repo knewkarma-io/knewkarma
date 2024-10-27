@@ -47,8 +47,6 @@ class Post:
         :type id: str
         :param subreddit: The subreddit where the post was created.
         :type subreddit: str
-        :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
-        :type time_format: Literal["concise", "locale"]
         """
 
         self._id = id
@@ -60,13 +58,16 @@ class Post:
         proxy: Optional[str] = None,
         proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves data for a Reddit post, excluding comments.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A `SimpleNamespace` object containing parsed post data.
@@ -100,12 +101,20 @@ class Post:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of comments to retrieve.
         :type limit: int
         :param sort: The sorting criterion for the comments. Defaults to "all".
         :type sort: SORT, optional
+        :param timeframe:
+        :type timeframe:
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
         :rtype: List[SimpleNamespace]
         """
@@ -145,12 +154,18 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -163,6 +178,7 @@ class Posts:
             status=status,
             kind="best",
             limit=limit,
+            sort="all",
             timeframe=timeframe,
         )
 
@@ -183,12 +199,18 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -201,6 +223,7 @@ class Posts:
             status=status,
             kind="controversial",
             limit=limit,
+            sort="all",
             timeframe=timeframe,
         )
 
@@ -222,6 +245,10 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -230,6 +257,8 @@ class Posts:
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -264,6 +293,10 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -272,6 +305,8 @@ class Posts:
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -305,12 +340,18 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -322,6 +363,7 @@ class Posts:
             status=status,
             kind="popular",
             limit=limit,
+            sort="all",
             timeframe=timeframe,
         )
 
@@ -342,12 +384,18 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -360,6 +408,7 @@ class Posts:
             status=status,
             kind="rising",
             limit=limit,
+            sort="all",
             timeframe=timeframe,
         )
 
@@ -378,8 +427,6 @@ class Search:
 
         :param query: The search query string.
         :type query: str
-        :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
-        :type time_format: Literal["concise", "locale"]
         """
 
         self._query = query
@@ -398,13 +445,18 @@ class Search:
         Asynchronously retrieves posts that match with the specified query.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession:param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param sort: Sorting criterion for posts. Defaults to "all".
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -437,13 +489,18 @@ class Search:
         Asynchronously retrieves subreddits that match with the specified query.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession:param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of subreddits to retrieve.
         :type limit: int
         :param sort: Sorting criterion for subreddits. Defaults to "all".
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed subreddit data.
         :rtype: List[SimpleNamespace]
         """
@@ -476,13 +533,19 @@ class Search:
         Asynchronously retrieves users that match with the specified query.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of users to retrieve.
         :type limit: int
         :param sort: Sorting criterion for users. Defaults to "all".
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed user data.
         :rtype: List[SimpleNamespace]
         """
@@ -512,8 +575,6 @@ class Subreddit:
 
         :param name: The name of the subreddit to retrieve data from.
         :type name: str
-        :param time_format: Format for displaying time, either 'concise' or 'locale'. Defaults to 'locale'.
-        :type time_format: Literal["concise", "locale"]
         """
 
         self._name = name
@@ -534,7 +595,11 @@ class Subreddit:
         Asynchronously retrieves comments from a subreddit.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param posts_limit: Maximum number of posts to retrieve comments from.
         :type posts_limit: int
         :param comments_per_post: Maximum number of comments to retrieve per post.
@@ -545,6 +610,8 @@ class Subreddit:
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
         :rtype: List[SimpleNamespace]
         """
@@ -593,7 +660,11 @@ class Subreddit:
         Asynchronously retrieves posts from a subreddit.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param sort: Sorting criterion for the posts. Defaults to "all".
@@ -602,6 +673,8 @@ class Subreddit:
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -627,13 +700,16 @@ class Subreddit:
         proxy: Optional[str] = None,
         proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves a subreddit's profile data.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A `SimpleNamespace` object containing the parsed subreddit profile data.
@@ -666,7 +742,11 @@ class Subreddit:
         Asynchronously get posts that contain the specified query string from a subreddit.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param query: Search query.
         :type query: str
         :param limit: Maximum number of posts to return.
@@ -677,6 +757,8 @@ class Subreddit:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing post data.
         :rtype: List[SimpleNamespace]
         """
@@ -703,13 +785,16 @@ class Subreddit:
         proxy: Optional[str] = None,
         proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[str]:
         """
         Asynchronously get a subreddit's wiki pages.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A list of strings, each representing a wiki page.
@@ -737,7 +822,6 @@ class Subreddit:
         proxy: Optional[str] = None,
         proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> SimpleNamespace:
         """
         Asynchronously get a subreddit's specified wiki page data.
@@ -745,7 +829,11 @@ class Subreddit:
         :param page_name: Wiki page to get data from.
         :type page_name: str
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A `SimpleNamespace` object containing the parsed wiki page data.
@@ -767,17 +855,8 @@ class Subreddit:
 class Subreddits:
     """Represents Reddit subreddits and provides methods for getting related data."""
 
-    def __init__(self):
-        """
-        Initialises the `Subreddits()` instance for getting `all`, `default`, `new` and `popular` subreddits.
-
-        :param time_format: Time format of the output data. Use `concise` for a human-readable
-                        time difference, or `locale` for a localized datetime string. Defaults to `locale`.
-        :type time_format: Literal["concise", "locale"]
-        """
-
+    @staticmethod
     async def all(
-        self,
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -790,13 +869,19 @@ class Subreddits:
         Asynchronously get all subreddits.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get all subreddits.
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing subreddit data.
         :rtype: List[SimpleNamespace]
 
@@ -817,8 +902,8 @@ class Subreddits:
 
         return all_subreddits
 
+    @staticmethod
     async def default(
-        self,
         limit: int,
         session: aiohttp.ClientSession,
         proxy: Optional[str] = None,
@@ -832,9 +917,15 @@ class Subreddits:
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing subreddit data.
         :rtype: List[SimpleNamespace]
         """
@@ -852,8 +943,8 @@ class Subreddits:
 
         return default_subreddits
 
+    @staticmethod
     async def new(
-        self,
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -866,13 +957,19 @@ class Subreddits:
         Asynchronously get new subreddits.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new subreddits.
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing subreddit data.
         :rtype: List[SimpleNamespace]
         """
@@ -889,8 +986,8 @@ class Subreddits:
 
         return new_subreddits
 
+    @staticmethod
     async def popular(
-        self,
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -903,13 +1000,19 @@ class Subreddits:
         Asynchronously get popular subreddits.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular subreddits.
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing subreddit data.
         :rtype: List[SimpleNamespace]
         """
@@ -937,9 +1040,6 @@ class User:
 
         :param name: Username to get data from.
         :type name: str
-        :param time_format: Time format of the output data. Use "concise" for a human-readable
-                        time difference, or "locale" for a localized datetime string. Defaults to "locale".
-        :type time_format: Literal["concise", "locale"]
         """
 
         self._name = name
@@ -959,7 +1059,11 @@ class User:
         Asynchronously get a user's comments.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of comments to return.
         :type limit: int
         :param sort: Sort criterion for the comments.
@@ -968,6 +1072,8 @@ class User:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing comment data.
         :rtype: List[SimpleNamespace]
         """
@@ -990,6 +1096,8 @@ class User:
     async def moderated_subreddits(
         self,
         session: aiohttp.ClientSession,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> List[SimpleNamespace]:
@@ -998,8 +1106,14 @@ class User:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing subreddit data.
         :rtype: List[SimpleNamespace]
         """
@@ -1011,6 +1125,7 @@ class User:
             message=message,
             status=status,
             kind="user_moderated",
+            timeframe="all",
             username=self._name,
             limit=0,
         )
@@ -1033,8 +1148,14 @@ class User:
         :type limit: int
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing data about a recent comment.
         :rtype: List[SimpleNamespace]
         """
@@ -1047,6 +1168,7 @@ class User:
             status=status,
             kind="user_overview",
             limit=limit,
+            sort="all",
             timeframe="all",
             username=self._name,
         )
@@ -1068,7 +1190,11 @@ class User:
         Asynchronously get a user's posts.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param sort: Sort criterion for the posts.
@@ -1077,6 +1203,8 @@ class User:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing post data.
         :rtype: List[SimpleNamespace]
         """
@@ -1102,13 +1230,16 @@ class User:
         proxy: Optional[str] = None,
         proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> SimpleNamespace:
         """
         Asynchronously get a user's profile data.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A SimpleNamespace object containing user profile data.
@@ -1141,7 +1272,11 @@ class User:
         Asynchronously get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param top_n: Communities arranging number.
         :type top_n: int
         :param limit: Maximum number of posts to scrape.
@@ -1152,6 +1287,8 @@ class User:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         """
 
         posts = await reddit.posts(
@@ -1162,6 +1299,7 @@ class User:
             status=status,
             kind="user",
             limit=limit,
+            sort="all",
             timeframe=timeframe,
             username=self._name,
         )
@@ -1181,7 +1319,7 @@ class User:
             subreddit_frequencies = [subreddit[1] for subreddit in top_subreddits]
 
             if General.is_matplotlib_installed():
-                General.plot_bar_chart(
+                General().plot_bar_chart(
                     data=dict(zip(subreddit_names, subreddit_frequencies)),
                     title=f"top {top_n}/{limit} subreddits analysis",
                     xlabel="Subreddits",
@@ -1196,6 +1334,8 @@ class User:
     async def username_available(
         self,
         session: aiohttp.ClientSession,
+        proxy: Optional[str] = None,
+        proxy_auth: Optional[aiohttp.BasicAuth] = None,
         status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
         message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
     ) -> bool:
@@ -1203,9 +1343,15 @@ class User:
         Checks if the given username is available or taken.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: `True` if the given username is available. Otherwise, `False`.
         :rtype: bool
         """
@@ -1221,7 +1367,13 @@ class User:
             params={"user": self._name},
         )
 
-        return response
+        if status and message:
+            if response:
+                message.ok(f"Username ({self._name}) is available")
+            else:
+                message.warning(f"Username ({self._name}) is already taken")
+        else:
+            return response
 
 
 class Users:
@@ -1241,13 +1393,19 @@ class Users:
         Asynchronously get new users.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of new users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new posts.
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing a user's data.
         :rtype: List[SimpleNamespace]
         """
@@ -1279,13 +1437,19 @@ class Users:
         Asynchronously get popular users.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param limit: Maximum number of popular users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular posts.
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing a user's data.
         :rtype: List[SimpleNamespace]
         """
@@ -1319,11 +1483,17 @@ class Users:
         :param limit: Maximum number of all users to return.
         :type limit: int
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+                :type session: aiohttp.ClientSession
+        :param proxy:
+        :type proxy: str
+        :param proxy_auth:
+        :type proxy_auth: aiohttp.BasicAuth
         :param timeframe: Timeframe from which to get all posts.
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param message:
+        :type message: kraw.dummies.Message
         :return: A list of `SimpleNamespace` objects, each containing a user's data.
         :rtype: List[SimpleNamespace]
         """

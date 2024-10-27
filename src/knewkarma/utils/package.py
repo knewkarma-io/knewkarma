@@ -37,6 +37,8 @@ class Package:
         :type session: aiohttp.ClientSession
         :param status: An optional `Status` object for displaying status messages.
         :type status: Optional[rich.status.Status]
+        :param install_if_available:
+        :type install_if_available: bool
         """
 
         if status:

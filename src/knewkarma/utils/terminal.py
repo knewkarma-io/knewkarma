@@ -40,37 +40,37 @@ class Message:
     """
 
     @staticmethod
-    def ok(message: str):
+    def ok(text: str):
         """
         Prints a `success` message (with a checkmark).
 
-        :param message: Text to be logged.
-        :type message: str
-        """
-
-        console.print(f"{Style.green}✔{Style.reset} {message}")
-
-    @staticmethod
-    def info(message: str):
-        """
-        Prints an `informational` message to the console.
-
-        :param message: Text to be logged.
-        :type message: str
-        """
-
-        console.print(f"{Style.green}✱{Style.reset} {message}")
-
-    @staticmethod
-    def warning(message: str):
-        """
-        Prints a `warning` message to the console.
-
-        :param message: Text to be logged.
+        :param text: Text to be logged.
         :type text: str
         """
 
-        console.print(f"{Style.yellow}✘{Style.reset} {message}")
+        console.print(f"{Style.green}✔{Style.reset} {text}")
+
+    @staticmethod
+    def info(text: str):
+        """
+        Prints an `informational` message to the console.
+
+        :param text: Text to be logged.
+        :type text: str
+        """
+
+        console.print(f"{Style.green}✱{Style.reset} {text}")
+
+    @staticmethod
+    def warning(text: str):
+        """
+        Prints a `warning` message to the console.
+
+        :param text: Text to be logged.
+        :type text: str
+        """
+
+        console.print(f"{Style.yellow}✘{Style.reset} {text}")
 
     @staticmethod
     def error(text: str):
@@ -81,7 +81,7 @@ class Message:
         :type text: str
         """
 
-        console.log(f"{Style.yellow}✘{Style.reset} {message}")
+        console.log(f"{Style.yellow}✘{Style.reset} {text}")
 
     @staticmethod
     def exception(error: Exception, title: str = "An unexpected error occurred"):
