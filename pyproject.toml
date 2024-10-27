@@ -33,14 +33,10 @@ rich-click = "^1.8.3"
 visualisation = ["matplotlib"]
 
 [tool.poetry.group.dev.dependencies]
-flake8 = "^7.1.1"
 myst-parser = "^3.0.1"
 poetry = "^1.8.3"
-pytest = "^8.2.0"
-pytest-asyncio = "^0.24.0"
 sphinx = "^7.4.7"
 sphinx-rtd-theme = "^2.0.0"
-tenacity = "^8.3.0"
 
 [tool.poetry.scripts]
 knewkarma = "knewkarma._cli:start"
