@@ -20,9 +20,9 @@ from ._main import (
 from .meta.about import Project
 from .meta.license import License
 from .meta.version import Version
-from .utils.general import General
-from .utils.package import Package
-from .utils.terminal import console, Message, Style
+from .tools.general import General
+from .tools.package import Package
+from .tools.terminal import console, Message, Style
 
 __all__ = ["start"]
 

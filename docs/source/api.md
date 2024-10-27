@@ -19,21 +19,19 @@ Represents a Reddit post and provides method(s) for getting data from the specif
 ### Initialisation
 
 ```text
-post = Post(id: str, subreddit: str, time_format: Literal["concise", "locale"])
+post = Post(id: str, subreddit: str, )
 ```
 
 Initialises an instance for getting data from a specified post.
 
 * `post_id`: ID of the post to get data from.
 * `subreddit`: Name of the subreddit where the post is located.
-* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
-  or "locale" for a localized datetime string. Defaults to "locale".
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">Post.</span><strong>data</strong>(session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Post.</span><strong>data</strong></span>
 
-Returns a post's data. This method fetches the detailed data of a specified Reddit post.
+Gets a post's data.
 
 ##### Code Example:
 
@@ -55,10 +53,9 @@ asyncio.run(get_post_data(post_id="13ptwzd", post_subreddit="AskReddit"))
 
 ***
 
-#### <span class="method-name"><span class="italic">Post.</span><strong>comments</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Post.</span><strong>comments</strong></span>
 
-Returns a post's comments. This method retrieves comments from the specified post. You can limit the number of comments
-returned and sort them based on a specified criterion.
+Gets a post's comments.
 
 ##### Code Example:
 
@@ -74,7 +71,7 @@ async def get_post_comments(post_id, post_subreddit, comments_limit):
         comments = await post.comments(limit=comments_limit, session=session)
 
         for comment in comments:
-            print(comment.text)
+            print(comment.body)
 
 
 asyncio.run(get_post_comments(post_id="13ptwzd", post_subreddit="AskReddit", comments_limit=50))
@@ -89,20 +86,16 @@ Represents Reddit posts and provides methods for getting posts from various sour
 ### Initialisation
 
 ```text
-posts = Posts(time_format: Literal["concise", "locale"])
+posts = Posts()
 ```
 
 Initialises an instance for getting data from multiple posts.
 
-* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
-  or "locale" for a localized datetime string. Defaults to "locale".
-
 ### Methods
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>best</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>best</strong></span>
 
-Returns posts from the best listing. This method retrieves the best posts according to Reddit's algorithm. You can limit
-the number of posts returned.
+Gets posts from the best listing.
 
 ##### Code Example:
 
@@ -126,10 +119,9 @@ asyncio.run(get_best_posts(posts_limit=120))
 
 ***
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>controversial</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>controversial</strong></span>
 
-Returns posts from the controversial listing. This method fetches posts that are considered controversial based on
-Reddit's algorithm. You can limit the number of posts returned.
+Gets posts from the controversial listing.
 
 ##### Code Example::
 
@@ -153,10 +145,9 @@ asyncio.run(get_controversial_posts(posts_limit=50))
 
 ***
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>front_page</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>front_page</strong></span>
 
-Returns posts from the Reddit front-page. This method retrieves posts from Reddit's front page. You can limit the number
-of posts returned and sort them based on a specified criterion.
+Gets posts from the Reddit front-page.
 
 ##### Code Example:
 
@@ -180,10 +171,9 @@ asyncio.run(get_frontpage_posts(posts_limit=10))
 
 ***
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>new</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>new</strong></span>
 
-Returns new posts. This method fetches new posts. You can limit the number of posts returned, sort them based on a
-specified criterion, and filter them by a timeframe.
+Gets new posts.
 
 ##### Code Example:
 
@@ -207,9 +197,9 @@ asyncio.run(get_new_posts(posts_limit=10))
 
 ***
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>popular</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>popular</strong></span>
 
-Returns posts from the popular listing. This method retrieves popular posts. You can limit the number of posts returned.
+Gets posts from the popular listing.
 
 ##### Code Example:
 
@@ -233,9 +223,9 @@ asyncio.run(get_popular_posts(posts_limit=50))
 
 ***
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>rising</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>rising</strong></span>
 
-Returns posts from the rising listing. This method fetches rising posts. You can limit the number of posts returned.
+Gets posts from the rising listing.
 
 ##### Code Example:
 
@@ -267,21 +257,18 @@ different entities.
 ### Initialisation
 
 ```text
-search = Search(query: str, time_format: Literal["concise", "locale"])
+search = Search(query: str, )
 ```
 
 Initialises an instance for performing searches across Reddit.
 
 * `query`: Search query.
-* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
-  or "locale" for a localized datetime string. Defaults to "locale".
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">Search.</span><strong>posts</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Search.</span><strong>posts</strong></span>
 
-Returns posts matching the search query. This method retrieves posts that match the search query. You can limit the
-number of posts returned, sort them based on a specified criterion, and filter them by a timeframe.
+Search posts.
 
 ##### Code Example:
 
@@ -305,10 +292,9 @@ asyncio.run(search_posts(query="something in data science", results_limit=200))
 
 ***
 
-#### <span class="method-name"><span class="italic">Search.</span><strong>subreddits</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Search.</span><strong>subreddits</strong></span>
 
-Search subreddits. This method searches for subreddits that match the query. You can limit the number of subreddits
-returned, sort them based on a specified criterion, and filter them by a timeframe.
+Search subreddits.
 
 ##### Code Example:
 
@@ -332,10 +318,9 @@ asyncio.run(search_subreddits(query="questions", results_limit=200))
 
 ***
 
-#### <span class="method-name"><span class="italic">Search.</span><strong>users</strong>(timeframe: Literal[str], sort: Literal[str], limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Search.</span><strong>users</strong></span>
 
-Search users. This method searches for users that match the query. You can limit the number of users returned, sort them
-based on a specified criterion, and filter them by a timeframe.
+Search users.
 
 ##### Code Example:
 
@@ -366,20 +351,18 @@ Represents a Reddit subreddit and provides methods for getting data from it.
 ### Initialisation
 
 ```text
-subreddit = Subreddit(name: str, time_format: Literal["concise", "locale"])
+subreddit = Subreddit(name: str, )
 ```
 
 Initialises a Subreddit instance for getting profile and posts from the specified subreddit.
 
 * `name`: Name of the subreddit to get data from.
-* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
-  or "locale" for a localized datetime string. Defaults to "locale".
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>profile</strong>(session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>profile</strong></span>
 
-Returns a subreddit's profile data. This method fetches the profile data of a specified subreddit.
+Gets a subreddit's profile data.
 
 ##### Code Example:
 
@@ -401,9 +384,9 @@ asyncio.run(get_subreddit_profile(subreddit="AskScience"))
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>wiki_pages</strong>(session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>wiki_pages</strong></span>
 
-Returns a subreddit's wiki pages. This method retrieves the wiki pages of a specified subreddit.
+Gets a subreddit's wiki pages.
 
 ##### Code Example:
 
@@ -416,7 +399,7 @@ from knewkarma import Subreddit
 async def get_subreddit_wiki_pages(subreddit):
     subreddit = Subreddit(name=subreddit)
     async with aiohttp.ClientSession() as session:
-        wiki_pages = await subreddit.wiki_pages(session=session)
+        wiki_pages = await subreddit.wikipages(session=session)
         print(wiki_pages)
 
 
@@ -425,9 +408,9 @@ asyncio.run(get_subreddit_wiki_pages(subreddit="MachineLearning"))
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>wiki_page</strong>(page: str, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>wiki_page</strong></span>
 
-Returns a subreddit's specified wiki page data. This method fetches the data of a specified wiki page from a subreddit.
+Gets a subreddit's specified wiki page data.
 
 ##### Code Example:
 
@@ -440,7 +423,7 @@ from knewkarma import Subreddit
 async def get_subreddit_wiki_page(page, subreddit):
     subreddit = Subreddit(name=subreddit)
     async with aiohttp.ClientSession() as session:
-        wiki_page_data = await subreddit.wiki_page(page_name=page, session=session)
+        wiki_page_data = await subreddit.wikipage(page_name=page, session=session)
         print(wiki_page_data.content_markdown)
 
 
@@ -449,10 +432,9 @@ asyncio.run(get_subreddit_wiki_page(page="rules", subreddit="MachineLearning"))
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>posts</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>posts</strong></span>
 
-Returns a subreddit's posts. This method retrieves posts from a specified subreddit. You can limit the number of posts
-returned, sort them based on a specified criterion, and filter them by a timeframe.
+Gets a subreddit's posts.
 
 ##### Code Example:
 
@@ -476,11 +458,9 @@ asyncio.run(get_subreddit_posts(posts_limit=500, subreddit="MachineLearning"))
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>comments</strong>(session: aiohttp.ClientSession, posts_limit: int, comments_per_post: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>comments</strong></span>
 
-Returns a subreddit's comments. This method retrieves comments from a specified subreddit. You can limit the number of
-posts
-to get comments from, and the number of comments to get from each post.
+Gets a subreddit's comments.
 
 ##### Code Example:
 
@@ -500,53 +480,17 @@ async def get_subreddit_comments(subreddit, posts_limit, comments_per_post):
         )
 
         for comment in comments:
-            print(comment.text)
+            print(comment.body)
 
 
 asyncio.run(get_subreddit_comments(subreddit="AskScience", posts_limit=100, comments_per_post=20))
 ```
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>search_comments</strong>(session: aiohttp.ClientSession, keyword: str, posts_limit: int, comments_per_post: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
-
-Returns comments that contain a specified keyword from a subreddit. This method searches for posts in a subreddit that
-contain the specified keyword. You can limit the number of posts returned, sort them based on a specified criterion, and
-filter them by a timeframe.
-
-##### Code Example:
-
-```python
-import asyncio
-import aiohttp
-from knewkarma import Subreddit
-
-
-async def search_subreddit_comments(search_query, subreddit, posts_limit, comments_per_post):
-    subreddit = Subreddit(name=subreddit)
-    async with aiohttp.ClientSession() as session:
-        posts = await subreddit.search_comments(query=search_query, posts_limit=posts_limit,
-                                                comments_per_post=comments_per_post, session=session)
-
-        for post in posts:
-            print(post.title)
-
-
-asyncio.run(search_subreddit_comments(search_query="ML jobs", posts_limit=100, comments_per_post=10,
-                                      subreddit="MachineLearning"))
-```
-
-##### Note:
-
-The limit of posts will be the same as the number of comments that will be returned, e.i., If you specify the limit as
-500, then the search will also look through 500 comments for matches of the query (I intend to improve this, but that's
-how it'll work for now.)
-
 ***
 
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>search_posts</strong>(session: aiohttp.ClientSession, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Subreddit.</span><strong>search_posts</strong></span>
 
-Returns posts that contain a specified keyword from a subreddit. This method searches for posts in a subreddit that
-contain the specified keyword. You can limit the number of posts returned, sort them based on a specified criterion, and
-filter them by a timeframe.
+Gets posts that contain a specified keyword from a subreddit.
 
 ##### Code Example:
 
@@ -559,13 +503,13 @@ from knewkarma import Subreddit
 async def search_subreddit_posts(search_query, subreddit, posts_limit):
     subreddit = Subreddit(name=subreddit)
     async with aiohttp.ClientSession() as session:
-        posts = await subreddit.search_posts(query=search_query, limit=posts_limit, session=session)
+        posts = await subreddit.search(query=search_query, limit=posts_limit, session=session)
 
         for post in posts:
             print(post.title)
 
 
-asyncio.run(search_subreddit_posts(search_query="ML jobs", posts_limit=100, subreddit="MachineLearning"))
+asyncio.run(search_subreddit_posts(search_query="multiverse theory", posts_limit=100, subreddit="AskScience"))
 ```
 
 ***
@@ -577,20 +521,16 @@ Represents subreddits and provides methods for getting related data.
 ### Initialisation
 
 ```text
-subreddits = Subreddits(time_format: Literal["concise", "locale"])
+subreddits = Subreddits()
 ```
 
 Initialises an instance for getting data from multiple subreddits.
 
-* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
-  or "locale" for a localized datetime string. Defaults to "locale".
-
 ### Methods
 
-#### <span class="method-name"><span class="italic">Subreddits.</span><strong>all</strong>(limit: int, timeframe: Literal[str] = "all", session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Subreddits.</span><strong>all</strong></span>
 
-Returns all subreddits. This method retrieves all subreddits. You can limit the number of subreddits returned and filter
-them by a timeframe.
+Gets all subreddits.
 
 ##### implementation
 
@@ -614,9 +554,9 @@ asyncio.run(get_all_subreddits(subreddits_limit=500))
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddits.</span><strong>default</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Subreddits.</span><strong>default</strong></span>
 
-Returns default subreddits. This method fetches the default subreddits. You can limit the number of subreddits returned.
+Gets default subreddits.
 
 ##### Code Example:
 
@@ -640,10 +580,9 @@ asyncio.run(get_default_subreddits(subreddits_limit=20))
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddits.</span><strong>new</strong>(limit: int, session: aiohttp.ClientSession, timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Subreddits.</span><strong>new</strong></span>
 
-Returns new subreddits. This method retrieves new subreddits. You can limit the number of subreddits returned and filter
-them by a timeframe.
+Gets new subreddits.
 
 ##### Code Example:
 
@@ -667,10 +606,9 @@ asyncio.run(get_new_subreddits(subreddits_limit=50))
 
 ***
 
-#### <span class="method-name"><span class="italic">Subreddits.</span><strong>popular</strong>(limit: int, session: aiohttp.ClientSession, timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">Subreddits.</span><strong>popular</strong></span>
 
-Returns popular subreddits. This method fetches popular subreddits. You can limit the number of subreddits returned and
-filter them by a timeframe.
+Gets popular subreddits.
 
 ##### Code Example:
 
@@ -701,21 +639,18 @@ Represents a Reddit user and provides methods for getting data from the specifie
 ### Initialisation
 
 ```text
-user = User(username: str, time_format: Literal["concise", "locale"])
+user = User(username: str, )
 ```
 
 Initialises a User instance for getting profile, posts, and comments data from the specified user.
 
 * `username`: Username of the user to get data from.
-* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
-  or "locale" for a localized datetime string. Defaults to "locale".
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">User.</span><strong>profile</strong>(session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>profile</strong></span>
 
-Returns a user's profile data. This method fetches the profile data of a specified user. It requires
-an `aiohttp.ClientSession` to make the asynchronous HTTP request.
+Gets a user's profile data.
 
 ##### Code Example:
 
@@ -737,10 +672,9 @@ asyncio.run(get_user_profile(username="AutoModerator"))
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>posts</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>posts</strong></span>
 
-Returns a user's posts. This method retrieves posts from a specified user. You can limit the number of posts returned,
-sort them based on a specified criterion, and filter them by a timeframe.
+Gets a user's posts.
 
 ##### Code Example:
 
@@ -764,10 +698,9 @@ asyncio.run(get_user_posts(username="AutoModerator", posts_limit=100))
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>comments</strong>(session: aiohttp.ClientSession, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>comments</strong></span>
 
-Returns a user's comments. This method retrieves comments from a specified user. You can limit the number of comments
-returned, sort them based on a specified criterion, and filter them by a timeframe.
+Gets a user's comments.
 
 ##### COde Example:
 
@@ -791,10 +724,9 @@ asyncio.run(get_user_comments(username="AutoModerator", comments_limit=100))
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>overview</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>overview</strong></span>
 
-Returns a user's most recent comments. This method retrieves the most recent comments of a specified user. You can limit
-the number of comments returned.
+Gets a user's most recent comments.
 
 ##### Code Example:
 
@@ -810,7 +742,7 @@ async def get_user_overview(username, comments_limit):
         comments = await user.overview(limit=comments_limit, session=session)
 
         for comment in comments:
-            print(comment.text)
+            print(comment.body)
 
 
 asyncio.run(get_user_overview(username="AutoModerator", comments_limit=100))
@@ -818,77 +750,9 @@ asyncio.run(get_user_overview(username="AutoModerator", comments_limit=100))
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>search_posts</strong>(session: aiohttp.ClientSession, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>moderated_subreddits</strong></span>
 
-Returns a user's posts that contain the specified keywords. This method searches for posts from a specified user that
-contain the specified keywords. You can limit the number of posts returned, sort them based on a specified criterion,
-and filter them by a timeframe.
-
-##### Code Example:
-
-```python
-import asyncio
-import aiohttp
-from knewkarma import User
-
-
-async def search_user_posts(username, search_query, posts_limit):
-    user = User(name=username)
-    async with aiohttp.ClientSession() as session:
-        posts = await user.search_posts(query=search_query,
-                                        limit=posts_limit, session=session)
-
-        for post in posts:
-            print(post.body)
-
-
-asyncio.run(search_user_posts(username="AutoModerator",
-                              search_query="banned", posts_limit=100))
-```
-
-***
-
-#### <span class="method-name"><span class="italic">User.</span><strong>search_comments</strong>(session: aiohttp.ClientSession, keyword: str, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all")</span>
-
-Returns a user's comments that contain the specified keyword. This method searches for comments from a specified user
-that contain the specified keyword. You can limit the number of comments returned, sort them based on a specified
-criterion, and filter them by a timeframe.
-
-##### Code Example:
-
-```python
-import asyncio
-import aiohttp
-from knewkarma import User
-
-
-async def search_user_comments(username, search_query, comments_limit):
-    user = User(name=username)
-    async with aiohttp.ClientSession() as session:
-        comments = await user.search_comments(
-            query=search_query,
-            limit=comments_limit,
-            session=session
-        )
-
-        for comment in comments:
-            print(comment.text)
-
-
-asyncio.run(
-    search_user_comments(
-        username="AutoModerator",
-        search_query="this is an automated action",
-        comments_limit=100
-    )
-)
-```
-
-***
-
-#### <span class="method-name"><span class="italic">User.</span><strong>moderated_subreddits</strong>(session: aiohttp.ClientSession)</span>
-
-Returns subreddits moderated by the user. This method fetches the subreddits moderated by a specified user.
+Gets subreddits moderated by the user.
 
 ##### Code Example:
 
@@ -912,11 +776,9 @@ asyncio.run(get_user_moderated_subreddits(username="TheRealKSI"))
 
 ***
 
-#### <span class="method-name"><span class="italic">User.</span><strong>top_subreddits</strong>(session: aiohttp.ClientSession, top_n: int, limit: int, sort: Literal[str] = "all", timeframe: Literal[str] = "all") -> list[tuple]</span>
+#### <span class="method-name"><span class="italic">User.</span><strong>top_subreddits</strong></span>
 
-Returns a user's top n subreddits based on subreddit frequency in n posts. This method retrieves the top n subreddits
-that a specified user is most active in. You can limit the number of posts considered, sort them based on a specified
-criterion, and filter them by a timeframe.
+Gets a user's top n subreddits based on subreddit frequency in *n* posts.
 
 ##### Code Example:
 
@@ -956,19 +818,16 @@ Represents Reddit users and provides methods for getting related data.
 ### Initialisation
 
 ```text
-users = Users(time_format: Literal["concise", "locale"])
+users = Users()
 ```
 
-Initialises an instance for getting data from multiple users.
-
-* `time_format`: Determines the format of the output's datetime. Use "concise" for a human-readable time difference,
-  or "locale" for a localized datetime string. Defaults to "locale".
+Initialises an instance for getting users from multiple sources.
 
 ### Methods
 
-#### <span class="method-name"><span class="italic">Users.</span><strong>all</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Users.</span><strong>all</strong></span>
 
-Returns all users. This method retrieves all users. You can limit the number of users returned.
+Gets all users.
 
 ##### Code Example:
 
@@ -992,9 +851,9 @@ asyncio.run(get_all_users(users_limit=1000))
 
 ***
 
-#### <span class="method-name"><span class="italic">Users.</span><strong>new</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Users.</span><strong>new</strong></span>
 
-Returns new users. This method retrieves new users. You can limit the number of users returned.
+Gets new users.
 
 ##### Code Example:
 
@@ -1005,7 +864,7 @@ from knewkarma import Users
 
 
 async def get_new_users(users_limit):
-    users = Users(time_format="concise")
+    users = Users()
     async with aiohttp.ClientSession() as session:
         new_users = await users.new(limit=users_limit, session=session)
 
@@ -1018,9 +877,9 @@ asyncio.run(get_new_users(users_limit=500))
 
 ***
 
-#### <span class="method-name"><span class="italic">Users.</span><strong>popular</strong>(limit: int, session: aiohttp.ClientSession)</span>
+#### <span class="method-name"><span class="italic">Users.</span><strong>popular</strong></span>
 
-Returns popular users. This method retrieves popular users. You can limit the number of users returned.
+Gets popular users.
 
 ##### Code Example:
 
