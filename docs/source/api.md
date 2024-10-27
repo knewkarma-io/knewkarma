@@ -1050,30 +1050,10 @@ When fetching posts or comments, you can specify timeframes ("`hour`", "`day`", 
 criteria ("`controversial`", "`new`", "`top`", "`best`", "`hot`", "`rising`"). Leaving these parameters unspecified
 defaults to retrieving data across all timeframes and sort criteria.
 
-## Utilising `time_format` Parameter
-
-The `time_format` parameter (or `--time-format` in the CLI) affects how timestamps are displayed in your results.
-Use "`concise`" for relative times (e.g., "*5 minutes ago*") or "`locale`" for locale-based formatting.
-
-Here's how to apply it:
-
-```python
-from knewkarma import Posts
-
-posts = Posts(time_format="concise")
-```
-
 ## Random Cool-Down for Bulk Results
 
 To avoid hitting rate limits, Knew Karma includes a random cool-down or sleep timer ranging from 1 to 10 seconds for
 bulk results that exceed 100. This feature ensures smooth and uninterrupted data retrieval while adhering to Reddit's
 API usage.
 
-## Important Note on Data Fetching
-
-Knew Karma is designed to fetch recent data from Reddit. It directly interacts with the Reddit API to access up-to-date
-information, including the latest posts, comments, and user activity.
-
-If you need to access historical Reddit data, I recommend using the [Pushshift API](https://api.pushshift.io/docs),
-which is specifically designed for retrieving large volumes of historical data, including posts, comments, and other
-Reddit activity.
+That's pretty much it. You've completed the Knew Karma API crash course!
