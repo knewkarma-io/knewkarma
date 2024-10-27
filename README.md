@@ -20,7 +20,7 @@ import knewkarma
 
 
 async def subreddit_posts(subreddit_name, posts_limit):
-    subreddit = knewkarma.Subreddit(name=subreddit_name)
+    subreddit = knewkarma.Subreddit(subreddit_name)
 
     async with aiohttp.ClientSession() as session:
         posts = await subreddit.posts(session=session, limit=posts_limit)
