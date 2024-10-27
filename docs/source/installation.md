@@ -13,27 +13,6 @@ You can install it by running the following command:
 pip install knewkarma
 ```
 
-[!Tip]
-To install the CLI also, you should run:
-
-```shell
-pip install knewkarma[cli]
-```
-
-> The installation command structure will vary based on the current shell, so if the above command fails, you can try
-> running:
-
-```shell
-pip install knewkarma\[cli\]
-```
-
-or
-
-```shell
-pip install "knewkarma[cli]"
-
-```
-
 ## Snap Package
 
 If you prefer installing Knew Karma from the Snap Store instead, you can either run
