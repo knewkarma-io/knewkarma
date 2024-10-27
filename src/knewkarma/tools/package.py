@@ -93,7 +93,7 @@ class Package:
                 if install_if_available:
                     self.update_package(status=status)
             else:
-                Message.ok(message=f"No new releases")
+                Message.ok("No new releases")
 
     @staticmethod
     def is_docker_container() -> bool:

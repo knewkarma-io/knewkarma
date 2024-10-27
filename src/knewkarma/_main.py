@@ -8,7 +8,7 @@ import kraw
 
 from .meta.about import Project
 from .meta.version import Version
-from .utils.general import General
+from .tools.general import General
 
 __all__ = [
     "reddit",
