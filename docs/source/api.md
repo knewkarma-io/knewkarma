@@ -44,8 +44,8 @@ from knewkarma import Post
 async def get_post_data(post_id, post_subreddit):
     post = Post(id=post_id, subreddit=post_subreddit)
     async with aiohttp.ClientSession() as session:
-        data = await post.data(session=session)
-        print(data.title)
+        post = await post.data(session=session)
+        print(post.data)
 
 
 asyncio.run(get_post_data(post_id="13ptwzd", post_subreddit="AskReddit"))
@@ -71,7 +71,7 @@ async def get_post_comments(post_id, post_subreddit, comments_limit):
         comments = await post.comments(limit=comments_limit, session=session)
 
         for comment in comments:
-            print(comment.body)
+            print(comment.data.body)
 
 
 asyncio.run(get_post_comments(post_id="13ptwzd", post_subreddit="AskReddit", comments_limit=50))
@@ -111,7 +111,7 @@ async def get_best_posts(posts_limit):
         best_posts = await posts.best(limit=posts_limit, session=session)
 
         for post in best_posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(get_best_posts(posts_limit=120))
@@ -137,7 +137,7 @@ async def get_controversial_posts(posts_limit):
         controversial_posts = await posts.controversial(limit=posts_limit, session=session)
 
         for post in controversial_posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(get_controversial_posts(posts_limit=50))
@@ -163,7 +163,7 @@ async def get_frontpage_posts(posts_limit):
         frontpage_posts = await posts.front_page(limit=posts_limit, session=session)
 
         for post in frontpage_posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(get_frontpage_posts(posts_limit=10))
@@ -189,7 +189,7 @@ async def get_new_posts(posts_limit):
         new_posts = await posts.new(limit=posts_limit, session=session)
 
         for post in new_posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(get_new_posts(posts_limit=10))
@@ -215,7 +215,7 @@ async def get_popular_posts(posts_limit):
         popular_posts = await posts.popular(limit=posts_limit, session=session)
 
         for post in popular_posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(get_popular_posts(posts_limit=50))
@@ -241,7 +241,7 @@ async def get_rising_posts(posts_limit):
         rising_posts = await posts.rising(limit=posts_limit, session=session)
 
         for post in rising_posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(get_rising_posts(posts_limit=100))
@@ -284,7 +284,7 @@ async def search_posts(query, results_limit):
         posts = await search.posts(limit=results_limit, session=session)
 
         for post in posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(search_posts(query="something in data science", results_limit=200))
@@ -310,7 +310,7 @@ async def search_subreddits(query, results_limit):
         subreddits = await search.subreddits(limit=results_limit, session=session)
 
         for subreddit in subreddits:
-            print(subreddit.name)
+            print(subreddit.data.name)
 
 
 asyncio.run(search_subreddits(query="questions", results_limit=200))
@@ -336,7 +336,7 @@ async def search_users(query, results_limit):
         users = await search.users(limit=results_limit, session=session)
 
         for user in users:
-            print(user.name)
+            print(user.data.name)
 
 
 asyncio.run(search_users(query="john", results_limit=200))
@@ -376,7 +376,7 @@ async def get_subreddit_profile(subreddit):
     subreddit = Subreddit(name=subreddit)
     async with aiohttp.ClientSession() as session:
         profile = await subreddit.profile(session=session)
-        print(profile.description)
+        print(profile.data.description)
 
 
 asyncio.run(get_subreddit_profile(subreddit="AskScience"))
@@ -424,7 +424,7 @@ async def get_subreddit_wiki_page(page, subreddit):
     subreddit = Subreddit(name=subreddit)
     async with aiohttp.ClientSession() as session:
         wiki_page_data = await subreddit.wikipage(page_name=page, session=session)
-        print(wiki_page_data.content_markdown)
+        print(wiki_page_data.data.content_markdown)
 
 
 asyncio.run(get_subreddit_wiki_page(page="rules", subreddit="MachineLearning"))
@@ -450,7 +450,7 @@ async def get_subreddit_posts(subreddit, posts_limit):
         posts = await subreddit.posts(limit=posts_limit, session=session)
 
         for post in posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(get_subreddit_posts(posts_limit=500, subreddit="MachineLearning"))
@@ -480,7 +480,7 @@ async def get_subreddit_comments(subreddit, posts_limit, comments_per_post):
         )
 
         for comment in comments:
-            print(comment.body)
+            print(comment.data.body)
 
 
 asyncio.run(get_subreddit_comments(subreddit="AskScience", posts_limit=100, comments_per_post=20))
@@ -506,7 +506,7 @@ async def search_subreddit_posts(search_query, subreddit, posts_limit):
         posts = await subreddit.search(query=search_query, limit=posts_limit, session=session)
 
         for post in posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(search_subreddit_posts(search_query="multiverse theory", posts_limit=100, subreddit="AskScience"))
@@ -546,7 +546,7 @@ async def get_all_subreddits(subreddits_limit):
         all_subreddits = await subreddits.all(limit=subreddits_limit, session=session)
 
         for subreddit in all_subreddits:
-            print(subreddit.description)
+            print(subreddit.data.description)
 
 
 asyncio.run(get_all_subreddits(subreddits_limit=500))
@@ -572,7 +572,7 @@ async def get_default_subreddits(subreddits_limit):
         default_subreddits = await subreddits.default(limit=subreddits_limit, session=session)
 
         for subreddit in default_subreddits:
-            print(subreddit.description)
+            print(subreddit.data.description)
 
 
 asyncio.run(get_default_subreddits(subreddits_limit=20))
@@ -598,7 +598,7 @@ async def get_new_subreddits(subreddits_limit):
         new_subreddits = await subreddits.new(limit=subreddits_limit, session=session)
 
         for subreddit in new_subreddits:
-            print(subreddit.description)
+            print(subreddit.data.description)
 
 
 asyncio.run(get_new_subreddits(subreddits_limit=50))
@@ -624,7 +624,7 @@ async def get_popular_subreddits(subreddits_limit):
         popular_subreddits = await subreddits.popular(limit=subreddits_limit, session=session)
 
         for subreddit in popular_subreddits:
-            print(subreddit.description)
+            print(subreddit.data.description)
 
 
 asyncio.run(get_popular_subreddits(subreddits_limit=100))
@@ -664,7 +664,7 @@ async def get_user_profile(username):
     user = User(name=username)
     async with aiohttp.ClientSession() as session:
         profile = await user.profile(session=session)
-        print(profile.created)
+        print(profile.data.created)
 
 
 asyncio.run(get_user_profile(username="AutoModerator"))
@@ -690,7 +690,7 @@ async def get_user_posts(username, posts_limit):
         posts = await user.posts(limit=posts_limit, session=session)
 
         for post in posts:
-            print(post.title)
+            print(post.data.title)
 
 
 asyncio.run(get_user_posts(username="AutoModerator", posts_limit=100))
@@ -716,7 +716,7 @@ async def get_user_comments(username, comments_limit):
         comments = await user.comments(limit=comments_limit, session=session)
 
         for comment in comments:
-            print(comment.id)
+            print(comment.data.id)
 
 
 asyncio.run(get_user_comments(username="AutoModerator", comments_limit=100))
@@ -742,7 +742,7 @@ async def get_user_overview(username, comments_limit):
         comments = await user.overview(limit=comments_limit, session=session)
 
         for comment in comments:
-            print(comment.body)
+            print(comment.data.body)
 
 
 asyncio.run(get_user_overview(username="AutoModerator", comments_limit=100))
@@ -768,7 +768,7 @@ async def get_user_moderated_subreddits(username):
         moderated_subreddits = await user.moderated_subreddits(session=session)
 
         for subreddit in moderated_subreddits:
-            print(subreddit.name)
+            print(subreddit.data.name)
 
 
 asyncio.run(get_user_moderated_subreddits(username="TheRealKSI"))
@@ -843,7 +843,7 @@ async def get_all_users(users_limit):
         all_users = await users.all(limit=users_limit, session=session)
 
         for user in all_users:
-            print(user.name)
+            print(user.data.name)
 
 
 asyncio.run(get_all_users(users_limit=1000))
@@ -869,7 +869,7 @@ async def get_new_users(users_limit):
         new_users = await users.new(limit=users_limit, session=session)
 
         for user in new_users:
-            print(user.created)
+            print(user.data.created)
 
 
 asyncio.run(get_new_users(users_limit=500))
@@ -895,7 +895,7 @@ async def get_popular_users(users_limit):
         popular_users = await users.popular(limit=users_limit, session=session)
 
         for user in popular_users:
-            print(user.id)
+            print(user.data.id)
 
 
 asyncio.run(get_popular_users(users_limit=100))
