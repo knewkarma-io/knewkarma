@@ -1,13 +1,14 @@
 import os
 import subprocess
-from typing import Optional, List
+import typing as t
 
 import aiohttp
 from rich.markdown import Markdown
 from rich.status import Status
 
-from .general import General
-from .terminal import Message, Style
+from . import colours
+from .data_and_visualisation import DataAndVisualisation
+from .logging import logger
 
 __all__ = ["Package"]
 
@@ -25,7 +26,7 @@ class Package:
     async def check_updates(
         self,
         session: aiohttp.ClientSession,
-        status: Optional[Status] = None,
+        status: t.Optional[Status] = None,
         install_if_available: bool = False,
     ):
         """
@@ -36,7 +37,7 @@ class Package:
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
         :param status: An optional `Status` object for displaying status messages.
-        :type status: Optional[rich.status.Status]
+        :type status: t.Optional[rich.status.Status]
         :param install_if_available:
         :type install_if_available: bool
         """
@@ -60,7 +61,7 @@ class Package:
                 self._version.minor[0],
                 self._version.patch[0],
             ]
-            remote_version_parts: List = remote_version_str.split(".")
+            remote_version_parts: t.List = remote_version_str.split(".")
 
             local_major: int = local_version_parts[0]
             local_minor: int = local_version_parts[1]
@@ -74,26 +75,26 @@ class Package:
 
             # Check for differences in version parts
             if remote_major != local_major:
-                update_level = f"{Style.red}{self._version.major[1]}{Style.reset}"
+                update_level = f"{colours.BOLD_RED}{self._version.major[1]}{colours.BOLD_RED_RESET}"
 
             elif remote_minor != local_minor:
-                update_level = f"{Style.yellow}{self._version.minor[1]}{Style.reset}"
+                update_level = f"{colours.BOLD_YELLOW}{self._version.minor[1]}{colours.BOLD_YELLOW_RESET}"
 
             elif remote_patch != local_patch:
-                update_level = f"{Style.green}{self._version.patch[1]}{Style.reset}"
+                update_level = f"{colours.BOLD_GREEN}{self._version.patch[1]}{colours.BOLD_GREEN_RESET}"
 
             if update_level:
                 markdown_release_notes = Markdown(markup=markup_release_notes)
-                General.make_panel(
-                    title=f"{Style.bold}{update_level} Update Available ({Style.cyan}{remote_version_str}{Style.reset}){Style.reset}",
+                DataAndVisualisation.make_panel(
+                    title=f"{update_level} Update Available ({colours.CYAN}{remote_version_str}{colours.CYAN_RESET})",
                     content=markdown_release_notes,
-                    subtitle=f"{Style.bold}{Style.italic}Thank you, for using Knew Karma!{Style.reset}{Style.reset} ❤️ ",
+                    subtitle=f"{colours.ITALIC}Thank you, for using Knew Karma!{colours.ITALIC_RESET} ❤️ ",
                 )
 
                 if install_if_available:
                     self.update_package(status=status)
             else:
-                Message.ok("No new releases")
+                logger.info("No new releases")
 
     @staticmethod
     def is_docker_container() -> bool:
@@ -117,7 +118,9 @@ class Package:
         if self._package:
             return True if os.getenv("SNAP") else False
         else:
-            Message.error(self._invalid_package_error)
+            logger.error(self._invalid_package_error)
+
+        return False
 
     def is_pypi_package(self) -> bool:
         """
@@ -134,9 +137,11 @@ class Package:
             except ImportError:
                 return False
         else:
-            Message.error(self._invalid_package_error)
+            logger.error(self._invalid_package_error)
 
-    def update_package(self, status: Optional[Status] = None):
+        return False
+
+    def update_package(self, status: t.Optional[Status] = None):
         """
         Updates a specified pypi package.
 
@@ -145,7 +150,7 @@ class Package:
         """
 
         if self.is_snap_package():
-            Message.warning("Run 'snap refresh knewkarma' to update the snap package.")
+            logger.warning("Run 'snap refresh knewkarma' to update the snap package.")
         else:
             if self._package:
                 try:
@@ -161,16 +166,16 @@ class Package:
                         ],
                         check=True,
                     )
-                    Message.ok(f"DONE. The updates will be installed on next run.")
+                    logger.info(f"DONE. The updates will be installed on next run.")
                 except subprocess.CalledProcessError as called_process_error:
-                    Message.exception(
-                        title=f"An error occurred ({Style.italic}while updating package{Style.reset})",
-                        error=called_process_error,
+                    logger.exception(
+                        f"An error occurred ({colours.ITALIC.strip('[,]')}while updating package{colours.ITALIC_RESET})",
+                        exc_info=called_process_error,
                     )
                 except Exception as unexpected_error:
-                    Message.exception(unexpected_error)
+                    logger.exception(unexpected_error)
             else:
-                Message.error(self._invalid_package_error)
+                logger.error(self._invalid_package_error)
 
 
 # -------------------------------- END ----------------------------------------- #
