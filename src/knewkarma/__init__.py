@@ -1,4 +1,4 @@
-from ._main import Post, Posts, Search, Subreddit, Subreddits, User, Users
+from .core.models import Post, Posts, Search, Subreddit, Subreddits, User, Users
 
 __all__ = [
     "Post",

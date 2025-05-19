@@ -1,8 +1,8 @@
 from datetime import date
 
-from knewkarma.meta.about import Author
-from knewkarma.meta.about import Project
-from knewkarma.meta.version import Version
+from knewkarma.metadata.about import Author
+from knewkarma.metadata.about import Project
+from knewkarma.metadata.version import Version
 
 # Configuration file for the Sphinx documentation builder.
 

@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "knewkarma"
-version = "7.1.4"
-description = "A Reddit data analysis toolkit"
-authors = ["Richard Mwewa <rly0nheart@duck.com>", "Knew Karma IO <redacted@redacted.com>"]
+version = "8.0.0"
+description = "An asynchronous, zero-auth toolkit for Reddit data analysis."
+authors = ["Ritchie Mwewa <rly0nheart@duck.com>", "Knew Karma IO <redacted@redacted.com>"]
 readme = "README.md"
 license = "GPL-3.0+"
 keywords = ["reddit", "data-analysis"]
@@ -24,13 +24,10 @@ repository = "https://github.com/knewkarma-io/knewkarma"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-kraw = "^0.3.6"
-matplotlib = { version = "^3.9.2", optional = true }
+aiohttp = "^3.11.10"
 pandas = "^2.1.4"
 rich-click = "^1.8.3"
-
-[tool.poetry.extras]
-visualisation = ["matplotlib"]
+questionary = { version = "^2.1.0", optional = true }
 
 [tool.poetry.group.dev.dependencies]
 myst-parser = "^3.0.1"
@@ -38,8 +35,11 @@ poetry = "^1.8.3"
 sphinx = "^7.4.7"
 sphinx-rtd-theme = "^2.0.0"
 
+[tool.poetry.extras]
+tui = ["questionary"]
+
 [tool.poetry.scripts]
-knewkarma = "knewkarma._cli:start"
+knewkarma = "knewkarma.cli.app:start"
 
 [build-system]
 requires = ["poetry-core"]

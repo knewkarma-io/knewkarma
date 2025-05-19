@@ -1,8 +1,11 @@
 from datetime import date
 
+from toolbox import colours
 from .about import Author, Project
 
 __all__ = ["License"]
+
+from .version import Version
 
 _current_year: int = date.today().year
 
@@ -79,7 +82,7 @@ class License:
     the source code needed to generate, install, and (for an executable
     work) run the object code and to modify the work, including scripts to
     control those activities.  However, it does not include the work's
-    System Libraries, or general-purpose tools or generally available free
+    System Libraries, or general-purpose _utils or generally available free
     programs which are used unmodified in performing those activities but
     which are not part of the work.  For example, Corresponding Source
     includes interface definition files associated with source files for
@@ -566,11 +569,11 @@ class License:
 """
 
     notice: str = f"""
-{_project.name} Copyright (C) {_current_year} {_author.name}
+{_project.name} {Version.release} Copyright © {_current_year} {_author.name}
 
-This program comes with [bold]ABSOLUTELY NO WARRANTY[/]; for details, use 'knewkarma licence -w/--warranty'.
+This program comes with [bold]ABSOLUTELY NO WARRANTY[/]; for details, use {colours.BOLD_BLUE}licence -w/--warranty{colours.BOLD_BLUE_RESET}.
 This is free software, and you are welcome to redistribute it
-[bold]UNDER CERTAIN CONDITIONS[/]; use 'knewkarma license -c/--conditions' for details.
+[bold]UNDER CERTAIN CONDITIONS[/]; use {colours.BOLD_BLUE}license -c/--conditions{colours.BOLD_BLUE_RESET} for details.
 """
 
     warranty: str = f"""

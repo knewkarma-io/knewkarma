@@ -1,78 +1,64 @@
 import os
+import subprocess
+import typing as t
 from datetime import datetime
 from types import SimpleNamespace
-from typing import Union, Literal, List, Tuple, Dict, Optional
 
 import pandas as pd
-from rich.box import DOUBLE
-from rich.console import ConsoleRenderable, RichCast
+from rich.console import ConsoleRenderable, RichCast, Group
 from rich.panel import Panel
+from rich.rule import Rule
+from rich.table import Table
+from rich.text import Text
 
-from .terminal import console, Message
+from . import colours
+from .logging import console, logger
 
-__all__ = ["General"]
+__all__ = ["DataAndVisualisation"]
 
 
-class General:
+class DataAndVisualisation:
 
-    EXPORT_FORMATS = Literal["csv", "html", "json", "xml"]
+    EXPORT_FORMATS = t.Literal["csv", "html", "json", "xml"]
     EXPORTS_PARENT_DIR: str = os.path.expanduser(os.path.join("~", "knewkarma"))
 
-    @staticmethod
-    def is_matplotlib_installed() -> bool:
-        try:
-            __import__("matplotlib.pyplot")
-
-            is_installed: bool = True
-        except ImportError:
-            is_installed = False
-
-        return is_installed
-
+    @classmethod
     def plot_bar_chart(
-        self,
-        data: Dict[str, int],
+        cls,
+        data: t.Dict[str, int],
         title: str,
-        xlabel: str,
-        ylabel: str,
-        colours: List[str],
-        filename: str,
-        figure_size: Tuple[int, int] = (10, 5),
+        x_label: str,
+        y_label: str,
     ):
         """
-        Plots a bar chart for the given data.
+        Renders a simple bar chart in the terminal using Rich.
 
-        :param data: A dictionary where keys are the categories and values are the counts or frequencies.
-        :type data: list[str, int]
-        :param title: The title of the plot.
-        :type title: str
-        :param xlabel: The label for the x-axis.
-        :type xlabel: str
-        :param ylabel: The label for the y-axis.
-        :type ylabel: str
-        :param colours: A list of colours to use for the bars in the chart.
-        :type colours: list[str]
-        :param filename: The name of the file where the plot will be saved.
-        :type filename: str
-        :param figure_size: The size of the figure (width, height). Defaults to (10, 5).
-        :type figure_size: tuple[int, int]
+        :param data: A dictionary of category-value pairs.
+        :param title: Title of the chart.
+        :param x_label: Label for the x-axis (shown in the subtitle).
+        :param y_label: Label for the y-axis (shown in the subtitle).
         """
 
-        if self.is_matplotlib_installed():
-            import matplotlib.pyplot as plt
+        max_value = max(data.values()) or 1  # Avoid divide-by-zero
+        table = Table(show_header=False, box=None, expand=True)
+        table.add_column("Category", justify="right")
+        table.add_column("Bar", justify="left")
 
-            plt.figure(figsize=figure_size)
-            plt.bar(list(data.keys()), list(data.values()), color=colours)
-            plt.title(title)
-            plt.xlabel(xlabel)
-            plt.ylabel(ylabel)
-            plt.savefig(f"{filename}.png")
+        for label, value in data.items():
+            bar_length = int((value / max_value) * 40)
+            bar = "█" * bar_length
+            table.add_row(f"[bold]{label}[/bold]", f"{bar} {value}")
 
-            Message.ok(f"{title} saved to [link file://{filename}.png]{filename}.png")
+        subtitle = f"{x_label} vs {y_label}" if x_label and y_label else ""
+        panel = Panel(
+            table, title=f"[bold magenta]{title}[/bold magenta]", subtitle=subtitle
+        )
+        console.print(panel)
 
-    @staticmethod
+    @classmethod
     def create_dataframe(
-        data: Union[SimpleNamespace, List[SimpleNamespace], List[Tuple[str, int]]],
+        cls,
+        data: t.Union[SimpleNamespace, t.List[SimpleNamespace], t.List[t.Tuple[str, int]]],
     ) -> pd.DataFrame:
         """
         Makes a Pandas dataframe from the provided data.
@@ -83,7 +69,6 @@ class General:
                  column from the dataframe.
         :rtype: pd.DataFrame
         """
-
         if isinstance(data, SimpleNamespace):
             # Transform each attribute of the object into a dictionary entry
             transformed_data = [
@@ -92,7 +77,7 @@ class General:
             ]
 
         # Convert a list of SimpleNamespace objects to a list of dictionaries
-        elif isinstance(data, List) and all(
+        elif isinstance(data, t.List) and all(
             isinstance(item, SimpleNamespace) for item in data
         ):
             # Each object in the list is transformed to its dictionary representation
@@ -108,12 +93,13 @@ class General:
 
         return dataframe.dropna(axis=1, how="all")
 
+    @classmethod
     def export_dataframe(
-        self,
+        cls,
         dataframe: pd.DataFrame,
         filename: str,
         directory: str,
-        formats: List[EXPORT_FORMATS],
+        formats: t.List[EXPORT_FORMATS],
     ):
         """
         Exports a Pandas dataframe to specified file formats.
@@ -128,7 +114,7 @@ class General:
         :type formats: List[Literal]
         """
 
-        file_mapping: Dict = {
+        file_mapping: t.Dict = {
             "csv": lambda: dataframe.to_csv(
                 os.path.join(directory, "csv", f"{filename}.csv"), encoding="utf-8"
             ),
@@ -155,14 +141,14 @@ class General:
                     directory, file_format, f"{filename}.{file_format}"
                 )
                 file_mapping.get(file_format)()
-                Message.ok(
-                    f"{self.get_file_size(file_path=filepath)} written to [link file://{filepath}]{filepath}"
+                logger.info(
+                    f"{cls.get_file_size(file_path=filepath)} written to [link file://{filepath}]{filepath}"
                 )
             else:
                 continue
 
-    @staticmethod
-    def get_file_size(file_path: str) -> str:
+    @classmethod
+    def get_file_size(cls, file_path: str) -> str:
         """
         Gets a file size and puts it in human-readable form.
 
@@ -183,11 +169,12 @@ class General:
 
         return f"{file_size_bytes:.2f} {units[unit_index]}"
 
-    @staticmethod
+    @classmethod
     def make_panel(
+        cls,
         title: str,
-        content: Union[ConsoleRenderable, RichCast, str],
-        subtitle: Optional[str] = None,
+        content: t.Union[ConsoleRenderable, RichCast, str],
+        subtitle: t.Optional[str] = None,
     ):
         """
         Makes a rich Panel for whatever data is needed to be placed in it.
@@ -199,20 +186,18 @@ class General:
         :param subtitle: Panel subtitle.
         :type subtitle: str
         """
-        from .terminal import Style
 
-        console.print(
-            Panel(
-                renderable=content,
-                title=f"{Style.bold}{title}{Style.reset}",
-                subtitle=(subtitle if subtitle else None),
-                box=DOUBLE,
-                style=f"{Style.white.strip('[,]')} on black",
-            )
-        )
+        header = Text.from_markup(title, justify="center", overflow="ellipsis")
+        divider = Rule(style=colours.WHITE.strip("[,]"))
+        content_items = [header, divider, content]
+        content = Group(*content_items)
 
-    @staticmethod
-    def filename_timestamp() -> str:
+        panel = Panel(renderable=content, title_align="left", subtitle=subtitle)
+
+        console.print(panel)
+
+    @classmethod
+    def filename_timestamp(cls) -> str:
         """
         Generates a timestamp string suitable for file naming, based on the current date and time.
         The format of the timestamp is adapted based on the operating system.
@@ -233,8 +218,8 @@ class General:
             else now.strftime("%d-%B-%Y-%I:%M:%S%p")
         )
 
-    @staticmethod
-    def pathfinder(directories: Union[List[str], str]):
+    @classmethod
+    def pathfinder(cls, directories: t.Union[t.List[str], str]):
         """
         Creates directories for exported data (`exported`).
 
@@ -244,7 +229,7 @@ class General:
         """
 
         try:
-            if isinstance(directories, List) and all(
+            if isinstance(directories, t.List) and all(
                 isinstance(directory, str) for directory in directories
             ):
                 for directory in directories:
@@ -252,7 +237,13 @@ class General:
             elif isinstance(directories, str):
                 os.makedirs(name=directories, exist_ok=True)
         except Exception as unexpected_error:
-            Message.exception(unexpected_error)
+            logger.exception(unexpected_error)
+
+
+    @classmethod
+    def clear_screen(cls):
+        subprocess.run(["cls" if os.name == "nt" else "clear"])
+
 
 
 # -------------------------------- END ----------------------------------------- #

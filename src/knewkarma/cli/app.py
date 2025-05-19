@@ -7,7 +7,11 @@ import aiohttp
 import rich_click as click
 from rich.status import Status
 
-from ._main import (
+from toolbox import colours
+from toolbox.data_and_visualisation import DataAndVisualisation
+from toolbox.logging import console
+from toolbox.package import Package
+from ..core.models import (
     reddit,
     Post,
     Posts,
@@ -17,21 +21,19 @@ from ._main import (
     User,
     Users,
 )
-from .meta.about import Project
-from .meta.license import License
-from .meta.version import Version
-from .tools.general import General
-from .tools.package import Package
-from .tools.terminal import console, Message, Style
+from ..metadata.about import Project
+from ..metadata.license import License
+from ..metadata.version import Version
 
 __all__ = ["start"]
 
+
 package = Package(
-    name=Project.package, version=Version, requester=reddit.connection.send_request
+    name=Project.package, version=Version, requester=reddit.request_handler.send_request
 )
 
 
-def help_callback(ctx: click.Context, option: click.Option, value: bool):
+def help_callback(ctx: click.Context, _, value: bool):
     """
     Custom callback function for handling the '--help' option in Click commands.
 
@@ -41,8 +43,6 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
 
     :param ctx: The Click context object.
     :type ctx: click.Context
-    :param option: The Click option that triggered this callback.
-    :type option: click.Option
     :param value: The value of the custom help option. If True, the help
             message is displayed and the command execution is halted.
     :type value: bool
@@ -61,7 +61,7 @@ def help_callback(ctx: click.Context, option: click.Option, value: bool):
 @click.option("-c", "--conditions", is_flag=True, help="Get licen[cs]e warranty.")
 @click.option("-w", "--warranty", is_flag=True, help="Get licen[cs]e conditions.")
 @click.pass_context
-def license(ctx: click.Context, conditions: bool, warranty: bool):
+def _license(ctx: click.Context, conditions: bool, warranty: bool):
     """
     Callback function for the `license` command.
     """
@@ -94,10 +94,10 @@ def updates(ctx: click.Context, check: bool, install: bool):
     :type install: bool
     """
     method_map = {
-        "check": lambda session, status=None, message=Message: package.check_updates(
+        "check": lambda session, status: package.check_updates(
             session=session, status=status
         ),
-        "install": lambda session, status=None,: package.check_updates(
+        "install": lambda session, status: package.check_updates(
             session=session, status=status, install_if_available=True
         ),
     }
@@ -131,7 +131,7 @@ def updates(ctx: click.Context, check: bool, install: bool):
     default=100,
     show_default=True,
     type=int,
-    help=f"<bulk/semi-bulk> Maximum data output limit",
+    help=f"<bulk/semi-bulk> Maximum data output limit (maximum is 100 if searching for users)",
 )
 @click.option(
     "--sort",
@@ -167,7 +167,7 @@ def cli(
     timeframe: reddit.TIMEFRAME,
     sort: reddit.SORT,
     limit: int,
-    export: List[General.EXPORT_FORMATS],
+    export: List[DataAndVisualisation.EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -192,7 +192,7 @@ def cli(
     ctx.obj["export"] = export
 
 
-cli.add_command(cmd=license, name="license")
+cli.add_command(cmd=_license, name="license")
 cli.add_command(cmd=updates, name="updates")
 
 
@@ -227,10 +227,10 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 
     post_instance = Post(id=id, subreddit=subreddit)
     method_map: Dict = {
-        "comments": lambda session, status=None, message=Message: post_instance.comments(
-            limit=limit, sort=sort, status=status, message=message, session=session
+        "comments": lambda session, status, logger: post_instance.comments(
+            limit=limit, sort=sort, status=status, logger=logger, session=session
         ),
-        "data": lambda session, status=None, message=Message: post_instance.data(
+        "data": lambda session, status, logger: post_instance.data(
             session=session, status=status
         ),
     }
@@ -303,35 +303,35 @@ def posts(
 
     posts_instance = Posts()
     method_map: Dict = {
-        "best": lambda session, status=None, message=Message: posts_instance.best(
+        "best": lambda session, status, logger: posts_instance.best(
             timeframe=timeframe,
             limit=limit,
             status=status,
-            message=message,
+            logger=logger,
             session=session,
         ),
-        "controversial": lambda session, status=None, message=Message: posts_instance.controversial(
+        "controversial": lambda session, status, logger: posts_instance.controversial(
             timeframe=timeframe,
             limit=limit,
             status=status,
-            message=message,
+            logger=logger,
             session=session,
         ),
-        "front_page": lambda session, status=None, message=Message: posts_instance.front_page(
-            limit=limit, sort=sort, status=status, message=message, session=session
+        "front_page": lambda session, status, logger: posts_instance.front_page(
+            limit=limit, sort=sort, status=status, logger=logger, session=session
         ),
-        "new": lambda session, status=None, message=Message: posts_instance.new(
-            limit=limit, sort=sort, status=status, message=message, session=session
+        "new": lambda session, status, logger: posts_instance.new(
+            limit=limit, sort=sort, status=status, logger=logger, session=session
         ),
-        "popular": lambda session, status=None, message=Message: posts_instance.popular(
+        "popular": lambda session, status, logger: posts_instance.popular(
             timeframe=timeframe,
             limit=limit,
             status=status,
-            message=message,
+            logger=logger,
             session=session,
         ),
-        "rising": lambda session, status=None, message=Message: posts_instance.rising(
-            limit=limit, status=status, message=message, session=session
+        "rising": lambda session, status, logger: posts_instance.rising(
+            limit=limit, status=status, logger=logger, session=session
         ),
     }
 
@@ -382,14 +382,14 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
         query=query,
     )
     method_map: Dict = {
-        "posts": lambda session, status=None, message=Message: search_instance.posts(
-            sort=sort, limit=limit, status=status, message=message, session=session
+        "posts": lambda session, status, logger: search_instance.posts(
+            sort=sort, limit=limit, status=status, logger=logger, session=session
         ),
-        "subreddits": lambda session, status=None, message=Message: search_instance.subreddits(
-            sort=sort, limit=limit, session=session
+        "subreddits": lambda session, status, logger: search_instance.subreddits(
+            sort=sort, limit=limit, logger=logger, session=session
         ),
-        "users": lambda session, status=None, message=Message: search_instance.users(
-            sort=sort, limit=limit, status=status, message=message, session=session
+        "users": lambda session, status, logger: search_instance.users(
+            sort=sort, limit=limit, status=status, logger=logger, session=session
         ),
     }
 
@@ -464,39 +464,39 @@ def subreddit(
         name=subreddit_name,
     )
     method_map: Dict = {
-        "comments": lambda session, status=None, message=Message: subreddit_instance.comments(
+        "comments": lambda session, status, logger: subreddit_instance.comments(
             session=session,
             posts_limit=limit,
             comments_per_post=comments_per_post,
             sort=sort,
             timeframe=timeframe,
             status=status,
-            message=message,
+            logger=logger,
         ),
-        "posts": lambda session, status=None, message=Message: subreddit_instance.posts(
+        "posts": lambda session, status, logger=None: subreddit_instance.posts(
             limit=limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
-            message=message,
+            logger=logger,
             session=session,
         ),
-        "profile": lambda session, status=None: subreddit_instance.profile(
+        "profile": lambda session, status: subreddit_instance.profile(
             status=status, session=session
         ),
-        "search": lambda session, status=None, message=Message: subreddit_instance.search(
+        "search": lambda session, status, logger: subreddit_instance.search(
             query=search,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
-            message=message,
+            logger=logger,
             session=session,
         ),
-        "wikipages": lambda session, status=None, message=Message: subreddit_instance.wikipages(
+        "wikipages": lambda session, status, logger: subreddit_instance.wikipages(
             status=status, session=session
         ),
-        "wikipage": lambda session, status=None, message=Message: subreddit_instance.wikipage(
+        "wikipage": lambda session, status, logger: subreddit_instance.wikipage(
             page_name=wikipage, status=status, session=session
         ),
     }
@@ -558,20 +558,20 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
 
     subreddits_instance = Subreddits()
     method_map: Dict = {
-        "all": lambda session, status=None, message=Message: subreddits_instance.all(
+        "all": lambda session, status, logger: subreddits_instance.all(
             limit=limit,
             session=session,
             status=status,
-            message=message,
+            logger=logger,
         ),
-        "default": lambda session, status=None, message=Message: subreddits_instance.default(
+        "default": lambda session, status, logger: subreddits_instance.default(
             limit=limit, session=session, status=status
         ),
-        "new": lambda session, status=None, message=Message: subreddits_instance.new(
-            limit=limit, session=session, status=status
+        "new": lambda session, status, logger: subreddits_instance.new(
+            limit=limit, logger=logger, session=session, status=status
         ),
-        "popular": lambda session, status=None, message=Message: subreddits_instance.popular(
-            limit=limit, session=session, status=status
+        "popular": lambda session, status, logger: subreddits_instance.popular(
+            limit=limit, logger=logger, session=session, status=status
         ),
     }
 
@@ -656,41 +656,41 @@ def user(
         name=username,
     )
     method_map: Dict = {
-        "comments": lambda session, status=None, message=Message: user_instance.comments(
+        "comments": lambda session, status, logger: user_instance.comments(
             session=session,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
-            message=message,
+            logger=logger,
         ),
-        "moderated_subreddits": lambda session, status=None, message=Message: user_instance.moderated_subreddits(
-            session=session, status=status
+        "moderated_subreddits": lambda session, status, logger: user_instance.moderated_subreddits(
+            logger=logger, session=session, status=status
         ),
-        "overview": lambda session, status=None, message=Message: user_instance.overview(
-            limit=limit, session=session, status=status
+        "overview": lambda session, status, logger: user_instance.overview(
+            limit=limit, logger=logger, session=session, status=status
         ),
-        "posts": lambda session, status=None, message=Message: user_instance.posts(
+        "posts": lambda session, status, logger: user_instance.posts(
             session=session,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
             status=status,
-            message=message,
+            logger=logger,
         ),
-        "profile": lambda session, status=None,: user_instance.profile(
+        "profile": lambda session, status: user_instance.profile(
             session=session, status=status
         ),
-        "top_subreddits": lambda session, status=None, message=Message: user_instance.top_subreddits(
+        "top_subreddits": lambda session, status, logger: user_instance.top_subreddits(
             session=session,
             top_n=top_subreddits,
             limit=limit,
             timeframe=timeframe,
             status=status,
-            message=message,
+            logger=logger,
         ),
-        "username_available": lambda session, status=None, message=Message: user_instance.username_available(
-            session=session, status=status
+        "username_available": lambda session, status, logger: user_instance.username_available(
+            logger=logger, session=session, status=status
         ),
     }
 
@@ -745,14 +745,26 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 
     users_instance = Users()
     method_map: Dict = {
-        "all": lambda session, status=None, message=Message: users_instance.all(
-            session=session, limit=limit, timeframe=timeframe, status=status
+        "all": lambda session, status, logger: users_instance.all(
+            logger=logger,
+            session=session,
+            limit=limit,
+            timeframe=timeframe,
+            status=status,
         ),
-        "new": lambda session, status=None, message=Message: users_instance.new(
-            session=session, limit=limit, timeframe=timeframe, status=status
+        "new": lambda session, status, logger: users_instance.new(
+            logger=logger,
+            session=session,
+            limit=limit,
+            timeframe=timeframe,
+            status=status,
         ),
-        "popular": lambda session, status=None, message=Message: users_instance.popular(
-            session=session, limit=limit, timeframe=timeframe, status=status
+        "popular": lambda session, status, logger: users_instance.popular(
+            logger=logger,
+            session=session,
+            limit=limit,
+            timeframe=timeframe,
+            status=status,
         ),
     }
 
@@ -789,23 +801,22 @@ async def call_method(
     argument: str = kwargs.get("argument")
 
     response_data: Union[List, Dict, str, bool] = await method(
-        session=session,
-        status=status,
+        session=session, status=status, logger=kwargs.get("logger")
     )
     if response_data:
-        dataframe = General.create_dataframe(data=response_data)
+        dataframe = DataAndVisualisation.create_dataframe(data=response_data)
         console.print(dataframe)
 
         if kwargs.get("export"):
 
             exports_child_dir: str = os.path.join(
-                General.EXPORTS_PARENT_DIR,
+                DataAndVisualisation.EXPORTS_PARENT_DIR,
                 "exports",
                 command,
                 argument,
             )
 
-            General.pathfinder(
+            DataAndVisualisation.pathfinder(
                 directories=[
                     os.path.join(exports_child_dir, extension)
                     for extension in ["csv", "html", "json", "xml"]
@@ -813,9 +824,9 @@ async def call_method(
             )
 
             export_to: List = kwargs.get("export").split(",")
-            General().export_dataframe(
+            DataAndVisualisation.export_dataframe(
                 dataframe=dataframe,
-                filename=General.filename_timestamp(),
+                filename=DataAndVisualisation.filename_timestamp(),
                 directory=exports_child_dir,
                 formats=export_to,
             )
@@ -840,6 +851,8 @@ async def method_call_handler(
     :type kwargs: Union[str, int, bool]
     """
 
+    from toolbox.logging import logger
+
     is_valid_arg: bool = False
 
     for argument, method in method_map.items():
@@ -849,37 +862,43 @@ async def method_call_handler(
             try:
                 console.print(License.notice, justify="center")
                 with Status(
-                    status=f"Opening new client session",
+                    status=f"Opening new ClientSession...",
                     spinner="dots",
-                    spinner_style=Style.yellow.strip("[,]"),
                     console=console,
                 ) as status:
                     async with aiohttp.ClientSession() as session:
-                        Message.ok("New client session opened")
+                        logger.info("[bold green]✔[/bold green] ClientSession opened.")
                         await reddit.infra_status(
                             session=session,
                             status=status,
-                            message=Message,
+                            logger=logger,
                         )
 
                         await call_method(
                             method=method,
                             session=session,
                             status=status,
+                            logger=logger,
                             ctx=ctx,
                             export=export,
                             argument=argument,
                         )
             except aiohttp.ClientConnectionError as connection_error:
-                Message.exception(
-                    title="An HTTP error occurred", error=connection_error
+                logger.error(
+                    f"{colours.BOLD_RED}✘{colours.BOLD_RED_RESET} A connection error occurred: {connection_error}"
                 )
             except aiohttp.ClientResponseError as response_error:
-                Message.exception(title="An API error occurred", error=response_error)
+                logger.error(
+                    f"{colours.BOLD_RED}✘{colours.BOLD_RED_RESET} A response error occurred: {response_error}"
+                )
+            except Exception as unexpected_error:
+                logger.error(
+                    f"{colours.BOLD_RED}✘{colours.BOLD_RED_RESET} An unexpected error occurred: {unexpected_error}"
+                )
             finally:
                 elapsed_time = datetime.now() - start_time
-                Message.ok(
-                    f"Session closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
+                logger.info(
+                    f"{colours.BOLD_GREEN}✔{colours.BOLD_GREEN_RESET} ClientSession closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
                 )
 
     if not is_valid_arg:
