@@ -804,8 +804,7 @@ async def call_method(
         session=session, status=status, logger=kwargs.get("logger")
     )
     if response_data:
-        dataframe = DataAndVisualisation.create_dataframe(data=response_data)
-        console.print(dataframe)
+        DataAndVisualisation.print_table(data=response_data)
 
         if kwargs.get("export"):
 
@@ -824,6 +823,7 @@ async def call_method(
             )
 
             export_to: List = kwargs.get("export").split(",")
+            dataframe = DataAndVisualisation.create_dataframe(data=response_data)
             DataAndVisualisation.export_dataframe(
                 dataframe=dataframe,
                 filename=DataAndVisualisation.filename_timestamp(),

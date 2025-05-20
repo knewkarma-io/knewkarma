@@ -5,6 +5,7 @@ from datetime import datetime
 from types import SimpleNamespace
 
 import pandas as pd
+from rich import box
 from rich.console import ConsoleRenderable, RichCast, Group
 from rich.panel import Panel
 from rich.rule import Rule
@@ -56,6 +57,103 @@ class DataAndVisualisation:
         console.print(panel)
 
     @classmethod
+    def print_table(
+            cls,
+            data: t.Union[SimpleNamespace, t.List[SimpleNamespace], t.List[t.Tuple[str, int]]],
+            n_head: t.Optional[int] = None,
+            n_tail: t.Optional[int] = None,
+    ):
+        """
+        Creates and displays a rich-formatted table from the provided data.
+
+        Any keys that contain only `None` values across all rows are excluded.
+        Dynamically adjusts columns shown based on terminal width.
+
+        :param data: Input data to display.
+        :type data: Union[SimpleNamespace, List[SimpleNamespace], List[Tuple[str, int]]]
+        :param n_head: Number of keys to show from the start (optional).
+        :param n_tail: Number of keys to show from the end (optional).
+        """
+        terminal_width = console.size.width
+
+        # Estimate how many columns we can show
+        # Assume 15 chars per column (avg); minus some buffer for borders
+        max_columns = max((terminal_width - 10) // 15, 1)
+
+        # If user didn't specify n_head/n_tail, we balance them based on space
+        if n_head is None or n_tail is None:
+            half = max_columns // 2
+            n_head = n_head or half
+            n_tail = n_tail or (max_columns - n_head - 1)  # leave room for "..."
+
+        table = Table(highlight=True, box=box.ASCII2, expand=True, show_lines=True)
+
+        def extract_namespace(ns: SimpleNamespace) -> dict:
+            if hasattr(ns, "data") and isinstance(ns.data, SimpleNamespace):
+                return ns.data.__dict__
+            return ns.__dict__
+
+        # Case 1: Single SimpleNamespace
+        if isinstance(data, SimpleNamespace):
+            values = {k: v for k, v in extract_namespace(data).items() if v is not None}
+            table.add_column("Key", style="cyan", no_wrap=True)
+            table.add_column("Value", style="magenta")
+
+            for key, value in values.items():
+                table.add_row(str(key), str(value))
+
+        # Case 2: List of SimpleNamespace
+        elif isinstance(data, list) and all(isinstance(item, SimpleNamespace) for item in data):
+            if not data:
+                console.print("[bold red]Empty list provided.[/bold red]")
+                return
+
+            values_list = [extract_namespace(item) for item in data]
+
+            non_none_keys = {
+                key
+                for d in values_list
+                for key, value in d.items()
+                if value is not None
+            }
+
+            if not non_none_keys:
+                console.print("[bold yellow]All values were None. Nothing to show.[/bold yellow]")
+                return
+
+            all_keys = [k for k in values_list[0].keys() if k in non_none_keys]
+
+            if len(all_keys) <= n_head + n_tail:
+                visible_keys = all_keys
+            else:
+                visible_keys = all_keys[:n_head] + ["..."] + all_keys[-n_tail:]
+
+            for key in visible_keys:
+                table.add_column(key)
+
+            for row_values in values_list:
+                row = []
+                for key in visible_keys:
+                    if key == "...":
+                        row.append("...")
+                    else:
+                        val = row_values.get(key)
+                        row.append(str(val) if val is not None else "")
+                table.add_row(*row)
+
+        # Case 3: List of tuples
+        elif isinstance(data, list) and all(isinstance(item, tuple) and len(item) == 2 for item in data):
+            filtered = [(k, v) for k, v in data if v is not None]
+
+            table.add_column("Key", style="cyan")
+            table.add_column("Value", style="magenta")
+
+            for key, value in filtered:
+                table.add_row(str(key), str(value))
+
+        console.print(table)
+
+    @classmethod
     def create_dataframe(
         cls,
         data: t.Union[SimpleNamespace, t.List[SimpleNamespace], t.List[t.Tuple[str, int]]],
@@ -65,8 +163,7 @@ class DataAndVisualisation:
 
         :param data: Data to be converted.
         :type data: Union[SimpleNamespace, List[SimpleNamespace], List[Tuple[str, int]]]
-        :return: A pandas DataFrame constructed from the provided data. Excludes any 'raw_data'
-                 column from the dataframe.
+        :return: A pandas DataFrame constructed from the provided data.
         :rtype: pd.DataFrame
         """
         if isinstance(data, SimpleNamespace):
