@@ -1,4 +1,4 @@
-<p align="center"><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is a fully asynchronous, 0-auth toolkit for Reddit data analysis. Designed to provide an extensive range of functionalities for exploring and analysing Reddit data, Knew Karma includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), a <strong>Textual-based User Interface</strong> (<strong>TUI</strong>), and an <strong>Application Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.</p>
+<p align="center"><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is an asynchronous, zero-auth toolkit for Reddit data analysis. Designed to provide an extensive range of functionalities for exploring and analysing Reddit data, Knew Karma includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), a <strong>Textual-based User Interface</strong> (<strong>TUI</strong>), and an <strong>Application Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.</p>
 
 <p align="center">
   <a href="https://github.com/knewkarma-io/knewkarma"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-000000?logo=github&link=https%3A%2F%2Fgithub.com%2Frly0nheart%2Fknewkarma"></a>
@@ -49,7 +49,7 @@ Integration*, and *Usage* instructions.
 
 ## License
 
-GPL-3.0+ License © [Richard Mwewa](https://gravatar.com/rly0nheart)
+GPL-3.0+ License © [Ritchie Mwewa](https://gravatar.com/rly0nheart)
 
 ## Support
 
