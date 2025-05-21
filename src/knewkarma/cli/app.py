@@ -8,9 +8,10 @@ import rich_click as click
 from rich.status import Status
 
 from toolbox import colours
-from toolbox.data_and_visualisation import DataAndVisualisation
+from toolbox.data import Data
 from toolbox.logging import console
-from toolbox.package import Package
+from toolbox.render import Render
+from toolbox.runtime import Runtime
 from ..core.models import (
     reddit,
     Post,
@@ -26,11 +27,6 @@ from ..metadata.license import License
 from ..metadata.version import Version
 
 __all__ = ["start"]
-
-
-package = Package(
-    name=Project.package, version=Version, requester=reddit.request_handler.send_request
-)
 
 
 def help_callback(ctx: click.Context, _, value: bool):
@@ -50,7 +46,7 @@ def help_callback(ctx: click.Context, _, value: bool):
 
     if value and not ctx.resilient_parsing:
         click.echo(ctx.get_help())
-        if package.is_snap_package():
+        if Runtime.is_snap_package():
             click.pause()
         ctx.exit()
 
@@ -71,46 +67,6 @@ def _license(ctx: click.Context, conditions: bool, warranty: bool):
         console.print(License.warranty, justify="center")
     else:
         click.echo(ctx.command.get_usage(ctx=ctx))
-
-
-@click.command(name="updates", help="Use this command to check for or install updates.")
-@click.option("-c", "--check", is_flag=True, help="Check for updates.")
-@click.option(
-    "-i",
-    "--install",
-    is_flag=True,
-    help="Install updates, if any are available [Non-Snap Packages only]",
-)
-@click.pass_context
-def updates(ctx: click.Context, check: bool, install: bool):
-    """
-    Check for, or install updates if any are available.
-
-    :param ctx: The Click context object.
-    :type ctx: click.Context
-    :param check: Option to check for updates.
-    :type check: bool
-    :param install: Option to install updates.
-    :type install: bool
-    """
-    method_map = {
-        "check": lambda session, status: package.check_updates(
-            session=session, status=status
-        ),
-        "install": lambda session, status: package.check_updates(
-            session=session, status=status, install_if_available=True
-        ),
-    }
-
-    asyncio.run(
-        method_call_handler(
-            ctx=ctx,
-            method_map=method_map,
-            export="",
-            check=check,
-            install=install,
-        )
-    )
 
 
 @click.group(
@@ -167,7 +123,7 @@ def cli(
     timeframe: reddit.TIMEFRAME,
     sort: reddit.SORT,
     limit: int,
-    export: List[DataAndVisualisation.EXPORT_FORMATS],
+    export: List[Data.EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -193,7 +149,6 @@ def cli(
 
 
 cli.add_command(cmd=_license, name="license")
-cli.add_command(cmd=updates, name="updates")
 
 
 @cli.command(
@@ -780,7 +735,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     )
 
 
-async def call_method(
+async def method_caller(
     method: Callable,
     **kwargs: Union[str, click.Context, aiohttp.ClientSession, Status],
 ):
@@ -804,18 +759,18 @@ async def call_method(
         session=session, status=status, logger=kwargs.get("logger")
     )
     if response_data:
-        DataAndVisualisation.print_table(data=response_data)
+        Render.panels(data=response_data)
 
         if kwargs.get("export"):
 
             exports_child_dir: str = os.path.join(
-                DataAndVisualisation.EXPORTS_PARENT_DIR,
+                Data.EXPORTS_PARENT_DIR,
                 "exports",
                 command,
                 argument,
             )
 
-            DataAndVisualisation.pathfinder(
+            Data.pathfinder(
                 directories=[
                     os.path.join(exports_child_dir, extension)
                     for extension in ["csv", "html", "json", "xml"]
@@ -823,10 +778,10 @@ async def call_method(
             )
 
             export_to: List = kwargs.get("export").split(",")
-            dataframe = DataAndVisualisation.create_dataframe(data=response_data)
-            DataAndVisualisation.export_dataframe(
+            dataframe = Data.make_dataframe(data=response_data)
+            Data.export_dataframe(
                 dataframe=dataframe,
-                filename=DataAndVisualisation.filename_timestamp(),
+                filename=Data.filename_timestamp(),
                 directory=exports_child_dir,
                 formats=export_to,
             )
@@ -867,14 +822,17 @@ async def method_call_handler(
                     console=console,
                 ) as status:
                     async with aiohttp.ClientSession() as session:
-                        logger.info("[bold green]✔[/bold green] ClientSession opened.")
+                        logger.info(
+                            f"{colours.BOLD_BLUE}◉{colours.BOLD_BLUE_RESET} ClientSession opened."
+                        )
+                        await Runtime.check_updates(session=session, status=status)
                         await reddit.infra_status(
                             session=session,
                             status=status,
                             logger=logger,
                         )
 
-                        await call_method(
+                        await method_caller(
                             method=method,
                             session=session,
                             status=status,
@@ -885,20 +843,17 @@ async def method_call_handler(
                         )
             except aiohttp.ClientConnectionError as connection_error:
                 logger.error(
-                    f"{colours.BOLD_RED}✘{colours.BOLD_RED_RESET} A connection error occurred: {connection_error}"
+                    f"[{colours.BOLD_RED}✘{colours.BOLD_RED_RESET}] A connection error occurred: {connection_error}"
                 )
             except aiohttp.ClientResponseError as response_error:
                 logger.error(
-                    f"{colours.BOLD_RED}✘{colours.BOLD_RED_RESET} A response error occurred: {response_error}"
+                    f"[{colours.BOLD_RED}✘{colours.BOLD_RED_RESET}] A response error occurred: {response_error}"
                 )
-            except Exception as unexpected_error:
-                logger.error(
-                    f"{colours.BOLD_RED}✘{colours.BOLD_RED_RESET} An unexpected error occurred: {unexpected_error}"
-                )
+
             finally:
                 elapsed_time = datetime.now() - start_time
                 logger.info(
-                    f"{colours.BOLD_GREEN}✔{colours.BOLD_GREEN_RESET} ClientSession closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
+                    f"{colours.BOLD_YELLOW}◉{colours.BOLD_YELLOW_RESET} ClientSession closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
                 )
 
     if not is_valid_arg:

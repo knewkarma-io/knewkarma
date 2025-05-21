@@ -133,7 +133,7 @@ class RedditClient:
 
         if logger:
             logger.info(
-                f"{colours.BOLD_GREEN}✔{colours.BOLD_GREEN_RESET} Got {len(comments)} of {limit} comments from {kind}"
+                f"{colours.BOLD_GREEN}+{colours.BOLD_GREEN_RESET} Got {len(comments)} of {limit} comments from {kind}"
             )
 
         return comments
@@ -218,7 +218,7 @@ class RedditClient:
 
         if logger:
             logger.info(
-                f"[bold green]✔[/bold green] Got {len(posts)} of {limit} {kind} posts"
+                f"{colours.BOLD_GREEN}+{colours.BOLD_GREEN_RESET} Showing {len(posts)} of {limit} {kind} posts"
             )
 
         return posts
@@ -270,7 +270,7 @@ class RedditClient:
 
         if logger:
             logger.info(
-                f"[bold green]✔[/bold green] Got {len(results)} of {limit} {kind} search results"
+                f"{colours.BOLD_GREEN}+{colours.BOLD_GREEN_RESET} Showing {len(results)} of {limit} {kind} search results"
             )
 
         return results
@@ -344,7 +344,7 @@ class RedditClient:
 
         if logger:
             logger.info(
-                f"[bold green]✔[/bold green] Got {len(subreddits)} of {limit} {kind} subreddits"
+                f"{colours.BOLD_GREEN}+{colours.BOLD_GREEN_RESET} Showing {len(subreddits)} of {limit} {kind} subreddits"
             )
 
         return subreddits
@@ -411,7 +411,7 @@ class RedditClient:
 
         if logger:
             logger.info(
-                f"[bold green]✔[/bold green] Got {len(users)} of {limit} {kind} users"
+                f"{colours.BOLD_GREEN}+{colours.BOLD_GREEN_RESET} Showing {len(users)} of {limit} {kind} users"
             )
 
         return users
