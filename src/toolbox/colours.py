@@ -1,4 +1,5 @@
-# Flat color styles
+ORANGE_RED: str = "[#FF4500]"
+SOFT_BLUE: str = "[#7193FF]"
 BLUE: str = "[blue]"
 BLUE_RESET: str = "[/blue]"
 

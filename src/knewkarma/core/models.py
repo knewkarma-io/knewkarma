@@ -8,7 +8,7 @@ import aiohttp
 from rich.status import Status
 
 from engines import klaus
-from toolbox.data_and_visualisation import DataAndVisualisation
+from toolbox.render import Render
 from ..metadata.about import Project
 from ..metadata.version import Version
 
@@ -1309,7 +1309,7 @@ class User:
             subreddit_names = [subreddit[0] for subreddit in top_subreddits]
             subreddit_frequencies = [subreddit[1] for subreddit in top_subreddits]
 
-            DataAndVisualisation.plot_bar_chart(
+            Render.bar_chart(
                 data=dict(zip(subreddit_names, subreddit_frequencies)),
                 title=f"top {top_n}/{limit} subreddits analysis",
                 x_label="Subreddits",
