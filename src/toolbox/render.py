@@ -9,6 +9,7 @@ from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
 
+from engines.klaus import RedditEndpoints
 from toolbox import colours
 from toolbox.logging import console
 
@@ -17,9 +18,9 @@ __all__ = ["Render"]
 
 class Render:
     @classmethod
-    def _time_ago_from_unix(cls, unix_timestamp: float) -> str:
+    def timestamp_to_relative(cls, unix_timestamp: float) -> str:
         """
-        Converts a UNIX timestamp to Reddit-style relative time format.
+        Converts a UNIX timestamp to relative time format.
 
         Examples:
             - Just now
@@ -48,60 +49,167 @@ class Render:
         if seconds < minute:
             return "Just now"
         elif seconds < hour:
-            return f"{seconds // minute} min. ago"
+            return f"{seconds // minute}m ago"
         elif seconds < day:
-            return f"{seconds // hour} hr. ago"
+            return f"{seconds // hour}h ago"
         elif seconds < week:
-            return f"{seconds // day} day. ago"
+            return f"{seconds // day}d ago"
         elif seconds < month:
-            return f"{seconds // week} wk. ago"
+            return f"{seconds // week}w ago"
         elif seconds < year:
-            return f"{seconds // month} mo. ago"
+            return f"{seconds // month}mo ago"
         else:
-            return f"{seconds // year} yr. ago"
+            return f"{seconds // year}y ago"
+
+    @classmethod
+    def posts(cls, data: t.List[SimpleNamespace]):
+        """Print panels for displaying posts/comments."""
+        panels: t.List[Panel] = []
+
+        for item in data:
+            post = item.data
+            panel_parts: t.List = []
+
+            is_comment: bool = hasattr(post, "body") and not hasattr(post, "selftext")
+            is_post: bool = not is_comment
+
+            title: str = getattr(post, "title", "")
+            selftext: str = getattr(post, "selftext", "")
+            body: str = getattr(post, "body", "")
+            permalink: str = getattr(post, "permalink", "")
+            url: str = getattr(post, "url", "")
+            subreddit_name: str = getattr(post, "subreddit_name_prefixed", "")
+            author: str = getattr(post, "author", "")
+            created: int = getattr(post, "created", int)
+            comments: int = getattr(post, "num_comments", int)
+            replies: t.List = getattr(post, "replies", [])
+            is_nsfw: bool = getattr(post, "over_18", False)
+
+            if title:
+                panel_parts.append(f"**{title}**")
+
+            panel_parts.append(selftext) if selftext else panel_parts.append(body) if body else None
+
+            text: str = "\n\n".join(panel_parts)
+
+            header_content: str = (
+                f"{colours.BOLD}{subreddit_name}{colours.RESET} · {colours.BOLD_BLUE}"
+                f"{f'[link={RedditEndpoints.BASE}/{permalink}]View on Reddit[/link]'
+                           if is_comment else 
+                f'[link={url}]View on Reddit[/link]'}{colours.BOLD_BLUE_RESET}\nu/{author}"
+                f" · {colours.BOLD_BLACK}{cls.timestamp_to_relative(unix_timestamp=created)}"
+                f"{colours.BOLD_BLACK_RESET}"
+            )
+
+            footer_content: str = (
+                f"{colours.ORANGE_RED}🡅{post.ups}{colours.RESET} "
+                f" {colours.SOFT_BLUE}🡇{post.downs}{colours.RESET} "
+                f" {colours.WHITE}🗩 {comments if is_post else len(replies)}{colours.WHITE_RESET} "
+                f" {colours.BOLD_YELLOW}🎖{len(post.all_awardings)}{colours.BOLD_YELLOW_RESET}"
+            )
+
+            if is_nsfw:
+                header_content: str = (
+                    f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
+                )
+
+            panel = cls.panel(
+                header=header_content,
+                content=text,
+                footer=footer_content,
+                add_dividers=True,
+            )
+
+            panels.append(panel)
+
+        panel_group = Group(*panels)
+
+        console.print(panel_group)
+
+    @classmethod
+    def subreddit_profile(cls, data: SimpleNamespace):
+        cls.panel(
+            header=(
+                f"{data.display_name_prefixed} · "
+                f"[bold black]{cls.timestamp_to_relative(unix_timestamp=data.created)}[/bold black]"
+                f" · {data.public_description}"
+            ),
+            content=data.description,
+            footer=f"Subscribers {data.subscribers}  Active Accounts {data.accounts_active}",
+            print_panel=True,
+        )
 
     @classmethod
     def panel(
         cls,
-        header_text: str,
-        content_text: str,
-        footer_text: str = "Hello",
-        print_panel: bool = False,
-        show_outline: bool = True,
-        add_dividers: bool = True,
-        divider_visibility: t.Literal["visible", "hidden"] = "hidden",
+        content: t.Union[str, RenderableType],
+        header: t.Optional[str] = None,
+        footer: t.Optional[str] = None,
+        **kwargs,
     ) -> Panel:
         """
-        Wraps the given header, content, and metadata into a styled Rich Panel.
+        Builds and optionally prints a styled Rich Panel.
+
+        Supports Markdown-formatted string content or any Rich renderable (e.g., Tree, Table, Markdown).
+        Header and footer are rendered using Rich markup. Various display options can be controlled via kwargs.
+
+        :param content: The main body of the panel. If a string is passed, it is rendered as Markdown.
+        :type content: Union[str, RenderableType]
+        :param header: Optional panel header, rendered using Rich markup.
+        :type header: Optional[str]
+        :param footer: Optional panel footer, rendered using Rich markup.
+        :type footer: Optional[str]
+        :keyword print_panel: Whether to immediately print the panel to the console.
+        :keyword show_outline: Whether to show a visible white border around the panel.
+        :keyword add_dividers: Whether to add horizontal dividers between header, content, and footer.
+        :keyword divider_visibility: Whether dividers should be visible or hidden (color-wise).
+        Accepted values: "visible", "hidden". Defaults to "hidden".
+        :return: A styled Rich Panel containing the given content.
+        :rtype: Panel
         """
 
+        print_panel: bool = kwargs.get("print_panel", False)
+        show_outline: bool = kwargs.get("show_outline", True)
+        add_dividers: bool = kwargs.get("add_dividers", True)
+
+        div_visibility_literals = t.Literal["visible", "hidden"]
+        divider_visibility: t.Literal["visible", "hidden"] = t.cast(
+            div_visibility_literals, kwargs.get("divider_visibility", "hidden")
+        )
+
         divider_style: str = "#444444" if divider_visibility == "visible" else "black"
-        header = Text.from_markup(text=header_text, justify="left", overflow="ellipsis")
-        content = Markdown(markup=content_text, justify="left", style="white")
+        content_items: t.List[RenderableType] = []
 
-        meta_info = Text()
-        if footer_text:
-            meta_info = Text.from_markup(
-                text=footer_text, justify="left", overflow="ellipsis"
+        if header:
+            header_renderable = Text.from_markup(
+                header, justify="left", overflow="ellipsis"
             )
+            content_items.append(header_renderable)
+            if add_dividers:
+                content_items.append(Rule(style=divider_style))
 
-        content_items: t.List[RenderableType] = [header]
+        if isinstance(content, str):
+            content_renderable = Markdown(content, justify="left", style="white")
+        else:
+            content_renderable = content
 
-        if add_dividers:
-            content_items.append(Rule(style=divider_style))
+        content_items.append(content_renderable)
 
-        content_items.append(content)
+        if footer:
+            if add_dividers:
+                content_items.append(Rule(style=divider_style))
+            footer_renderable = Text.from_markup(
+                footer, justify="left", overflow="ellipsis"
+            )
+            content_items.append(footer_renderable)
 
-        if add_dividers:
-            content_items.append(Rule(style=divider_style))
+        # content_items.append(Rule(style="#444444"))
 
-        content_items.append(meta_info)
-        content_items.append(Rule(style="#444444"))
         group = Group(*content_items)
 
         panel = Panel(
             renderable=group,
-            border_style=None if show_outline else "black",
+            border_style="#444444" if show_outline else "black",
             title_align="left",
         )
 
@@ -109,64 +217,6 @@ class Render:
             console.print(panel)
 
         return panel
-
-    @classmethod
-    def panels(
-        cls, data: t.Union[t.List[SimpleNamespace], SimpleNamespace, str], **kwargs
-    ):
-        """
-        Print panels for displaying code or structured file information.
-
-        Accepts either:
-          - a single SimpleNamespace with fields `code`, `language`
-          - a string of raw code
-          - a list of SimpleNamespace objects with fields `filename`, `repo`, `language`, `linescount`, `lines`
-
-        :param data: The input data to display as panels.
-        :type data: Union[List[SimpleNamespace], SimpleNamespace, str]
-        :param kwargs: Additional optional keyword arguments (e.g., id for logging).
-        :type kwargs: Any
-        """
-        inner_panels: t.List[Panel] = []
-
-        for item in data:
-            parts = []
-
-            title = getattr(item.data, "title", "")
-            selftext = getattr(item.data, "selftext", "")
-
-            if title:
-                parts.append(f"**[{title}]({item.data.url})**")
-            if selftext:
-                parts.append(selftext)
-
-            text = "\n\n".join(parts)
-
-            header_text = f"u/{item.data.author} · [bold black]{cls._time_ago_from_unix(unix_timestamp=item.data.created)}[/bold black]"
-
-            if item.data.over_18:
-                header_text = (
-                    f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_text}"
-                )
-
-            inner_panel = cls.panel(
-                header_text=header_text,
-                content_text=text,
-                footer_text=f"{colours.ORANGE_RED}🡅{item.data.ups}{colours.RESET} "
-                f" {colours.SOFT_BLUE}🡇{item.data.downs}{colours.RESET} "
-                f" {colours.WHITE}🗩 {item.data.num_comments}{colours.WHITE_RESET} "
-                f" {colours.BOLD_YELLOW}🎖{len(item.data.all_awardings)}{colours.BOLD_YELLOW_RESET}",
-                add_dividers=True,
-                show_outline=False,
-            )
-
-            inner_panels.append(inner_panel)
-
-        group = Group(*inner_panels)
-
-        outer_panel = Panel(renderable=group, title=kwargs.get("title"))
-
-        console.print(outer_panel)
 
     @classmethod
     def bar_chart(

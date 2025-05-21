@@ -1,7 +1,9 @@
 import asyncio
+import inspect
 import os
+import typing as t
 from datetime import datetime
-from typing import get_args, Union, Callable, Literal, List, Dict
+from types import SimpleNamespace
 
 import aiohttp
 import rich_click as click
@@ -93,14 +95,14 @@ def _license(ctx: click.Context, conditions: bool, warranty: bool):
     "--sort",
     default="all",
     show_default=True,
-    type=click.Choice(get_args(reddit.SORT)),
+    type=click.Choice(t.get_args(reddit.SORT)),
     help=f"<bulk/semi-bulk> Sort criterion",
 )
 @click.option(
     "--timeframe",
     default="all",
     show_default=True,
-    type=click.Choice(get_args(reddit.TIMEFRAME)),
+    type=click.Choice(t.get_args(reddit.TIMEFRAME)),
     help=f"<bulk/semi-bulk> Timeframe to get data from",
 )
 @click.option(
@@ -123,7 +125,7 @@ def cli(
     timeframe: reddit.TIMEFRAME,
     sort: reddit.SORT,
     limit: int,
-    export: List[Data.EXPORT_FORMATS],
+    export: t.List[Data.EXPORT_FORMATS],
 ):
     """
     Main CLI group for Knew Karma.
@@ -131,16 +133,16 @@ def cli(
     :param ctx: The Click context object.
     :type ctx: click.Context
     :param timeframe: Option to set the timeframe for the data.
-    :type timeframe: Literal[str]
+    :type timeframe: t.Literal[str]
     :param sort: Option to set the sort criterion for the data.
-    :type sort: Literal[str]
+    :type sort: t.Literal[str]
     :param limit: Option to set output data limit.
     :type limit: int
     :param export: Option to set data export file types.
-    :type export: Literal[str]
+    :type export: t.Literal[str]
     """
 
-    ctx.ensure_object(Dict)
+    ctx.ensure_object(t.Dict)
     ctx.obj["timeframe"] = timeframe
     ctx.obj["sort"] = sort
     ctx.obj["limit"] = limit
@@ -181,7 +183,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     export: str = ctx.obj["export"]
 
     post_instance = Post(id=id, subreddit=subreddit)
-    method_map: Dict = {
+    method_map: t.Dict = {
         "comments": lambda session, status, logger: post_instance.comments(
             limit=limit, sort=sort, status=status, logger=logger, session=session
         ),
@@ -257,7 +259,7 @@ def posts(
     export: str = ctx.obj["export"]
 
     posts_instance = Posts()
-    method_map: Dict = {
+    method_map: t.Dict = {
         "best": lambda session, status, logger: posts_instance.best(
             timeframe=timeframe,
             limit=limit,
@@ -336,7 +338,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     search_instance = Search(
         query=query,
     )
-    method_map: Dict = {
+    method_map: t.Dict = {
         "posts": lambda session, status, logger: search_instance.posts(
             sort=sort, limit=limit, status=status, logger=logger, session=session
         ),
@@ -418,7 +420,7 @@ def subreddit(
     subreddit_instance = Subreddit(
         name=subreddit_name,
     )
-    method_map: Dict = {
+    method_map: t.Dict = {
         "comments": lambda session, status, logger: subreddit_instance.comments(
             session=session,
             posts_limit=limit,
@@ -512,7 +514,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
     limit: int = ctx.obj["limit"]
 
     subreddits_instance = Subreddits()
-    method_map: Dict = {
+    method_map: t.Dict = {
         "all": lambda session, status, logger: subreddits_instance.all(
             limit=limit,
             session=session,
@@ -610,7 +612,7 @@ def user(
     user_instance: User = User(
         name=username,
     )
-    method_map: Dict = {
+    method_map: t.Dict = {
         "comments": lambda session, status, logger: user_instance.comments(
             session=session,
             limit=limit,
@@ -699,7 +701,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     limit: int = ctx.obj["limit"]
 
     users_instance = Users()
-    method_map: Dict = {
+    method_map: t.Dict = {
         "all": lambda session, status, logger: users_instance.all(
             logger=logger,
             session=session,
@@ -736,33 +738,56 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 
 
 async def method_caller(
-    method: Callable,
-    **kwargs: Union[str, click.Context, aiohttp.ClientSession, Status],
+    method: t.Callable,
+    **kwargs: t.Union[str, click.Context, aiohttp.ClientSession, Status],
 ):
     """
-    Calls a method with the provided arguments.
+    Calls a method with the provided arguments, filtering only those
+    that are accepted by the method.
 
     :param method: A method to call.
-    :type method: Callable
-    :param kwargs: Additional keyword arguments for `export: str`,
-    `status: rich.status.Status`, `session: aiohttp.ClientSession`,
-    `argument: str` and `ctx: click.Context` .
+    :type method: t.Callable
+    :param kwargs: Additional keyword arguments such as:
+        - export: str
+        - status: rich.status.Status
+        - session: aiohttp.ClientSession
+        - argument: str
+        - ctx: click.Context
+        - logger: logging.Logger (optional)
     """
 
     session = kwargs.get("session")
     status = kwargs.get("status")
-
-    command: str = kwargs.get("ctx").command.name
+    ctx: click.Context = kwargs.get("ctx")
+    command: str = ctx.command.name
     argument: str = kwargs.get("argument")
 
-    response_data: Union[List, Dict, str, bool] = await method(
-        session=session, status=status, logger=kwargs.get("logger")
+    # 🔍 Filter out only those kwargs that the method actually accepts
+    sig = inspect.signature(method)
+    accepted_kwargs = {
+        key: value for key, value in kwargs.items() if key in sig.parameters
+    }
+
+    # 👇 Add direct assignment variables to the accepted args if needed
+    if "session" in sig.parameters:
+        accepted_kwargs["session"] = session
+    if "status" in sig.parameters:
+        accepted_kwargs["status"] = status
+    if "logger" in sig.parameters:
+        accepted_kwargs["logger"] = kwargs.get("logger")
+
+    # 🧠 Actually call the method
+    response_data: t.Union[t.List, t.Dict, str, bool, SimpleNamespace] = await method(
+        **accepted_kwargs
     )
+
     if response_data:
-        Render.panels(data=response_data)
+        if isinstance(response_data, list):
+            Render.posts(data=response_data)
+        elif isinstance(response_data, SimpleNamespace):
+            Render.subreddit_profile(data=response_data.data)
 
         if kwargs.get("export"):
-
             exports_child_dir: str = os.path.join(
                 Data.EXPORTS_PARENT_DIR,
                 "exports",
@@ -777,7 +802,7 @@ async def method_caller(
                 ],
             )
 
-            export_to: List = kwargs.get("export").split(",")
+            export_to: t.List[str] = kwargs.get("export").split(",")
             dataframe = Data.make_dataframe(data=response_data)
             Data.export_dataframe(
                 dataframe=dataframe,
@@ -789,21 +814,21 @@ async def method_caller(
 
 async def method_call_handler(
     ctx: click.Context,
-    method_map: Dict,
+    method_map: t.Dict,
     export: str,
-    **kwargs: Union[str, int, bool],
+    **kwargs: t.Union[str, int, bool],
 ):
     """
     Handle the method calls based on the provided arguments.
 
     :param ctx: The Click context object.
     :type ctx: click.Context
-    :param method_map: Dictionary mapping method names to their corresponding functions.
-    :type method_map: Dict
+    :param method_map: t.Dictionary mapping method names to their corresponding functions.
+    :type method_map: t.Dict
     :param export: The export format.
     :type export: str
     :param kwargs: Additional keyword arguments.
-    :type kwargs: Union[str, int, bool]
+    :type kwargs: t.Union[str, int, bool]
     """
 
     from toolbox.logging import logger
