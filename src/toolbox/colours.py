@@ -45,6 +45,9 @@ BOLD_WHITE_RESET: str = "[/bold white]"
 
 BLACK: str = "[black]"
 BLACK_RESET: str = "[/black]"
+
+BOLD_BLACK: str = "[bold black]"
+BOLD_BLACK_RESET: str = "[/bold black]"
 BOLD: str = "[bold]"
 BOLD_RESET: str = "[/bold]"
 
