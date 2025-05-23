@@ -8,12 +8,12 @@ from types import SimpleNamespace
 import aiohttp
 import rich_click as click
 from rich.status import Status
-
 from toolbox import colours
 from toolbox.data import Data
 from toolbox.logging import console
 from toolbox.render import Render
 from toolbox.runtime import Runtime
+
 from ..core.models import (
     reddit,
     Post,
@@ -343,7 +343,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
             sort=sort, limit=limit, status=status, logger=logger, session=session
         ),
         "subreddits": lambda session, status, logger: search_instance.subreddits(
-            sort=sort, limit=limit, logger=logger, session=session
+            sort=sort, limit=limit, logger=logger, session=session, status=status
         ),
         "users": lambda session, status, logger: search_instance.users(
             sort=sort, limit=limit, status=status, logger=logger, session=session
@@ -782,10 +782,7 @@ async def method_caller(
     )
 
     if response_data:
-        if isinstance(response_data, list):
-            Render.posts(data=response_data)
-        elif isinstance(response_data, SimpleNamespace):
-            Render.subreddit_profile(data=response_data.data)
+        Render.show(data=response_data)
 
         if kwargs.get("export"):
             exports_child_dir: str = os.path.join(
@@ -842,14 +839,11 @@ async def method_call_handler(
             try:
                 console.print(License.notice, justify="center")
                 with Status(
-                    status=f"Opening new ClientSession...",
-                    spinner="dots",
+                    status=f"Starting",
                     console=console,
                 ) as status:
                     async with aiohttp.ClientSession() as session:
-                        logger.info(
-                            f"{colours.BOLD_BLUE}◉{colours.BOLD_BLUE_RESET} ClientSession opened."
-                        )
+                        # logger.info(f"◉ Session opened.")
                         await Runtime.check_updates(session=session, status=status)
                         await reddit.infra_status(
                             session=session,
@@ -877,8 +871,9 @@ async def method_call_handler(
 
             finally:
                 elapsed_time = datetime.now() - start_time
-                logger.info(
-                    f"{colours.BOLD_YELLOW}◉{colours.BOLD_YELLOW_RESET} ClientSession closed. {elapsed_time.total_seconds():.2f} seconds elapsed."
+                console.print(
+                    f"{colours.ITALIC}END. {elapsed_time.total_seconds():.2f} seconds elapsed.{colours.RESET}",
+                    justify="center",
                 )
 
     if not is_valid_arg:

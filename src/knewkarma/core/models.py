@@ -1,14 +1,14 @@
+import typing as t
 from collections import Counter
 from logging import Logger
 from platform import python_version, platform
 from types import SimpleNamespace
-from typing import Literal, Union, Optional, List
 
 import aiohttp
-from rich.status import Status
-
 from engines import klaus
+from rich.status import Status
 from toolbox.render import Render
+
 from ..metadata.about import Project
 from ..metadata.version import Version
 
@@ -49,9 +49,9 @@ class Post:
     async def data(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves data for a Reddit post, excluding comments.
@@ -85,11 +85,11 @@ class Post:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves comments for a Reddit post.
 
@@ -138,11 +138,11 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the best posts.
 
@@ -183,11 +183,11 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the controversial posts.
 
@@ -229,11 +229,11 @@ class Posts:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         sort: reddit.SORT = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the front-page posts.
 
@@ -277,11 +277,11 @@ class Posts:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         sort: reddit.SORT = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the new posts.
 
@@ -324,11 +324,11 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the popular posts.
 
@@ -368,11 +368,11 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the rising posts.
 
@@ -430,11 +430,11 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves posts that match with the specified query.
 
@@ -474,11 +474,11 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves subreddits that match with the specified query.
 
@@ -518,11 +518,11 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves users that match with the specified query.
 
@@ -580,11 +580,11 @@ class Subreddit:
         comments_per_post: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves comments from a subreddit.
 
@@ -620,7 +620,7 @@ class Subreddit:
             sort=sort,
             timeframe=timeframe,
         )
-        all_comments: List = []
+        all_comments: t.List = []
         for post in posts:
             post = Post(
                 id=post.get("id"),
@@ -645,11 +645,11 @@ class Subreddit:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves posts from a subreddit.
 
@@ -691,9 +691,9 @@ class Subreddit:
     async def profile(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves a subreddit's profile data.
@@ -727,11 +727,11 @@ class Subreddit:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get posts that contain the specified query string from a subreddit.
 
@@ -776,10 +776,10 @@ class Subreddit:
     async def wikipages(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-    ) -> List[str]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+    ) -> t.List[str]:
         """
         Asynchronously get a subreddit's wiki pages.
 
@@ -813,9 +813,9 @@ class Subreddit:
         self,
         page_name: str,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
     ) -> SimpleNamespace:
         """
         Asynchronously get a subreddit's specified wiki page data.
@@ -854,11 +854,11 @@ class Subreddits:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get all subreddits.
 
@@ -900,11 +900,11 @@ class Subreddits:
     async def default(
         limit: int,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get default subreddits.
 
@@ -942,11 +942,11 @@ class Subreddits:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get new subreddits.
 
@@ -985,11 +985,11 @@ class Subreddits:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get popular subreddits.
 
@@ -1044,11 +1044,11 @@ class User:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get a user's comments.
 
@@ -1090,11 +1090,11 @@ class User:
     async def moderated_subreddits(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get subreddits moderated by user.
 
@@ -1130,11 +1130,11 @@ class User:
         self,
         limit: int,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get a user's most recent comments.
 
@@ -1175,11 +1175,11 @@ class User:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get a user's posts.
 
@@ -1221,9 +1221,9 @@ class User:
     async def profile(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
     ) -> SimpleNamespace:
         """
         Asynchronously get a user's profile data.
@@ -1256,11 +1256,11 @@ class User:
         top_n: int,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> Union[List[tuple[str, int]], None]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.Union[t.Dict[str, int], None]:
         """
         Asynchronously get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
 
@@ -1303,29 +1303,34 @@ class User:
             subreddit_counts: Counter = Counter(subreddits)
 
             # Get the most common subreddits
-            top_subreddits: List[tuple[str, int]] = subreddit_counts.most_common(top_n)
+            top_subreddits: t.List[tuple[str, int]] = subreddit_counts.most_common(
+                top_n
+            )
 
             # Prepare data for plotting
             subreddit_names = [subreddit[0] for subreddit in top_subreddits]
             subreddit_frequencies = [subreddit[1] for subreddit in top_subreddits]
 
-            Render.bar_chart(
-                data=dict(zip(subreddit_names, subreddit_frequencies)),
-                title=f"top {top_n}/{limit} subreddits analysis",
-                x_label="Subreddits",
-                y_label="Frequency",
-            )
+            data: t.Dict[str, int] = dict(zip(subreddit_names, subreddit_frequencies))
 
+            if logger or status:
+                Render.bar_chart(
+                    data=data,
+                    title=f"top {top_n}/{limit} subreddits analysis",
+                    x_label="Subreddits",
+                    y_label="Frequency",
+                )
+            return data
         return None
 
     async def username_available(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> Union[bool, None]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.Union[bool, None]:
         """
         Checks if the given username is available or taken.
 
@@ -1373,11 +1378,11 @@ class Users:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get new users.
 
@@ -1417,11 +1422,11 @@ class Users:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get popular users.
 
@@ -1461,11 +1466,11 @@ class Users:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[Status] = Status,
-        logger: Optional[Logger] = Logger,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get all users.
 

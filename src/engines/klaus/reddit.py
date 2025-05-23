@@ -3,10 +3,10 @@ from logging import Logger
 from types import SimpleNamespace
 
 import aiohttp
-from rich.status import Status
-
 from engines import karmakaze
+from rich.status import Status
 from toolbox import colours
+
 from .api import RedditRequestHandler, RedditEndpoints
 
 __all__ = ["RedditClient"]
@@ -48,7 +48,7 @@ class RedditClient:
     ) -> t.Union[t.List[t.Dict], None]:
 
         if status:
-            status.update(f"Checking Reddit's infrastructure status...")
+            status.update(f"Checking server status")
 
         status_response: t.Dict = await self.request_handler.send_request(
             session=session,
@@ -78,7 +78,7 @@ class RedditClient:
                 )
 
                 if status:
-                    status.update("Getting status components...")
+                    status.update("Getting status components")
 
                 status_components: t.Dict = await self.request_handler.send_request(
                     session=session,

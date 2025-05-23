@@ -2,11 +2,11 @@ import os
 import typing as t
 
 import aiohttp
-from rich.status import Status
-
 from knewkarma.core.models import reddit
 from knewkarma.metadata.about import Project
 from knewkarma.metadata.version import Version
+from rich.status import Status
+
 from . import colours
 from .logging import logger
 
@@ -36,7 +36,7 @@ class Runtime:
         """
 
         if status:
-            status.update("Checking for updates...")
+            status.update("Checking for updates")
 
         # Make a GET request to GitHub to get the project's latest release.
         response = await cls._REQ_HANDLER(
@@ -79,7 +79,7 @@ class Runtime:
 
             if update_level:
                 logger.info(
-                    f"{colours.BOLD_BLUE}⟳{colours.BOLD_BLUE_RESET} A new {update_level} update is available [{colours.CYAN}{remote_version_str}{colours.CYAN_RESET}]"
+                    f"🙭 {update_level} update is available [{colours.CYAN}{remote_version_str}{colours.CYAN_RESET}]"
                 )
 
     @staticmethod
