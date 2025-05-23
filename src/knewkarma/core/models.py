@@ -1,14 +1,16 @@
+import typing as t
 from collections import Counter
+from logging import Logger
 from platform import python_version, platform
 from types import SimpleNamespace
-from typing import Literal, Union, Optional, List
 
 import aiohttp
-import kraw
+from engines import klaus
+from rich.status import Status
+from toolbox.render import Render
 
-from .meta.about import Project
-from .meta.version import Version
-from .tools.general import General
+from ..metadata.about import Project
+from ..metadata.version import Version
 
 __all__ = [
     "reddit",
@@ -22,18 +24,10 @@ __all__ = [
 ]
 
 
-reddit = kraw.Reddit(
-    headers={
-        "User-Agent": f"{Project.name.replace(' ', '-')}/{Version.release} "
-        f"(Python {python_version} on {platform}; +{Project.documentation})"
-    },
+reddit = klaus.RedditClient(
+    user_agent=f"{Project.name.replace(' ', '-')}/{Version.release} "
+    f"(Python {python_version} on {platform}; +{Project.documentation})"
 )
-
-
-class Comment:
-    """Represents a Reddit comment and provides methods for interacting with it."""
-
-    pass
 
 
 class Post:
@@ -55,9 +49,9 @@ class Post:
     async def data(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves data for a Reddit post, excluding comments.
@@ -91,11 +85,11 @@ class Post:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves comments for a Reddit post.
 
@@ -113,8 +107,8 @@ class Post:
         :type timeframe:
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
         :rtype: List[SimpleNamespace]
         """
@@ -123,7 +117,7 @@ class Post:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="post",
             id=self._id,
@@ -144,11 +138,11 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the best posts.
 
@@ -164,8 +158,8 @@ class Posts:
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -174,7 +168,7 @@ class Posts:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="best",
             limit=limit,
@@ -189,11 +183,11 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the controversial posts.
 
@@ -209,8 +203,8 @@ class Posts:
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -219,7 +213,7 @@ class Posts:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="controversial",
             limit=limit,
@@ -235,11 +229,11 @@ class Posts:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         sort: reddit.SORT = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the front-page posts.
 
@@ -257,8 +251,8 @@ class Posts:
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -267,7 +261,7 @@ class Posts:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="front_page",
             limit=limit,
@@ -283,11 +277,11 @@ class Posts:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         sort: reddit.SORT = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the new posts.
 
@@ -305,8 +299,8 @@ class Posts:
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -315,7 +309,7 @@ class Posts:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="new",
             limit=limit,
@@ -330,11 +324,11 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the popular posts.
 
@@ -350,8 +344,8 @@ class Posts:
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -359,7 +353,7 @@ class Posts:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="popular",
             limit=limit,
@@ -374,11 +368,11 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves the rising posts.
 
@@ -394,8 +388,8 @@ class Posts:
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -404,7 +398,7 @@ class Posts:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="rising",
             limit=limit,
@@ -436,11 +430,11 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves posts that match with the specified query.
 
@@ -455,8 +449,8 @@ class Search:
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -465,7 +459,7 @@ class Search:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="posts",
             query=self._query,
@@ -480,11 +474,11 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves subreddits that match with the specified query.
 
@@ -499,8 +493,8 @@ class Search:
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed subreddit data.
         :rtype: List[SimpleNamespace]
         """
@@ -509,7 +503,7 @@ class Search:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="subreddits",
             query=self._query,
@@ -524,11 +518,11 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves users that match with the specified query.
 
@@ -544,8 +538,8 @@ class Search:
         :type sort: SORT, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed user data.
         :rtype: List[SimpleNamespace]
         """
@@ -554,7 +548,7 @@ class Search:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="users",
             query=self._query,
@@ -586,11 +580,11 @@ class Subreddit:
         comments_per_post: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves comments from a subreddit.
 
@@ -610,8 +604,8 @@ class Subreddit:
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed comment data.
         :rtype: List[SimpleNamespace]
         """
@@ -620,13 +614,13 @@ class Subreddit:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             limit=posts_limit,
             sort=sort,
             timeframe=timeframe,
         )
-        all_comments: List = []
+        all_comments: t.List = []
         for post in posts:
             post = Post(
                 id=post.get("id"),
@@ -651,11 +645,11 @@ class Subreddit:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously retrieves posts from a subreddit.
 
@@ -673,8 +667,8 @@ class Subreddit:
         :type timeframe: reddit.TIMEFRAME, optional
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing parsed post data.
         :rtype: List[SimpleNamespace]
         """
@@ -683,7 +677,7 @@ class Subreddit:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="subreddit",
             subreddit=self._name,
@@ -697,9 +691,9 @@ class Subreddit:
     async def profile(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
     ) -> SimpleNamespace:
         """
         Asynchronously retrieves a subreddit's profile data.
@@ -733,11 +727,11 @@ class Subreddit:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get posts that contain the specified query string from a subreddit.
 
@@ -757,8 +751,8 @@ class Subreddit:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing post data.
         :rtype: List[SimpleNamespace]
         """
@@ -767,7 +761,7 @@ class Subreddit:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="search_subreddit",
             subreddit=self._name,
@@ -782,10 +776,10 @@ class Subreddit:
     async def wikipages(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-    ) -> List[str]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+    ) -> t.List[str]:
         """
         Asynchronously get a subreddit's wiki pages.
 
@@ -806,8 +800,8 @@ class Subreddit:
                 f"Retrieving wiki pages from subreddit ({self._name})",
             )
 
-        pages = await reddit.connection.send_request(
-            endpoint=f"{reddit.connection.endpoints.subreddit}/{self._name}/wiki/pages.json",
+        pages = await reddit.request_handler.send_request(
+            endpoint=f"{reddit.api_endpoints.SUBREDDIT}/{self._name}/wiki/pages.json",
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
@@ -819,9 +813,9 @@ class Subreddit:
         self,
         page_name: str,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
     ) -> SimpleNamespace:
         """
         Asynchronously get a subreddit's specified wiki page data.
@@ -860,11 +854,11 @@ class Subreddits:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get all subreddits.
 
@@ -880,8 +874,8 @@ class Subreddits:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing subreddit data.
         :rtype: List[SimpleNamespace]
 
@@ -893,7 +887,7 @@ class Subreddits:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="all",
             limit=limit,
@@ -906,11 +900,11 @@ class Subreddits:
     async def default(
         limit: int,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get default subreddits.
 
@@ -924,8 +918,8 @@ class Subreddits:
         :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing subreddit data.
         :rtype: List[SimpleNamespace]
         """
@@ -934,7 +928,7 @@ class Subreddits:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="default",
             timeframe="all",
@@ -948,11 +942,11 @@ class Subreddits:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get new subreddits.
 
@@ -968,8 +962,8 @@ class Subreddits:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing subreddit data.
         :rtype: List[SimpleNamespace]
         """
@@ -977,7 +971,7 @@ class Subreddits:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="new",
             limit=limit,
@@ -991,11 +985,11 @@ class Subreddits:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get popular subreddits.
 
@@ -1011,8 +1005,8 @@ class Subreddits:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing subreddit data.
         :rtype: List[SimpleNamespace]
         """
@@ -1021,7 +1015,7 @@ class Subreddits:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="popular",
             limit=limit,
@@ -1050,11 +1044,11 @@ class User:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get a user's comments.
 
@@ -1072,8 +1066,8 @@ class User:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing comment data.
         :rtype: List[SimpleNamespace]
         """
@@ -1082,7 +1076,7 @@ class User:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="user",
             username=self._name,
@@ -1096,11 +1090,11 @@ class User:
     async def moderated_subreddits(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get subreddits moderated by user.
 
@@ -1112,8 +1106,8 @@ class User:
         :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing subreddit data.
         :rtype: List[SimpleNamespace]
         """
@@ -1122,7 +1116,7 @@ class User:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="user_moderated",
             timeframe="all",
@@ -1136,11 +1130,11 @@ class User:
         self,
         limit: int,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get a user's most recent comments.
 
@@ -1154,8 +1148,8 @@ class User:
         :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing data about a recent comment.
         :rtype: List[SimpleNamespace]
         """
@@ -1164,7 +1158,7 @@ class User:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="user_overview",
             limit=limit,
@@ -1181,11 +1175,11 @@ class User:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get a user's posts.
 
@@ -1203,8 +1197,8 @@ class User:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing post data.
         :rtype: List[SimpleNamespace]
         """
@@ -1213,7 +1207,7 @@ class User:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="user",
             limit=limit,
@@ -1227,9 +1221,9 @@ class User:
     async def profile(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
     ) -> SimpleNamespace:
         """
         Asynchronously get a user's profile data.
@@ -1261,13 +1255,12 @@ class User:
         session: aiohttp.ClientSession,
         top_n: int,
         limit: int,
-        filename: str = None,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> Union[List[tuple[str, int]], None]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.Union[t.Dict[str, int], None]:
         """
         Asynchronously get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
 
@@ -1281,21 +1274,19 @@ class User:
         :type top_n: int
         :param limit: Maximum number of posts to scrape.
         :type limit: int
-        :param filename: Filename to which the analysis will be saved.
-        :type filename: str
         :param timeframe: Timeframe from which to get posts.
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         """
 
         posts = await reddit.posts(
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="user",
             limit=limit,
@@ -1306,39 +1297,40 @@ class User:
 
         if posts:
             # Extract subreddit names
-            subreddits = [post.get("data", {}).get("subreddit") for post in posts]
+            subreddits = [post.data.subreddit for post in posts]
 
             # Count the occurrences of each subreddit
             subreddit_counts: Counter = Counter(subreddits)
 
             # Get the most common subreddits
-            top_subreddits: List[tuple[str, int]] = subreddit_counts.most_common(top_n)
+            top_subreddits: t.List[tuple[str, int]] = subreddit_counts.most_common(
+                top_n
+            )
 
             # Prepare data for plotting
             subreddit_names = [subreddit[0] for subreddit in top_subreddits]
             subreddit_frequencies = [subreddit[1] for subreddit in top_subreddits]
 
-            if General.is_matplotlib_installed():
-                General().plot_bar_chart(
-                    data=dict(zip(subreddit_names, subreddit_frequencies)),
+            data: t.Dict[str, int] = dict(zip(subreddit_names, subreddit_frequencies))
+
+            if logger or status:
+                Render.bar_chart(
+                    data=data,
                     title=f"top {top_n}/{limit} subreddits analysis",
-                    xlabel="Subreddits",
-                    ylabel="Frequency",
-                    figure_size=(top_n + 10, 5),
-                    colours=["lightblue"] * top_n,
-                    filename=f"{filename + '_' if filename else ''}top_{top_n}_of_{limit}_subreddits",
+                    x_label="Subreddits",
+                    y_label="Frequency",
                 )
-            else:
-                return top_subreddits
+            return data
+        return None
 
     async def username_available(
         self,
         session: aiohttp.ClientSession,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> bool:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.Union[bool, None]:
         """
         Checks if the given username is available or taken.
 
@@ -1350,8 +1342,8 @@ class User:
         :type proxy_auth: aiohttp.BasicAuth
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: `True` if the given username is available. Otherwise, `False`.
         :rtype: bool
         """
@@ -1359,21 +1351,23 @@ class User:
         if status:
             status.update(f"Checking username availability: {self._name}")
 
-        response: bool = await reddit.connection.send_request(
+        response: bool = await reddit.request_handler.send_request(
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            endpoint=reddit.connection.endpoints.username_available,
+            endpoint=reddit.api_endpoints.USERNAME_AVAILABLE,
             params={"user": self._name},
         )
 
-        if status and message:
+        if status and logger:
             if response:
-                message.ok(f"Username ({self._name}) is available")
+                logger.info(f"Username ({self._name}) is available")
             else:
-                message.warning(f"Username ({self._name}) is already taken")
+                logger.warning(f"Username ({self._name}) is already taken")
         else:
             return response
+
+        return None
 
 
 class Users:
@@ -1384,11 +1378,11 @@ class Users:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get new users.
 
@@ -1404,8 +1398,8 @@ class Users:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing a user's data.
         :rtype: List[SimpleNamespace]
         """
@@ -1414,7 +1408,7 @@ class Users:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="new",
             limit=limit,
@@ -1428,11 +1422,11 @@ class Users:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get popular users.
 
@@ -1448,8 +1442,8 @@ class Users:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing a user's data.
         :rtype: List[SimpleNamespace]
         """
@@ -1458,7 +1452,7 @@ class Users:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="popular",
             limit=limit,
@@ -1472,11 +1466,11 @@ class Users:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: Optional[str] = None,
-        proxy_auth: Optional[aiohttp.BasicAuth] = None,
-        status: Optional[kraw.dummies.Status] = kraw.dummies.Status,
-        message: Optional[kraw.dummies.Message] = kraw.dummies.Message,
-    ) -> List[SimpleNamespace]:
+        proxy: t.Optional[str] = None,
+        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
+        status: t.Optional[Status] = Status,
+        logger: t.Optional[Logger] = Logger,
+    ) -> t.List[SimpleNamespace]:
         """
         Asynchronously get all users.
 
@@ -1492,8 +1486,8 @@ class Users:
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
-        :param message:
-        :type message: kraw.dummies.Message
+        :param logger:
+        :type logger: Logger
         :return: A list of `SimpleNamespace` objects, each containing a user's data.
         :rtype: List[SimpleNamespace]
         """
@@ -1502,7 +1496,7 @@ class Users:
             session=session,
             proxy=proxy,
             proxy_auth=proxy_auth,
-            message=message,
+            logger=logger,
             status=status,
             kind="all",
             limit=limit,
