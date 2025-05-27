@@ -1,14 +1,12 @@
 import typing as t
-from collections import Counter
 from logging import Logger
 from platform import python_version, platform
 from types import SimpleNamespace
 
 import aiohttp
-from engines import klaus
 from rich.status import Status
-from toolbox.render import Render
 
+from engines import snoopy
 from ..metadata.about import Project
 from ..metadata.version import Version
 
@@ -19,12 +17,11 @@ __all__ = [
     "Search",
     "Subreddit",
     "Subreddits",
-    "User",
     "Users",
 ]
 
 
-reddit = klaus.RedditClient(
+reddit = snoopy.RedditClient(
     user_agent=f"{Project.name.replace(' ', '-')}/{Version.release} "
     f"(Python {python_version} on {platform}; +{Project.documentation})"
 )
@@ -49,8 +46,6 @@ class Post:
     async def data(
         self,
         session: aiohttp.ClientSession,
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
     ) -> SimpleNamespace:
         """
@@ -58,10 +53,10 @@ class Post:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A `SimpleNamespace` object containing parsed post data.
@@ -70,8 +65,6 @@ class Post:
 
         post_data = await reddit.post(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             status=status,
             id=self._id,
             subreddit=self._subreddit,
@@ -85,8 +78,6 @@ class Post:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -95,10 +86,10 @@ class Post:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of comments to retrieve.
         :type limit: int
         :param sort: The sorting criterion for the comments. Defaults to "all".
@@ -115,8 +106,6 @@ class Post:
 
         comments_data = await reddit.comments(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="post",
@@ -138,8 +127,6 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -148,10 +135,10 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -166,8 +153,6 @@ class Posts:
 
         best_posts = await reddit.posts(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="best",
@@ -183,8 +168,6 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -193,10 +176,10 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -211,8 +194,6 @@ class Posts:
 
         controversial_posts = await reddit.posts(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="controversial",
@@ -229,8 +210,6 @@ class Posts:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         sort: reddit.SORT = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -239,10 +218,10 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -259,8 +238,6 @@ class Posts:
 
         front_page_posts = await reddit.posts(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="front_page",
@@ -277,8 +254,6 @@ class Posts:
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
         sort: reddit.SORT = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -287,10 +262,10 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -307,8 +282,6 @@ class Posts:
 
         new_posts = await reddit.posts(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="new",
@@ -324,8 +297,6 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -334,10 +305,10 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -351,8 +322,6 @@ class Posts:
         """
         popular_posts = await reddit.posts(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="popular",
@@ -368,8 +337,6 @@ class Posts:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -378,10 +345,10 @@ class Posts:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
         :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -396,8 +363,6 @@ class Posts:
 
         rising_posts = await reddit.posts(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="rising",
@@ -430,8 +395,6 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -439,10 +402,10 @@ class Search:
         Asynchronously retrieves posts that match with the specified query.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession:param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+                :type session: aiohttp.ClientSession
+
+
+
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param sort: Sorting criterion for posts. Defaults to "all".
@@ -457,8 +420,6 @@ class Search:
 
         search_results = await reddit.search(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="posts",
@@ -474,8 +435,6 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -483,10 +442,10 @@ class Search:
         Asynchronously retrieves subreddits that match with the specified query.
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession:param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+                :type session: aiohttp.ClientSession
+
+
+
         :param limit: Maximum number of subreddits to retrieve.
         :type limit: int
         :param sort: Sorting criterion for subreddits. Defaults to "all".
@@ -501,8 +460,6 @@ class Search:
 
         search_results = await reddit.search(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="subreddits",
@@ -518,8 +475,6 @@ class Search:
         session: aiohttp.ClientSession,
         limit: int,
         sort: reddit.SORT = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -528,10 +483,10 @@ class Search:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of users to retrieve.
         :type limit: int
         :param sort: Sorting criterion for users. Defaults to "all".
@@ -546,8 +501,6 @@ class Search:
 
         search_results = await reddit.search(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="users",
@@ -580,8 +533,6 @@ class Subreddit:
         comments_per_post: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -590,10 +541,10 @@ class Subreddit:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param posts_limit: Maximum number of posts to retrieve comments from.
         :type posts_limit: int
         :param comments_per_post: Maximum number of comments to retrieve per post.
@@ -612,8 +563,6 @@ class Subreddit:
 
         posts = await self.posts(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             limit=posts_limit,
@@ -628,8 +577,6 @@ class Subreddit:
             )
             post_comments = await post.comments(
                 session=session,
-                proxy=proxy,
-                proxy_auth=proxy_auth,
                 limit=comments_per_post,
                 sort=sort,
                 status=status,
@@ -645,8 +592,6 @@ class Subreddit:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -655,10 +600,10 @@ class Subreddit:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param sort: Sorting criterion for the posts. Defaults to "all".
@@ -675,8 +620,6 @@ class Subreddit:
 
         subreddit_posts = await reddit.posts(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="subreddit",
@@ -691,8 +634,6 @@ class Subreddit:
     async def profile(
         self,
         session: aiohttp.ClientSession,
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
     ) -> SimpleNamespace:
         """
@@ -700,10 +641,10 @@ class Subreddit:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A `SimpleNamespace` object containing the parsed subreddit profile data.
@@ -712,8 +653,6 @@ class Subreddit:
 
         subreddit_profile = await reddit.subreddit(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             status=status,
             name=self._name,
         )
@@ -727,8 +666,6 @@ class Subreddit:
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -737,10 +674,10 @@ class Subreddit:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param query: Search query.
         :type query: str
         :param limit: Maximum number of posts to return.
@@ -759,8 +696,6 @@ class Subreddit:
 
         search_results = await reddit.posts(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="search_subreddit",
@@ -776,8 +711,6 @@ class Subreddit:
     async def wikipages(
         self,
         session: aiohttp.ClientSession,
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
     ) -> t.List[str]:
         """
@@ -785,10 +718,10 @@ class Subreddit:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A list of strings, each representing a wiki page.
@@ -803,8 +736,6 @@ class Subreddit:
         pages = await reddit.request_handler.send_request(
             endpoint=f"{reddit.api_endpoints.SUBREDDIT}/{self._name}/wiki/pages.json",
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
         )
 
         return pages.get("data")
@@ -813,8 +744,6 @@ class Subreddit:
         self,
         page_name: str,
         session: aiohttp.ClientSession,
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
     ) -> SimpleNamespace:
         """
@@ -824,10 +753,10 @@ class Subreddit:
         :type page_name: str
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A `SimpleNamespace` object containing the parsed wiki page data.
@@ -836,8 +765,6 @@ class Subreddit:
 
         wiki_page = await reddit.wiki_page(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             status=status,
             name=page_name,
             subreddit=self._name,
@@ -854,8 +781,6 @@ class Subreddits:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -864,10 +789,10 @@ class Subreddits:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get all subreddits.
@@ -885,8 +810,6 @@ class Subreddits:
 
         all_subreddits = await reddit.subreddits(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="all",
@@ -900,8 +823,6 @@ class Subreddits:
     async def default(
         limit: int,
         session: aiohttp.ClientSession,
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -912,10 +833,10 @@ class Subreddits:
         :type limit: int
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :param logger:
@@ -926,8 +847,6 @@ class Subreddits:
 
         default_subreddits = await reddit.subreddits(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="default",
@@ -942,8 +861,6 @@ class Subreddits:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -952,10 +869,10 @@ class Subreddits:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new subreddits.
@@ -969,8 +886,6 @@ class Subreddits:
         """
         new_subreddits = await reddit.subreddits(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="new",
@@ -985,8 +900,6 @@ class Subreddits:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -995,10 +908,10 @@ class Subreddits:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular subreddits.
@@ -1013,8 +926,6 @@ class Subreddits:
 
         popular_subreddits = await reddit.subreddits(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="popular",
@@ -1025,351 +936,6 @@ class Subreddits:
         return popular_subreddits
 
 
-class User:
-    """Represents a Reddit user and provides methods for getting data from the specified user."""
-
-    def __init__(self, name: str):
-        """
-        Initialises a `User()` instance for getting a user's `profile`, `posts` and `comments` data.
-
-        :param name: Username to get data from.
-        :type name: str
-        """
-
-        self._name = name
-
-    async def comments(
-        self,
-        session: aiohttp.ClientSession,
-        limit: int,
-        sort: reddit.SORT = "all",
-        timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
-    ) -> t.List[SimpleNamespace]:
-        """
-        Asynchronously get a user's comments.
-
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
-        :param limit: Maximum number of comments to return.
-        :type limit: int
-        :param sort: Sort criterion for the comments.
-        :type sort: str
-        :param timeframe: Timeframe from which tyo get comments.
-        :type timeframe: Literal[str]
-        :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
-        :type status: Optional[rich.status.Status]
-        :param logger:
-        :type logger: Logger
-        :return: A list of `SimpleNamespace` objects, each containing comment data.
-        :rtype: List[SimpleNamespace]
-        """
-
-        user_comments = await reddit.comments(
-            session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
-            logger=logger,
-            status=status,
-            kind="user",
-            username=self._name,
-            limit=limit,
-            sort=sort,
-            timeframe=timeframe,
-        )
-
-        return user_comments
-
-    async def moderated_subreddits(
-        self,
-        session: aiohttp.ClientSession,
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
-    ) -> t.List[SimpleNamespace]:
-        """
-        Asynchronously get subreddits moderated by user.
-
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
-        :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
-        :type status: Optional[rich.status.Status]
-        :param logger:
-        :type logger: Logger
-        :return: A list of `SimpleNamespace` objects, each containing subreddit data.
-        :rtype: List[SimpleNamespace]
-        """
-
-        subreddits = await reddit.subreddits(
-            session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
-            logger=logger,
-            status=status,
-            kind="user_moderated",
-            timeframe="all",
-            username=self._name,
-            limit=0,
-        )
-
-        return subreddits
-
-    async def overview(
-        self,
-        limit: int,
-        session: aiohttp.ClientSession,
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
-    ) -> t.List[SimpleNamespace]:
-        """
-        Asynchronously get a user's most recent comments.
-
-        :param limit: Maximum number of comments to return.
-        :type limit: int
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
-        :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
-        :type status: Optional[rich.status.Status]
-        :param logger:
-        :type logger: Logger
-        :return: A list of `SimpleNamespace` objects, each containing data about a recent comment.
-        :rtype: List[SimpleNamespace]
-        """
-
-        user_overview = await reddit.comments(
-            session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
-            logger=logger,
-            status=status,
-            kind="user_overview",
-            limit=limit,
-            sort="all",
-            timeframe="all",
-            username=self._name,
-        )
-
-        return user_overview
-
-    async def posts(
-        self,
-        session: aiohttp.ClientSession,
-        limit: int,
-        sort: reddit.SORT = "all",
-        timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
-    ) -> t.List[SimpleNamespace]:
-        """
-        Asynchronously get a user's posts.
-
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
-        :param limit: Maximum number of posts to return.
-        :type limit: int
-        :param sort: Sort criterion for the posts.
-        :type sort: str
-        :param timeframe: Timeframe from which to get posts.
-        :type timeframe: Literal[str]
-        :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
-        :type status: Optional[rich.status.Status]
-        :param logger:
-        :type logger: Logger
-        :return: A list of `SimpleNamespace` objects, each containing post data.
-        :rtype: List[SimpleNamespace]
-        """
-
-        user_posts = await reddit.posts(
-            session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
-            logger=logger,
-            status=status,
-            kind="user",
-            limit=limit,
-            sort=sort,
-            timeframe=timeframe,
-            username=self._name,
-        )
-
-        return user_posts
-
-    async def profile(
-        self,
-        session: aiohttp.ClientSession,
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
-        status: t.Optional[Status] = Status,
-    ) -> SimpleNamespace:
-        """
-        Asynchronously get a user's profile data.
-
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
-        :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
-        :type status: Optional[rich.status.Status]
-        :return: A SimpleNamespace object containing user profile data.
-        :rtype: SimpleNamespace
-        """
-
-        user_profile = await reddit.user(
-            session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
-            status=status,
-            name=self._name,
-        )
-
-        return user_profile
-
-    async def top_subreddits(
-        self,
-        session: aiohttp.ClientSession,
-        top_n: int,
-        limit: int,
-        timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
-    ) -> t.Union[t.Dict[str, int], None]:
-        """
-        Asynchronously get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
-
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
-        :param top_n: Communities arranging number.
-        :type top_n: int
-        :param limit: Maximum number of posts to scrape.
-        :type limit: int
-        :param timeframe: Timeframe from which to get posts.
-        :type timeframe: Literal[str]
-        :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
-        :type status: Optional[rich.status.Status]
-        :param logger:
-        :type logger: Logger
-        """
-
-        posts = await reddit.posts(
-            session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
-            logger=logger,
-            status=status,
-            kind="user",
-            limit=limit,
-            sort="all",
-            timeframe=timeframe,
-            username=self._name,
-        )
-
-        if posts:
-            # Extract subreddit names
-            subreddits = [post.data.subreddit for post in posts]
-
-            # Count the occurrences of each subreddit
-            subreddit_counts: Counter = Counter(subreddits)
-
-            # Get the most common subreddits
-            top_subreddits: t.List[tuple[str, int]] = subreddit_counts.most_common(
-                top_n
-            )
-
-            # Prepare data for plotting
-            subreddit_names = [subreddit[0] for subreddit in top_subreddits]
-            subreddit_frequencies = [subreddit[1] for subreddit in top_subreddits]
-
-            data: t.Dict[str, int] = dict(zip(subreddit_names, subreddit_frequencies))
-
-            if logger or status:
-                Render.bar_chart(
-                    data=data,
-                    title=f"top {top_n}/{limit} subreddits analysis",
-                    x_label="Subreddits",
-                    y_label="Frequency",
-                )
-            return data
-        return None
-
-    async def username_available(
-        self,
-        session: aiohttp.ClientSession,
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
-    ) -> t.Union[bool, None]:
-        """
-        Checks if the given username is available or taken.
-
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
-        :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
-        :type status: Optional[rich.status.Status]
-        :param logger:
-        :type logger: Logger
-        :return: `True` if the given username is available. Otherwise, `False`.
-        :rtype: bool
-        """
-
-        if status:
-            status.update(f"Checking username availability: {self._name}")
-
-        response: bool = await reddit.request_handler.send_request(
-            session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
-            endpoint=reddit.api_endpoints.USERNAME_AVAILABLE,
-            params={"user": self._name},
-        )
-
-        if status and logger:
-            if response:
-                logger.info(f"Username ({self._name}) is available")
-            else:
-                logger.warning(f"Username ({self._name}) is already taken")
-        else:
-            return response
-
-        return None
-
-
 class Users:
     """Represents Reddit users and provides methods for getting related data."""
 
@@ -1378,8 +944,6 @@ class Users:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -1388,10 +952,10 @@ class Users:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of new users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new posts.
@@ -1406,8 +970,6 @@ class Users:
 
         new_users = await reddit.users(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="new",
@@ -1422,8 +984,6 @@ class Users:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -1432,10 +992,10 @@ class Users:
 
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param limit: Maximum number of popular users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular posts.
@@ -1450,8 +1010,6 @@ class Users:
 
         popular_users = await reddit.users(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="popular",
@@ -1466,8 +1024,6 @@ class Users:
         session: aiohttp.ClientSession,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        proxy: t.Optional[str] = None,
-        proxy_auth: t.Optional[aiohttp.BasicAuth] = None,
         status: t.Optional[Status] = Status,
         logger: t.Optional[Logger] = Logger,
     ) -> t.List[SimpleNamespace]:
@@ -1478,10 +1034,10 @@ class Users:
         :type limit: int
         :param session: An `aiohttp.ClientSession` for making the HTTP request.
                 :type session: aiohttp.ClientSession
-        :param proxy:
-        :type proxy: str
-        :param proxy_auth:
-        :type proxy_auth: aiohttp.BasicAuth
+
+
+
+
         :param timeframe: Timeframe from which to get all posts.
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
@@ -1494,8 +1050,6 @@ class Users:
 
         all_users = await reddit.users(
             session=session,
-            proxy=proxy,
-            proxy_auth=proxy_auth,
             logger=logger,
             status=status,
             kind="all",

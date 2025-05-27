@@ -1,14 +1,15 @@
 import typing as t
 from datetime import datetime, timezone
-from types import SimpleNamespace
 
-from engines.klaus import RedditEndpoints
 from rich.console import RenderableType, Group
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
+
+from engines.karmakaze.schemas import User, Subreddit, WikiPage, Comment, Post
+from engines.snoopy import RedditEndpoints
 from toolbox import colours
 from toolbox.checkers import Checkers
 from toolbox.logging import console
@@ -29,18 +30,21 @@ class Render:
         )
 
     @classmethod
-    def footer_table(cls, footer_data: t.Dict) -> Table:
-        table = Table.grid(padding=(0, 4))
-        table.add_row(
-            *[
-                Text.from_markup(
-                    f"{colours.BOLD}{value}{colours.RESET}\n[dim]{label}[/]"
-                )
-                for label, value in footer_data.items()
-            ]
-        )
+    def footer_table(cls, footer_data: t.Dict) -> t.Union[Table, None]:
+        if footer_data:
+            table = Table.grid(padding=(0, 4))
+            table.add_row(
+                *[
+                    Text.from_markup(
+                        f"{colours.BOLD}{value}{colours.RESET}\n[dim]{label}[/]"
+                    )
+                    for label, value in footer_data.items()
+                ]
+            )
 
-        return table
+            return table
+        
+        return None
 
     @classmethod
     def timestamp_to_relative(cls, unix_timestamp: float) -> str:
@@ -87,30 +91,45 @@ class Render:
             return f"{seconds // year}y ago"
 
     @classmethod
-    def show(cls, data: t.Any):
+    def show(
+        cls,
+        data: t.Union[
+            t.List[t.Union[User, Post, Subreddit, Comment, WikiPage]],
+            User,
+            Post,
+            Subreddit,
+            Comment,
+            WikiPage,
+        ],
+    ):
         """
         Dynamically dispatch the appropriate rendering method based on data type.
         """
+        # Handle list input
         if isinstance(data, list) and data:
             item = data[0]
-            # Guess based on item shape
-            if hasattr(item.data, "selftext") and hasattr(item.data, "title"):
+            if isinstance(item, Post):
                 return cls.posts(data)
-            elif hasattr(item.data, "body"):
+            elif isinstance(item, Comment):
                 return cls.comments(data)
-            elif hasattr(item.data, "link_karma"):
+            elif isinstance(item, User):
                 return cls.users(data)
-            elif hasattr(item, "data") and hasattr(item.data, "subreddit_type"):
+            elif isinstance(item, Subreddit):
                 return cls.subreddits(data)
-        elif isinstance(data, SimpleNamespace):
-            if hasattr(data.data, "selftext") and hasattr(data.data, "title"):
-                return cls.post(data)
-            elif hasattr(data.data, "body"):
-                return cls.comment(data)
-            elif hasattr(data.data, "link_karma"):
-                return cls.user(data)
-            elif hasattr(data, "data") and hasattr(data.data, "subreddit_type"):
-                return cls.subreddit(data.data)
+            # elif isinstance(item, WikiPage):
+            #    return cls.wiki_pages(data)
+
+        # Handle single item input
+        elif isinstance(data, Post):
+            return cls.post(data)
+        elif isinstance(data, Comment):
+            return cls.comment(data)
+        elif isinstance(data, User):
+            return cls.user(data)
+        elif isinstance(data, Subreddit):
+            return cls.subreddit(data)
+        # elif isinstance(data, WikiPage):
+        #    return cls.wiki_page(data)
 
         console.print(
             "[bold red]Unable to determine render type for the given data.[/]"
@@ -118,29 +137,20 @@ class Render:
         return None
 
     @classmethod
-    def user(cls, data: SimpleNamespace, print_panel: bool = True):
-        user = getattr(data, "data", None)
-        subreddit = getattr(user, "subreddit", None)
-
-        if (
-            not user
-            or not subreddit
-            or not cls.has_attrs(
-                user, ["name", "created", "link_karma", "comment_karma"]
-            )
-        ):
-            return None
-
-        description = getattr(subreddit, "public_description", "")
+    def user(cls, data: User, print_panel: bool = True):
+        subreddit = data.subreddit
 
         header_content = (
-            f"{colours.BOLD}{user.name}{colours.RESET} · "
+            f"{colours.BOLD}{data.name}{colours.RESET} · "
             f"{colours.BOLD_BLUE}[link={RedditEndpoints.BASE}{subreddit.url}]"
             f"View on Reddit[/link]{colours.BOLD_BLUE_RESET}\n"
             f"{subreddit.display_name_prefixed} · "
-            f"{colours.BOLD_BLACK}{cls.timestamp_to_relative(unix_timestamp=user.created)}"
+            f"{colours.BOLD_BLACK}{cls.timestamp_to_relative(unix_timestamp=data.created)}"
             f"{colours.BOLD_BLACK_RESET}"
         )
+
+        if data.is_suspended:
+            header_content = f"{colours.BOLD_YELLOW}SUSPENDED{colours.BOLD_YELLOW_RESET} · {header_content}"
 
         if subreddit.over_18:
             header_content = (
@@ -148,20 +158,20 @@ class Render:
             )
 
         footer_data = {
-            "Post Karma": user.link_karma,
-            "Comment Karma": user.comment_karma,
+            "Post Karma": data.link_karma,
+            "Comment Karma": data.comment_karma,
             "Total Karma": (
-                user.link_karma + user.comment_karma
-                if not hasattr(user, "total_karma")
-                else user.link_karma + user.comment_karma
+                data.link_karma + data.comment_karma
+                if not hasattr(data, "total_karma")
+                else data.link_karma + data.comment_karma
             ),
         }
 
         footer_content = cls.footer_table(footer_data=footer_data)
 
         panel_parts = []
-        if description:
-            panel_parts.append(description)
+        if subreddit.public_description:
+            panel_parts.append(subreddit.public_description)
 
         text = "\n\n".join(panel_parts)
 
@@ -174,7 +184,7 @@ class Render:
         )
 
     @classmethod
-    def users(cls, data: t.List[SimpleNamespace], print_panel: bool = True):
+    def users(cls, data: t.List[User], print_panel: bool = True):
         panels = []
 
         for user_data in data:
@@ -189,28 +199,23 @@ class Render:
             console.print("[dim]No valid users to display.[/]")
 
     @classmethod
-    def comment(cls, data: SimpleNamespace, print_panel: bool = True):
-        comment = data.data
-
-        if not comment or not cls.has_attrs(
-            comment, ["author", "body", "created", "permalink", "ups", "downs"]
-        ):
-            return None
-
+    def comment(cls, data: Comment, print_panel: bool = True):
         panel_parts: t.List[str] = []
 
-        author: str = getattr(comment, "author", "")
-        body: str = getattr(comment, "body", "")
-        subreddit: str = getattr(comment, "subreddit_name_prefixed", "")
+        author: str = getattr(data, "author", "")
+        body: str = getattr(data, "body", "")
+        subreddit: str = getattr(data, "subreddit_name_prefixed", "")
         subreddit = f"self" if subreddit.lower() == f"u/{author.lower()}" else subreddit
-        permalink: str = getattr(comment, "permalink", "")
-        created: int = getattr(comment, "created", 0)
-        upvotes: int = getattr(comment, "ups", 0)
-        downvotes: int = getattr(comment, "downs", 0)
-        replies: list = getattr(comment, "replies", [])
+        permalink: str = getattr(data, "permalink", "")
+        created: int = getattr(data, "created", 0)
+        upvotes: int = getattr(data, "ups", 0)
+        downvotes: int = getattr(data, "downs", 0)
+        score = data.score
+        score = f"📈{score}" if score >= 0 else f"📉{score}"
+        replies: list = getattr(data, "replies", [])
 
-        awards: list = getattr(comment, "all_awardings", [])
-        is_nsfw: bool = getattr(comment, "over_18", False)
+        awards: list = getattr(data, "all_awardings", [])
+        is_nsfw: bool = getattr(data, "over_18", False)
 
         if body:
             panel_parts.append(body)
@@ -225,10 +230,9 @@ class Render:
         )
 
         footer_content: str = (
-            f"{colours.ORANGE_RED}🡅{upvotes}{colours.RESET} "
-            f"{colours.SOFT_BLUE}🡇{downvotes}{colours.RESET} "
-            f"{colours.WHITE}🗩 {len(replies)}{colours.WHITE_RESET} "
-            f"{colours.BOLD_YELLOW}🎖{len(awards)}{colours.BOLD_YELLOW_RESET}"
+            f"{score} "
+            f"{colours.WHITE}💬{len(replies)}{colours.WHITE_RESET} "
+            f"{colours.BOLD_YELLOW}🏆{len(awards)}{colours.BOLD_YELLOW_RESET}"
         )
 
         if is_nsfw:
@@ -245,7 +249,7 @@ class Render:
         )
 
     @classmethod
-    def comments(cls, data: t.List[SimpleNamespace]):
+    def comments(cls, data: t.List[Comment]):
         panels: t.List[Panel] = []
 
         for item in data:
@@ -258,57 +262,40 @@ class Render:
         console.print(panel_group)
 
     @classmethod
-    def post(
-        cls, data: SimpleNamespace, print_panel: bool = True
-    ) -> t.Union[Panel, None]:
+    def post(cls, data: Post, print_panel: bool = True) -> t.Union[Panel, None]:
         """Render a single Reddit post or comment into a Panel."""
-
-        post = getattr(data, "data", None)
-        if not post or not cls.has_attrs(
-            obj=post,
-            attrs=[
-                "title",
-                "selftext",
-                "author",
-                "created",
-                "ups",
-                "downs",
-                "num_comments",
-                "all_awardings",
-            ],
-        ):
-            return None
 
         panel_parts: t.List[str] = []
         subreddit_name = (
             f"self"
-            if post.subreddit_name_prefixed.lower() == f"u/{post.author.lower()}"
-            else post.subreddit_name_prefixed
+            if data.subreddit_name_prefixed.lower() == f"u/{data.author.lower()}"
+            else data.subreddit_name_prefixed
         )
-        if post.title:
-            panel_parts.append(f"**{post.title}**")
+        if data.title:
+            panel_parts.append(f"**{data.title}**")
 
-        if post.selftext:
-            panel_parts.append(post.selftext)
+        if data.selftext:
+            panel_parts.append(data.selftext)
 
         text: str = "\n\n".join(panel_parts)
 
+        score = data.score
+        score = f"📈{score}" if score >= 0 else f"📉{score}"
         header_content: str = (
             f"{colours.BOLD}{subreddit_name}{colours.RESET} · "
-            f"{colours.BOLD_BLUE} [link={post.url}]View on Reddit[/link]"
-            f"{colours.BOLD_BLUE_RESET}\nu/{post.author} · "
-            f"{colours.BOLD_BLACK}{cls.timestamp_to_relative(unix_timestamp=post.created)}"
+            f"{colours.BOLD_BLUE} [link={data.url}]View on Reddit[/link]"
+            f"{colours.BOLD_BLUE_RESET}\nu/{data.author} · "
+            f"{colours.BOLD_BLACK}{cls.timestamp_to_relative(unix_timestamp=data.created)}"
             f"{colours.BOLD_BLACK_RESET}"
         )
 
         footer_content: str = (
-            f"{colours.ORANGE_RED}🡅{post.ups}{colours.RESET} "
-            f"{colours.SOFT_BLUE}🡇{post.downs}{colours.RESET} "
-            f"{colours.WHITE}🗩 {post.num_comments}{colours.WHITE_RESET} "
-            f"{colours.BOLD_YELLOW}🎖{len(post.all_awardings)}{colours.BOLD_YELLOW_RESET}"
+            f"{score} "
+            f"{colours.WHITE}💬{data.num_comments}{colours.WHITE_RESET} "
+            f"{colours.BOLD_YELLOW}🏆{len(data.all_awardings)}{colours.BOLD_YELLOW_RESET}"
         )
 
-        if post.over_18:
+        if data.over_18:
             header_content = (
                 f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
             )
@@ -322,7 +309,7 @@ class Render:
         )
 
     @classmethod
-    def posts(cls, data: t.List[SimpleNamespace]):
+    def posts(cls, data: t.List[Post]):
         """Render and print a list of posts/comments using the `post` method."""
         panels: t.List[Panel] = []
 
@@ -336,7 +323,7 @@ class Render:
 
     @classmethod
     def subreddit(
-        cls, data: SimpleNamespace, print_panel: bool = True
+        cls, data: Subreddit, print_panel: bool = True
     ) -> t.Union[Panel, None]:
         if data.subreddit_type == "private":
             return None
@@ -365,6 +352,9 @@ class Render:
         if getattr(data, "accounts_active", None):
             footer_data.update({"Active Accounts": data.accounts_active})
 
+        if data.subreddit_type == "user":
+            footer_data = None
+
         footer_content = cls.footer_table(footer_data=footer_data)
 
         return cls.panel(
@@ -376,10 +366,9 @@ class Render:
         )
 
     @classmethod
-    def subreddits(cls, data: t.List[SimpleNamespace]):
+    def subreddits(cls, data: t.List[Subreddit]):
         panels = []
-        for item in data:
-            subreddit = item.data
+        for subreddit in data:
             panel = cls.subreddit(data=subreddit, print_panel=False)
             if panel:
                 panels.append(panel)
@@ -391,7 +380,7 @@ class Render:
     def panel(
         cls,
         content: t.Union[str, RenderableType],
-        footer: t.Union[str, Table],
+        footer: t.Union[str, Table, None] = None,
         header: t.Optional[str] = None,
         **kwargs,
     ) -> Panel:

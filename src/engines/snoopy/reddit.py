@@ -3,10 +3,10 @@ from logging import Logger
 from types import SimpleNamespace
 
 import aiohttp
-from engines import karmakaze
 from rich.status import Status
-from toolbox import colours
 
+from engines import karmakaze
+from toolbox import colours
 from .api import RedditRequestHandler, RedditEndpoints
 
 __all__ = ["RedditClient"]

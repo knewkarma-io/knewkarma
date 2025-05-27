@@ -2,11 +2,11 @@ import os
 import typing as t
 
 import aiohttp
+from rich.status import Status
+
 from knewkarma.core.models import reddit
 from knewkarma.metadata.about import Project
 from knewkarma.metadata.version import Version
-from rich.status import Status
-
 from . import colours
 from .logging import logger
 
@@ -79,7 +79,7 @@ class Runtime:
 
             if update_level:
                 logger.info(
-                    f"🙭 {update_level} update is available [{colours.CYAN}{remote_version_str}{colours.CYAN_RESET}]"
+                    f"🔄 {update_level} update is available [{colours.CYAN}{remote_version_str}{colours.CYAN_RESET}]"
                 )
 
     @staticmethod

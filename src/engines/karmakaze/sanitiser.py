@@ -3,6 +3,14 @@ from types import SimpleNamespace
 
 __all__ = ["RedditSanitiser"]
 
+from engines.karmakaze.schemas import (
+    Comment,
+    Post,
+    Subreddit,
+    User,
+    WikiPage,
+)
+
 
 class RedditSanitiser:
     """
@@ -10,166 +18,211 @@ class RedditSanitiser:
     SimpleNamespace format for easier attribute-based access.
     """
 
-    @classmethod
-    def _dict_to_namespace_obj(
-        cls, obj: t.Union[t.List[t.Dict], t.Dict]
-    ) -> t.Union[t.List[SimpleNamespace], SimpleNamespace, t.List[t.Dict], t.Dict]:
-        """
-        Recursively converts dictionaries and lists of dictionaries into SimpleNamespace objects.
+    @staticmethod
+    def get_after(response: t.Dict) -> t.Union[str, None]:
+        if (
+            isinstance(response, dict)
+            and isinstance(response.get("data"), dict)
+            and isinstance(response.get("data").get("after"), (str, None))
+        ):
+            return response.get("data").get("after")
 
-        :param obj: The object to convert, either a dictionary or a list of dictionaries.
-        :type obj: Union[List[Dict], Dict]
-        :return: A SimpleNamespace object or list of SimpleNamespace objects.
-        :rtype: Union[List[SimpleNamespace], SimpleNamespace, None]
-        """
-        if isinstance(obj, t.Dict):
-            return SimpleNamespace(
-                **{
-                    key: cls._dict_to_namespace_obj(obj=value)
-                    for key, value in obj.items()
-                }
-            )
-        elif isinstance(obj, t.List):
-            return [cls._dict_to_namespace_obj(obj=item) for item in obj]
-        else:
-            return obj
+        return None
 
-    @classmethod
-    def comment(cls, response: t.Dict) -> t.Union[SimpleNamespace, None]:
+    @staticmethod
+    def comment(response: dict) -> t.Optional[Comment]:
         """
-        Converts a single comment response to a SimpleNamespace object.
+        Sanitises and converts a single Reddit comment response to a SimpleNamespace.
 
         :param response: The dictionary representing the comment.
-        :type response: Dict
-        :return: A SimpleNamespace object for the comment.
-        :rtype: SimpleNamespace
+        :return: A SimpleNamespace object for the comment, or None if invalid.
         """
-        if isinstance(response, t.Dict):
-            return cls._dict_to_namespace_obj(obj=response)
-
-        return None
-
-    @classmethod
-    def comments(
-        cls, response: t.Union[t.List[t.Dict], t.Dict]
-    ) -> t.Union[t.List[SimpleNamespace], SimpleNamespace, None]:
-        """
-        Converts a list of comments or a single comment to SimpleNamespace objects.
-
-        :param response: A list of dictionaries, each representing a comment, or a single dictionary.
-        :type response: Union[List[Dict], Dict]
-        :return: A list of SimpleNamespace objects or a single SimpleNamespace object.
-        :rtype: Union[List[SimpleNamespace], SimpleNamespace]
-        """
-        if isinstance(response, t.List) and all(
-            isinstance(comment, t.Dict) for comment in response
+        if (
+            isinstance(response, dict)
+            and response.get("kind") == "t1"
+            and isinstance(response.get("data"), dict)
         ):
-            return [cls.comment(response=raw_comment) for raw_comment in response]
-        elif isinstance(response, t.Dict):
-            return cls._dict_to_namespace_obj(obj=response.get("data", {}))
+            return Comment(**response["data"])
 
         return None
 
-    @classmethod
-    def post(cls, response: t.List[t.Dict]) -> t.Union[SimpleNamespace, None]:
+    def comments(
+        self, response: t.Union[t.List[t.Dict], t.Dict]
+    ) -> t.Optional[t.List[Comment]]:
         """
-        Converts a single post response to a SimpleNamespace object.
+        Sanitises and converts multiple Reddit comments to a list of SimpleNamespace objects.
 
-        :param response: A list containing dictionaries with post data.
-        :type response: List[Dict]
-        :return: A SimpleNamespace object representing the post.
-        :rtype: SimpleNamespace
+        :param response: Either a dict with 'data > children', or a list of comment dicts.
+        :return: A list of SimpleNamespace objects representing comments.
         """
-        if isinstance(response, t.List) and len(response) == 2:
-            children = response[0].get("data", {}).get("children")
-            return cls._dict_to_namespace_obj(obj=children[0])
+        # Case 1: Raw Reddit listing response (dict with children)
+        if isinstance(response, dict):
+            data = response.get("data")
+            if isinstance(data, dict):
+                children = data.get("children")
+                if isinstance(children, list):
+                    sane_comments: list[Comment] = []
+
+                    for child in children:
+                        comment = self.comment(child)
+                        if comment is not None:
+                            sane_comments.append(comment)
+
+                    return sane_comments if sane_comments else None
+
+        # Case 2: A pre-extracted list of comment dicts (e.g., from saved data)
+        elif isinstance(response, list):
+            sane_comments: list[Comment] = []
+
+            for raw_comment in response:
+                comment = self.comment(raw_comment)
+                if comment is not None:
+                    sane_comments.append(comment)
+
+            return sane_comments if sane_comments else None
 
         return None
 
-    @classmethod
-    def posts(
-        cls, response: t.Dict
-    ) -> t.Union[t.List[SimpleNamespace], SimpleNamespace, None]:
+    @staticmethod
+    def post(response: t.List[t.Dict]) -> t.Optional[Post]:
         """
-        Converts post data to SimpleNamespace objects.
+        Sanitises and converts a single post response (from e.g. comments endpoint) to a SimpleNamespace.
 
-        :param response: A dictionary containing post data.
-        :type response: Dict
-        :return: A SimpleNamespace object or list of SimpleNamespace objects representing posts.
-        :rtype: Union[List[SimpleNamespace], SimpleNamespace]
+        :param response: A list of two dicts, first containing post data.
+        :return: A SimpleNamespace object representing the post, or None if invalid.
         """
-        data = response.get("data", {})
-        if isinstance(data, t.Dict):
-            return cls._dict_to_namespace_obj(obj=data)
+        if (
+            isinstance(response, list)
+            and len(response) >= 1
+            and isinstance(response[0], dict)
+        ):
+            data = response[0].get("data")
+            if isinstance(data, dict):
+                children = data.get("children")
+                if (
+                    isinstance(children, list)
+                    and len(children) > 0
+                    and isinstance(children[0], dict)
+                    and children[0].get("kind") == "t3"
+                    and isinstance(children[0].get("data"), dict)
+                ):
+                    return Post(**children[0]["data"])
 
         return None
 
-    @classmethod
-    def subreddit(cls, response: t.Dict) -> t.Union[SimpleNamespace, None]:
+    @staticmethod
+    def posts(response: t.Dict) -> t.Optional[t.List[Post]]:
         """
-        Converts a single subreddit response to a SimpleNamespace object.
+        Sanitises and converts multiple post results to SimpleNamespace objects.
 
-        :param response: A dictionary containing subreddit data.
-        :type response: Dict
-        :return: A SimpleNamespace object for the subreddit data.
-        :rtype: SimpleNamespace
+        :param response: A dictionary containing post search results.
+        :return: A list of SimpleNamespace objects representing posts, or None if invalid.
         """
-        if "data" in response:
-            return cls._dict_to_namespace_obj(obj=response)
+        data = response.get("data")
+        if not isinstance(data, dict):
+            return None
+
+        children = data.get("children")
+        if not isinstance(children, list):
+            return None
+
+        sane_children: list[Post] = []
+
+        for child in children:
+            if (
+                isinstance(child, dict)
+                and child.get("kind") == "t3"
+                and isinstance(child.get("data"), dict)
+            ):
+                sane_children.append(Post(**child["data"]))
+
+        return sane_children if sane_children else None
+
+    @staticmethod
+    def subreddit(response: t.Dict) -> t.Optional[Subreddit]:
+        """
+        Sanitises and converts a single subreddit response to a SimpleNamespace object.
+
+        :param response: A dictionary containing a single subreddit.
+        :return: A SimpleNamespace object or None if invalid.
+        """
+        if (
+            isinstance(response, dict)
+            and response.get("kind") == "t5"
+            and isinstance(response.get("data"), dict)
+        ):
+            return Subreddit(**response["data"])
 
         return None
 
-    @classmethod
-    def subreddits(
-        cls, response: t.Dict
-    ) -> t.Union[t.List[SimpleNamespace], SimpleNamespace, None]:
+    def subreddits(self, response: t.Dict) -> t.Optional[t.List[Subreddit]]:
         """
-        Converts subreddit data to SimpleNamespace objects.
+        Sanitises and converts multiple subreddit responses to a list of SimpleNamespace objects.
 
-        :param response: A dictionary containing subreddit data.
-        :type response: Dict
-        :return: A SimpleNamespace object or list of SimpleNamespace objects for the subreddits.
-        :rtype: Union[List[SimpleNamespace], SimpleNamespace]
+        :param response: A dictionary containing multiple subreddits.
+        :return: A list of SimpleNamespace objects or None if invalid.
         """
-        if "data" in response:
-            return cls._dict_to_namespace_obj(obj=response.get("data", {}))
+        data = response.get("data")
+        if not isinstance(data, dict):
+            return None
+
+        children = data.get("children")
+        if not isinstance(children, list):
+            return None
+
+        sane_children: list[Subreddit] = []
+
+        for child in children:
+            subreddit = self.subreddit(child)
+            if subreddit is not None:
+                sane_children.append(subreddit)
+
+        return sane_children if sane_children else None
+
+    @staticmethod
+    def user(response: t.Dict) -> t.Union[User, Subreddit, None]:
+        """
+        Sanitises and converts a single Reddit user response to a SimpleNamespace object.
+        """
+        if (
+            isinstance(response, dict)
+            and response.get("kind") == "t2"
+            and isinstance(response.get("data"), dict)
+        ):
+            return User(**response["data"])
+        elif (
+            isinstance(response, dict)
+            and response.get("kind")
+            == "t5"  # Edge-case only applies to users (top, new, all)... Reddit data is a damn mess!
+            and isinstance(response.get("data"), dict)
+        ) and response.get("data", {}).get("subreddit_type") == "user":
+            return Subreddit(**response["data"])
 
         return None
 
-    @classmethod
-    def user(cls, response: t.Dict) -> t.Union[SimpleNamespace, None]:
+    def users(self, response: t.Dict) -> t.Optional[t.List[User]]:
         """
-        Converts a single user response to a SimpleNamespace object.
-
-        :param response: A dictionary containing user data.
-        :type response: Dict
-        :return: A SimpleNamespace object for the user data.
-        :rtype: SimpleNamespace
+        Sanitises and converts a list of Reddit user search results to SimpleNamespace objects.
         """
-        if "data" in response:
-            return cls._dict_to_namespace_obj(obj=response)
+        data = response.get("data")
+        if not isinstance(data, dict):
+            return None
 
-        return None
+        children = data.get("children")
+        if not isinstance(children, list):
+            return None
 
-    @classmethod
-    def users(
-        cls, response: t.Dict
-    ) -> t.Union[t.List[SimpleNamespace], SimpleNamespace, None]:
-        """
-        Converts user data to SimpleNamespace objects.
+        sane_users: t.List[User] = []
 
-        :param response: A dictionary containing user data.
-        :type response: Dict
-        :return: A SimpleNamespace object or list of SimpleNamespace objects for the users.
-        :rtype: Union[List[SimpleNamespace], SimpleNamespace]
-        """
-        if "data" in response:
-            return cls._dict_to_namespace_obj(obj=response.get("data", {}))
+        for child in children:
+            user = self.user(child)
+            if user is not None:
+                sane_users.append(user)
 
-        return None
+        return sane_users if sane_users else None
 
-    @classmethod
-    def wiki_page(cls, response: t.Dict) -> t.Union[SimpleNamespace, None]:
+    @staticmethod
+    def wiki_page(response: t.Dict) -> t.Union[WikiPage, None]:
         """
         Converts a single wiki page response to a SimpleNamespace object.
 
@@ -179,7 +232,7 @@ class RedditSanitiser:
         :rtype: SimpleNamespace
         """
         if "data" in response:
-            return cls._dict_to_namespace_obj(obj=response)
+            return WikiPage(**response.get("data"))
 
         return None
 
