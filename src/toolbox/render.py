@@ -43,7 +43,7 @@ class Render:
             )
 
             return table
-        
+
         return None
 
     @classmethod
@@ -208,10 +208,7 @@ class Render:
         subreddit = f"self" if subreddit.lower() == f"u/{author.lower()}" else subreddit
         permalink: str = getattr(data, "permalink", "")
         created: int = getattr(data, "created", 0)
-        upvotes: int = getattr(data, "ups", 0)
-        downvotes: int = getattr(data, "downs", 0)
         score = data.score
-        score = f"📈{score}" if score >= 0 else f"📉{score}"
         replies: list = getattr(data, "replies", [])
 
         awards: list = getattr(data, "all_awardings", [])
@@ -230,7 +227,7 @@ class Render:
         )
 
         footer_content: str = (
-            f"{score} "
+            f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" if score == 0 else colours.WHITE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
             f"{colours.WHITE}💬{len(replies)}{colours.WHITE_RESET} "
             f"{colours.BOLD_YELLOW}🏆{len(awards)}{colours.BOLD_YELLOW_RESET}"
         )
@@ -280,7 +277,7 @@ class Render:
         text: str = "\n\n".join(panel_parts)
 
         score = data.score
-        score = f"📈{score}" if score >= 0 else f"📉{score}"
+        # score = f"⬍{score}" if score >= 0 else f"📉{score}"
         header_content: str = (
             f"{colours.BOLD}{subreddit_name}{colours.RESET} · "
             f"{colours.BOLD_BLUE} [link={data.url}]View on Reddit[/link]"
@@ -290,7 +287,7 @@ class Render:
         )
 
         footer_content: str = (
-            f"{score} "
+            f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" if score == 0 else colours.WHITE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
             f"{colours.WHITE}💬{data.num_comments}{colours.WHITE_RESET} "
             f"{colours.BOLD_YELLOW}🏆{len(data.all_awardings)}{colours.BOLD_YELLOW_RESET}"
         )
