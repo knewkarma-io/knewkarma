@@ -3,27 +3,19 @@ import inspect
 import os
 import typing as t
 from datetime import datetime
-from types import SimpleNamespace
 
 import aiohttp
 import rich_click as click
 from rich.status import Status
+
+from knewkarma.core.client import reddit
 from toolbox import colours
 from toolbox.data import Data
 from toolbox.logging import console
 from toolbox.render import Render
 from toolbox.runtime import Runtime
-
-from ..core.models import (
-    reddit,
-    Post,
-    Posts,
-    Search,
-    Subreddit,
-    Subreddits,
-    User,
-    Users,
-)
+from ..core.user import User
+from ..core.users import Users
 from ..metadata.about import Project
 from ..metadata.license import License
 from ..metadata.version import Version
@@ -154,399 +146,6 @@ cli.add_command(cmd=_license, name="license")
 
 
 @cli.command(
-    help="Use this command to get an individual post's data including its comments, "
-    "provided the post's <id> and source <subreddit> are specified.",
-)
-@click.argument("id")
-@click.argument("subreddit")
-@click.option("--data", is_flag=True, help="Get post data")
-@click.option("--comments", is_flag=True, help="Get post comments")
-@click.pass_context
-def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool):
-    """
-    Retrieve an individual post's data or comments.
-
-    :param ctx: The Click context object.
-    :type ctx: click.Context
-    :param id: The ID of the post.
-    :type id: str
-    :param subreddit: The source subreddit of the post.
-    :type subreddit: str
-    :param data: Flag to get post data.
-    :type data: bool
-    :param comments: Flag to get post comments.
-    :type comments: bool
-    """
-
-    sort: reddit.SORT = ctx.obj["sort"]
-    limit: int = ctx.obj["limit"]
-    export: str = ctx.obj["export"]
-
-    post_instance = Post(id=id, subreddit=subreddit)
-    method_map: t.Dict = {
-        "comments": lambda session, status, logger: post_instance.comments(
-            limit=limit, sort=sort, status=status, logger=logger, session=session
-        ),
-        "data": lambda session, status, logger: post_instance.data(
-            session=session, status=status
-        ),
-    }
-
-    asyncio.run(
-        method_call_handler(
-            ctx=ctx,
-            method_map=method_map,
-            export=export,
-            data=data,
-            comments=comments,
-        )
-    )
-
-
-@cli.command(
-    help="Use this command get best, controversial, front-page, new, popular, and/or rising posts.",
-)
-@click.option("--best", is_flag=True, help="Get posts from the best listing")
-@click.option(
-    "--controversial",
-    is_flag=True,
-    help="Get posts from the controversial listing",
-)
-@click.option(
-    "--front-page",
-    is_flag=True,
-    help="Get posts from the reddit front-page",
-)
-@click.option("--new", is_flag=True, help="Get new posts")
-@click.option(
-    "--popular",
-    is_flag=True,
-    help="Get posts from the popular listing",
-)
-@click.option("--rising", is_flag=True, help="Get posts from the rising listing")
-@click.pass_context
-def posts(
-    ctx: click.Context,
-    best: bool,
-    controversial: bool,
-    front_page: bool,
-    new: bool,
-    popular: bool,
-    rising: bool,
-):
-    """
-    Retrieve various types of posts such as best, controversial, popular, new, and front-page.
-
-    :param ctx: The Click context object.
-    :type ctx: click.Context
-    :param best: Flag to get posts from the best listing.
-    :type best: bool
-    :param controversial: Flag to get posts from the controversial listing.
-    :type controversial: bool
-    :param front_page: Flag to get posts from the reddit front-page.
-    :type front_page: bool
-    :param new: Flag to get new posts.
-    :type new: bool
-    :param popular: Flag to get posts from the popular listing.
-    :type popular: bool
-    :param rising: Flag to get posts from the rising listing.
-    :type rising: bool
-    """
-
-    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
-    sort: reddit.SORT = ctx.obj["sort"]
-    limit: int = ctx.obj["limit"]
-    export: str = ctx.obj["export"]
-
-    posts_instance = Posts()
-    method_map: t.Dict = {
-        "best": lambda session, status, logger: posts_instance.best(
-            timeframe=timeframe,
-            limit=limit,
-            status=status,
-            logger=logger,
-            session=session,
-        ),
-        "controversial": lambda session, status, logger: posts_instance.controversial(
-            timeframe=timeframe,
-            limit=limit,
-            status=status,
-            logger=logger,
-            session=session,
-        ),
-        "front_page": lambda session, status, logger: posts_instance.front_page(
-            limit=limit, sort=sort, status=status, logger=logger, session=session
-        ),
-        "new": lambda session, status, logger: posts_instance.new(
-            limit=limit, sort=sort, status=status, logger=logger, session=session
-        ),
-        "popular": lambda session, status, logger: posts_instance.popular(
-            timeframe=timeframe,
-            limit=limit,
-            status=status,
-            logger=logger,
-            session=session,
-        ),
-        "rising": lambda session, status, logger: posts_instance.rising(
-            limit=limit, status=status, logger=logger, session=session
-        ),
-    }
-
-    asyncio.run(
-        method_call_handler(
-            ctx=ctx,
-            method_map=method_map,
-            export=export,
-            best=best,
-            controversial=controversial,
-            front_page=front_page,
-            new=new,
-            popular=popular,
-            rising=rising,
-        )
-    )
-
-
-@cli.command(
-    help="Use this command for search/discovery of users, subreddits, and posts.",
-)
-@click.argument("query")
-@click.option("--posts", is_flag=True, help="Search posts")
-@click.option("--subreddits", is_flag=True, help="Search subreddits")
-@click.option("--users", is_flag=True, help="Search users")
-@click.pass_context
-def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users: bool):
-    """
-    Search for posts, subreddits, or users based on a query.
-
-    :param ctx: The Click context object.
-    :type ctx: click.Context
-    :param query: The search query.
-    :type query: str
-    :param posts: Flag to search posts.
-    :type posts: bool
-    :param subreddits: Flag to search subreddits.
-    :type subreddits: bool
-    :param users: Flag to search users.
-    :type users: bool
-    """
-
-    sort: reddit.SORT = ctx.obj["sort"]
-    limit: int = ctx.obj["limit"]
-    export: str = ctx.obj["export"]
-
-    search_instance = Search(
-        query=query,
-    )
-    method_map: t.Dict = {
-        "posts": lambda session, status, logger: search_instance.posts(
-            sort=sort, limit=limit, status=status, logger=logger, session=session
-        ),
-        "subreddits": lambda session, status, logger: search_instance.subreddits(
-            sort=sort, limit=limit, logger=logger, session=session, status=status
-        ),
-        "users": lambda session, status, logger: search_instance.users(
-            sort=sort, limit=limit, status=status, logger=logger, session=session
-        ),
-    }
-
-    asyncio.run(
-        method_call_handler(
-            ctx=ctx,
-            method_map=method_map,
-            export=export,
-            posts=posts,
-            subreddits=subreddits,
-            users=users,
-        )
-    )
-
-
-@cli.command(
-    help="Use this command to get a subreddit's data, such as comments, posts, wiki-pages, wiki-page data, and more...",
-)
-@click.argument("subreddit_name")
-@click.option(
-    "--comments",
-    is_flag=True,
-    help="Get a subreddit's comments (beta)",
-)
-@click.option(
-    "--comments-per-post",
-    type=int,
-    help="To be used when getting comments with `--comments`",
-)
-@click.option("--profile", is_flag=True, help="Get a subreddit's profile")
-@click.option("--posts", is_flag=True, help="Get a subreddit's posts")
-@click.option("--wikipage", type=str, help="Get a subreddit's specified wiki page data")
-@click.option("--wikipages", is_flag=True, help="Get a subreddit's wiki pages")
-@click.pass_context
-def subreddit(
-    ctx: click.Context,
-    subreddit_name: str,
-    comments: bool,
-    comments_per_post: int,
-    posts: bool,
-    profile: bool,
-    wikipage: str,
-    wikipages: bool,
-):
-    """
-    Retrieve data about a specific subreddit including profile, comments, posts, and wiki pages.
-
-    :param ctx: The Click context object.
-    :type ctx: click.Context
-    :param subreddit_name: The name of the subreddit.
-    :type subreddit_name: str
-    :param comments: Flag to get the subreddit's comments.
-    :type comments: bool
-    :param comments_per_post: Number of comments per post to retrieve.
-    :type comments_per_post: int
-    :param posts: Flag to get the subreddit's posts.
-    :type posts: bool
-    :param profile: Flag to get the subreddit's profile.
-    :type profile: bool
-    :param wikipage: The name of the wiki page to retrieve.
-    :type wikipage: str
-    :param wikipages: Flag to get the subreddit's wiki pages.
-    :type wikipages: bool
-    """
-
-    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
-    sort: reddit.SORT = ctx.obj["sort"]
-    limit: int = ctx.obj["limit"]
-    export: str = ctx.obj["export"]
-
-    subreddit_instance = Subreddit(
-        name=subreddit_name,
-    )
-    method_map: t.Dict = {
-        "comments": lambda session, status, logger: subreddit_instance.comments(
-            session=session,
-            posts_limit=limit,
-            comments_per_post=comments_per_post,
-            sort=sort,
-            timeframe=timeframe,
-            status=status,
-            logger=logger,
-        ),
-        "posts": lambda session, status, logger=None: subreddit_instance.posts(
-            limit=limit,
-            sort=sort,
-            timeframe=timeframe,
-            status=status,
-            logger=logger,
-            session=session,
-        ),
-        "profile": lambda session, status: subreddit_instance.profile(
-            status=status, session=session
-        ),
-        "search": lambda session, status, logger: subreddit_instance.search(
-            query=search,
-            limit=limit,
-            sort=sort,
-            timeframe=timeframe,
-            status=status,
-            logger=logger,
-            session=session,
-        ),
-        "wikipages": lambda session, status, logger: subreddit_instance.wikipages(
-            status=status, session=session
-        ),
-        "wikipage": lambda session, status, logger: subreddit_instance.wikipage(
-            page_name=wikipage, status=status, session=session
-        ),
-    }
-
-    asyncio.run(
-        method_call_handler(
-            ctx=ctx,
-            method_map=method_map,
-            export=export,
-            profile=profile,
-            comments=comments,
-            comments_per_post=comments_per_post,
-            posts=posts,
-            wikipages=wikipages,
-            wikipage=wikipage,
-        )
-    )
-
-
-@cli.command(
-    help="Use this command to get all, default, new, and/or popular subreddits.",
-)
-@click.option("--all", is_flag=True, help="Get all subreddits")
-@click.option(
-    "--default",
-    is_flag=True,
-    help="Get default subreddits",
-)
-@click.option(
-    "--new",
-    is_flag=True,
-    help="Get new subreddits",
-)
-@click.option(
-    "--popular",
-    is_flag=True,
-    help="Get popular subreddits",
-)
-@click.pass_context
-def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular: bool):
-    """
-    Retrieve various subreddits such as new, popular, default, and all subreddits.
-
-    :param ctx: The Click context object.
-    :type ctx: click.Context
-    :param all: Flag to get all subreddits.
-    :type all: bool
-    :param default: Flag to get default subreddits.
-    :type default: bool
-    :param new: Flag to get new subreddits.
-    :type new: bool
-    :param popular: Flag to get popular subreddits.
-    :type popular: bool
-    """
-
-    export: str = ctx.obj["export"]
-    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
-    limit: int = ctx.obj["limit"]
-
-    subreddits_instance = Subreddits()
-    method_map: t.Dict = {
-        "all": lambda session, status, logger: subreddits_instance.all(
-            limit=limit,
-            session=session,
-            status=status,
-            logger=logger,
-        ),
-        "default": lambda session, status, logger: subreddits_instance.default(
-            limit=limit, session=session, status=status
-        ),
-        "new": lambda session, status, logger: subreddits_instance.new(
-            limit=limit, logger=logger, session=session, status=status
-        ),
-        "popular": lambda session, status, logger: subreddits_instance.popular(
-            limit=limit, logger=logger, session=session, status=status
-        ),
-    }
-
-    asyncio.run(
-        method_call_handler(
-            ctx=ctx,
-            method_map=method_map,
-            export=export,
-            timeframe=timeframe,
-            all=all,
-            default=default,
-            new=new,
-            popular=popular,
-        )
-    )
-
-
-@cli.command(
     help="Use this command to get user data, such as profile, posts, "
     "comments, top subreddits, moderated subreddits, and more...",
 )
@@ -566,7 +165,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
     help="Get user's top n subreddits",
 )
 @click.option(
-    "--username-available",
+    "--is-username-available",
     is_flag=True,
     help="Check if the given username is available or taken.",
 )
@@ -580,7 +179,7 @@ def user(
     posts: bool,
     profile: bool,
     top_subreddits: int,
-    username_available: bool,
+    is_username_available: bool,
 ):
     """
     Retrieve data about a specific user including profile, posts, comments, and top subreddits.
@@ -601,15 +200,15 @@ def user(
     :type profile: bool
     :param top_subreddits: Number of top subreddits to retrieve.
     :type top_subreddits: int
-    :param username_available: Flag to check if the given username is available of taken.
-    :type username_available: bool
+    :param is_username_available: Flag to check if the given username is available of taken.
+    :type is_username_available: bool
     """
     timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
     sort: reddit.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
 
-    user_instance: User = User(
+    user_instance = User(
         name=username,
     )
     method_map: t.Dict = {
@@ -646,7 +245,7 @@ def user(
             status=status,
             logger=logger,
         ),
-        "username_available": lambda session, status, logger: user_instance.username_available(
+        "is_username_available": lambda session, status, logger: user_instance.is_username_available(
             logger=logger, session=session, status=status
         ),
     }
@@ -662,7 +261,7 @@ def user(
             posts=posts,
             profile=profile,
             top_subreddits=top_subreddits,
-            username_available=username_available,
+            is_username_available=is_username_available,
         )
     )
 
@@ -777,7 +376,7 @@ async def method_caller(
         accepted_kwargs["logger"] = kwargs.get("logger")
 
     # 🧠 Actually call the method
-    response_data: t.Union[t.List, t.Dict, str, bool, SimpleNamespace] = await method(
+    response_data: t.Union[t.List, t.Dict, str, bool, t.Any] = await method(
         **accepted_kwargs
     )
 
@@ -844,7 +443,7 @@ async def method_call_handler(
                 ) as status:
                     async with aiohttp.ClientSession() as session:
                         # logger.info(f"◉ Session opened.")
-                        await Runtime.check_updates(session=session, status=status)
+                        # await Runtime.check_updates(session=session, status=status)
                         await reddit.infra_status(
                             session=session,
                             status=status,
