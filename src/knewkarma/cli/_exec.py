@@ -7,10 +7,10 @@ import click
 import requests
 from rich.status import Status
 
-from toolbox import colours
-from toolbox.data import Data
-from toolbox.logging import console
-from toolbox.render import Render
+from tools import colours
+from tools.io_assets import FileHandler, DataFrame
+from tools.logging import console
+from tools.render import Render
 from ..core.client import reddit
 from ..meta.license import License
 
@@ -63,13 +63,13 @@ def _method_caller(
         Render.show(data=response_data)
         if kwargs.get("export"):
             exports_child_dir: str = os.path.join(
-                Data.EXPORTS_PARENT_DIR,
+                FileHandler.EXPORTS_PARENT_DIR,
                 "exports",
                 command,
                 argument,
             )
 
-            Data.pathfinder(
+            FileHandler.pathfinder(
                 directories=[
                     os.path.join(exports_child_dir, extension)
                     for extension in ["csv", "html", "json", "xml"]
@@ -77,10 +77,10 @@ def _method_caller(
             )
 
             export_to: t.List[str] = kwargs.get("export").split(",")
-            dataframe = Data.make_dataframe(data=response_data)
-            Data.export_dataframe(
+            dataframe = DataFrame.build(data=response_data)
+            DataFrame.export(
                 dataframe=dataframe,
-                filename=Data.filename_timestamp(),
+                filename=FileHandler.time_to_filename(),
                 directory=exports_child_dir,
                 formats=export_to,
             )
@@ -105,7 +105,7 @@ def _method_call_handler(
     :type kwargs: t.Union[str, int, bool]
     """
 
-    from toolbox.logging import logger
+    from tools.logging import logger
 
     is_valid_arg: bool = False
 

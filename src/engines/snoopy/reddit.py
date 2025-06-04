@@ -8,7 +8,7 @@ from rich.status import Status
 
 from engines.karmakaze.sanitiser import RedditSanitiser
 from engines.karmakaze.schemas import User, Subreddit, Post, WikiPage, Comment
-from toolbox import colours
+from tools import colours
 
 
 class Reddit:
@@ -184,7 +184,7 @@ class Reddit:
         """
         # Set logging level to logging.NOTSET
         # and show_level to True
-        # in toolbox.logging, in order to see debug logs printed to the console.
+        # in tools.logging, in order to see debug logs printed to the console.
         results = []
         after = None
         params = dict(initial_params) if initial_params else {}

@@ -8,10 +8,17 @@ from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
 
-from engines.karmakaze.schemas import User, Subreddit, WikiPage, Comment, Post, ModeratedSubreddit
+from engines.karmakaze.schemas import (
+    User,
+    Subreddit,
+    WikiPage,
+    Comment,
+    Post,
+    ModeratedSubreddit,
+)
 from engines.snoopy.reddit import Reddit
-from toolbox import colours
-from toolbox.logging import console
+from tools import colours
+from tools.logging import console
 
 __all__ = ["Render"]
 
@@ -146,12 +153,9 @@ class Render:
         subreddit = data.subreddit
 
         header_content = (
-            f"{colours.BOLD}{data.name}{colours.RESET} · "
-            f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}{subreddit.url}]"
-            f"View on Reddit[/link]{colours.BOLD_BLUE_RESET}\n"
-            f"{subreddit.display_name_prefixed} · "
-            f"{colours.BOLD_BLACK}{cls._timestamp_to_relative(unix_timestamp=data.created)}"
-            f"{colours.BOLD_BLACK_RESET}"
+            f"{colours.BOLD}{colours.POWDER_BLUE}{data.name}{colours.RESET}{colours.RESET} "
+            f"· {colours.GREY}{cls._timestamp_to_relative(unix_timestamp=data.created)}\n"
+            f"{subreddit.display_name_prefixed}{colours.RESET}"
         )
 
         if data.is_suspended:
@@ -181,6 +185,7 @@ class Render:
         text = "\n\n".join(panel_parts)
 
         return cls.panel(
+            title=f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}{subreddit.url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
             header=header_content,
             content=text,
             footer=footer_content,
@@ -215,36 +220,28 @@ class Render:
         created: int = getattr(data, "created", 0)
         score = cls._number_to_relative(number=data.score)
         replies: list = getattr(data, "replies", [])
-
         awards: list = getattr(data, "all_awardings", [])
-        is_nsfw: bool = getattr(data, "over_18", False)
 
         if body:
             panel_parts.append(body)
 
         text: str = "\n\n".join(panel_parts)
         header_content: str = (
-            f"{colours.BOLD}{subreddit}{colours.RESET} · "
-            f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}/{permalink}]"
-            f"View on Reddit[/link]{colours.BOLD_BLUE_RESET}\nu/{author}"
-            f" · {colours.BOLD_BLACK}{cls._timestamp_to_relative(unix_timestamp=created)}"
-            f"{colours.BOLD_BLACK_RESET}"
+            f"{colours.BOLD}{colours.POWDER_BLUE}{subreddit}{colours.RESET}{colours.RESET} · "
+            f"{colours.GREY}{cls._timestamp_to_relative(unix_timestamp=created)}\n"
+            f"u/{author}{colours.RESET}"
         )
 
         footer_content: str = (
             f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" 
             if score == 0 
-            else colours.WHITE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
-            f"{colours.WHITE}💬{cls._number_to_relative(number=len(replies))}{colours.WHITE_RESET} "
+            else colours.POWDER_BLUE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
+            f"💬{colours.POWDER_BLUE}{cls._number_to_relative(number=len(replies))}{colours.RESET} "
             f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(awards))}{colours.BOLD_YELLOW_RESET}"
         )
 
-        if is_nsfw:
-            header_content = (
-                f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
-            )
-
         return cls.panel(
+            title=f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}/{permalink}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
             header=header_content,
             content=text,
             footer=footer_content,
@@ -285,18 +282,16 @@ class Render:
 
         score = cls._number_to_relative(number=data.score)
         header_content: str = (
-            f"{colours.BOLD}{subreddit_name}{colours.RESET} · "
-            f"{colours.BOLD_BLUE} [link={data.url}]View on Reddit[/link]"
-            f"{colours.BOLD_BLUE_RESET}\nu/{data.author} · "
-            f"{colours.BOLD_BLACK}{cls._timestamp_to_relative(unix_timestamp=data.created)}"
-            f"{colours.BOLD_BLACK_RESET}"
+            f"{colours.BOLD}{colours.POWDER_BLUE}{subreddit_name}{colours.RESET}{colours.RESET} · "
+            f"{colours.GREY}{cls._timestamp_to_relative(unix_timestamp=data.created)}{colours.RESET}\n"
+            f"{colours.GREY}u/{data.author}{colours.RESET}"
         )
 
         footer_content: str = (
             f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" 
             if score == 0 
-            else colours.WHITE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
-            f"{colours.WHITE}💬{cls._number_to_relative(number=data.num_comments)}{colours.WHITE_RESET} "
+            else colours.POWDER_BLUE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
+            f"💬{colours.POWDER_BLUE}{cls._number_to_relative(number=data.num_comments)}{colours.RESET} "
             f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(data.all_awardings))}{colours.BOLD_YELLOW_RESET}"
         )
 
@@ -306,6 +301,7 @@ class Render:
             )
 
         return cls.panel(
+            title=f"{colours.BOLD_BLUE}[link={data.url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
             header=header_content,
             content=text,
             footer=footer_content,
@@ -335,7 +331,11 @@ class Render:
 
         has_public_description: bool = hasattr(data, "public_description")
         has_description: bool = hasattr(data, "description")
-        is_nsfw: bool = getattr(data, "over_18") if hasattr(data, "over_18") else getattr(data, "over18")
+        is_nsfw: bool = (
+            getattr(data, "over_18")
+            if hasattr(data, "over_18")
+            else getattr(data, "over18")
+        )
         has_title = hasattr(data, "title")
 
         panel_parts: t.List[str] = []
@@ -360,9 +360,17 @@ class Render:
                 f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
             )
 
-        footer_data: t.Union[t.Dict, None] = {"Subscribers": cls._number_to_relative(number=data.subscribers)}
+        footer_data: t.Union[t.Dict, None] = {
+            "Subscribers": cls._number_to_relative(number=data.subscribers)
+        }
         if getattr(data, "accounts_active", None):
-            footer_data.update({"Active Accounts": cls._number_to_relative(number=data.accounts_active)})
+            footer_data.update(
+                {
+                    "Active Accounts": cls._number_to_relative(
+                        number=data.accounts_active
+                    )
+                }
+            )
         if hasattr(data, "lang"):
             footer_data.update({"Language": data.lang})
 
@@ -394,6 +402,7 @@ class Render:
     def panel(
         cls,
         content: t.Union[str, RenderableType],
+        title: t.Union[str, None] = None,
         footer: t.Union[str, Table, None] = None,
         header: t.Optional[str] = None,
         **kwargs,
@@ -440,7 +449,7 @@ class Render:
                 content_items.append(Rule(style=divider_style))
 
         if isinstance(content, str):
-            content_renderable = Markdown(content, justify="left", style="white")
+            content_renderable = Markdown(content, justify="left")
         else:
             content_renderable = content
 
@@ -466,9 +475,10 @@ class Render:
         group = Group(*content_items)
 
         panel = Panel(
+            title=title,
+            title_align="right",
             renderable=group,
             border_style="#444444" if show_outline else "black",
-            title_align="left",
         )
 
         if print_panel:
