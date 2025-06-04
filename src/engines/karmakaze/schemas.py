@@ -158,7 +158,7 @@ class Post(BaseModel):
     contest_mode: bool
     permalink: str
     stickied: bool
-    url: HttpUrl
+    url: str
     subreddit_subscribers: int
     created_utc: float
     num_crossposts: int
@@ -238,6 +238,29 @@ class User(BaseModel):
 
 class CommentContributionSettings(BaseModel):
     allowed_media_types: t.Optional[t.List[str]] = None
+
+
+class ModeratedSubreddit(BaseModel):
+    icon_img: t.Optional[str] = None
+    display_name: str
+    display_name_prefixed: str
+    title: str
+    url: str
+    sr: str
+    sr_display_name_prefixed: str
+    created_utc: int
+    key_color: str
+    created: int
+    mod_permissions: t.List
+    over_18: bool
+    subscribers: int
+    community_icon: str
+    icon_size: t.Optional[t.List[int]] = None
+    banner_img: t.Optional[str] = None
+    banner_size: t.Optional[t.List[int]] = None
+    primary_color: str
+    subreddit_type: str
+    name: str
 
 
 class Subreddit(BaseModel):

@@ -1,7 +1,7 @@
 import typing as t
 from logging import Logger
 
-import aiohttp
+import requests
 from rich.status import Status
 
 from engines.karmakaze.schemas import User
@@ -12,18 +12,18 @@ class Users:
     """Represents Reddit users and provides methods for getting related data."""
 
     @staticmethod
-    async def new(
-        session: aiohttp.ClientSession,
+    def new(
+        session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.List[User]:
         """
-        Asynchronously get new users.
+        get new users.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: A `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -40,7 +40,7 @@ class Users:
         :rtype: List[SimpleNamespace]
         """
 
-        new_users = await reddit.users(
+        new_users = reddit.users(
             session=session,
             logger=logger,
             status=status,
@@ -52,18 +52,18 @@ class Users:
         return new_users
 
     @staticmethod
-    async def popular(
-        session: aiohttp.ClientSession,
+    def popular(
+        session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.List[User]:
         """
-        Asynchronously get popular users.
+        get popular users.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: A `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -80,7 +80,7 @@ class Users:
         :rtype: List[SimpleNamespace]
         """
 
-        popular_users = await reddit.users(
+        popular_users = reddit.users(
             session=session,
             logger=logger,
             status=status,
@@ -92,20 +92,20 @@ class Users:
         return popular_users
 
     @staticmethod
-    async def all(
-        session: aiohttp.ClientSession,
+    def all(
+        session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.List[User]:
         """
-        Asynchronously get all users.
+        get all users.
 
         :param limit: Maximum number of all users to return.
         :type limit: int
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: A `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -120,7 +120,7 @@ class Users:
         :rtype: List[SimpleNamespace]
         """
 
-        all_users = await reddit.users(
+        all_users = reddit.users(
             session=session,
             logger=logger,
             status=status,

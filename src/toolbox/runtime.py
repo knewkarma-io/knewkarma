@@ -4,9 +4,9 @@ import typing as t
 import aiohttp
 from rich.status import Status
 
-from knewkarma.core.models import reddit
-from knewkarma.metadata.about import Project
-from knewkarma.metadata.version import Version
+from knewkarma.core.client import reddit
+from knewkarma.meta.about import Project
+from knewkarma.meta.version import Version
 from . import colours
 from .logging import logger
 
@@ -16,7 +16,7 @@ __all__ = ["Runtime"]
 class Runtime:
     _PACKAGE = Project.package
     _VERSION = Version
-    _REQ_HANDLER = reddit.request_handler.send_request
+    _REQ_HANDLER = reddit.send_request
 
     @classmethod
     async def check_updates(

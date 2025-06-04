@@ -9,6 +9,7 @@ from engines.karmakaze.schemas import (
     Subreddit,
     User,
     WikiPage,
+    ModeratedSubreddit,
 )
 
 
@@ -155,7 +156,9 @@ class RedditSanitiser:
 
         return None
 
-    def subreddits(self, response: t.Dict) -> t.Optional[t.List[Subreddit]]:
+    def subreddits(
+        self, response: t.Dict
+    ) -> t.Optional[t.List[t.Union[Subreddit, ModeratedSubreddit]]]:
         """
         Sanitises and converts multiple subreddit responses to a list of SimpleNamespace objects.
 
@@ -163,14 +166,18 @@ class RedditSanitiser:
         :return: A list of SimpleNamespace objects or None if invalid.
         """
         data = response.get("data")
+        kind = response.get("kind")
+
+        sane_children: list[t.Union[Subreddit, ModeratedSubreddit]] = []
+        if kind == "ModeratedList":
+            return [ModeratedSubreddit(**child) for child in data]
+
+        children = data.get("children")
         if not isinstance(data, dict):
             return None
 
-        children = data.get("children")
         if not isinstance(children, list):
             return None
-
-        sane_children: list[Subreddit] = []
 
         for child in children:
             subreddit = self.subreddit(child)

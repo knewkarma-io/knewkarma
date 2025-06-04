@@ -1,4 +1,4 @@
-<h2 align="center">Klaus</h2>
+<h2 align="center">SnooPy</h2>
 
 <p align="center">0-auth Reddit API wrapper and response handling engine.</p>
 

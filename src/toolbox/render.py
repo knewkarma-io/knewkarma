@@ -8,29 +8,18 @@ from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
 
-from engines.karmakaze.schemas import User, Subreddit, WikiPage, Comment, Post
-from engines.snoopy import RedditEndpoints
+from engines.karmakaze.schemas import User, Subreddit, WikiPage, Comment, Post, ModeratedSubreddit
+from engines.snoopy.reddit import Reddit
 from toolbox import colours
-from toolbox.checkers import Checkers
 from toolbox.logging import console
 
 __all__ = ["Render"]
 
 
 class Render:
-    checkers = Checkers
 
     @classmethod
-    def has_attrs(cls, obj: t.Any, attrs: t.List[str]) -> bool:
-        """
-        Return True if all given attributes exist and are not None on the object.
-        """
-        return all(
-            hasattr(obj, attr) and getattr(obj, attr) is not None for attr in attrs
-        )
-
-    @classmethod
-    def footer_table(cls, footer_data: t.Dict) -> t.Union[Table, None]:
+    def _footer_table(cls, footer_data: t.Dict) -> t.Union[Table, None]:
         if footer_data:
             table = Table.grid(padding=(0, 4))
             table.add_row(
@@ -47,7 +36,7 @@ class Render:
         return None
 
     @classmethod
-    def timestamp_to_relative(cls, unix_timestamp: float) -> str:
+    def _timestamp_to_relative(cls, unix_timestamp: float) -> str:
         """
         Converts a UNIX timestamp to relative time format.
 
@@ -91,6 +80,22 @@ class Render:
             return f"{seconds // year}y ago"
 
     @classmethod
+    def _number_to_relative(cls, number: t.Union[int, float]):
+        """
+        Format a number using abbreviations like k, M, B, etc.
+        """
+        if number >= 1_000_000_000_000:
+            return f"{number / 1_000_000_000_000:.1f}T"
+        if number >= 1_000_000_000:
+            return f"{number / 1_000_000_000:.1f}B"
+        elif number >= 1_000_000:
+            return f"{number / 1_000_000:.1f}M"
+        elif number >= 1_000:
+            return f"{number / 1_000:.1f}K"
+        else:
+            return str(number)
+
+    @classmethod
     def show(
         cls,
         data: t.Union[
@@ -114,7 +119,7 @@ class Render:
                 return cls.comments(data)
             elif isinstance(item, User):
                 return cls.users(data)
-            elif isinstance(item, Subreddit):
+            elif isinstance(item, (Subreddit, ModeratedSubreddit)):
                 return cls.subreddits(data)
             # elif isinstance(item, WikiPage):
             #    return cls.wiki_pages(data)
@@ -126,7 +131,7 @@ class Render:
             return cls.comment(data)
         elif isinstance(data, User):
             return cls.user(data)
-        elif isinstance(data, Subreddit):
+        elif isinstance(data, (Subreddit, ModeratedSubreddit)):
             return cls.subreddit(data)
         # elif isinstance(data, WikiPage):
         #    return cls.wiki_page(data)
@@ -142,10 +147,10 @@ class Render:
 
         header_content = (
             f"{colours.BOLD}{data.name}{colours.RESET} · "
-            f"{colours.BOLD_BLUE}[link={RedditEndpoints.BASE}{subreddit.url}]"
+            f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}{subreddit.url}]"
             f"View on Reddit[/link]{colours.BOLD_BLUE_RESET}\n"
             f"{subreddit.display_name_prefixed} · "
-            f"{colours.BOLD_BLACK}{cls.timestamp_to_relative(unix_timestamp=data.created)}"
+            f"{colours.BOLD_BLACK}{cls._timestamp_to_relative(unix_timestamp=data.created)}"
             f"{colours.BOLD_BLACK_RESET}"
         )
 
@@ -158,16 +163,16 @@ class Render:
             )
 
         footer_data = {
-            "Post Karma": data.link_karma,
-            "Comment Karma": data.comment_karma,
+            "Post Karma": cls._number_to_relative(number=data.link_karma),
+            "Comment Karma": cls._number_to_relative(number=data.comment_karma),
             "Total Karma": (
-                data.link_karma + data.comment_karma
+                cls._number_to_relative(number=data.link_karma + data.comment_karma)
                 if not hasattr(data, "total_karma")
-                else data.link_karma + data.comment_karma
+                else cls._number_to_relative(number=data.total_karma)
             ),
         }
 
-        footer_content = cls.footer_table(footer_data=footer_data)
+        footer_content = cls._footer_table(footer_data=footer_data)
 
         panel_parts = []
         if subreddit.public_description:
@@ -208,7 +213,7 @@ class Render:
         subreddit = f"self" if subreddit.lower() == f"u/{author.lower()}" else subreddit
         permalink: str = getattr(data, "permalink", "")
         created: int = getattr(data, "created", 0)
-        score = data.score
+        score = cls._number_to_relative(number=data.score)
         replies: list = getattr(data, "replies", [])
 
         awards: list = getattr(data, "all_awardings", [])
@@ -220,16 +225,18 @@ class Render:
         text: str = "\n\n".join(panel_parts)
         header_content: str = (
             f"{colours.BOLD}{subreddit}{colours.RESET} · "
-            f"{colours.BOLD_BLUE}[link={RedditEndpoints.BASE}/{permalink}]"
+            f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}/{permalink}]"
             f"View on Reddit[/link]{colours.BOLD_BLUE_RESET}\nu/{author}"
-            f" · {colours.BOLD_BLACK}{cls.timestamp_to_relative(unix_timestamp=created)}"
+            f" · {colours.BOLD_BLACK}{cls._timestamp_to_relative(unix_timestamp=created)}"
             f"{colours.BOLD_BLACK_RESET}"
         )
 
         footer_content: str = (
-            f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" if score == 0 else colours.WHITE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
-            f"{colours.WHITE}💬{len(replies)}{colours.WHITE_RESET} "
-            f"{colours.BOLD_YELLOW}🏆{len(awards)}{colours.BOLD_YELLOW_RESET}"
+            f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" 
+            if score == 0 
+            else colours.WHITE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
+            f"{colours.WHITE}💬{cls._number_to_relative(number=len(replies))}{colours.WHITE_RESET} "
+            f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(awards))}{colours.BOLD_YELLOW_RESET}"
         )
 
         if is_nsfw:
@@ -276,20 +283,21 @@ class Render:
 
         text: str = "\n\n".join(panel_parts)
 
-        score = data.score
-        # score = f"⬍{score}" if score >= 0 else f"📉{score}"
+        score = cls._number_to_relative(number=data.score)
         header_content: str = (
             f"{colours.BOLD}{subreddit_name}{colours.RESET} · "
             f"{colours.BOLD_BLUE} [link={data.url}]View on Reddit[/link]"
             f"{colours.BOLD_BLUE_RESET}\nu/{data.author} · "
-            f"{colours.BOLD_BLACK}{cls.timestamp_to_relative(unix_timestamp=data.created)}"
+            f"{colours.BOLD_BLACK}{cls._timestamp_to_relative(unix_timestamp=data.created)}"
             f"{colours.BOLD_BLACK_RESET}"
         )
 
         footer_content: str = (
-            f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" if score == 0 else colours.WHITE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
-            f"{colours.WHITE}💬{data.num_comments}{colours.WHITE_RESET} "
-            f"{colours.BOLD_YELLOW}🏆{len(data.all_awardings)}{colours.BOLD_YELLOW_RESET}"
+            f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" 
+            if score == 0 
+            else colours.WHITE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
+            f"{colours.WHITE}💬{cls._number_to_relative(number=data.num_comments)}{colours.WHITE_RESET} "
+            f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(data.all_awardings))}{colours.BOLD_YELLOW_RESET}"
         )
 
         if data.over_18:
@@ -320,39 +328,48 @@ class Render:
 
     @classmethod
     def subreddit(
-        cls, data: Subreddit, print_panel: bool = True
+        cls, data: t.Union[Subreddit, ModeratedSubreddit], print_panel: bool = True
     ) -> t.Union[Panel, None]:
         if data.subreddit_type == "private":
             return None
 
+        has_public_description: bool = hasattr(data, "public_description")
+        has_description: bool = hasattr(data, "description")
+        is_nsfw: bool = getattr(data, "over_18") if hasattr(data, "over_18") else getattr(data, "over18")
+        has_title = hasattr(data, "title")
+
         panel_parts: t.List[str] = []
 
-        if data.public_description:
+        if has_title:
+            panel_parts.append(f"**{data.title}**")
+        if has_public_description:
             panel_parts.append(f"**{data.public_description}**")
-        if data.description:
+        if has_description:
             panel_parts.append(data.description)
 
-        content = "\n\n".join(panel_parts)
+        content: str = "\n\n".join(panel_parts)
 
-        header_content = (
+        header_content: str = (
             f"{colours.BOLD}{data.display_name_prefixed}{colours.RESET} · "
-            f"{colours.BOLD_BLACK}{cls.timestamp_to_relative(unix_timestamp=data.created)}"
+            f"{colours.BOLD_BLACK}{cls._timestamp_to_relative(unix_timestamp=data.created)}"
             f"{colours.BOLD_BLACK_RESET}"
         )
 
-        if data.over18:
-            header_content = (
+        if is_nsfw:
+            header_content: str = (
                 f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
             )
 
-        footer_data = {"Suscribers": data.subscribers, "Language": data.lang}
+        footer_data: t.Union[t.Dict, None] = {"Subscribers": cls._number_to_relative(number=data.subscribers)}
         if getattr(data, "accounts_active", None):
-            footer_data.update({"Active Accounts": data.accounts_active})
+            footer_data.update({"Active Accounts": cls._number_to_relative(number=data.accounts_active)})
+        if hasattr(data, "lang"):
+            footer_data.update({"Language": data.lang})
 
         if data.subreddit_type == "user":
             footer_data = None
 
-        footer_content = cls.footer_table(footer_data=footer_data)
+        footer_content = cls._footer_table(footer_data=footer_data)
 
         return cls.panel(
             header=header_content,
@@ -363,7 +380,7 @@ class Render:
         )
 
     @classmethod
-    def subreddits(cls, data: t.List[Subreddit]):
+    def subreddits(cls, data: t.List[t.Union[Subreddit, ModeratedSubreddit]]):
         panels = []
         for subreddit in data:
             panel = cls.subreddit(data=subreddit, print_panel=False)

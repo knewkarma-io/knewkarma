@@ -1,11 +1,11 @@
 import typing as t
 from logging import Logger
 
-import aiohttp
+import requests
 from rich.status import Status
 
-from client import reddit
 from engines.karmakaze.schemas import Post, WikiPage
+from .client import reddit
 
 
 class Subreddit:
@@ -23,21 +23,21 @@ class Subreddit:
         self._name = name
 
     '''
-    async def comments(
+    def comments(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         posts_limit: int,
         comments_per_post: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.List[Comment]:
         """
-        Asynchronously retrieves comments from a subreddit.
+        retrieves comments from a subreddit.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -58,7 +58,7 @@ class Subreddit:
         :rtype: List[SimpleNamespace]
         """
 
-        posts = await self.posts(
+        posts = self.posts(
             session=session,
             logger=logger,
             status=status,
@@ -72,7 +72,7 @@ class Subreddit:
                 id=post.get("id"),
                 subreddit=post.get("subreddit"),
             )
-            post_comments = await post.comments(
+            post_comments = post.comments(
                 session=session,
                 limit=comments_per_post,
                 sort=sort,
@@ -84,20 +84,20 @@ class Subreddit:
         return all_comments
         '''
 
-    async def posts(
+    def posts(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        Asynchronously retrieves posts from a subreddit.
+        retrieves posts from a subreddit.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -116,7 +116,7 @@ class Subreddit:
         :rtype: List[SimpleNamespace]
         """
 
-        subreddit_posts = await reddit.posts(
+        subreddit_posts = reddit.posts(
             session=session,
             logger=logger,
             status=status,
@@ -129,17 +129,17 @@ class Subreddit:
 
         return subreddit_posts
 
-    async def profile(
+    def profile(
         self,
-        session: aiohttp.ClientSession,
-        logger: t.Optional[Logger] = Logger,
-        status: t.Optional[Status] = Status,
+        session: requests.Session,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ):
         """
-        Asynchronously retrieves a subreddit's profile data.
+        retrieves a subreddit's profile data.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -150,7 +150,7 @@ class Subreddit:
         :rtype: SimpleNamespace
         """
 
-        subreddit_profile = await reddit.subreddit(
+        subreddit_profile = reddit.subreddit(
             session=session,
             logger=logger,
             status=status,
@@ -159,21 +159,21 @@ class Subreddit:
 
         return subreddit_profile
 
-    async def search(
+    def search(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         query: str,
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        Asynchronously get posts that contain the specified query string from a subreddit.
+        get posts that contain the specified query string from a subreddit.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -194,7 +194,7 @@ class Subreddit:
         :rtype: List[SimpleNamespace]
         """
 
-        search_results = await reddit.posts(
+        search_results = reddit.posts(
             session=session,
             logger=logger,
             status=status,
@@ -208,16 +208,16 @@ class Subreddit:
 
         return search_results
 
-    async def wikipages(
+    def wikipages(
         self,
-        session: aiohttp.ClientSession,
-        status: t.Optional[Status] = Status,
+        session: requests.Session,
+        status: t.Optional[Status] = None,
     ) -> t.List[str]:
         """
-        Asynchronously get a subreddit's wiki pages.
+        get a subreddit's wiki pages.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -233,26 +233,26 @@ class Subreddit:
                 f"Retrieving wiki pages from subreddit ({self._name})",
             )
 
-        pages = await reddit.request_handler.send_request(
+        pages = reddit.request_handler.send_request(
             endpoint=f"{reddit.api_endpoints.SUBREDDIT}/{self._name}/wiki/pages.json",
             session=session,
         )
 
         return pages.get("data")
 
-    async def wikipage(
+    def wikipage(
         self,
         page_name: str,
-        session: aiohttp.ClientSession,
-        status: t.Optional[Status] = Status,
+        session: requests.Session,
+        status: t.Optional[Status] = None,
     ) -> WikiPage:
         """
-        Asynchronously get a subreddit's specified wiki page data.
+        get a subreddit's specified wiki page data.
 
         :param page_name: Wiki page to get data from.
         :type page_name: str
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -263,7 +263,7 @@ class Subreddit:
         :rtype: SimpleNamespace
         """
 
-        wiki_page = await reddit.wiki_page(
+        wiki_page = reddit.wiki_page(
             session=session,
             status=status,
             name=page_name,

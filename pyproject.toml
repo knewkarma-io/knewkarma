@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "knewkarma"
 version = "8.0.0"
-description = "An asynchronous, zero-auth toolkit for Reddit data analysis."
+description = "A zero-auth toolkit for Reddit data analysis."
 authors = ["Ritchie Mwewa <rly0nheart@duck.com>", "Knew Karma IO <redacted@redacted.com>"]
 readme = "README.md"
 license = "GPL-3.0+"
@@ -23,11 +23,10 @@ issues = "https://github.com/knewkarma-io/knewkarma/issues"
 repository = "https://github.com/knewkarma-io/knewkarma"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-aiohttp = "^3.11.10"
+python = "^3.11"
+requests = "^2.32.3"
 pandas = "^2.1.4"
 rich-click = "^1.8.3"
-questionary = { version = "^2.1.0", optional = true }
 
 [tool.poetry.group.dev.dependencies]
 myst-parser = "^3.0.1"
@@ -35,11 +34,15 @@ poetry = "^1.8.3"
 sphinx = "^7.4.7"
 sphinx-rtd-theme = "^2.0.0"
 
-[tool.poetry.extras]
-tui = ["questionary"]
-
 [tool.poetry.scripts]
-knewkarma = "knewkarma.cli.app:start"
+kk = "knewkarma.cli._main:cli"
+kk-user = "knewkarma.cli._main:user"
+kk-users = "knewkarma.cli._main:users"
+kk-subreddit = "knewkarma.cli._main:subreddit"
+kk-subreddits = "knewkarma.cli._main:subreddits"
+kk-search = "knewkarma.cli._main:search"
+kk-posts = "knewkarma.cli._main:posts"
+knewkarma = "knewkarma.cli._main:cli"
 
 [build-system]
 requires = ["poetry-core"]
