@@ -1,9 +1,9 @@
 name: knewkarma
 icon: snap/gui/icon512x512.png
 title: Knew Karma
-summary: A Reddit data analysis toolkit
+summary: A Zero-auth toolkit for Reddit data analysis
 description: |
-  **Knew Karma** (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of
+  **Knew Karma** (/nuː ‘kɑːrmə/) is a zero-auth data analysis toolkit designed to provide an extensive range of
   functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
   **Application Programming Interface (API)** to enable an easy integration in other Python Projects. Refer to the documentation (https://knewkarma.readthedocs.io) for the **usage** and **integration** guide.
 license: GPL-3.0+
@@ -14,9 +14,9 @@ grade: stable
 confinement: strict
 adopt-info: knewkarma
 
-source-code: https://github.com/rly0nheart/knewkarma
+source-code: https://github.com/knewkarma-io/knewkarma
 issues:
-  - https://github.com/rly0nheart/knewkarma/issues
+  - https://github.com/knewkarma-io/knewkarma/issues
 donation:
   - https://opencolletive.com/knewkarma
 contact:
