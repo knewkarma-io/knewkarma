@@ -174,7 +174,7 @@ def run(
 ):
     """
     Entrypoint to execute a modular CLI command.
-    Wraps the call to method_call_handler.
+    Wraps the call to route_to_method.
     """
     route_to_method(
         ctx=ctx,
