@@ -6,8 +6,8 @@ import requests
 from rich.status import Status
 
 from engines.karmakaze.schemas import Comment, Subreddit, Post
-from toolbox import colours
-from toolbox.render import Render
+from tools import colours
+from tools.render import Render
 from .client import reddit
 
 

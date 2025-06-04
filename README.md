@@ -15,14 +15,15 @@ knewkarma subreddit AskScience --posts --limit 200
 Or
 
 ```commandline
-kk-subreddit AskScience --posts --limit 200
+rsubreddit AskScience --posts --limit 200
 ```
 
 And/Or
 
 ```python
-from knewkarma.core.subreddit import Subreddit
 import requests
+
+from knewkarma.core.subreddit import Subreddit
 
 subreddit = Subreddit("AskScience")
 with requests.Session() as session:

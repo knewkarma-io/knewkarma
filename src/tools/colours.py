@@ -54,4 +54,6 @@ BOLD_RESET: str = "[/bold]"
 ITALIC: str = "[italic]"
 ITALIC_RESET: str = "[/italic]"
 
+POWDER_BLUE = "[#B7CAD4]"
+GREY = "[#8BA2AD]"
 RESET: str = "[/]"

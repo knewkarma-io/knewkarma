@@ -2,8 +2,8 @@ import typing as t
 
 import rich_click as click
 
-from toolbox.logging import console
-from toolbox.runtime import Runtime
+from tools.logging import console
+from tools.runtime import Runtime
 from . import _exec, _shared
 from ..core.client import reddit
 from ..core.post import Post
@@ -18,6 +18,15 @@ from ..meta.license import License
 from ..meta.version import Version
 
 __all__ = ["start"]
+
+
+def set_window_title(text: t.Optional[str] = None):
+    title = f"{Project.name} v{Version.release}"
+
+    if text:
+        title = f"{title} - {text}"
+
+    console.set_window_title(title)
 
 
 def help_callback(ctx: click.Context, _, value: bool):
@@ -40,25 +49,6 @@ def help_callback(ctx: click.Context, _, value: bool):
         if Runtime.is_snap_package():
             click.pause()
         ctx.exit()
-
-
-@click.command(
-    name="license", help="Use this command to get licen[cs]e related information."
-)
-@click.option("-c", "--conditions", is_flag=True, help="Get licen[cs]e warranty.")
-@click.option("-w", "--warranty", is_flag=True, help="Get licen[cs]e conditions.")
-@_shared.global_options
-@click.pass_context
-def _license(ctx: click.Context, conditions: bool, warranty: bool):
-    """
-    Callback function for the `license` command.
-    """
-    if conditions:
-        console.print(License.conditions, justify="center")
-    elif warranty:
-        console.print(License.warranty, justify="center")
-    else:
-        click.echo(ctx.command.get_usage(ctx=ctx))
 
 
 @click.group(
@@ -90,23 +80,38 @@ def cli(
 ):
     """
     Main CLI group for Knew Karma.
-
-    :param ctx: The Click context object.
-    :type ctx: click.Context
-    :param timeframe: Option to set the timeframe for the data.
-    :type timeframe: t.Literal[str]
-    :param sort: Option to set the sort criterion for the data.
-    :type sort: t.Literal[str]
-    :param limit: Option to set output data limit.
-    :type limit: int
-    :param export: Option to set data export file types.
-    :type export: t.Literal[str]
     """
-    console.set_window_title(f"{Project.name} {Version.release}")
+    set_window_title()
     ctx.ensure_object(t.Dict)
 
 
-cli.add_command(cmd=_license, name="license")
+@cli.command("license")
+@click.option("--conditions", help="License terms and conditions.", is_flag=True)
+@click.option("--warranty", help="License warranty.", is_flag=True)
+@click.pass_context
+def licence(
+    ctx: click.Context, conditions: t.Optional[bool], warranty: t.Optional[bool]
+):
+    """
+    Show license information
+    """
+    set_window_title(
+        "License Terms and Conditions"
+        if conditions
+        else "License Warranty" if warranty else None
+    )
+    if conditions:
+        console.print(
+            License.conditions,
+            justify="center",
+        )
+    elif warranty:
+        console.print(
+            License.warranty,
+            justify="center",
+        )
+    else:
+        click.echo(ctx.get_help())
 
 
 @cli.command(
@@ -664,7 +669,6 @@ def start():
     """
     Main entrypoint for the Knew Karma command-line interface.
     """
-
 
     cli(obj={})
 
