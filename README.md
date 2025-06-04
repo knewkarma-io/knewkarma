@@ -1,4 +1,4 @@
-<p align="center"><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is an asynchronous, zero-auth toolkit for Reddit data analysis. Designed to provide an extensive range of functionalities for exploring and analysing Reddit data, Knew Karma includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), a <strong>Textual-based User Interface</strong> (<strong>TUI</strong>), and an <strong>Application Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.</p>
+<p align="center"><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is a zero-auth toolkit for Reddit data analysis. Designed to provide an extensive range of functionalities for exploring and analysing Reddit data, Knew Karma includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), a <strong>Textual-based User Interface</strong> (<strong>TUI</strong>), and an <strong>Application Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.</p>
 
 <p align="center">
   <a href="https://github.com/knewkarma-io/knewkarma"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-000000?logo=github&link=https%3A%2F%2Fgithub.com%2Frly0nheart%2Fknewkarma"></a>
@@ -9,27 +9,26 @@
 </p>
 
 ```commandline
-knewkarma --limit 200 subreddit AskScience --posts
+knewkarma subreddit AskScience --posts --limit 200
 ```
 
+Or
+
+```commandline
+kk-subreddit AskScience --posts --limit 200
+```
+
+And/Or
+
 ```python
-import asyncio
+import requests
+from knewkarma.core.subreddit import Subreddit
 
-import aiohttp
-import knewkarma
-
-
-async def subreddit_posts(subreddit_name, posts_limit):
-    subreddit = knewkarma.Subreddit(subreddit_name)
-
-    async with aiohttp.ClientSession() as session:
-        posts = await subreddit.posts(session=session, limit=posts_limit)
-
-        for post in posts:
-            print(post.data.title)
-
-
-asyncio.run(subreddit_posts(subreddit_name="AskScience", posts_limit=200))
+subreddit = Subreddit("AskScience")
+with requests.Session() as session:
+    posts = subreddit.posts(session=session, limit=200)
+    for post in posts:
+        print(post.title)
 ```
 
 ## Documentation

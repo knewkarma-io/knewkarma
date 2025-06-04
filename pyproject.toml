@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "knewkarma"
 version = "8.0.0"
-description = "A zero-auth toolkit for Reddit data analysis."
+description = "Zero-auth toolkit for Reddit data analysis."
 authors = ["Ritchie Mwewa <rly0nheart@duck.com>", "Knew Karma IO <redacted@redacted.com>"]
 readme = "README.md"
 license = "GPL-3.0+"
