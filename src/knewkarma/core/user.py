@@ -2,14 +2,13 @@ import typing as t
 from collections import Counter
 from logging import Logger
 
-import aiohttp
+import requests
 from rich.status import Status
 
 from engines.karmakaze.schemas import Comment, Subreddit, Post
+from toolbox import colours
 from toolbox.render import Render
 from .client import reddit
-
-print(reddit.ENDPOINTS["username_available"])
 
 
 class User:
@@ -25,9 +24,9 @@ class User:
 
         self.name = name
 
-    async def comments(
+    def comments(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
@@ -35,10 +34,10 @@ class User:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Comment]:
         """
-        Asynchronously get a user's comments.
+        get a user's comments.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -57,7 +56,7 @@ class User:
         :rtype: List[SimpleNamespace]
         """
 
-        user_comments = await reddit.comments(
+        user_comments = reddit.comments(
             session=session,
             logger=logger,
             status=status,
@@ -70,17 +69,17 @@ class User:
 
         return user_comments
 
-    async def moderated_subreddits(
+    def moderated_subreddits(
         self,
-        session: aiohttp.ClientSession,
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
+        session: requests.Session,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.List[Subreddit]:
         """
-        Asynchronously get subreddits moderated by user.
+        get subreddits moderated by user.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+        :type session: requests.Session
 
 
 
@@ -93,7 +92,7 @@ class User:
         :rtype: List[SimpleNamespace]
         """
 
-        subreddits = await reddit.subreddits(
+        subreddits = reddit.subreddits(
             session=session,
             logger=logger,
             status=status,
@@ -105,20 +104,20 @@ class User:
 
         return subreddits
 
-    async def overview(
+    def overview(
         self,
         limit: int,
-        session: aiohttp.ClientSession,
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
+        session: requests.Session,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.List[Comment]:
         """
-        Asynchronously get a user's most recent comments.
+        get a user's most recent comments.
 
         :param limit: Maximum number of comments to return.
         :type limit: int
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+        :type session: requests.Session
 
 
 
@@ -131,7 +130,7 @@ class User:
         :rtype: List[SimpleNamespace]
         """
 
-        user_overview = await reddit.comments(
+        user_overview = reddit.comments(
             session=session,
             logger=logger,
             status=status,
@@ -144,20 +143,20 @@ class User:
 
         return user_overview
 
-    async def posts(
+    def posts(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         limit: int,
         sort: reddit.SORT = "all",
         timeframe: reddit.TIMEFRAME = "all",
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        Asynchronously get a user's posts.
+        get a user's posts.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-        :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+        :type session: requests.Session
         :param limit: Maximum number of posts to return.
         :type limit: int
         :param sort: Sort criterion for the posts.
@@ -172,7 +171,7 @@ class User:
         :rtype: List[SimpleNamespace]
         """
 
-        user_posts = await reddit.posts(
+        user_posts = reddit.posts(
             session=session,
             logger=logger,
             status=status,
@@ -185,16 +184,16 @@ class User:
 
         return user_posts
 
-    async def profile(
+    def profile(
         self,
-        session: aiohttp.ClientSession,
-        status: t.Optional[Status] = Status,
+        session: requests.Session,
+        status: t.Optional[Status] = None,
     ):
         """
-        Asynchronously get a user's profile data.
+        get a user's profile data.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -205,7 +204,7 @@ class User:
         :rtype: SimpleNamespace
         """
 
-        user_profile = await reddit.user(
+        user_profile = reddit.user(
             session=session,
             status=status,
             name=self.name,
@@ -213,20 +212,20 @@ class User:
 
         return user_profile
 
-    async def top_subreddits(
+    def top_subreddits(
         self,
-        session: aiohttp.ClientSession,
+        session: requests.Session,
         top_n: int,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.Union[t.Dict[str, int], None]:
         """
-        Asynchronously get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
+        get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -243,7 +242,7 @@ class User:
         :type logger: Logger
         """
 
-        posts = await reddit.posts(
+        posts = reddit.posts(
             session=session,
             logger=logger,
             status=status,
@@ -282,17 +281,17 @@ class User:
             return data
         return None
 
-    async def is_username_available(
+    def is_username_available(
         self,
-        session: aiohttp.ClientSession,
-        status: t.Optional[Status] = Status,
-        logger: t.Optional[Logger] = Logger,
+        session: requests.Session,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.Union[bool, None]:
         """
         Checks if the given username is available or taken.
 
-        :param session: An `aiohttp.ClientSession` for making the HTTP request.
-                :type session: aiohttp.ClientSession
+        :param session: An `requests.Session` for making the HTTP request.
+                :type session: requests.Session
 
 
 
@@ -308,7 +307,7 @@ class User:
         if status:
             status.update(f"Checking username availability: {self.name}")
 
-        response: bool = await reddit.send_request(
+        response: bool = reddit.send_request(
             session=session,
             url=reddit.ENDPOINTS["username_available"],
             params={"user": self.name},
@@ -316,9 +315,13 @@ class User:
 
         if status and logger:
             if bool(response) is True:
-                logger.info(f"Username ({self.name}) is available")
+                logger.info(
+                    f"[{self.name}] {colours.BOLD_GREEN}Username is available{colours.BOLD_GREEN_RESET}"
+                )
             else:
-                logger.warning(f"Username ({self.name}) is already taken")
+                logger.warning(
+                    f"[{self.name}] {colours.BOLD_YELLOW}Username is already taken{colours.BOLD_YELLOW_RESET}"
+                )
         else:
             return response
 

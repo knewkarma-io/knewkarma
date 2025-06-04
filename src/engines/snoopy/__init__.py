@@ -1,4 +1,3 @@
-from .api import RedditRequestHandler, RedditEndpoints
-from .reddit import RedditClient
+from .reddit import Reddit
 
-__all__ = ["RedditClient", "RedditRequestHandler", "RedditEndpoints"]
+__all__ = ["Reddit"]

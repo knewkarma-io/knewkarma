@@ -1,3 +1,4 @@
-from .core import models
+from .core import post, posts, search, subreddit, subreddits, user, users
 
-__all__ = ["models.py"]
+
+__all__ = ["post", "posts", "search", "subreddit", "subreddits", "user", "users"]
