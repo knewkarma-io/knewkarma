@@ -5,6 +5,8 @@ import rich_click as click
 
 from ..core.client import reddit
 
+__all__ = ["global_options"]
+
 
 def global_options(func: t.Callable) -> t.Callable:
     """
