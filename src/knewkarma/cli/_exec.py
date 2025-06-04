@@ -8,7 +8,7 @@ import requests
 from rich.status import Status
 
 from tools import colours
-from tools.io_assets import FileHandler, DataFrame
+from tools.io_handlers import DataFrameHandler, FileHandler
 from tools.logging import console
 from tools.render import Render
 from ..core.client import reddit
@@ -77,8 +77,8 @@ def _method_caller(
             )
 
             export_to: t.List[str] = kwargs.get("export").split(",")
-            dataframe = DataFrame.build(data=response_data)
-            DataFrame.export(
+            dataframe = DataFrameHandler.build(data=response_data)
+            DataFrameHandler.export(
                 dataframe=dataframe,
                 filename=FileHandler.time_to_filename(),
                 directory=exports_child_dir,
