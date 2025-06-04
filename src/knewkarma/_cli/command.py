@@ -174,7 +174,15 @@ def run(
 ):
     """
     Entrypoint to execute a modular CLI command.
-    Wraps the call to route_to_method.
+
+    :param ctx: The Click context for the current CLI invocation.
+    :type ctx: click.Context
+    :param export: Comma-separated string of export formats (e.g., "csv,json").
+    :type export: str
+    :param method_map: Dictionary mapping CLI argument names to callable functions.
+    :type method_map: Dict[str, Callable]
+    :param kwargs: Additional keyword arguments passed from Click options/arguments.
+    :type kwargs: Any
     """
     route_to_method(
         ctx=ctx,
