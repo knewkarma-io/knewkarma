@@ -35,12 +35,12 @@ sphinx = "^7.4.7"
 sphinx-rtd-theme = "^2.0.0"
 
 [tool.poetry.scripts]
-ruser = "knewkarma._cli.main:user"
-rusers = "knewkarma._cli.main:users"
-rsubreddit = "knewkarma._cli.main:subreddit"
-rsubreddits = "knewkarma._cli.main:subreddits"
-rsearch = "knewkarma._cli.main:search"
-rposts = "knewkarma._cli.main:posts"
+ruser = "knewkarma._cli.main:cmd_user"
+rusers = "knewkarma._cli.main:cmd_users"
+rsubreddit = "knewkarma._cli.main:cmd_subreddit"
+rsubreddits = "knewkarma._cli.main:cmd_subreddits"
+rsearch = "knewkarma._cli.main:cmd_search"
+rposts = "knewkarma._cli.main:cmd_posts"
 knewkarma = "knewkarma._cli.main:cli"
 
 [build-system]
