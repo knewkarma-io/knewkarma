@@ -7,10 +7,10 @@ import pandas as pd
 from engines.karmakaze.schemas import User, Subreddit, Post, WikiPage, Comment
 from .logging import logger
 
-__all__ = ["FileHandler", "DataFrame"]
+__all__ = ["FileHandler", "DataFrameHandler"]
 
 
-class DataFrame:
+class DataFrameHandler:
     EXPORT_FORMATS = t.Literal["csv", "html", "json", "xml"]
 
     @classmethod
