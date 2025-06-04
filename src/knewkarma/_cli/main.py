@@ -4,7 +4,7 @@ import rich_click as click
 
 from tools.logging import console
 from tools.runtime import Runtime
-from . import _exec, _shared
+from . import command, shared
 from ..core.client import reddit
 from ..core.post import Post
 from ..core.posts import Posts
@@ -73,7 +73,7 @@ def help_callback(ctx: click.Context, _, value: bool):
     "-v",
     "--version",
 )
-@_shared.global_options
+@shared.global_options
 @click.pass_context
 def cli(
     ctx: click.Context,
@@ -122,7 +122,7 @@ def licence(
 @click.argument("subreddit")
 @click.option("--data", is_flag=True, help="Get post data")
 @click.option("--comments", is_flag=True, help="Get post comments")
-@_shared.global_options
+@shared.global_options
 @click.pass_context
 def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool):
     """
@@ -154,7 +154,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
         ),
     }
 
-    _exec.run(
+    command.run(
         ctx=ctx,
         method_map=method_map,
         export=export,
@@ -184,7 +184,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     help="Get posts from the popular listing",
 )
 @click.option("--rising", is_flag=True, help="Get posts from the rising listing")
-@_shared.global_options
+@shared.global_options
 @click.pass_context
 def posts(
     ctx: click.Context,
@@ -253,7 +253,7 @@ def posts(
         ),
     }
 
-    _exec.run(
+    command.run(
         ctx=ctx,
         method_map=method_map,
         export=export,
@@ -273,7 +273,7 @@ def posts(
 @click.option("--posts", is_flag=True, help="Search posts")
 @click.option("--subreddits", is_flag=True, help="Search subreddits")
 @click.option("--users", is_flag=True, help="Search users")
-@_shared.global_options
+@shared.global_options
 @click.pass_context
 def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users: bool):
     """
@@ -310,7 +310,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
         ),
     }
 
-    _exec.run(
+    command.run(
         ctx=ctx,
         method_map=method_map,
         export=export,
@@ -344,7 +344,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
     is_flag=True,
     help="Check if the given username is available or taken.",
 )
-@_shared.global_options
+@shared.global_options
 @click.pass_context
 def user(
     ctx: click.Context,
@@ -426,7 +426,7 @@ def user(
         ),
     }
 
-    _exec.run(
+    command.run(
         ctx=ctx,
         method_map=method_map,
         export=export,
@@ -454,7 +454,7 @@ def user(
     is_flag=True,
     help="Get popular users",
 )
-@_shared.global_options
+@shared.global_options
 @click.pass_context
 def users(ctx: click.Context, all: bool, new: bool, popular: bool):
     """
@@ -499,7 +499,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
         ),
     }
 
-    _exec.run(
+    command.run(
         ctx=ctx,
         method_map=method_map,
         export=export,
@@ -518,7 +518,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 @click.option("--posts", is_flag=True, help="Get a subreddit's posts")
 @click.option("--wikipage", type=str, help="Get a subreddit's specified wiki page data")
 @click.option("--wikipages", is_flag=True, help="Get a subreddit's wiki pages")
-@_shared.global_options
+@shared.global_options
 @click.pass_context
 def subreddit(
     ctx: click.Context,
@@ -582,7 +582,7 @@ def subreddit(
             page_name=wikipage, status=status, session=session
         ),
     }
-    _exec.run(
+    command.run(
         ctx=ctx,
         method_map=method_map,
         export=export,
@@ -612,7 +612,7 @@ def subreddit(
     is_flag=True,
     help="Get popular subreddits",
 )
-@_shared.global_options
+@shared.global_options
 @click.pass_context
 def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular: bool):
     """
@@ -653,7 +653,7 @@ def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular:
         ),
     }
 
-    _exec.run(
+    command.run(
         ctx=ctx,
         method_map=method_map,
         export=export,
