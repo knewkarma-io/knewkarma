@@ -36,19 +36,14 @@ Gets a post's data.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Post
+import requests
+from knewkarma.core.post import Post
 
+post = Post(id="13ptwzd", subreddit="AskReddit")
+with requests.Session() as session:
+    post = post.data(session=session)
+    print(post.data)
 
-async def get_post_data(post_id, post_subreddit):
-    post = Post(id=post_id, subreddit=post_subreddit)
-    async with aiohttp.ClientSession() as session:
-        post = await post.data(session=session)
-        print(post.data)
-
-
-asyncio.run(get_post_data(post_id="13ptwzd", post_subreddit="AskReddit"))
 ```
 
 ***
@@ -60,21 +55,14 @@ Gets a post's comments.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Post
+import requests
+from knewkarma.core.post import Post
 
-
-async def get_post_comments(post_id, post_subreddit, comments_limit):
-    post = Post(id=post_id, subreddit=post_subreddit)
-    async with aiohttp.ClientSession() as session:
-        comments = await post.comments(limit=comments_limit, session=session)
-
-        for comment in comments:
-            print(comment.data.body)
-
-
-asyncio.run(get_post_comments(post_id="13ptwzd", post_subreddit="AskReddit", comments_limit=50))
+post = Post(id="13ptwzd", subreddit="AskReddit")
+with requests.Session() as session:
+    comments = post.comments(limit=50, session=session)
+    for comment in comments:
+        print(comment.body)
 ```
 
 ***
@@ -100,21 +88,16 @@ Gets posts from the best listing.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Posts
+import requests
+from knewkarma.core.posts import Posts
 
+posts = Posts()
+with requests.Session() as session:
+    best_posts = posts.best(limit=150, session=session)
 
-async def get_best_posts(posts_limit):
-    posts = Posts()
-    async with aiohttp.ClientSession() as session:
-        best_posts = await posts.best(limit=posts_limit, session=session)
+    for post in best_posts:
+        print(post.title)
 
-        for post in best_posts:
-            print(post.data.title)
-
-
-asyncio.run(get_best_posts(posts_limit=120))
 ```
 
 ***
@@ -126,21 +109,15 @@ Gets posts from the controversial listing.
 ##### Code Example::
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Posts
+import requests
+from knewkarma.core.posts import Posts
 
+posts = Posts()
+with requests.Session() as session:
+    controversial_posts = posts.controversial(limit=20, session=session)
 
-async def get_controversial_posts(posts_limit):
-    posts = Posts()
-    async with aiohttp.ClientSession() as session:
-        controversial_posts = await posts.controversial(limit=posts_limit, session=session)
-
-        for post in controversial_posts:
-            print(post.data.title)
-
-
-asyncio.run(get_controversial_posts(posts_limit=50))
+    for post in controversial_posts:
+        print(post.title)
 ```
 
 ***
@@ -152,21 +129,15 @@ Gets posts from the Reddit front-page.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Posts
+import requests
+from knewkarma.core.posts import Posts
 
+posts = Posts()
+with requests.Session() as session:
+    frontpage_posts = posts.front_page(limit=10, session=session)
 
-async def get_frontpage_posts(posts_limit):
-    posts = Posts()
-    async with aiohttp.ClientSession() as session:
-        frontpage_posts = await posts.front_page(limit=posts_limit, session=session)
-
-        for post in frontpage_posts:
-            print(post.data.title)
-
-
-asyncio.run(get_frontpage_posts(posts_limit=10))
+    for post in frontpage_posts:
+        print(post.title)
 ```
 
 ***
@@ -178,21 +149,16 @@ Gets new posts.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Posts
+import requests
+from knewkarma.core.posts import Posts
 
+posts = Posts()
+with requests.Session() as session:
+    new_posts = posts.new(limit=10, session=session)
 
-async def get_new_posts(posts_limit):
-    posts = Posts()
-    async with aiohttp.ClientSession() as session:
-        new_posts = await posts.new(limit=posts_limit, session=session)
+    for post in new_posts:
+        print(post.title)
 
-        for post in new_posts:
-            print(post.data.title)
-
-
-asyncio.run(get_new_posts(posts_limit=10))
 ```
 
 ***
@@ -204,21 +170,15 @@ Gets posts from the popular listing.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Posts
+import requests
+from knewkarma.core.posts import Posts
 
+posts = Posts()
+with requests.Session() as session:
+    popular_posts = posts.popular(limit=50, session=session)
 
-async def get_popular_posts(posts_limit):
-    posts = Posts()
-    async with aiohttp.ClientSession() as session:
-        popular_posts = await posts.popular(limit=posts_limit, session=session)
-
-        for post in popular_posts:
-            print(post.data.title)
-
-
-asyncio.run(get_popular_posts(posts_limit=50))
+    for post in popular_posts:
+        print(post.title)
 ```
 
 ***
@@ -230,21 +190,16 @@ Gets posts from the rising listing.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Posts
+import requests
+from knewkarma.core.posts import Posts
 
+posts = Posts()
+with requests.Session() as session:
+    rising_posts = posts.rising(limit=100, session=session)
 
-async def get_rising_posts(posts_limit):
-    posts = Posts()
-    async with aiohttp.ClientSession() as session:
-        rising_posts = await posts.rising(limit=posts_limit, session=session)
+    for post in rising_posts:
+        print(post.title)
 
-        for post in rising_posts:
-            print(post.data.title)
-
-
-asyncio.run(get_rising_posts(posts_limit=100))
 ```
 
 ***
@@ -273,21 +228,16 @@ Search posts.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Search
+import requests
+from knewkarma.core.search import Search
 
+search = Search(query="Something about data science")
+with requests.Session() as session:
+    posts = search.posts(limit=200, session=session)
 
-async def search_posts(query, results_limit):
-    search = Search(query=query)
-    async with aiohttp.ClientSession() as session:
-        posts = await search.posts(limit=results_limit, session=session)
+    for post in posts:
+        print(post.title)
 
-        for post in posts:
-            print(post.data.title)
-
-
-asyncio.run(search_posts(query="something in data science", results_limit=200))
 ```
 
 ***
@@ -299,21 +249,15 @@ Search subreddits.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Search
+import requests
+from knewkarma.core.search import Search
 
+search = Search(query="ask")
+with requests.Session() as session:
+    subreddits = search.subreddits(limit=200, session=session)
 
-async def search_subreddits(query, results_limit):
-    search = Search(query=query)
-    async with aiohttp.ClientSession() as session:
-        subreddits = await search.subreddits(limit=results_limit, session=session)
-
-        for subreddit in subreddits:
-            print(subreddit.data.name)
-
-
-asyncio.run(search_subreddits(query="questions", results_limit=200))
+    for subreddit in subreddits:
+        print(subreddit.name)
 ```
 
 ***
@@ -325,21 +269,15 @@ Search users.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Search
+import requests
+from knewkarma.core.search import Search
 
+search = Search(query="john")
+with requests.Session() as session:
+    users = search.users(limit=200, session=session)
 
-async def search_users(query, results_limit):
-    search = Search(query=query)
-    async with aiohttp.ClientSession() as session:
-        users = await search.users(limit=results_limit, session=session)
-
-        for user in users:
-            print(user.data.name)
-
-
-asyncio.run(search_users(query="john", results_limit=200))
+    for user in users:
+        print(user.name)
 ```
 
 ***
@@ -367,19 +305,13 @@ Gets a subreddit's profile data.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Subreddit
+import requests
+from knewkarma.core.subreddit import Subreddit
 
-
-async def get_subreddit_profile(subreddit):
-    subreddit = Subreddit(name=subreddit)
-    async with aiohttp.ClientSession() as session:
-        profile = await subreddit.profile(session=session)
-        print(profile.data.description)
-
-
-asyncio.run(get_subreddit_profile(subreddit="AskScience"))
+subreddit = Subreddit(name="AskScience")
+with requests.Session() as session:
+    profile = subreddit.profile(session=session)
+    print(profile.description)
 ```
 
 ***
@@ -391,19 +323,13 @@ Gets a subreddit's wiki pages.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Subreddit
+import requests
+from knewkarma.core.subreddit import Subreddit
 
-
-async def get_subreddit_wiki_pages(subreddit):
-    subreddit = Subreddit(name=subreddit)
-    async with aiohttp.ClientSession() as session:
-        wiki_pages = await subreddit.wikipages(session=session)
-        print(wiki_pages)
-
-
-asyncio.run(get_subreddit_wiki_pages(subreddit="MachineLearning"))
+subreddit = Subreddit(name="MachineLearning")
+with requests.Session() as session:
+    wiki_pages = subreddit.wikipages(session=session)
+    print(wiki_pages)
 ```
 
 ***
@@ -415,19 +341,13 @@ Gets a subreddit's specified wiki page data.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Subreddit
+import requests
+from knewkarma.core.subreddit import Subreddit
 
-
-async def get_subreddit_wiki_page(page, subreddit):
-    subreddit = Subreddit(name=subreddit)
-    async with aiohttp.ClientSession() as session:
-        wiki_page_data = await subreddit.wikipage(page_name=page, session=session)
-        print(wiki_page_data.data.content_markdown)
-
-
-asyncio.run(get_subreddit_wiki_page(page="rules", subreddit="MachineLearning"))
+subreddit = Subreddit(name="MachineLearning")
+with requests.Session() as session:
+    wiki_page = subreddit.wikipage(page_name="rules", session=session)
+    print(wiki_page.content_markdown)
 ```
 
 ***
@@ -439,51 +359,15 @@ Gets a subreddit's posts.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Subreddit
+import requests
+from knewkarma.core.subreddit import Subreddit
 
+subreddit = Subreddit(name="MachineLearning")
+with requests.Session() as session:
+    posts = subreddit.posts(limit=500, session=session)
 
-async def get_subreddit_posts(subreddit, posts_limit):
-    subreddit = Subreddit(name=subreddit)
-    async with aiohttp.ClientSession() as session:
-        posts = await subreddit.posts(limit=posts_limit, session=session)
-
-        for post in posts:
-            print(post.data.title)
-
-
-asyncio.run(get_subreddit_posts(posts_limit=500, subreddit="MachineLearning"))
-```
-
-***
-
-#### <span class="method-name"><span class="italic">Subreddit.</span><strong>comments</strong></span>
-
-Gets a subreddit's comments.
-
-##### Code Example:
-
-```python
-import asyncio
-import aiohttp
-from knewkarma import Subreddit
-
-
-async def get_subreddit_comments(subreddit, posts_limit, comments_per_post):
-    subreddit = Subreddit(name=subreddit)
-    async with aiohttp.ClientSession() as session:
-        comments = await subreddit.comments(
-            posts_limit=posts_limit,
-            comments_per_post=comments_per_post,
-            session=session
-        )
-
-        for comment in comments:
-            print(comment.data.body)
-
-
-asyncio.run(get_subreddit_comments(subreddit="AskScience", posts_limit=100, comments_per_post=20))
+    for post in posts:
+        print(post.title)
 ```
 
 ***
@@ -495,21 +379,15 @@ Gets posts that contain a specified keyword from a subreddit.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Subreddit
+import requests
+from knewkarma.core.subreddit import Subreddit
 
+subreddit = Subreddit(name="AskScience")
+with requests.Session() as session:
+    posts = subreddit.search(query="multiverse", limit=100, session=session)
 
-async def search_subreddit_posts(search_query, subreddit, posts_limit):
-    subreddit = Subreddit(name=subreddit)
-    async with aiohttp.ClientSession() as session:
-        posts = await subreddit.search(query=search_query, limit=posts_limit, session=session)
-
-        for post in posts:
-            print(post.data.title)
-
-
-asyncio.run(search_subreddit_posts(search_query="multiverse theory", posts_limit=100, subreddit="AskScience"))
+    for post in posts:
+        print(post.title)
 ```
 
 ***
@@ -535,21 +413,15 @@ Gets all subreddits.
 ##### implementation
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Subreddits
+import requests
+from knewkarma.core.subreddits import Subreddits
 
+subreddits = Subreddits()
+with requests.Session() as session:
+    all_subreddits = subreddits.all(limit=500, session=session)
 
-async def get_all_subreddits(subreddits_limit):
-    subreddits = Subreddits()
-    async with aiohttp.ClientSession() as session:
-        all_subreddits = await subreddits.all(limit=subreddits_limit, session=session)
-
-        for subreddit in all_subreddits:
-            print(subreddit.data.description)
-
-
-asyncio.run(get_all_subreddits(subreddits_limit=500))
+    for subreddit in all_subreddits:
+        print(subreddit.description)
 ```
 
 ***
@@ -561,21 +433,15 @@ Gets default subreddits.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Subreddits
+import requests
+from knewkarma.core.subreddits import Subreddits
 
+subreddits = Subreddits()
+with requests.Session() as session:
+    default_subreddits = subreddits.default(limit=20, session=session)
 
-async def get_default_subreddits(subreddits_limit):
-    subreddits = Subreddits()
-    async with aiohttp.ClientSession() as session:
-        default_subreddits = await subreddits.default(limit=subreddits_limit, session=session)
-
-        for subreddit in default_subreddits:
-            print(subreddit.data.description)
-
-
-asyncio.run(get_default_subreddits(subreddits_limit=20))
+    for subreddit in default_subreddits:
+        print(subreddit.description)
 ```
 
 ***
@@ -587,21 +453,16 @@ Gets new subreddits.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Subreddits
+import requests
+from knewkarma.core.subreddits import Subreddits
 
+subreddits = Subreddits()
+with requests.Session() as session:
+    new_subreddits = subreddits.new(limit=50, session=session)
 
-async def get_new_subreddits(subreddits_limit):
-    subreddits = Subreddits()
-    async with aiohttp.ClientSession() as session:
-        new_subreddits = await subreddits.new(limit=subreddits_limit, session=session)
+    for subreddit in new_subreddits:
+        print(subreddit.description)
 
-        for subreddit in new_subreddits:
-            print(subreddit.data.description)
-
-
-asyncio.run(get_new_subreddits(subreddits_limit=50))
 ```
 
 ***
@@ -613,21 +474,15 @@ Gets popular subreddits.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Subreddits
+import requests
+from knewkarma.core.subreddits import Subreddits
 
+subreddits = Subreddits()
+with requests.Session() as session:
+    popular_subreddits = subreddits.popular(limit=100, session=session)
 
-async def get_popular_subreddits(subreddits_limit):
-    subreddits = Subreddits()
-    async with aiohttp.ClientSession() as session:
-        popular_subreddits = await subreddits.popular(limit=subreddits_limit, session=session)
-
-        for subreddit in popular_subreddits:
-            print(subreddit.data.description)
-
-
-asyncio.run(get_popular_subreddits(subreddits_limit=100))
+    for subreddit in popular_subreddits:
+        print(subreddit.description)
 ```
 
 ***
@@ -655,19 +510,13 @@ Gets a user's profile data.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import User
+import requests
+from knewkarma.core.user import User
 
-
-async def get_user_profile(username):
-    user = User(name=username)
-    async with aiohttp.ClientSession() as session:
-        profile = await user.profile(session=session)
-        print(profile.data.created)
-
-
-asyncio.run(get_user_profile(username="AutoModerator"))
+user = User(name="AutoModerator")
+with requests.Session() as session:
+    profile = user.profile(session=session)
+    print(profile.created)
 ```
 
 ***
@@ -679,21 +528,15 @@ Gets a user's posts.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import User
+import requests
+from knewkarma.core.user import User
 
+user = User(name="AutoModerator")
+with requests.Session() as session:
+    posts = user.posts(limit=100, session=session)
 
-async def get_user_posts(username, posts_limit):
-    user = User(name=username)
-    async with aiohttp.ClientSession() as session:
-        posts = await user.posts(limit=posts_limit, session=session)
-
-        for post in posts:
-            print(post.data.title)
-
-
-asyncio.run(get_user_posts(username="AutoModerator", posts_limit=100))
+    for post in posts:
+        print(post.title)
 ```
 
 ***
@@ -705,21 +548,15 @@ Gets a user's comments.
 ##### COde Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import User
+import requests
+from knewkarma.core.user import User
 
+user = User(name="AutoModerator")
+with requests.Session() as session:
+    comments = user.comments(limit=100, session=session)
 
-async def get_user_comments(username, comments_limit):
-    user = User(name=username)
-    async with aiohttp.ClientSession() as session:
-        comments = await user.comments(limit=comments_limit, session=session)
-
-        for comment in comments:
-            print(comment.data.id)
-
-
-asyncio.run(get_user_comments(username="AutoModerator", comments_limit=100))
+    for comment in comments:
+        print(comment.id)
 ```
 
 ***
@@ -731,21 +568,15 @@ Gets a user's most recent comments.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import User
+import requests
+from knewkarma.core.user import User
 
+user = User(name="AutoModerator")
+with requests.Session() as session:
+    comments = user.overview(limit=100, session=session)
 
-async def get_user_overview(username, comments_limit):
-    user = User(name=username)
-    async with aiohttp.ClientSession() as session:
-        comments = await user.overview(limit=comments_limit, session=session)
-
-        for comment in comments:
-            print(comment.data.body)
-
-
-asyncio.run(get_user_overview(username="AutoModerator", comments_limit=100))
+    for comment in comments:
+        print(comment.body)
 ```
 
 ***
@@ -757,21 +588,15 @@ Gets subreddits moderated by the user.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import User
+import requests
+from knewkarma.core.user import User
 
+user = User(name="JanelleMonae")
+with requests.Session() as session:
+    moderated_subreddits = user.moderated_subreddits(session=session)
 
-async def get_user_moderated_subreddits(username):
-    user = User(name=username)
-    async with aiohttp.ClientSession() as session:
-        moderated_subreddits = await user.moderated_subreddits(session=session)
-
-        for subreddit in moderated_subreddits:
-            print(subreddit.data.name)
-
-
-asyncio.run(get_user_moderated_subreddits(username="TheRealKSI"))
+    for subreddit in moderated_subreddits:
+        print(subreddit.name)
 ```
 
 ***
@@ -783,30 +608,18 @@ Gets a user's top n subreddits based on subreddit frequency in *n* posts.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import User
+import requests
+from knewkarma.core.user import User
 
-
-async def get_user_top_subreddits(username, top_number, subreddits_limit):
-    user = User(name=username)
-    async with aiohttp.ClientSession() as session:
-        top_subreddits = await user.top_subreddits(
-            top_n=top_number,
-            limit=subreddits_limit,
-            session=session
-        )
-
-        print(top_subreddits)
-
-
-asyncio.run(
-    get_user_top_subreddits(
-        username="TheRealKSI",
-        top_number=10,
-        subreddits_limit=100
+user = User(name="JanelleMonae")
+with requests.Session() as session:
+    top_subreddits = user.top_subreddits(
+        top_n=10,
+        limit=100,
+        session=session
     )
-)
+
+    print(top_subreddits)
 ```
 
 ***
@@ -832,21 +645,15 @@ Gets all users.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Users
+import requests
+from knewkarma.core.users import Users
 
+users = Users()
+with requests.Session() as session:
+    all_users = users.all(limit=50, session=session)
 
-async def get_all_users(users_limit):
-    users = Users()
-    async with aiohttp.ClientSession() as session:
-        all_users = await users.all(limit=users_limit, session=session)
-
-        for user in all_users:
-            print(user.data.name)
-
-
-asyncio.run(get_all_users(users_limit=1000))
+    for user in all_users:
+        print(user.name)
 ```
 
 ***
@@ -858,21 +665,15 @@ Gets new users.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Users
+import requests
+from knewkarma.core.users import Users
 
+users = Users()
+with requests.Session() as session:
+    new_users = users.new(limit=100, session=session)
 
-async def get_new_users(users_limit):
-    users = Users()
-    async with aiohttp.ClientSession() as session:
-        new_users = await users.new(limit=users_limit, session=session)
-
-        for user in new_users:
-            print(user.data.created)
-
-
-asyncio.run(get_new_users(users_limit=500))
+    for user in new_users:
+        print(user.created)
 ```
 
 ***
@@ -884,21 +685,15 @@ Gets popular users.
 ##### Code Example:
 
 ```python
-import asyncio
-import aiohttp
-from knewkarma import Users
+import requests
+from knewkarma.core.users import Users
 
+users = Users()
+with requests.Session() as session:
+    popular_users = users.popular(limit=200, session=session)
 
-async def get_popular_users(users_limit):
-    users = Users()
-    async with aiohttp.ClientSession() as session:
-        popular_users = await users.popular(limit=users_limit, session=session)
-
-        for user in popular_users:
-            print(user.data.id)
-
-
-asyncio.run(get_popular_users(users_limit=100))
+    for user in popular_users:
+        print(user.id)
 ```
 
 ***

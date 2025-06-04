@@ -3,7 +3,7 @@ A fully asynchronous, zero-auth toolkit for Reddit data analysis
 
 .. raw:: html
 
-   <p align="center"><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is a fully asynchronous, zero-auth toolkit for Reddit data analysis designed to provide an extensive range of functionalities for exploring and analysing Reddit data. It includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), and an <strong>Application Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.</p>
+   <p align="center"><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is a zero-auth toolkit for Reddit data analysis designed to provide an extensive range of functionalities for exploring and analysing Reddit data. It includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), and an <strong>Application Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.</p>
 
 .. raw:: html
 
