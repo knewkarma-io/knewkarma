@@ -21,8 +21,8 @@ kk-subreddit AskScience --posts --limit 200
 And/Or
 
 ```python
-import requests
 from knewkarma.core.subreddit import Subreddit
+import requests
 
 subreddit = Subreddit("AskScience")
 with requests.Session() as session:
