@@ -17,23 +17,26 @@ from ..meta.license import License
 __all__ = ["run"]
 
 
-def _method_caller(
+def invoke_method(
     method: t.Callable,
     **kwargs: t.Union[str, click.Context, requests.Session, Status],
 ):
     """
-    Calls a method with the provided arguments, filtering only those
-    that are accepted by the method.
+    Invoke a method with the keyword arguments it accepts, and optionally export the result.
 
-    :param method: A method to call.
-    :type method: t.Callable
-    :param kwargs: Additional keyword arguments such as:
-        - export: str
-        - status: rich.status.Status
-        - session: requests.Session
-        - argument: str
-        - ctx: click.Context
-        - logger: logging.Logger (optional)
+    :param method: The method to invoke.
+    :type method: Callable
+    :param kwargs: Keyword arguments that may include:
+        - ``export`` (str): Comma-separated list of export formats (e.g., "csv,json").
+        - ``status`` (Status): A Rich status indicator.
+        - ``session`` (requests.Session): An HTTP session to use.
+        - ``argument`` (str): The argument that triggered the method.
+        - ``ctx`` (click.Context): The Click context object.
+        - ``logger`` (logging.Logger): Optional logger.
+
+    :raises ValueError: If the method cannot be called due to argument mismatch or invalid data.
+
+    :return: None
     """
 
     session = kwargs.get("session")
@@ -86,25 +89,32 @@ def _method_caller(
             )
 
 
-def _method_call_handler(
+def route_to_method(
     ctx: click.Context,
     method_map: t.Dict,
     export: str,
     **kwargs: t.Union[str, int, bool],
 ):
     """
-    Handle the method calls based on the provided arguments.
+    Routes CLI arguments to the appropriate method and delegates execution to `invoke_method`.
 
-    :param ctx: The Click context object.
+    :param ctx: The current Click context.
     :type ctx: click.Context
-    :param method_map: t.Dictionary mapping method names to their corresponding functions.
-    :type method_map: t.Dict
-    :param export: The export format.
+    :param method_map: A mapping of CLI argument names to their corresponding functions.
+    :type method_map: Dict[str, Callable]
+    :param export: Comma-separated string indicating desired export formats (e.g. "csv,html").
     :type export: str
-    :param kwargs: Additional keyword arguments.
-    :type kwargs: t.Union[str, int, bool]
-    """
+    :param kwargs: Parsed CLI arguments (from `click`) that may contain trigger flags for each method.
+    :type kwargs: Union[str, int, bool]
 
+    Side Effects:
+        - Prints status updates and errors to the console.
+        - Displays a license notice.
+        - Performs data export if applicable.
+        - Logs execution details and exceptions.
+
+    If no valid argument is provided, prints command usage help.
+    """
     from tools.logging import logger
 
     is_valid_arg: bool = False
@@ -128,7 +138,7 @@ def _method_call_handler(
                             logger=logger,
                         )
 
-                        _method_caller(
+                        invoke_method(
                             method=method,
                             session=session,
                             status=status,
@@ -166,7 +176,7 @@ def run(
     Entrypoint to execute a modular CLI command.
     Wraps the call to method_call_handler.
     """
-    _method_call_handler(
+    route_to_method(
         ctx=ctx,
         method_map=method_map,
         export=export,
