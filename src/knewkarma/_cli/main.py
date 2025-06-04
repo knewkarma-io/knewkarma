@@ -32,16 +32,6 @@ def set_window_title(text: t.Optional[str] = None):
 def help_callback(ctx: click.Context, _, value: bool):
     """
     Custom callback function for handling the '--help' option in Click commands.
-
-    Additionally, if the application is running as a Snap package, the
-    function will pause execution, prompting the user to press any key
-    before continuing. This is useful for when the user clicks the Knew Karma icon in application menu.
-
-    :param ctx: The Click context object.
-    :type ctx: click.Context
-    :param value: The value of the custom help option. If True, the help
-            message is displayed and the command execution is halted.
-    :type value: bool
     """
 
     if value and not ctx.resilient_parsing:
@@ -115,23 +105,24 @@ def licence(
 
 
 @cli.command(
+    name="post",
     help="Use this command to get an individual post's data including its comments, "
     "provided the post's <id> and source <subreddit> are specified.",
 )
-@click.argument("id")
+@click.argument("_id", metavar="id")
 @click.argument("subreddit")
 @click.option("--data", is_flag=True, help="Get post data")
 @click.option("--comments", is_flag=True, help="Get post comments")
 @shared.global_options
 @click.pass_context
-def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool):
+def cmd_post(ctx: click.Context, _id: str, subreddit: str, data: bool, comments: bool):
     """
     Retrieve an individual post's data or comments.
 
     :param ctx: The Click context object.
     :type ctx: click.Context
-    :param id: The ID of the post.
-    :type id: str
+    :param _id: The ID of the post.
+    :type _id: str
     :param subreddit: The source subreddit of the post.
     :type subreddit: str
     :param data: Flag to get post data.
@@ -144,7 +135,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
 
-    post_instance = Post(id=id, subreddit=subreddit)
+    post_instance = Post(id=_id, subreddit=subreddit)
     method_map: t.Dict = {
         "comments": lambda session, status, logger: post_instance.comments(
             limit=limit, sort=sort, status=status, logger=logger, session=session
@@ -164,6 +155,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 
 
 @cli.command(
+    name="posts",
     help="Use this command get best, controversial, front-page, new, popular, and/or rising posts.",
 )
 @click.option("--best", is_flag=True, help="Get posts from the best listing")
@@ -186,7 +178,7 @@ def post(ctx: click.Context, id: str, subreddit: str, data: bool, comments: bool
 @click.option("--rising", is_flag=True, help="Get posts from the rising listing")
 @shared.global_options
 @click.pass_context
-def posts(
+def cmd_posts(
     ctx: click.Context,
     best: bool,
     controversial: bool,
@@ -267,6 +259,7 @@ def posts(
 
 
 @cli.command(
+    name="search",
     help="Use this command for search/discovery of users, subreddits, and posts.",
 )
 @click.argument("query")
@@ -275,7 +268,9 @@ def posts(
 @click.option("--users", is_flag=True, help="Search users")
 @shared.global_options
 @click.pass_context
-def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users: bool):
+def cmd_search(
+    ctx: click.Context, query: str, posts: bool, subreddits: bool, users: bool
+):
     """
     Search for posts, subreddits, or users based on a query.
 
@@ -321,6 +316,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
 
 
 @cli.command(
+    name="user",
     help="Use this command to get user data, such as profile, posts, "
     "comments, top subreddits, moderated subreddits, and more...",
 )
@@ -346,7 +342,7 @@ def search(ctx: click.Context, query: str, posts: bool, subreddits: bool, users:
 )
 @shared.global_options
 @click.pass_context
-def user(
+def cmd_user(
     ctx: click.Context,
     username: str,
     comments: bool,
@@ -441,9 +437,10 @@ def user(
 
 
 @cli.command(
+    name="users",
     help="Use this command to get all, new, and/or popular users.",
 )
-@click.option("--all", is_flag=True, help="Get all users")
+@click.option("--all", "_all", is_flag=True, help="Get all users")
 @click.option(
     "--new",
     is_flag=True,
@@ -456,14 +453,14 @@ def user(
 )
 @shared.global_options
 @click.pass_context
-def users(ctx: click.Context, all: bool, new: bool, popular: bool):
+def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
     """
     Retrieve various users such as new, popular, and all users.
 
     :param ctx: The Click context object.
     :type ctx: click.Context
-    :param all: Flag to get all users.
-    :type all: bool
+    :param _all: Flag to get all users.
+    :type _all: bool
     :param new: Flag to get new users.
     :type new: bool
     :param popular: Flag to get popular users.
@@ -510,6 +507,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 
 
 @click.command(
+    name="subreddit",
     help="Use this command to get a subreddit's data, such as comments, posts, wiki-pages, wiki-page data, and more...",
 )
 @click.argument("subreddit_name")
@@ -520,7 +518,7 @@ def users(ctx: click.Context, all: bool, new: bool, popular: bool):
 @click.option("--wikipages", is_flag=True, help="Get a subreddit's wiki pages")
 @shared.global_options
 @click.pass_context
-def subreddit(
+def cmd_subreddit(
     ctx: click.Context,
     subreddit_name: str,
     posts: bool,
@@ -542,6 +540,8 @@ def subreddit(
     :type profile: bool
     :param wikipage: The name of the wiki page to retrieve.
     :type wikipage: str
+    :param search:
+    :type search: str
     :param wikipages: Flag to get the subreddit's wiki pages.
     :type wikipages: bool
     """
@@ -594,9 +594,10 @@ def subreddit(
 
 
 @cli.command(
+    name="subreddits",
     help="Use this command to get all, default, new, and/or popular subreddits.",
 )
-@click.option("--all", is_flag=True, help="Get all subreddits")
+@click.option("--all", "_all", is_flag=True, help="Get all subreddits")
 @click.option(
     "--default",
     is_flag=True,
@@ -614,14 +615,16 @@ def subreddit(
 )
 @shared.global_options
 @click.pass_context
-def subreddits(ctx: click.Context, all: bool, default: bool, new: bool, popular: bool):
+def cmd_subreddits(
+    ctx: click.Context, _all: bool, default: bool, new: bool, popular: bool
+):
     """
     Retrieve various subreddits such as new, popular, default, and all subreddits.
 
     :param ctx: The Click context object.
     :type ctx: click.Context
-    :param all: Flag to get all subreddits.
-    :type all: bool
+    :param _all: Flag to get all subreddits.
+    :type _all: bool
     :param default: Flag to get default subreddits.
     :type default: bool
     :param new: Flag to get new subreddits.
