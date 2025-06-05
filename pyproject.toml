@@ -40,6 +40,7 @@ rusers = "knewkarma._cli.main:cmd_users"
 rsubreddit = "knewkarma._cli.main:cmd_subreddit"
 rsubreddits = "knewkarma._cli.main:cmd_subreddits"
 rsearch = "knewkarma._cli.main:cmd_search"
+rpost = "knewkarma._cli.main:cmd_post"
 rposts = "knewkarma._cli.main:cmd_posts"
 knewkarma = "knewkarma._cli.main:cli"
 

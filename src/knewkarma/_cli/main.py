@@ -2,8 +2,8 @@ import typing as t
 
 import rich_click as click
 
-from tools.logging import console
-from tools.runtime import Runtime
+from tools.log_config import console
+from tools.runtime_ops import RuntimeOps
 from . import command, shared
 from ..core.client import reddit
 from ..core.post import Post
@@ -36,7 +36,7 @@ def help_callback(ctx: click.Context, _, value: bool):
 
     if value and not ctx.resilient_parsing:
         click.echo(ctx.get_help())
-        if Runtime.is_snap_package():
+        if RuntimeOps.is_snap_package():
             click.pause()
         ctx.exit()
 
@@ -69,7 +69,7 @@ def cli(
     Main CLI group for Knew Karma.
     """
     set_window_title()
-    ctx.ensure_object(t.Dict)
+    ctx.ensure_object(dict)
 
 
 @cli.command("license")
@@ -106,7 +106,7 @@ def licence(
     help="Use this command to get an individual post's data including its comments, "
     "provided the post's <id> and source <subreddit> are specified.",
 )
-@click.argument("_id", metavar="id")
+@click.argument("_id", metavar="ID")
 @click.argument("subreddit")
 @click.option("-d", "--data", is_flag=True, help="Get post data")
 @click.option("-c", "--comments", is_flag=True, help="Get post comments")

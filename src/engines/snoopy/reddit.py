@@ -16,10 +16,7 @@ class Reddit:
     SORT = t.Literal["controversial", "new", "top", "best", "hot", "rising", "all"]
     TIMEFRAME = t.Literal["hour", "day", "week", "month", "year", "all"]
 
-    # Step 1: Define the base URL separately
     BASE_URL: str = "https://reddit.com"
-
-    # Step 2: Now use the base URL to build the full endpoints dictionary
     ENDPOINTS: t.Dict[str, t.Union[str, t.Dict]] = {
         "subreddit": f"{BASE_URL}/r/%s",
         "subreddits": f"{BASE_URL}/subreddits",
@@ -58,55 +55,6 @@ class Reddit:
         :type user_agent: str
         """
         self.user_agent = user_agent
-
-    def infra_status(
-        self,
-        session: requests.Session,
-        logger: t.Optional[Logger] = None,
-        status: t.Optional[Status] = None,
-    ) -> t.Union[t.List[t.Dict], None]:
-
-        if status:
-            status.update(f"Checking server status...")
-
-        status_response: t.Dict = self.send_request(
-            session=session,
-            url=self.ENDPOINTS["infrastructure"]["status"],
-        )
-
-        indicator = status_response.get("status").get("indicator")
-        description = status_response.get("status").get("description")
-        if description:
-            if indicator == "none":
-                description = (
-                    f"{colours.BOLD_GREEN}✔{colours.BOLD_GREEN_RESET} {description}"
-                )
-                (
-                    logger.info(description)
-                    if logger
-                    else print(description.strip("[,]./,bold,green"))
-                )
-            else:
-                status_message = f"{colours.BOLD_YELLOW}✘{colours.BOLD_YELLOW_RESET} {description} ({colours.YELLOW}{indicator}{colours.YELLOW_RESET})"
-                (
-                    logger.warning(status_message)
-                    if logger
-                    else print(status_message.strip("[,],/,bold,yellow"))
-                )
-
-                if status:
-                    status.update("Getting status components...")
-
-                status_components: t.Dict = self.send_request(
-                    session=session,
-                    url=self.ENDPOINTS["infrastructure"]["components"],
-                )
-
-                if isinstance(status_components, t.Dict):
-                    components: t.List[t.Dict] = status_components.get("components")
-
-                    return components
-        return None
 
     def send_request(
         self,
@@ -294,7 +242,7 @@ class Reddit:
         :param limit: Max number of comments to return.
         :return: A list of parsed comment objects.
         """
-        if status:
+        if isinstance(status, Status):
             status.update("Fetching more comments...")
 
         url = f"{self.BASE_URL}/api/morechildren.json"
@@ -334,14 +282,14 @@ class Reddit:
         **kwargs: str,
     ) -> t.List[Comment]:
         username = kwargs.get("username")
-        # subreddit_name = kwargs.get("subreddit")
-        # post_id = kwargs.get("id")
+        subreddit_name = kwargs.get("subreddit")
+        post_id = kwargs.get("id")
 
         comments_map = {
             "user_overview": self.ENDPOINTS["user"] % username + "/overview.json",
             "user": self.ENDPOINTS["user"] % username + "/comments.json",
-            # "post": f"{self.api_endpoints.SUBREDDIT}/{kwargs.get('subreddit')}"
-            # f"/comments/{kwargs.get('id')}.json",
+            "post": self.ENDPOINTS["subreddit"]
+            % f"{subreddit_name}/comments/{post_id}.json",
         }
 
         if isinstance(status, Status):
@@ -404,7 +352,7 @@ class Reddit:
 
         response = self.send_request(
             session=session,
-            url=self.ENDPOINTS["subreddit"] % subreddit + f"/comments/{id}.json",
+            url=self.ENDPOINTS["subreddit"] % f"{subreddit}/comments/{id}.json",
         )
         sanitised_response = self.SANITISERS["post"](response=response)
 
@@ -484,7 +432,7 @@ class Reddit:
             status.update(f"Getting profile data from user {name}...")
 
         response = self.send_request(
-            url=self.ENDPOINTS["user"] % name + "/about.json", session=session
+            url=self.ENDPOINTS["user"] % f"{name}/about.json", session=session
         )
         user = self.SANITISERS["user"](response=response)
 
@@ -506,7 +454,7 @@ class Reddit:
             "popular": f"{self.ENDPOINTS['users']}/popular.json",
         }
 
-        if status:
+        if isinstance(status, Status):
             status.update(f"Getting {limit} {kind} users...")
 
         endpoint = users_map[kind]
@@ -536,11 +484,12 @@ class Reddit:
         """
         Fetch a single subreddit and sanitise the response.
         """
+        print(self.ENDPOINTS["subreddit"] % name)
         if isinstance(status, Status):
             status.update(f"Getting profile data from subreddit {name}...")
 
         response = self.send_request(
-            url=f"{self.ENDPOINTS['subreddit']}" % name, session=session
+            url=self.ENDPOINTS["subreddit"] % f"{name}/about.json", session=session
         )
         subreddit = self.SANITISERS["subreddit"](response=response)
 
@@ -566,7 +515,7 @@ class Reddit:
             + "/moderated_subreddits.json",
         }
 
-        if status:
+        if isinstance(status, Status):
             desc = f"{limit} " if kind != "user_moderated" else ""
             status.update(f"Getting {desc}{kind} subreddits...")
 
@@ -600,7 +549,7 @@ class Reddit:
         session: requests.Session,
         status: t.Optional[Status] = None,
     ) -> WikiPage:
-        if status:
+        if isinstance(status, Status):
             status.update(f"Getting data from wikipage {name} of r/{subreddit}...")
 
         response = self.send_request(

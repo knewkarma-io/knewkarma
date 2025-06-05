@@ -4,19 +4,23 @@ import random
 import typing as t
 from datetime import datetime
 
-import click
 import requests
+import rich_click as click
 from rich.status import Status
 from rich.syntax import Syntax
 
 from tools import colours
 from tools.io_handlers import DataFrameHandler, FileHandler
-from tools.logging import console
-from tools.render import Render
-from tools.runtime import Runtime
+from tools.log_config import console
+from tools.log_config import logger
+from tools.rich_render import RichRender
+from tools.runtime_ops import RuntimeOps
 from ..core.client import reddit
 
 __all__ = ["run"]
+
+from ..meta.about import Project
+from ..meta.version import Version
 
 THE_QUOTES: list = [
     "If you stare into the subreddit, the subreddit also stares back into you.",
@@ -26,7 +30,7 @@ THE_QUOTES: list = [
     "Hmmmm this data smells like upvote farming.",
     "My code doesn't judge your karma. But I do.",
     "If it’s on r/conspiracy, it’s either the truth or a guy named Greg in his basement. Sometimes both.",
-    "Behind every karma point is a user who just wanted internet validation.",
+    "Behind every karma point, there’s a good chance someone was just looking for a little internet validation.",
     "My algorithm is 99.7% sure that this post is a cry for help.",
     "A subreddit is like a dumpster fire...",
     "The plural of anecdote is not data. Unless it's from r/AskReddit.",
@@ -87,7 +91,7 @@ def invoke_method(
     response_data: t.Union[t.List, t.Dict, str, bool, t.Any] = method(**accepted_kwargs)
 
     if response_data:
-        Render.show(data=response_data)
+        RichRender.panels(data=response_data)
         if kwargs.get("export"):
             exports_child_dir: str = os.path.join(
                 FileHandler.EXPORTS_PARENT_DIR,
@@ -139,7 +143,9 @@ def route_to_method(
 
     If no valid argument is provided, prints command usage help.
     """
-    from tools.logging import logger
+    runtime = RuntimeOps(
+        package_name=Project.package, version_cls=Version, reddit_cls=reddit
+    )
 
     is_valid_arg: bool = False
 
@@ -148,7 +154,7 @@ def route_to_method(
             is_valid_arg = True
             start_time: datetime = datetime.now()
             try:
-                Runtime.clear_screen()
+                runtime.clear_screen()
                 console.print(
                     random.choice(THE_QUOTES),
                     justify="center",
@@ -160,8 +166,8 @@ def route_to_method(
                 ) as status:
                     with requests.Session() as session:
                         # logger.info(f"◉ Session opened.")
-                        # Runtime.check_updates(session=session, status=status)
-                        reddit.infra_status(
+                        runtime.check_updates(session=session, status=status)
+                        runtime.infra_status(
                             session=session,
                             status=status,
                             logger=logger,
