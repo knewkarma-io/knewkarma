@@ -321,16 +321,16 @@ def cmd_search(
     "comments, top subreddits, moderated subreddits, and more...",
 )
 @click.argument("username")
-@click.option("-c", "--comments", is_flag=True, help="Get user's comments")
+@click.option("-cms", "--comments", is_flag=True, help="Get user's comments")
 @click.option(
     "-ms",
     "--moderated-subreddits",
     is_flag=True,
     help="Get user's moderated subreddits",
 )
-@click.option("-o", "--overview", is_flag=True, help="Get user's most recent comments")
+@click.option("-ov", "--overview", is_flag=True, help="Get user's most recent comments")
 @click.option("-ps", "--posts", is_flag=True, help="Get user's posts")
-@click.option("-p", "--profile", is_flag=True, help="Get user's profile")
+@click.option("-pf", "--profile", is_flag=True, help="Get user's profile")
 @click.option(
     "-ts",
     "--top-subreddits",
@@ -516,8 +516,8 @@ def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
     help="Use this command to get a subreddit's data, such as comments, posts, wiki-pages, wiki-page data, and more...",
 )
 @click.argument("subreddit_name")
-@click.option("-s", "--search", type=str, help="Search for posts in a subreddit")
-@click.option("-p", "--profile", is_flag=True, help="Get a subreddit's profile")
+@click.option("-sr", "--search", type=str, help="Search for posts in a subreddit")
+@click.option("-pf", "--profile", is_flag=True, help="Get a subreddit's profile")
 @click.option("-ps", "--posts", is_flag=True, help="Get a subreddit's posts")
 @click.option(
     "-wp", "--wikipage", type=str, help="Get a subreddit's specified wiki page data"
