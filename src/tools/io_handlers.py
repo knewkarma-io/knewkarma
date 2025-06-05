@@ -5,7 +5,7 @@ from datetime import datetime
 import pandas as pd
 
 from engines.karmakaze.schemas import User, Subreddit, Post, WikiPage, Comment
-from .logging import logger
+from .log_config import logger
 
 __all__ = ["FileHandler", "DataFrameHandler"]
 

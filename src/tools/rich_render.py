@@ -18,12 +18,91 @@ from engines.karmakaze.schemas import (
 )
 from engines.snoopy.reddit import Reddit
 from tools import colours
-from tools.logging import console
+from tools.log_config import console
 
-__all__ = ["Render"]
+__all__ = ["RichRender"]
 
 
-class Render:
+class RichRender:
+
+    @classmethod
+    def panels(
+        cls,
+        data: t.Union[
+            t.List[t.Union[User, Post, Subreddit, Comment, WikiPage]],
+            User,
+            Post,
+            Subreddit,
+            Comment,
+            WikiPage,
+        ],
+    ):
+        """
+        Dynamically dispatch the appropriate rendering method based on data type.
+        """
+        # Handle list input
+        if isinstance(data, list) and data:
+            item = data[0]
+            if isinstance(item, Post):
+                return cls._posts(data)
+            elif isinstance(item, Comment):
+                return cls._comments(data)
+            elif isinstance(item, User):
+                return cls._users(data)
+            elif isinstance(item, (Subreddit, ModeratedSubreddit)):
+                return cls._subreddits(data)
+            # elif isinstance(item, WikiPage):
+            #    return cls.wiki_pages(data)
+
+        # Handle single item input
+        elif isinstance(data, Post):
+            return cls._post(data)
+        elif isinstance(data, Comment):
+            return cls._comment(data)
+        elif isinstance(data, User):
+            return cls._user(data)
+        elif isinstance(data, (Subreddit, ModeratedSubreddit)):
+            return cls._subreddit(data)
+        # elif isinstance(data, WikiPage):
+        #    return cls.wiki_page(data)
+
+        console.print(
+            "[bold red]Unable to determine render type for the given data.[/]"
+        )
+        return None
+
+    @classmethod
+    def bar_chart(
+        cls,
+        data: t.Dict[str, int],
+        title: str,
+        x_label: str,
+        y_label: str,
+    ):
+        """
+        Renders a simple bar chart in the terminal using Rich.
+
+        :param data: A dictionary of category-value pairs.
+        :param title: Title of the chart.
+        :param x_label: Label for the x-axis (shown in the subtitle).
+        :param y_label: Label for the y-axis (shown in the subtitle).
+        """
+
+        max_value = max(data.values()) or 1  # Avoid divide-by-zero
+        table = Table(show_header=False, box=None, expand=True)
+        table.add_column("Category", justify="right")
+        table.add_column("Bar", justify="left")
+
+        for label, value in data.items():
+            bar_length = int((value / max_value) * 40)
+            bar = "=" * bar_length  # █
+            table.add_row(f"[bold]{label}[/bold]", f"{bar} {value}")
+
+        subtitle = f"{x_label} vs {y_label}" if x_label and y_label else ""
+        panel = Panel(
+            table, title=f"[bold magenta]{title}[/bold magenta]", subtitle=subtitle
+        )
+        console.print(panel)
 
     @classmethod
     def _footer_table(cls, footer_data: t.Dict) -> t.Union[Table, None]:
@@ -103,53 +182,7 @@ class Render:
             return str(number)
 
     @classmethod
-    def show(
-        cls,
-        data: t.Union[
-            t.List[t.Union[User, Post, Subreddit, Comment, WikiPage]],
-            User,
-            Post,
-            Subreddit,
-            Comment,
-            WikiPage,
-        ],
-    ):
-        """
-        Dynamically dispatch the appropriate rendering method based on data type.
-        """
-        # Handle list input
-        if isinstance(data, list) and data:
-            item = data[0]
-            if isinstance(item, Post):
-                return cls.posts(data)
-            elif isinstance(item, Comment):
-                return cls.comments(data)
-            elif isinstance(item, User):
-                return cls.users(data)
-            elif isinstance(item, (Subreddit, ModeratedSubreddit)):
-                return cls.subreddits(data)
-            # elif isinstance(item, WikiPage):
-            #    return cls.wiki_pages(data)
-
-        # Handle single item input
-        elif isinstance(data, Post):
-            return cls.post(data)
-        elif isinstance(data, Comment):
-            return cls.comment(data)
-        elif isinstance(data, User):
-            return cls.user(data)
-        elif isinstance(data, (Subreddit, ModeratedSubreddit)):
-            return cls.subreddit(data)
-        # elif isinstance(data, WikiPage):
-        #    return cls.wiki_page(data)
-
-        console.print(
-            "[bold red]Unable to determine render type for the given data.[/]"
-        )
-        return None
-
-    @classmethod
-    def user(cls, data: User, print_panel: bool = True):
+    def _user(cls, data: User, print_panel: bool = True):
         subreddit = data.subreddit
 
         header_content = (
@@ -184,7 +217,7 @@ class Render:
 
         text = "\n\n".join(panel_parts)
 
-        return cls.panel(
+        return cls._panel(
             title=f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}{subreddit.url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
             header=header_content,
             content=text,
@@ -194,11 +227,11 @@ class Render:
         )
 
     @classmethod
-    def users(cls, data: t.List[User], print_panel: bool = True):
+    def _users(cls, data: t.List[User], print_panel: bool = True):
         panels = []
 
         for user_data in data:
-            panel = cls.user(user_data, print_panel=print_panel)
+            panel = cls._user(user_data, print_panel=print_panel)
             if panel is not None:
                 panels.append(panel)
 
@@ -209,7 +242,7 @@ class Render:
             console.print("[dim]No valid users to display.[/]")
 
     @classmethod
-    def comment(cls, data: Comment, print_panel: bool = True):
+    def _comment(cls, data: Comment, print_panel: bool = True):
         panel_parts: t.List[str] = []
 
         author: str = getattr(data, "author", "")
@@ -240,7 +273,7 @@ class Render:
             f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(awards))}{colours.BOLD_YELLOW_RESET}"
         )
 
-        return cls.panel(
+        return cls._panel(
             title=f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}/{permalink}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
             header=header_content,
             content=text,
@@ -250,11 +283,11 @@ class Render:
         )
 
     @classmethod
-    def comments(cls, data: t.List[Comment]):
+    def _comments(cls, data: t.List[Comment]):
         panels: t.List[Panel] = []
 
         for item in data:
-            panel = cls.comment(data=item, print_panel=False)
+            panel = cls._comment(data=item, print_panel=False)
 
             if panel is not None:
                 panels.append(panel)
@@ -263,7 +296,7 @@ class Render:
         console.print(panel_group)
 
     @classmethod
-    def post(cls, data: Post, print_panel: bool = True) -> t.Union[Panel, None]:
+    def _post(cls, data: Post, print_panel: bool = True) -> t.Union[Panel, None]:
         """Render a single Reddit post or comment into a Panel."""
 
         panel_parts: t.List[str] = []
@@ -300,7 +333,7 @@ class Render:
                 f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
             )
 
-        return cls.panel(
+        return cls._panel(
             title=f"{colours.BOLD_BLUE}[link={data.url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
             header=header_content,
             content=text,
@@ -310,12 +343,12 @@ class Render:
         )
 
     @classmethod
-    def posts(cls, data: t.List[Post]):
+    def _posts(cls, data: t.List[Post]):
         """Render and print a list of posts/comments using the `post` method."""
         panels: t.List[Panel] = []
 
         for item in data:
-            panel = cls.post(data=item, print_panel=False)
+            panel = cls._post(data=item, print_panel=False)
             if panel is not None:
                 panels.append(panel)
 
@@ -323,7 +356,7 @@ class Render:
         console.print(panel_group)
 
     @classmethod
-    def subreddit(
+    def _subreddit(
         cls, data: t.Union[Subreddit, ModeratedSubreddit], print_panel: bool = True
     ) -> t.Union[Panel, None]:
         if data.subreddit_type == "private":
@@ -379,7 +412,7 @@ class Render:
 
         footer_content = cls._footer_table(footer_data=footer_data)
 
-        return cls.panel(
+        return cls._panel(
             header=header_content,
             content=content,
             footer=footer_content,
@@ -388,10 +421,10 @@ class Render:
         )
 
     @classmethod
-    def subreddits(cls, data: t.List[t.Union[Subreddit, ModeratedSubreddit]]):
+    def _subreddits(cls, data: t.List[t.Union[Subreddit, ModeratedSubreddit]]):
         panels = []
         for subreddit in data:
-            panel = cls.subreddit(data=subreddit, print_panel=False)
+            panel = cls._subreddit(data=subreddit, print_panel=False)
             if panel:
                 panels.append(panel)
 
@@ -399,7 +432,7 @@ class Render:
         console.print(panels_group)
 
     @classmethod
-    def panel(
+    def _panel(
         cls,
         content: t.Union[str, RenderableType],
         title: t.Union[str, None] = None,
@@ -485,36 +518,3 @@ class Render:
             console.print(panel)
 
         return panel
-
-    @classmethod
-    def bar_chart(
-        cls,
-        data: t.Dict[str, int],
-        title: str,
-        x_label: str,
-        y_label: str,
-    ):
-        """
-        Renders a simple bar chart in the terminal using Rich.
-
-        :param data: A dictionary of category-value pairs.
-        :param title: Title of the chart.
-        :param x_label: Label for the x-axis (shown in the subtitle).
-        :param y_label: Label for the y-axis (shown in the subtitle).
-        """
-
-        max_value = max(data.values()) or 1  # Avoid divide-by-zero
-        table = Table(show_header=False, box=None, expand=True)
-        table.add_column("Category", justify="right")
-        table.add_column("Bar", justify="left")
-
-        for label, value in data.items():
-            bar_length = int((value / max_value) * 40)
-            bar = "=" * bar_length  # █
-            table.add_row(f"[bold]{label}[/bold]", f"{bar} {value}")
-
-        subtitle = f"{x_label} vs {y_label}" if x_label and y_label else ""
-        panel = Panel(
-            table, title=f"[bold magenta]{title}[/bold magenta]", subtitle=subtitle
-        )
-        console.print(panel)

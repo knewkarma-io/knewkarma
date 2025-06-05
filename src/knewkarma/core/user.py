@@ -7,7 +7,7 @@ from rich.status import Status
 
 from engines.karmakaze.schemas import Comment, Subreddit, Post
 from tools import colours
-from tools.render import Render
+from tools.rich_render import RichRender
 from .client import reddit
 
 
@@ -272,7 +272,7 @@ class User:
             data: t.Dict[str, int] = dict(zip(subreddit_names, subreddit_frequencies))
 
             if logger or status:
-                Render.bar_chart(
+                RichRender.bar_chart(
                     data=data,
                     title=f"top {top_n}/{limit} subreddits analysis",
                     x_label="Subreddits",
