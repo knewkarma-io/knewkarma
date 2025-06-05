@@ -305,7 +305,7 @@ class User:
         """
 
         if status:
-            status.update(f"Checking username availability: {self.name}")
+            status.update(f"Checking username availability: {self.name}...")
 
         response: bool = reddit.send_request(
             session=session,
