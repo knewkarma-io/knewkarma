@@ -43,10 +43,7 @@ def help_callback(ctx: click.Context, _, value: bool):
 
 @click.group(
     help=f"""
-{Project.summary}
-    
-    
-{Project.description}""",
+{Project.summary}\n\n\n{Project.description}""",
     context_settings=dict(help_option_names=["-h", "--help"]),
 )
 @click.option(
@@ -76,8 +73,8 @@ def cli(
 
 
 @cli.command("license")
-@click.option("--conditions", help="License terms and conditions.", is_flag=True)
-@click.option("--warranty", help="License warranty.", is_flag=True)
+@click.option("-c", "--conditions", help="License terms and conditions.", is_flag=True)
+@click.option("-w", "--warranty", help="License warranty.", is_flag=True)
 @click.pass_context
 def licence(
     ctx: click.Context, conditions: t.Optional[bool], warranty: t.Optional[bool]
@@ -111,8 +108,8 @@ def licence(
 )
 @click.argument("_id", metavar="id")
 @click.argument("subreddit")
-@click.option("--data", is_flag=True, help="Get post data")
-@click.option("--comments", is_flag=True, help="Get post comments")
+@click.option("-d", "--data", is_flag=True, help="Get post data")
+@click.option("-c", "--comments", is_flag=True, help="Get post comments")
 @shared.global_options
 @click.pass_context
 def cmd_post(ctx: click.Context, _id: str, subreddit: str, data: bool, comments: bool):
@@ -158,24 +155,27 @@ def cmd_post(ctx: click.Context, _id: str, subreddit: str, data: bool, comments:
     name="posts",
     help="Use this command get best, controversial, front-page, new, popular, and/or rising posts.",
 )
-@click.option("--best", is_flag=True, help="Get posts from the best listing")
+@click.option("-b", "--best", is_flag=True, help="Get posts from the best listing")
 @click.option(
+    "-c",
     "--controversial",
     is_flag=True,
     help="Get posts from the controversial listing",
 )
 @click.option(
+    "-fp",
     "--front-page",
     is_flag=True,
     help="Get posts from the reddit front-page",
 )
-@click.option("--new", is_flag=True, help="Get new posts")
+@click.option("-n", "--new", is_flag=True, help="Get new posts")
 @click.option(
+    "-p",
     "--popular",
     is_flag=True,
     help="Get posts from the popular listing",
 )
-@click.option("--rising", is_flag=True, help="Get posts from the rising listing")
+@click.option("-r", "--rising", is_flag=True, help="Get posts from the rising listing")
 @shared.global_options
 @click.pass_context
 def cmd_posts(
@@ -263,9 +263,9 @@ def cmd_posts(
     help="Use this command for search/discovery of users, subreddits, and posts.",
 )
 @click.argument("query")
-@click.option("--posts", is_flag=True, help="Search posts")
-@click.option("--subreddits", is_flag=True, help="Search subreddits")
-@click.option("--users", is_flag=True, help="Search users")
+@click.option("-p", "--posts", is_flag=True, help="Search posts")
+@click.option("-s", "--subreddits", is_flag=True, help="Search subreddits")
+@click.option("-u", "--users", is_flag=True, help="Search users")
 @shared.global_options
 @click.pass_context
 def cmd_search(
@@ -321,21 +321,24 @@ def cmd_search(
     "comments, top subreddits, moderated subreddits, and more...",
 )
 @click.argument("username")
-@click.option("--comments", is_flag=True, help="Get user's comments")
+@click.option("-c", "--comments", is_flag=True, help="Get user's comments")
 @click.option(
+    "-ms",
     "--moderated-subreddits",
     is_flag=True,
     help="Get user's moderated subreddits",
 )
-@click.option("--overview", is_flag=True, help="Get user's most recent comments")
-@click.option("--posts", is_flag=True, help="Get user's posts")
-@click.option("--profile", is_flag=True, help="Get user's profile")
+@click.option("-o", "--overview", is_flag=True, help="Get user's most recent comments")
+@click.option("-ps", "--posts", is_flag=True, help="Get user's posts")
+@click.option("-p", "--profile", is_flag=True, help="Get user's profile")
 @click.option(
+    "-ts",
     "--top-subreddits",
     type=int,
     help="Get user's top n subreddits",
 )
 @click.option(
+    "-iua",
     "--is-username-available",
     is_flag=True,
     help="Check if the given username is available or taken.",
@@ -440,13 +443,15 @@ def cmd_user(
     name="users",
     help="Use this command to get all, new, and/or popular users.",
 )
-@click.option("--all", "_all", is_flag=True, help="Get all users")
+@click.option("-a", "--all", "_all", is_flag=True, help="Get all users")
 @click.option(
+    "-n",
     "--new",
     is_flag=True,
     help="Get new users",
 )
 @click.option(
+    "-p",
     "--popular",
     is_flag=True,
     help="Get popular users",
@@ -511,11 +516,13 @@ def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
     help="Use this command to get a subreddit's data, such as comments, posts, wiki-pages, wiki-page data, and more...",
 )
 @click.argument("subreddit_name")
-@click.option("--search", type=str, help="Search for posts in a subreddit")
-@click.option("--profile", is_flag=True, help="Get a subreddit's profile")
-@click.option("--posts", is_flag=True, help="Get a subreddit's posts")
-@click.option("--wikipage", type=str, help="Get a subreddit's specified wiki page data")
-@click.option("--wikipages", is_flag=True, help="Get a subreddit's wiki pages")
+@click.option("-s", "--search", type=str, help="Search for posts in a subreddit")
+@click.option("-p", "--profile", is_flag=True, help="Get a subreddit's profile")
+@click.option("-ps", "--posts", is_flag=True, help="Get a subreddit's posts")
+@click.option(
+    "-wp", "--wikipage", type=str, help="Get a subreddit's specified wiki page data"
+)
+@click.option("-wps", "--wikipages", is_flag=True, help="Get a subreddit's wiki pages")
 @shared.global_options
 @click.pass_context
 def cmd_subreddit(
@@ -578,7 +585,7 @@ def cmd_subreddit(
         "wikipages": lambda session, status, logger: subreddit_instance.wikipages(
             status=status, session=session
         ),
-        "wikipage": lambda session, status, logger: subreddit_instance.wikipage(
+        "wikipage": lambda session, status: subreddit_instance.wikipage(
             page_name=wikipage, status=status, session=session
         ),
     }
@@ -597,18 +604,21 @@ def cmd_subreddit(
     name="subreddits",
     help="Use this command to get all, default, new, and/or popular subreddits.",
 )
-@click.option("--all", "_all", is_flag=True, help="Get all subreddits")
+@click.option("-a", "--all", "_all", is_flag=True, help="Get all subreddits")
 @click.option(
+    "-d",
     "--default",
     is_flag=True,
     help="Get default subreddits",
 )
 @click.option(
+    "-n",
     "--new",
     is_flag=True,
     help="Get new subreddits",
 )
 @click.option(
+    "-p",
     "--popular",
     is_flag=True,
     help="Get popular subreddits",

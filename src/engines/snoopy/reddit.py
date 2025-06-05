@@ -196,7 +196,7 @@ class Reddit:
                 params["after"] = after
 
             if isinstance(status, Status):
-                status.update(f"Fetching page {page} [after={after}]...")
+                status.update(f"Fetching page {page} (cursor={after})...")
 
             response = self.send_request(url=url, session=session, params=params)
             items = sanitiser(response) or []
@@ -215,13 +215,17 @@ class Reddit:
 
             if len(items) < params["limit"]:
                 if isinstance(logger, Logger):
-                    logger.debug("✅ Reached end of results (page shorter than limit).")
+                    logger.info(
+                        f"{colours.BOLD_GREEN}✔{colours.BOLD_GREEN_RESET} Reached end of results (page shorter than limit)."
+                    )
                 break
 
             after = self.SANITISERS["after"](response=response)
             if not after:
                 if isinstance(logger, Logger):
-                    logger.debug("✅ No `after` cursor returned — stopping pagination.")
+                    logger.debug(
+                        f"{colours.BOLD_GREEN}✔{colours.BOLD_GREEN_RESET} No `after` cursor returned — stopping pagination."
+                    )
                 break
 
             page += 1
@@ -239,9 +243,11 @@ class Reddit:
                 time.sleep(sleep_duration)
 
         if isinstance(logger, Logger):
+            # logger.info(f"Showing {len(results[:limit])} items")
             logger.debug(
                 f"🏁 Pagination complete. Returning {len(results[:limit])} results.\n"
             )
+
         return results[:limit]
 
     @staticmethod
@@ -349,14 +355,10 @@ class Reddit:
             session=session,
             limit=limit,
             sanitiser=self.SANITISERS["comments"],
+            logger=logger,
             status=status,
             initial_params=params,
         )
-
-        if isinstance(logger, Logger):
-            logger.info(
-                f"{colours.BOLD_GREEN}{colours.BOLD_GREEN_RESET} Showing {len(comments)} comments from {kind}"
-            )
 
         return comments
 
@@ -384,10 +386,9 @@ class Reddit:
             limit=limit,
             key="id",
             initial_params={"q": query, "t": timeframe, "sort": sort},
+            logger=logger,
             status=status,
         )
-        if isinstance(logger, Logger):
-            logger.info(f"🔍 Showing {len(results)} search results for '{query}'")
 
         return results
 
@@ -464,10 +465,9 @@ class Reddit:
             sanitiser=self.SANITISERS["posts"],
             limit=limit,
             initial_params=params,
+            logger=logger,
+            status=status,
         )
-
-        if isinstance(logger, Logger):
-            logger.info(f"❞ Showing {len(posts)} from (listing) {kind}")
 
         return posts
 
@@ -475,7 +475,6 @@ class Reddit:
         self,
         name: str,
         session: requests.Session,
-        logger: t.Optional[Logger] = None,
         status: t.Optional[Status] = None,
     ) -> User:
         """
@@ -488,9 +487,6 @@ class Reddit:
             url=self.ENDPOINTS["user"] % name + "/about.json", session=session
         )
         user = self.SANITISERS["user"](response=response)
-
-        if isinstance(logger, Logger):
-            logger.info(f"🪪 Showing profile data for user {name}")
 
         return user
 
@@ -529,16 +525,12 @@ class Reddit:
             status=status,
         )
 
-        if logger:
-            logger.info(f"👥 Showing {len(users)} {kind} users")
-
         return users
 
     def subreddit(
         self,
         name: str,
         session: requests.Session,
-        logger: t.Optional[Logger] = None,
         status: t.Optional[Status] = None,
     ) -> Subreddit:
         """
@@ -551,9 +543,6 @@ class Reddit:
             url=f"{self.ENDPOINTS['subreddit']}" % name, session=session
         )
         subreddit = self.SANITISERS["subreddit"](response=response)
-
-        if isinstance(logger, Logger):
-            logger.info(f"🔮 Showing profile data for subreddit {name}")
 
         return subreddit
 
@@ -600,11 +589,6 @@ class Reddit:
                 limit=limit,
                 logger=logger,
                 status=status,
-            )
-
-        if isinstance(logger, Logger):
-            logger.info(
-                f"{colours.BOLD_GREEN}+{colours.BOLD_GREEN_RESET} Showing {len(subreddits)} of {limit} {kind} subreddits"
             )
 
         return subreddits

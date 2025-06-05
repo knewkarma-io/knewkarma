@@ -1,4 +1,5 @@
 import os
+import subprocess
 import typing as t
 
 import aiohttp
@@ -19,7 +20,11 @@ class Runtime:
     _REQ_HANDLER = reddit.send_request
 
     @classmethod
-    async def check_updates(
+    def clear_screen(cls):
+        subprocess.run(["cls" if os.name == "nt" else "clear"])
+
+    @classmethod
+    def check_updates(
         cls,
         session: aiohttp.ClientSession,
         status: t.Optional[Status] = None,
@@ -39,7 +44,7 @@ class Runtime:
             status.update("Checking for updates")
 
         # Make a GET request to GitHub to get the project's latest release.
-        response = await cls._REQ_HANDLER(
+        response = cls._REQ_HANDLER(
             endpoint=f"https://api.github.com/repos/knewkarma-io/{cls._PACKAGE}/releases/latest",
             session=session,
         )

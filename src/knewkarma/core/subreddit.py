@@ -133,7 +133,6 @@ class Subreddit:
         self,
         session: requests.Session,
         status: t.Optional[Status] = None,
-        logger: t.Optional[Logger] = None,
     ):
         """
         retrieves a subreddit's profile data.
@@ -152,7 +151,6 @@ class Subreddit:
 
         subreddit_profile = reddit.subreddit(
             session=session,
-            logger=logger,
             status=status,
             name=self._name,
         )
@@ -233,8 +231,8 @@ class Subreddit:
                 f"Retrieving wiki pages from subreddit ({self._name})",
             )
 
-        pages = reddit.request_handler.send_request(
-            endpoint=f"{reddit.api_endpoints.SUBREDDIT}/{self._name}/wiki/pages.json",
+        pages = reddit.send_request(
+            endpoint=reddit.ENDPOINTS["subreddit"] % self._name + "/wiki/pages.json",
             session=session,
         )
 
