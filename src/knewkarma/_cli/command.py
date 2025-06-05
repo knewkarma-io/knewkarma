@@ -1,20 +1,44 @@
 import inspect
 import os
+import random
 import typing as t
 from datetime import datetime
 
 import click
 import requests
 from rich.status import Status
+from rich.syntax import Syntax
 
 from tools import colours
 from tools.io_handlers import DataFrameHandler, FileHandler
 from tools.logging import console
 from tools.render import Render
+from tools.runtime import Runtime
 from ..core.client import reddit
-from ..meta.license import License
 
 __all__ = ["run"]
+
+THE_QUOTES: list = [
+    "If you stare into the subreddit, the subreddit also stares back into you.",
+    "*sigh* some people just want to watch the subreddit burn.",
+    "I came here for memes and statistical insight. I’m all out of memes.",
+    "You know, analysing Reddit is like herding cats... if the cats were arguing about pineapple on pizza.",
+    "Hmmmm this data smells like upvote farming.",
+    "My code doesn't judge your karma. But I do.",
+    "If it’s on r/conspiracy, it’s either the truth or a guy named Greg in his basement. Sometimes both.",
+    "Behind every karma point is a user who just wanted internet validation.",
+    "My algorithm is 99.7% sure that this post is a cry for help.",
+    "A subreddit is like a dumpster fire...",
+    "The plural of anecdote is not data. Unless it's from r/AskReddit.",
+    "This analysis was brought to you by caffeine, spite, and three deleted comments.",
+    "I built this tool to understand Reddit, but now it understands me!",
+    "When in doubt, blame the algorithm. That’s what I do.",
+]
+
+
+def get_quote():
+    syntax = Syntax(code=random.choice(THE_QUOTES), lexer="text")
+    console.print(syntax)
 
 
 def invoke_method(
@@ -124,7 +148,12 @@ def route_to_method(
             is_valid_arg = True
             start_time: datetime = datetime.now()
             try:
-                console.print(License.notice, justify="center")
+                Runtime.clear_screen()
+                console.print(
+                    random.choice(THE_QUOTES),
+                    justify="center",
+                    style=f"{colours.BOLD_WHITE.strip('[,]')} on {colours.ORANGE_RED.strip('[,]')}",
+                )
                 with Status(
                     status=f"Starting",
                     console=console,
@@ -158,8 +187,9 @@ def route_to_method(
             finally:
                 elapsed_time = datetime.now() - start_time
                 console.print(
-                    f"{colours.ITALIC}END... {elapsed_time.total_seconds():.2f} seconds elapsed{colours.RESET}",
+                    f"END. {elapsed_time.total_seconds():.2f} seconds elapsed.",
                     justify="center",
+                    style=f"{colours.BOLD_WHITE.strip('[,]')} on {colours.ORANGE_RED.strip('[,]')}",
                 )
 
     if not is_valid_arg:

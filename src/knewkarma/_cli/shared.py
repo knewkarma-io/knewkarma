@@ -15,18 +15,21 @@ def global_options(func: t.Callable) -> t.Callable:
     """
 
     @click.option(
+        "-e",
         "--export",
         type=str,
-        help="A comma-separated list (no whitespaces) of file types to export the output to <supported: csv,html,json,xml>",
+        help="A comma-separated list <w/o whitespaces> of file types to export the output to <supported: csv,html,json,xml>",
     )
     @click.option(
+        "-l",
         "--limit",
         default=100,
         show_default=True,
         type=int,
-        help="Maximum data output limit (max 100 if searching for users)",
+        help="Maximum data output limit <max 100 if searching for users>",
     )
     @click.option(
+        "-s",
         "--sort",
         default="all",
         show_default=True,
@@ -34,6 +37,7 @@ def global_options(func: t.Callable) -> t.Callable:
         help="Sort criterion",
     )
     @click.option(
+        "-t",
         "--timeframe",
         default="all",
         show_default=True,
