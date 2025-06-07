@@ -1,6 +1,6 @@
 # Developer Interface
 
-## Overview
+## 🧭 Overview
 
 The Knew Karma API offers a seamless way to interact with Reddit data, providing asynchronous access to user profiles,
 subreddit information, posts, comments, and more.
@@ -698,13 +698,13 @@ with requests.Session() as session:
 
 ***
 
-## Timeframes and Sorting
+## 🕰️ Timeframes and Sorting
 
 When fetching posts or comments, you can specify timeframes ("`hour`", "`day`", "`month`", "`year`") and sorting
 criteria ("`controversial`", "`new`", "`top`", "`best`", "`hot`", "`rising`"). Leaving these parameters unspecified
 defaults to retrieving data across all timeframes and sort criteria.
 
-## Random Cool-Down for Bulk Results
+## 💤 Cooldown for Bulk Results
 
 To avoid hitting rate limits, Knew Karma includes a random cool-down or sleep timer ranging from 1 to 10 seconds for
 bulk results that exceed 100. This feature ensures smooth and uninterrupted data retrieval while adhering to Reddit's
