@@ -61,11 +61,11 @@ jobs:
           username: rly0nheart
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
-      # Extract metadata (tags, labels) for Docker
+      # Extract meta (tags, labels) for Docker
       # https://github.com/docker/metadata-action
-      - name: Extract Docker metadata
+      - name: Extract Docker meta
         id: meta
-        uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
+        uses: docker/meta-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 

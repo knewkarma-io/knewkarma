@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "knewkarma"
-version = "7.1.4"
-description = "A Reddit data analysis toolkit"
-authors = ["Richard Mwewa <rly0nheart@duck.com>", "Knew Karma IO <redacted@redacted.com>"]
+version = "8.0.0"
+description = "Zero-auth toolkit for Reddit data analysis."
+authors = ["Ritchie Mwewa <rly0nheart@duck.com>", "Knew Karma IO <redacted@redacted.com>"]
 readme = "README.md"
 license = "GPL-3.0+"
 keywords = ["reddit", "data-analysis"]
@@ -23,14 +23,11 @@ issues = "https://github.com/knewkarma-io/knewkarma/issues"
 repository = "https://github.com/knewkarma-io/knewkarma"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-kraw = "^0.3.6"
-matplotlib = { version = "^3.9.2", optional = true }
+python = "^3.11"
+requests = "^2.32.3"
 pandas = "^2.1.4"
-rich-click = "^1.8.3"
-
-[tool.poetry.extras]
-visualisation = ["matplotlib"]
+pydantic = "^2.11.5"
+rich-click = "^1.8.9"
 
 [tool.poetry.group.dev.dependencies]
 myst-parser = "^3.0.1"
@@ -39,7 +36,14 @@ sphinx = "^7.4.7"
 sphinx-rtd-theme = "^2.0.0"
 
 [tool.poetry.scripts]
-knewkarma = "knewkarma._cli:start"
+ruser = "knewkarma._cli.main:cmd_user"
+rusers = "knewkarma._cli.main:cmd_users"
+rsubreddit = "knewkarma._cli.main:cmd_subreddit"
+rsubreddits = "knewkarma._cli.main:cmd_subreddits"
+rsearch = "knewkarma._cli.main:cmd_search"
+rpost = "knewkarma._cli.main:cmd_post"
+rposts = "knewkarma._cli.main:cmd_posts"
+knewkarma = "knewkarma._cli.main:cli"
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,4 +1,6 @@
-<p align="center"><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is a Reddit data analysis toolkit designed to provide an extensive range of functionalities for exploring and analysing Reddit data. It includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), and an <strong>Application Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.</p>
+**Knew Karma** (*/nuː ‘kɑːrmə/*) is a zero-auth data analysis toolkit designed to provide an extensive range of
+functionalities for exploring and analysing Reddit data. It includes a **Command-Line Interface (CLI)**, and an
+**Application Programming Interface (API)** to enable an easy integration in other Python Projects</p>
 
 <p align="center">
   <a href="https://github.com/knewkarma-io/knewkarma"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-000000?logo=github&link=https%3A%2F%2Fgithub.com%2Frly0nheart%2Fknewkarma"></a>
@@ -9,27 +11,27 @@
 </p>
 
 ```commandline
-knewkarma subreddit AskScience --posts
+knewkarma subreddit AskScience --posts --limit 200
 ```
 
+Or
+
+```commandline
+rsubreddit AskScience --posts --limit 200
+```
+
+And/Or
+
 ```python
-import asyncio
+import requests
 
-import aiohttp
-import knewkarma
+from knewkarma.core.subreddit import Subreddit
 
-
-async def subreddit_posts(subreddit_name, posts_limit):
-    subreddit = knewkarma.Subreddit(subreddit_name)
-
-    async with aiohttp.ClientSession() as session:
-        posts = await subreddit.posts(session=session, limit=posts_limit)
-
-        for post in posts:
-            print(post.data.title)
-
-
-asyncio.run(subreddit_posts(subreddit_name="AskScience", posts_limit=200))
+subreddit = Subreddit("AskScience")
+with requests.Session() as session:
+    posts = subreddit.posts(session=session, limit=200)
+    for post in posts:
+        print(post.title)
 ```
 
 ## Documentation
@@ -37,7 +39,21 @@ asyncio.run(subreddit_posts(subreddit_name="AskScience", posts_limit=200))
 Refer to the [documentation](https://knewkarma.readthedocs.io) for *Feature Overview*, *Installation*, *API
 Integration*, and *Usage* instructions.
 
-## Sponsorship
+## Star History
+
+<a href="https://star-history.com/#knewkarma-io/knewkarma&Date">
+   <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date" />
+      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date" />
+   </picture>
+</a>
+
+## License
+
+GPL-3.0+ License © [Ritchie Mwewa](https://gravatar.com/rly0nheart)
+
+## Support
 
 If you find Knew Karma useful and would like to support its development, you can sponsor the project through **Open
 Collective**.
@@ -54,17 +70,3 @@ Whether you're a company that relies on Knew Karma for data analysis or an indiv
 projects and/or the work put into this project in particular, any sponsorship tier is greatly appreciated.
 
 [Become a Sponsor](https://opencollective.com/knewkarma)
-
-## Star History
-
-<a href="https://star-history.com/#knewkarma-io/knewkarma&Date">
-   <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date&theme=dark" />
-      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date" />
-      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=knewkarma-io/knewkarma&type=Date" />
-   </picture>
-</a>
-
-## License
-
-GPL-3.0+ License © [Richard Mwewa](https://gravatar.com/rly0nheart)
