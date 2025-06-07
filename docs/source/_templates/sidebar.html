@@ -2,24 +2,19 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
 </head>
 
+<!--
 <p>
-    A Zero-auth toolkit for Reddit data analysis.
+    A zero-auth toolkit for Reddit data analysis.
 </p>
-
-<h3>Useful Links</h3>
+-->
+<h3>Jump to Page</h3>
 <ul>
+    {%- if pagename != "index" %}
+    <li><i class="fa-solid fa-house"></i><a href="{{ pathto('index') }}"> Home</a></li>
+    {%- endif %}
     <li><i class="fa-solid fa-download"></i><a href="{{ pathto('installation') }}"> Installation</a></li>
-    <li><i class="fa-solid fa-keyboard"></i><a href="{{ pathto('usage') }}"> Usage (CLI)</a></li>
+    <li><i class="fa-solid fa-keyboard"></i><a href="{{ pathto('cli') }}"> Command-Line Interface</a></li>
     <li><i class="fa-solid fa-book"></i><a href="{{ pathto('api') }}"> API Reference</a></li>
-
-    <!--<p></p>-->
-
-    <li><i class="fa-solid fa-hand-holding-dollar"></i><a href="https://opencollective.com/knewkarma"> Become a
-        Sponsor</a></li>
-    <li><a href="https://github.com/knewkarma-io/knewkarma"><i class="fa-brands fa-github"></i> GitHub</a></li>
-    <li><i class="fa-brands fa-python"></i><a href="https://pypi.org/project/knewkarma/"> PyPI Package</a></li>
-    <li><i class="fa-brands fa-linux"></i><a href="https://snapcraft.io/knewkarma"> Snap Package</a></li>
-    <li><i class="fa-solid fa-bug"></i><a href="https://github.com/knewkarma-io/knewkarma/issues"> Bug Tracker</a></li>
 </ul>
 
 {% if pagename == "api" %}
@@ -32,7 +27,7 @@
             <li><a href="#class-knewkarma-post">knewkarma.Post</a>
                 <ul>
                     <li><a class="method-link"
-                           href="#post-data-session-requests-session">Post.data</a>
+                           href="#post-data">Post.data</a>
                     </li>
                     <li><a class="method-link"
                            href="#post-comments">Post.comments</a>
@@ -187,3 +182,14 @@
     </li>
 </ul>
 {% endif %}
+
+<h3>Useful Links</h3>
+<ul>
+    <li><a href="https://github.com/knewkarma-io/knewkarma"><i class="fa-brands fa-github"></i> GitHub</a></li>
+    <li><i class="fa-brands fa-python"></i><a href="https://pypi.org/project/knewkarma/"> PyPI Package</a></li>
+    <li><i class="fa-brands fa-linux"></i><a href="https://snapcraft.io/knewkarma"> Snap Package</a></li>
+    <li><i class="fa-solid fa-bug"></i><a href="https://github.com/knewkarma-io/knewkarma/issues"> Bug Tracker</a></li>
+    <li><i class="fa-solid fa-heart fa-beat-fade" style="color: red"></i><a href="https://opencollective.com/knewkarma">
+        Donate</a>
+    </li>
+</ul>

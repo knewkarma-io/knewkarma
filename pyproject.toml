@@ -26,6 +26,7 @@ repository = "https://github.com/knewkarma-io/knewkarma"
 python = "^3.11"
 requests = "^2.32.3"
 pandas = "^2.1.4"
+pydantic = "^2.11.5"
 rich-click = "^1.8.9"
 
 [tool.poetry.group.dev.dependencies]

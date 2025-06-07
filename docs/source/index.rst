@@ -1,13 +1,9 @@
-A fully asynchronous, zero-auth toolkit for Reddit data analysis
+Knew Karma: A Zero-auth toolkit for Reddit-data analysis.
 ================================================================
 
 .. raw:: html
 
-   <p align="center"><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is a zero-auth toolkit for Reddit data analysis designed to provide an extensive range of functionalities for exploring and analysing Reddit data. It includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), and an <strong>Application Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.</p>
-
-.. raw:: html
-
-   <p align="center">
+   <p>
       <a href="https://github.com/knewkarma-io/knewkarma"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-000000?logo=github&link=https%3A%2F%2Fgithub.com%2Frly0nheart%2Fknewkarma"></a>
       <a href="https://pepy.tech/project/knewkarma"><img alt="Downloads" src="https://img.shields.io/pepy/dt/knewkarma?logo=pypi"></a>
       <a href="https://pypi.org/project/knewkarma"><img alt="PyPI - Version" src="https://img.shields.io/pypi/v/knewkarma?logo=pypi&link=https%3A%2F%2Fpypi.org%2Fproject%2Fknewkarma"></a>
@@ -15,12 +11,16 @@ A fully asynchronous, zero-auth toolkit for Reddit data analysis
       <!--<a href="https://opencollective.com/knewkarma"><img alt="Open Collective backers and sponsors" src="https://img.shields.io/opencollective/all/knewkarma?logo=open-collective"></a>-->
    </p>
 
-.. list-table:: Knew Karma provides detailed access to Reddit data across various categories [see table below]
+.. raw:: html
+
+   <p><strong>Knew Karma</strong> (/nuː ‘kɑːrmə/) is a zero-auth toolkit for Reddit data analysis designed to provide an extensive range of functionalities for exploring and analysing Reddit data. It includes a <strong>Command-Line Interface</strong> (<strong>CLI</strong>), and an <strong>Application Programming Interface</strong> (<strong>API</strong>) to enable easy integration in other Python projects and/or scripts.</p>
+
+.. list-table:: Knew Karma provides detailed access to various types of Reddit data [see table below]:
    :widths: 25 25 50
    :header-rows: 1
 
-   * - Category
-     - Feature
+   * - Class
+     - Method
      - Description
    * - **Post**
      - ``Data``
@@ -50,9 +50,6 @@ A fully asynchronous, zero-auth toolkit for Reddit data analysis
      - ``Profile``
      - Retrieves subreddit profile information.
    * -
-     - ``Comments``
-     - Retrieves comments from a subreddit.
-   * -
      - ``Posts``
      - Retrieves posts from a subreddit.
    * -
@@ -63,7 +60,7 @@ A fully asynchronous, zero-auth toolkit for Reddit data analysis
      - Lists wiki pages in a subreddit.
    * -
      - ``Wiki Page``
-     - Retrieves content from specific wiki pages.
+     - Retrieves content from a specific wiki page.
    * - **Subreddits**
      - ``All``
      - Retrieves all subreddits.
@@ -109,3 +106,4 @@ A fully asynchronous, zero-auth toolkit for Reddit data analysis
    * -
      - ``Popular``
      - Retrieves popular users.
+

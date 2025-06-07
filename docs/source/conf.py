@@ -1,15 +1,24 @@
+import os
+import sys
 from datetime import date
 
-from knewkarma.meta.about import Author
+# Add the path to the 'src' directory
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src"))
+)
 from knewkarma.meta.about import Project
 from knewkarma.meta.version import Version
+
+# Ignore warning for files not in toctree (We have a custom sidebar.html file)
+suppress_warnings = ["toc.not_included"]
+
 
 # Configuration file for the Sphinx documentation builder.
 
 # -- Project information
 project = Project.name
 
-copyright = f' {date.today().year} GPL-3.0+ License, <a href="{Author.gravatar}" target="_blank">{Author.name}</a>'
+copyright = f' {date.today().year} GPL-3.0+ License, <a href="https://github.com/knewkarma-io" target="_blank">Knew Karma IO</a>'
 
 release = Version.release
 version = Version.full_version

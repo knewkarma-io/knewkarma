@@ -1,10 +1,9 @@
 # Usage (CLI)
 
-## Getting Started
+## 🚀 Getting Started
 
-After installation, the *command-line interface* instance can be called with the `knewkarma` command (
-or `docker run -it [container-name]`
-for Docker Containers):
+Once installed, you can launch the command-line interface using the knewkarma command.
+If you're using Docker, you can run the container interactively like this:
 
 ```shell
 knewkarma --help
@@ -14,8 +13,10 @@ knewkarma --help
 docker run -t knewkarma --help
 ```
 
-You can further view individual module usages by calling `knewkarma` with a module name and
-the `-h/--help` flag or by calling each module with an `r` prefix [see table below]:
+To explore the usage details of individual modules, either:
+
+* Run knewkarma <module> `-h` or `--help`
+* Or use the `r<module>` shortcut syntax (refer to the tables below for specifics)
 
 | Command                        | Shortened            | Description                                           |
 |--------------------------------|----------------------|-------------------------------------------------------|
@@ -27,7 +28,9 @@ the `-h/--help` flag or by calling each module with an `r` prefix [see table bel
 | `knewkarma user -- help`       | `ruser --help`       | Print help message for user data retrieval            |
 | `knewkarma users -- help`      | `rusers --help`      | Print help message for users' data retrieval          |
 
-## Basic Usage Examples
+---
+
+## 📋 Basic Usage Examples
 
 ### Post Command
 
@@ -38,6 +41,8 @@ source `subreddit` are specified.
 |-----------------------------------------------|--------------------------------------|-----------------------|
 | `knewkarma post 13ptwzd AskReddit --data`     | `rpost 13ptwzd AskReddit --data`     | Get a post's data     |
 | `knewkarma post 13ptwzd AskReddit --comments` | `rpost 13ptwzd AskReddit --comments` | Get a post's comments |
+
+---
 
 ### Posts Command
 
@@ -52,6 +57,8 @@ Use this command get best, controversial, popular, new and/or front-page posts.
 | `knewkarma posts --popular`       | `rposts --popular`       | Get posts from *popular* listing       |
 | `knewkarma posts --rising`        | `rposts --rising`        | Get posts from *rising* listing        |
 
+---
+
 ### Search Command
 
 Use this command search/discovery of targets in users, subreddits, and posts.
@@ -62,6 +69,8 @@ Use this command search/discovery of targets in users, subreddits, and posts.
 | `knewkarma search coronavirus --posts`            | `rsearch coronavirus --posts`            | Search posts      |
 | `knewkarma search ask --subreddits`               | `rsearch ask --subreddits`               | Search subreddits |
 | `knewkarma search john --users`                   | `rsearch john --users`                   | Search users      |
+
+---
 
 ### Subreddit Command
 
@@ -75,6 +84,8 @@ Use this command to get a subreddit's data, such as comments, posts, wiki-pages,
 | `knewkarma subreddit MachineLearning --wiki-pages`                             | `rsubreddit MachineLearning --wiki-pages`                             | Get subreddit's wiki pages                                    |
 | `knewkarma subreddit MachineLearning --wiki-page config/description`           | `rsubreddit MachineLearning --wiki-page config/description`           | Get subreddit's specified wiki page data                      |
 
+---
+
 ### Subreddits Command
 
 Use this command to get new, popular, default and/or all subreddits.
@@ -85,6 +96,8 @@ Use this command to get new, popular, default and/or all subreddits.
 | `knewkarma subreddits --default` | `rsubreddits --default` | Get default subreddits |
 | `knewkarma subreddits --new`     | `rsubreddits --new`     | Get new subreddits     |
 | `knewkarma subreddits --popular` | `rsubreddits --popular` | Get popular subreddits |
+
+---
 
 ### User Command
 
@@ -100,6 +113,8 @@ Use this command to get user data, such as profile, posts, comments, top subredd
 | `knewkarma user AutoModerator --search-comments "automated"` | `ruser AutoModerator --search-comments "automated"` | Get a user's comment that contain the specified keyword             |
 | `knewkarma user janellemonae --moderated-subreddits`         | `ruser janellemonae --moderated-subreddits`         | Get subreddits moderated by user                                    |
 | `knewkarma user TheRealKSi --top-subreddits 10`              | `ruser  janellemonae --top-subreddits 10`           | Get user's top n subreddits based on subreddit frequency in n posts |
+
+---
 
 ### Users Command
 
