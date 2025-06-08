@@ -90,7 +90,7 @@ class Reddit:
                     jittered_sleep = random.uniform(base_sleep / 2, base_sleep)
                     sleep_duration = min(jittered_sleep, self._max_backoff)
 
-                    self.cooldown(
+                    self._cooldown(
                         message=f"Too Many Requests ({response.status_code}). Attempt {self._backoff_attempts}. Retrying in",
                         duration=int(sleep_duration),
                         status=status,
@@ -210,7 +210,7 @@ class Reddit:
             page += 1
 
             sleep_duration: int = randint(1, 5)
-            self.cooldown(
+            self._cooldown(
                 message=(
                     f"{colours.CYAN}{len(results)}{colours.CYAN_RESET}"
                     f" of {colours.CYAN}{limit}{colours.CYAN_RESET}"
@@ -229,7 +229,7 @@ class Reddit:
         return results[:limit]
 
     @staticmethod
-    def cooldown(message: str, status: Status, duration: int = 120):
+    def _cooldown(message: str, status: Status, duration: int = 120):
         end_time: float = time.time() + duration
         while time.time() < end_time:
             remaining_time: float = end_time - time.time()
