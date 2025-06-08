@@ -238,14 +238,17 @@ class Reddit:
                 (remaining_time - remaining_seconds) * 100
             )
 
-            message: str = (
-                f"{message} in {colours.CYAN}{remaining_seconds}"
-                f".{remaining_milliseconds:02}{colours.CYAN_RESET} seconds"
+            (
+                status.update(
+                    f"{message} in {colours.CYAN}{remaining_seconds}"
+                    f".{remaining_milliseconds:02}{colours.CYAN_RESET} seconds"
+                )
+                if isinstance(status, Status)
+                else print(
+                    f"{message} in {colours.CYAN}{remaining_seconds}"
+                    f".{remaining_milliseconds:02}{colours.CYAN_RESET} seconds"
+                )
             )
-            if isinstance(status, Status):
-                status.update(message)
-            else:
-                print(message)
 
             time.sleep(0.01)  # Sleep for 10 milliseconds
 
