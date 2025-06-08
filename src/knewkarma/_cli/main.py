@@ -1,10 +1,11 @@
+import functools
 import typing as t
 
 import rich_click as click
 
 from tools.log_config import console
 from tools.runtime_ops import RuntimeOps
-from . import command, shared
+from . import command
 from ..core.client import reddit
 from ..core.post import Post
 from ..core.posts import Posts
@@ -27,6 +28,63 @@ def set_window_title(text: t.Optional[str] = None):
         title = f"{title} - {text}"
 
     console.set_window_title(title)
+
+
+def global_options(func: t.Callable) -> t.Callable:
+    """
+    Decorator to add global CLI options like sort, timeframe, export, etc.,
+    and inject them into ctx.obj for use within the command.
+    """
+
+    @click.option(
+        "-e",
+        "--export",
+        type=str,
+        help="A comma-separated list <w/o whitespaces> of file types to export the output to <supported: csv,html,json,xml>",
+    )
+    @click.option(
+        "-l",
+        "--limit",
+        default=100,
+        show_default=True,
+        type=int,
+        help="Maximum data output limit <max 100 if searching for users>",
+    )
+    @click.option(
+        "-s",
+        "--sort",
+        default="all",
+        show_default=True,
+        type=click.Choice(t.get_args(reddit.SORT)),
+        help="Sort criterion",
+    )
+    @click.option(
+        "-t",
+        "--timeframe",
+        default="all",
+        show_default=True,
+        type=click.Choice(t.get_args(reddit.TIMEFRAME)),
+        help="Timeframe to get data from",
+    )
+    @click.pass_context
+    @functools.wraps(func)
+    def wrapper(
+        ctx: click.Context,
+        timeframe: reddit.TIMEFRAME,
+        sort: reddit.SORT,
+        limit: int,
+        export: str,
+        *args,
+        **kwargs,
+    ):
+        ctx.ensure_object(dict)
+        ctx.obj["timeframe"] = timeframe
+        ctx.obj["sort"] = sort
+        ctx.obj["limit"] = limit
+        ctx.obj["export"] = export
+        return ctx.invoke(func, *args, **kwargs)
+
+    return wrapper
 
 
 def help_callback(ctx: click.Context, _, value: bool):
@@ -60,7 +118,7 @@ def help_callback(ctx: click.Context, _, value: bool):
     "-v",
     "--version",
 )
-@shared.global_options
+@global_options
 @click.pass_context
 def cli(
     ctx: click.Context,
@@ -108,9 +166,9 @@ def licence(
 )
 @click.argument("_id", metavar="ID")
 @click.argument("subreddit")
-@click.option("-d", "--data", is_flag=True, help="Get post data")
-@click.option("-c", "--comments", is_flag=True, help="Get post comments")
-@shared.global_options
+@click.option("--data", is_flag=True, help="Get post data")
+@click.option("--comments", is_flag=True, help="Get post comments")
+@global_options
 @click.pass_context
 def cmd_post(ctx: click.Context, _id: str, subreddit: str, data: bool, comments: bool):
     """
@@ -132,12 +190,12 @@ def cmd_post(ctx: click.Context, _id: str, subreddit: str, data: bool, comments:
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
 
-    post_instance = Post(id=_id, subreddit=subreddit)
+    post = Post(id=_id, subreddit=subreddit)
     method_map: t.Dict = {
-        "comments": lambda session, status, logger: post_instance.comments(
+        "comments": lambda session, status, logger: post.comments(
             limit=limit, sort=sort, status=status, logger=logger, session=session
         ),
-        "data": lambda session, status, logger: post_instance.data(
+        "data": lambda session, status, logger: post.data(
             session=session, status=status
         ),
     }
@@ -155,28 +213,25 @@ def cmd_post(ctx: click.Context, _id: str, subreddit: str, data: bool, comments:
     name="posts",
     help="Use this command get best, controversial, front-page, new, popular, and/or rising posts.",
 )
-@click.option("-b", "--best", is_flag=True, help="Get posts from the best listing")
+@click.option("--best", is_flag=True, help="Get posts from the best listing")
 @click.option(
-    "-c",
     "--controversial",
     is_flag=True,
     help="Get posts from the controversial listing",
 )
 @click.option(
-    "-fp",
     "--front-page",
     is_flag=True,
     help="Get posts from the reddit front-page",
 )
-@click.option("-n", "--new", is_flag=True, help="Get new posts")
+@click.option("--new", is_flag=True, help="Get new posts")
 @click.option(
-    "-p",
-    "--popular",
+    "--top",
     is_flag=True,
-    help="Get posts from the popular listing",
+    help="Get posts from the top listing",
 )
-@click.option("-r", "--rising", is_flag=True, help="Get posts from the rising listing")
-@shared.global_options
+@click.option("--rising", is_flag=True, help="Get posts from the rising listing")
+@global_options
 @click.pass_context
 def cmd_posts(
     ctx: click.Context,
@@ -184,7 +239,7 @@ def cmd_posts(
     controversial: bool,
     front_page: bool,
     new: bool,
-    popular: bool,
+    top: bool,
     rising: bool,
 ):
     """
@@ -200,8 +255,8 @@ def cmd_posts(
     :type front_page: bool
     :param new: Flag to get new posts.
     :type new: bool
-    :param popular: Flag to get posts from the popular listing.
-    :type popular: bool
+    param top: Flag to get posts from the top listing.
+    :type top: bool
     :param rising: Flag to get posts from the rising listing.
     :type rising: bool
     """
@@ -211,36 +266,35 @@ def cmd_posts(
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
 
-    posts_instance = Posts()
     method_map: t.Dict = {
-        "best": lambda session, status, logger: posts_instance.best(
+        "best": lambda session, status, logger: Posts.best(
             timeframe=timeframe,
             limit=limit,
             status=status,
             logger=logger,
             session=session,
         ),
-        "controversial": lambda session, status, logger: posts_instance.controversial(
+        "controversial": lambda session, status, logger: Posts.controversial(
             timeframe=timeframe,
             limit=limit,
             status=status,
             logger=logger,
             session=session,
         ),
-        "front_page": lambda session, status, logger: posts_instance.front_page(
+        "front_page": lambda session, status, logger: Posts.front_page(
             limit=limit, sort=sort, status=status, logger=logger, session=session
         ),
-        "new": lambda session, status, logger: posts_instance.new(
+        "new": lambda session, status, logger: Posts.new(
             limit=limit, sort=sort, status=status, logger=logger, session=session
         ),
-        "popular": lambda session, status, logger: posts_instance.popular(
+        "top": lambda session, status, logger: Posts.top(
             timeframe=timeframe,
             limit=limit,
             status=status,
             logger=logger,
             session=session,
         ),
-        "rising": lambda session, status, logger: posts_instance.rising(
+        "rising": lambda session, status, logger: Posts.rising(
             limit=limit, status=status, logger=logger, session=session
         ),
     }
@@ -253,7 +307,7 @@ def cmd_posts(
         controversial=controversial,
         front_page=front_page,
         new=new,
-        popular=popular,
+        top=top,
         rising=rising,
     )
 
@@ -263,10 +317,10 @@ def cmd_posts(
     help="Use this command for search/discovery of users, subreddits, and posts.",
 )
 @click.argument("query")
-@click.option("-p", "--posts", is_flag=True, help="Search posts")
-@click.option("-s", "--subreddits", is_flag=True, help="Search subreddits")
-@click.option("-u", "--users", is_flag=True, help="Search users")
-@shared.global_options
+@click.option("--posts", is_flag=True, help="Search posts")
+@click.option("--subreddits", is_flag=True, help="Search subreddits")
+@click.option("--users", is_flag=True, help="Search users")
+@global_options
 @click.pass_context
 def cmd_search(
     ctx: click.Context, query: str, posts: bool, subreddits: bool, users: bool
@@ -290,17 +344,17 @@ def cmd_search(
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
 
-    search_instance = Search(
+    search = Search(
         query=query,
     )
     method_map: t.Dict = {
-        "posts": lambda session, status, logger: search_instance.posts(
+        "posts": lambda session, status, logger: search.posts(
             sort=sort, limit=limit, status=status, logger=logger, session=session
         ),
-        "subreddits": lambda session, status, logger: search_instance.subreddits(
+        "subreddits": lambda session, status, logger: search.subreddits(
             sort=sort, limit=limit, logger=logger, session=session, status=status
         ),
-        "users": lambda session, status, logger: search_instance.users(
+        "users": lambda session, status, logger: search.users(
             sort=sort, limit=limit, status=status, logger=logger, session=session
         ),
     }
@@ -321,40 +375,49 @@ def cmd_search(
     "comments, top subreddits, moderated subreddits, and more...",
 )
 @click.argument("username")
-@click.option("-cms", "--comments", is_flag=True, help="Get user's comments")
+@click.option("--comments", is_flag=True, help="Get user's comments")
 @click.option(
-    "-ms",
     "--moderated-subreddits",
     is_flag=True,
     help="Get user's moderated subreddits",
 )
-@click.option("-ov", "--overview", is_flag=True, help="Get user's most recent comments")
-@click.option("-ps", "--posts", is_flag=True, help="Get user's posts")
-@click.option("-pf", "--profile", is_flag=True, help="Get user's profile")
+@click.option("--overview", is_flag=True, help="Get user's most recent comments")
+@click.option("--posts", is_flag=True, help="Get user's posts")
+@click.option("--profile", is_flag=True, help="Get user's profile")
 @click.option(
-    "-ts",
     "--top-subreddits",
     type=int,
     help="Get user's top n subreddits",
 )
 @click.option(
-    "-iua",
-    "--is-username-available",
+    "--does-user-exist",
     is_flag=True,
-    help="Check if the given username is available or taken.",
+    help="Check if a user exists",
 )
-@shared.global_options
+@click.option(
+    "--search-posts",
+    type=str,
+    help="Search user posts that match a specified query string",
+)
+@click.option(
+    "--search-comments",
+    type=str,
+    help="Search user comments that match a specified query string",
+)
+@global_options
 @click.pass_context
 def cmd_user(
     ctx: click.Context,
     username: str,
     comments: bool,
     moderated_subreddits: bool,
+    search_comments: str,
+    search_posts: str,
     overview: bool,
     posts: bool,
     profile: bool,
     top_subreddits: int,
-    is_username_available: bool,
+    does_user_exist: bool,
 ):
     """
     Retrieve data about a specific user including profile, posts, comments, and top subreddits.
@@ -365,6 +428,10 @@ def cmd_user(
     :type username: str
     :param comments: Flag to get user's comments.
     :type comments: bool
+    :param search_comments:
+    :type search_comments: str
+    :param search_posts:
+    :type search_posts: str
     :param moderated_subreddits: Flag to get user's moderated subreddits.
     :type moderated_subreddits: bool
     :param overview: Flag to get user's most recent comments.
@@ -375,19 +442,17 @@ def cmd_user(
     :type profile: bool
     :param top_subreddits: Number of top subreddits to retrieve.
     :type top_subreddits: int
-    :param is_username_available: Flag to check if the given username is available of taken.
-    :type is_username_available: bool
+    :param does_user_exist: Flag to check if the given user exists.
+    :type does_user_exist: bool
     """
     timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
     sort: reddit.SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
 
-    user_instance = User(
-        name=username,
-    )
+    user = User(username=username)
     method_map: t.Dict = {
-        "comments": lambda session, status, logger: user_instance.comments(
+        "comments": lambda session, status, logger: user.comments(
             session=session,
             limit=limit,
             sort=sort,
@@ -395,13 +460,13 @@ def cmd_user(
             status=status,
             logger=logger,
         ),
-        "moderated_subreddits": lambda session, status, logger: user_instance.moderated_subreddits(
+        "moderated_subreddits": lambda session, status, logger: user.moderated_subreddits(
             logger=logger, session=session, status=status
         ),
-        "overview": lambda session, status, logger: user_instance.overview(
+        "overview": lambda session, status, logger: user.overview(
             limit=limit, logger=logger, session=session, status=status
         ),
-        "posts": lambda session, status, logger: user_instance.posts(
+        "posts": lambda session, status, logger: user.posts(
             session=session,
             limit=limit,
             sort=sort,
@@ -409,10 +474,22 @@ def cmd_user(
             status=status,
             logger=logger,
         ),
-        "profile": lambda session, status: user_instance.profile(
-            session=session, status=status
+        "profile": lambda session, status: user.profile(session=session, status=status),
+        "search_comments": lambda logger, status, session: user.search_comments(
+            query=search_comments,
+            limit=limit,
+            logger=logger,
+            status=status,
+            session=session,
         ),
-        "top_subreddits": lambda session, status, logger: user_instance.top_subreddits(
+        "search_posts": lambda logger, status, session: user.search_posts(
+            query=search_posts,
+            limit=limit,
+            logger=logger,
+            status=status,
+            session=session,
+        ),
+        "top_subreddits": lambda session, status, logger: user.top_subreddits(
             session=session,
             top_n=top_subreddits,
             limit=limit,
@@ -420,7 +497,7 @@ def cmd_user(
             status=status,
             logger=logger,
         ),
-        "is_username_available": lambda session, status, logger: user_instance.is_username_available(
+        "does_user_exist": lambda session, status, logger: user.does_user_exist(
             logger=logger, session=session, status=status
         ),
     }
@@ -434,8 +511,10 @@ def cmd_user(
         overview=overview,
         posts=posts,
         profile=profile,
+        search_comments=search_comments,
+        search_posts=search_posts,
         top_subreddits=top_subreddits,
-        is_username_available=is_username_available,
+        does_user_exist=does_user_exist,
     )
 
 
@@ -456,7 +535,7 @@ def cmd_user(
     is_flag=True,
     help="Get popular users",
 )
-@shared.global_options
+@global_options
 @click.pass_context
 def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
     """
@@ -476,23 +555,22 @@ def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
     timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
     limit: int = ctx.obj["limit"]
 
-    users_instance = Users()
     method_map: t.Dict = {
-        "all": lambda session, status, logger: users_instance.all(
+        "all": lambda session, status, logger: Users.all(
             logger=logger,
             session=session,
             limit=limit,
             timeframe=timeframe,
             status=status,
         ),
-        "new": lambda session, status, logger: users_instance.new(
+        "new": lambda session, status, logger: Users.new(
             logger=logger,
             session=session,
             limit=limit,
             timeframe=timeframe,
             status=status,
         ),
-        "popular": lambda session, status, logger: users_instance.popular(
+        "popular": lambda session, status, logger: Users.popular(
             logger=logger,
             session=session,
             limit=limit,
@@ -523,7 +601,7 @@ def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
     "-wp", "--wikipage", type=str, help="Get a subreddit's specified wiki page data"
 )
 @click.option("-wps", "--wikipages", is_flag=True, help="Get a subreddit's wiki pages")
-@shared.global_options
+@global_options
 @click.pass_context
 def cmd_subreddit(
     ctx: click.Context,
@@ -558,11 +636,11 @@ def cmd_subreddit(
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
 
-    subreddit_instance = Subreddit(
+    subreddit = Subreddit(
         name=subreddit_name,
     )
     method_map: t.Dict = {
-        "posts": lambda session, status, logger=None: subreddit_instance.posts(
+        "posts": lambda session, status, logger=None: subreddit.posts(
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -570,10 +648,10 @@ def cmd_subreddit(
             logger=logger,
             session=session,
         ),
-        "profile": lambda session, status: subreddit_instance.profile(
+        "profile": lambda session, status: subreddit.profile(
             status=status, session=session
         ),
-        "search": lambda session, status, logger: subreddit_instance.search(
+        "search": lambda session, status, logger: subreddit.search(
             query=search,
             limit=limit,
             sort=sort,
@@ -582,10 +660,10 @@ def cmd_subreddit(
             logger=logger,
             session=session,
         ),
-        "wikipages": lambda session, status, logger: subreddit_instance.wikipages(
+        "wikipages": lambda session, status, logger: subreddit.wikipages(
             status=status, session=session
         ),
-        "wikipage": lambda session, status: subreddit_instance.wikipage(
+        "wikipage": lambda session, status: subreddit.wikipage(
             page_name=wikipage, status=status, session=session
         ),
     }
@@ -623,7 +701,7 @@ def cmd_subreddit(
     is_flag=True,
     help="Get popular subreddits",
 )
-@shared.global_options
+@global_options
 @click.pass_context
 def cmd_subreddits(
     ctx: click.Context, _all: bool, default: bool, new: bool, popular: bool
@@ -647,21 +725,20 @@ def cmd_subreddits(
     timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
     limit: int = ctx.obj["limit"]
 
-    subreddits_instance = Subreddits()
     method_map: t.Dict = {
-        "all": lambda session, status, logger: subreddits_instance.all(
+        "all": lambda session, status, logger: Subreddits.all(
             limit=limit,
             session=session,
             status=status,
             logger=logger,
         ),
-        "default": lambda session, status, logger: subreddits_instance.default(
+        "default": lambda session, status, logger: Subreddits.default(
             limit=limit, session=session, status=status
         ),
-        "new": lambda session, status, logger: subreddits_instance.new(
+        "new": lambda session, status, logger: Subreddits.new(
             limit=limit, logger=logger, session=session, status=status
         ),
-        "popular": lambda session, status, logger: subreddits_instance.popular(
+        "popular": lambda session, status, logger: Subreddits.popular(
             limit=limit, logger=logger, session=session, status=status
         ),
     }

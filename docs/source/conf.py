@@ -18,7 +18,7 @@ suppress_warnings = ["toc.not_included"]
 # -- Project information
 project = Project.name
 
-copyright = f' {date.today().year} GPL-3.0+ License, <a href="https://github.com/knewkarma-io" target="_blank">Knew Karma IO</a>'
+copyright = f' {date.today().year}, <a href="https://github.com/knewkarma-io" target="_blank">Knew Karma IO</a>'
 
 release = Version.release
 version = Version.full_version

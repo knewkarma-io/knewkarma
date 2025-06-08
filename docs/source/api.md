@@ -19,7 +19,7 @@ Represents a Reddit post and provides method(s) for getting data from the specif
 ### Initialisation
 
 ```text
-post = Post(id: str, subreddit: str, )
+post = Post(id: str, subreddit: str)
 ```
 
 Initialises an instance for getting data from a specified post.
@@ -71,14 +71,6 @@ with requests.Session() as session:
 
 Represents Reddit posts and provides methods for getting posts from various sources.
 
-### Initialisation
-
-```text
-posts = Posts()
-```
-
-Initialises an instance for getting data from multiple posts.
-
 ### Methods
 
 #### <span class="method-name"><span class="italic">Posts.</span><strong>best</strong></span>
@@ -91,9 +83,8 @@ Gets posts from the best listing.
 import requests
 from knewkarma.core.posts import Posts
 
-posts = Posts()
 with requests.Session() as session:
-    best_posts = posts.best(limit=150, session=session)
+    best_posts = Posts.best(limit=150, session=session)
 
     for post in best_posts:
         print(post.title)
@@ -112,9 +103,8 @@ Gets posts from the controversial listing.
 import requests
 from knewkarma.core.posts import Posts
 
-posts = Posts()
 with requests.Session() as session:
-    controversial_posts = posts.controversial(limit=20, session=session)
+    controversial_posts = Posts.controversial(limit=20, session=session)
 
     for post in controversial_posts:
         print(post.title)
@@ -132,9 +122,8 @@ Gets posts from the Reddit front-page.
 import requests
 from knewkarma.core.posts import Posts
 
-posts = Posts()
 with requests.Session() as session:
-    frontpage_posts = posts.front_page(limit=10, session=session)
+    frontpage_posts = Posts.front_page(limit=10, session=session)
 
     for post in frontpage_posts:
         print(post.title)
@@ -152,9 +141,8 @@ Gets new posts.
 import requests
 from knewkarma.core.posts import Posts
 
-posts = Posts()
 with requests.Session() as session:
-    new_posts = posts.new(limit=10, session=session)
+    new_posts = Posts.new(limit=10, session=session)
 
     for post in new_posts:
         print(post.title)
@@ -163,9 +151,9 @@ with requests.Session() as session:
 
 ***
 
-#### <span class="method-name"><span class="italic">Posts.</span><strong>popular</strong></span>
+#### <span class="method-name"><span class="italic">Posts.</span><strong>top</strong></span>
 
-Gets posts from the popular listing.
+Gets posts from the top listing.
 
 ##### Code Example:
 
@@ -173,9 +161,9 @@ Gets posts from the popular listing.
 import requests
 from knewkarma.core.posts import Posts
 
-posts = Posts()
+posts = Posts
 with requests.Session() as session:
-    popular_posts = posts.popular(limit=50, session=session)
+    popular_posts = posts.top(limit=50, session=session)
 
     for post in popular_posts:
         print(post.title)
@@ -193,9 +181,8 @@ Gets posts from the rising listing.
 import requests
 from knewkarma.core.posts import Posts
 
-posts = Posts()
 with requests.Session() as session:
-    rising_posts = posts.rising(limit=100, session=session)
+    rising_posts = Posts.rising(limit=100, session=session)
 
     for post in rising_posts:
         print(post.title)
@@ -212,7 +199,7 @@ different entities.
 ### Initialisation
 
 ```text
-search = Search(query: str, )
+search = Search(query: str)
 ```
 
 Initialises an instance for performing searches across Reddit.
@@ -289,7 +276,7 @@ Represents a Reddit subreddit and provides methods for getting data from it.
 ### Initialisation
 
 ```text
-subreddit = Subreddit(name: str, )
+subreddit = Subreddit(name: str)
 ```
 
 Initialises a Subreddit instance for getting profile and posts from the specified subreddit.
@@ -396,14 +383,6 @@ with requests.Session() as session:
 
 Represents subreddits and provides methods for getting related data.
 
-### Initialisation
-
-```text
-subreddits = Subreddits()
-```
-
-Initialises an instance for getting data from multiple subreddits.
-
 ### Methods
 
 #### <span class="method-name"><span class="italic">Subreddits.</span><strong>all</strong></span>
@@ -416,9 +395,8 @@ Gets all subreddits.
 import requests
 from knewkarma.core.subreddits import Subreddits
 
-subreddits = Subreddits()
 with requests.Session() as session:
-    all_subreddits = subreddits.all(limit=500, session=session)
+    all_subreddits = Subreddits.all(limit=500, session=session)
 
     for subreddit in all_subreddits:
         print(subreddit.description)
@@ -436,9 +414,8 @@ Gets default subreddits.
 import requests
 from knewkarma.core.subreddits import Subreddits
 
-subreddits = Subreddits()
 with requests.Session() as session:
-    default_subreddits = subreddits.default(limit=20, session=session)
+    default_subreddits = Subreddits.default(limit=20, session=session)
 
     for subreddit in default_subreddits:
         print(subreddit.description)
@@ -456,9 +433,8 @@ Gets new subreddits.
 import requests
 from knewkarma.core.subreddits import Subreddits
 
-subreddits = Subreddits()
 with requests.Session() as session:
-    new_subreddits = subreddits.new(limit=50, session=session)
+    new_subreddits = Subreddits.new(limit=50, session=session)
 
     for subreddit in new_subreddits:
         print(subreddit.description)
@@ -477,9 +453,8 @@ Gets popular subreddits.
 import requests
 from knewkarma.core.subreddits import Subreddits
 
-subreddits = Subreddits()
 with requests.Session() as session:
-    popular_subreddits = subreddits.popular(limit=100, session=session)
+    popular_subreddits = Subreddits.popular(limit=100, session=session)
 
     for subreddit in popular_subreddits:
         print(subreddit.description)
@@ -494,7 +469,7 @@ Represents a Reddit user and provides methods for getting data from the specifie
 ### Initialisation
 
 ```text
-user = User(username: str, )
+user = User(username: str)
 ```
 
 Initialises a User instance for getting profile, posts, and comments data from the specified user.
@@ -502,6 +477,25 @@ Initialises a User instance for getting profile, posts, and comments data from t
 * `username`: Username of the user to get data from.
 
 ### Methods
+
+#### <span class="method-name"><span class="italic">User.</span><strong>does_user_exist</strong></span>
+
+Check if a user exists.
+
+##### Code Example:
+
+```python
+import requests
+from knewkarma.core.user import User
+
+user = User(username="AutoModerator")
+with requests.Session() as session:
+    exists = user.does_user_exist(session=session)
+    print(exists)
+
+```
+
+***
 
 #### <span class="method-name"><span class="italic">User.</span><strong>profile</strong></span>
 
@@ -513,7 +507,7 @@ Gets a user's profile data.
 import requests
 from knewkarma.core.user import User
 
-user = User(name="AutoModerator")
+user = User(username="AutoModerator")
 with requests.Session() as session:
     profile = user.profile(session=session)
     print(profile.created)
@@ -531,7 +525,7 @@ Gets a user's posts.
 import requests
 from knewkarma.core.user import User
 
-user = User(name="AutoModerator")
+user = User(username="AutoModerator")
 with requests.Session() as session:
     posts = user.posts(limit=100, session=session)
 
@@ -551,7 +545,7 @@ Gets a user's comments.
 import requests
 from knewkarma.core.user import User
 
-user = User(name="AutoModerator")
+user = User(username="AutoModerator")
 with requests.Session() as session:
     comments = user.comments(limit=100, session=session)
 
@@ -571,12 +565,52 @@ Gets a user's most recent comments.
 import requests
 from knewkarma.core.user import User
 
-user = User(name="AutoModerator")
+user = User(username="AutoModerator")
 with requests.Session() as session:
     comments = user.overview(limit=100, session=session)
 
     for comment in comments:
         print(comment.body)
+```
+
+***
+
+#### <span class="method-name"><span class="italic">User.</span><strong>search_comments</strong></span>
+
+Search user comments that match the query string.
+
+##### Code Example:
+
+```python
+import requests
+from knewkarma.core.user import User
+
+user = User(username="AutoModerator")
+with requests.Session() as session:
+    comments = user.search_comments(query="automated", limit=100, session=session)
+
+    for comment in comments:
+        print(comment.body)
+```
+
+***
+
+#### <span class="method-name"><span class="italic">User.</span><strong>search_posts</strong></span>
+
+Search user posts that match the query string.
+
+##### Code Example:
+
+```python
+import requests
+from knewkarma.core.user import User
+
+user = User(username="AutoModerator")
+with requests.Session() as session:
+    posts = user.search_posts(query="banned", limit=100, session=session)
+
+    for post in posts:
+        print(post.title)
 ```
 
 ***
@@ -591,7 +625,7 @@ Gets subreddits moderated by the user.
 import requests
 from knewkarma.core.user import User
 
-user = User(name="JanelleMonae")
+user = User(username="JanelleMonae")
 with requests.Session() as session:
     moderated_subreddits = user.moderated_subreddits(session=session)
 
@@ -611,7 +645,7 @@ Gets a user's top n subreddits based on subreddit frequency in *n* posts.
 import requests
 from knewkarma.core.user import User
 
-user = User(name="JanelleMonae")
+user = User(username="JanelleMonae")
 with requests.Session() as session:
     top_subreddits = user.top_subreddits(
         top_n=10,
@@ -628,14 +662,6 @@ with requests.Session() as session:
 
 Represents Reddit users and provides methods for getting related data.
 
-### Initialisation
-
-```text
-users = Users()
-```
-
-Initialises an instance for getting users from multiple sources.
-
 ### Methods
 
 #### <span class="method-name"><span class="italic">Users.</span><strong>all</strong></span>
@@ -648,9 +674,8 @@ Gets all users.
 import requests
 from knewkarma.core.users import Users
 
-users = Users()
 with requests.Session() as session:
-    all_users = users.all(limit=50, session=session)
+    all_users = Users.all(limit=50, session=session)
 
     for user in all_users:
         print(user.name)
@@ -668,9 +693,8 @@ Gets new users.
 import requests
 from knewkarma.core.users import Users
 
-users = Users()
 with requests.Session() as session:
-    new_users = users.new(limit=100, session=session)
+    new_users = Users.new(limit=100, session=session)
 
     for user in new_users:
         print(user.created)
@@ -688,9 +712,8 @@ Gets popular users.
 import requests
 from knewkarma.core.users import Users
 
-users = Users()
 with requests.Session() as session:
-    popular_users = users.popular(limit=200, session=session)
+    popular_users = Users.popular(limit=200, session=session)
 
     for user in popular_users:
         print(user.id)

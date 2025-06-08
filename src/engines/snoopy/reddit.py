@@ -40,6 +40,7 @@ class Reddit:
         "user": lambda response: RedditSanitiser().user(response=response),
         "subreddits": lambda response: RedditSanitiser().subreddits(response=response),
         "subreddit": lambda response: RedditSanitiser().subreddit(response=response),
+        "post": lambda response: RedditSanitiser().post(response=response),
         "posts": lambda response: RedditSanitiser().posts(response=response),
         "wikipage": lambda response: RedditSanitiser().wiki_page(response=response),
         "after": lambda response: RedditSanitiser().get_after(response=response),
@@ -285,18 +286,18 @@ class Reddit:
         subreddit_name = kwargs.get("subreddit")
         post_id = kwargs.get("id")
 
-        comments_map = {
+        endpoints = {
             "user_overview": self.ENDPOINTS["user"] % username + "/overview.json",
             "user": self.ENDPOINTS["user"] % username + "/comments.json",
             "post": self.ENDPOINTS["subreddit"]
             % f"{subreddit_name}/comments/{post_id}.json",
         }
 
+        endpoint = endpoints[kind]
+        params = {"limit": limit, "sort": sort, "t": timeframe, "raw_json": 1}
+
         if isinstance(status, Status):
             status.update(f"Getting {limit} comments from {kind}...")
-
-        endpoint = comments_map[kind]
-        params = {"limit": limit, "sort": sort, "t": timeframe, "raw_json": 1}
 
         comments = self._paginate(
             url=endpoint,
@@ -365,7 +366,8 @@ class Reddit:
             "controversial",
             "front_page",
             "new",
-            "popular",
+            "top",
+            # "popular",
             "rising",
             "subreddit",
             "user",
@@ -386,29 +388,29 @@ class Reddit:
         subreddit = kwargs.get("subreddit")
         query = kwargs.get("query")
 
-        posts_map = {
-            "best": f"{self.BASE_URL}/{kind}.json",
-            "controversial": f"{self.BASE_URL}/{kind}.json",
+        endpoints = {
             "front_page": f"{self.BASE_URL}/.json",
-            "new": f"{self.BASE_URL}/new.json",
-            "popular": f"{self.BASE_URL}/{kind}.json",
-            "rising": f"{self.BASE_URL}/{kind}.json",
             "subreddit": f"{self.ENDPOINTS['subreddit']}" % subreddit + ".json",
             "user": f"{self.ENDPOINTS['user']}" % username + "/submitted.json",
             "search_subreddit": f"{self.ENDPOINTS['subreddit']}" % subreddit
             + "/search.json",
         }
 
-        if isinstance(status, Status):
-            status.update(f"Getting {limit} posts from (listing) {kind}...")
+        if kind in ["best", "controversial", "new", "top", "rising"]:
+            endpoint = f"{self.BASE_URL}/{kind}.json"
+        else:
+            endpoint = endpoints[kind]
 
         params: dict = (
             {"q": query, "restrict_sr": 1} if kind == "search_subreddit" else {}
         )
         params.update({"sort": sort, "t": timeframe})
 
+        if isinstance(status, Status):
+            status.update(f"Getting {limit} posts from (listing) {kind}...")
+
         posts = self._paginate(
-            url=posts_map[kind],
+            url=endpoint,
             session=session,
             sanitiser=self.SANITISERS["posts"],
             limit=limit,
@@ -448,20 +450,18 @@ class Reddit:
         status: t.Optional[Status] = None,
     ) -> t.List[User]:
 
-        users_map = {
-            "all": f"{self.ENDPOINTS['users']}.json",
-            "new": f"{self.ENDPOINTS['users']}/new.json",
-            "popular": f"{self.ENDPOINTS['users']}/popular.json",
-        }
+        if kind == "all":
+            endpoint = f"{self.ENDPOINTS["users"]}.json"
+        else:
+            endpoint = f"{self.ENDPOINTS['users']}/{kind}.json"
 
-        if isinstance(status, Status):
-            status.update(f"Getting {limit} {kind} users...")
-
-        endpoint = users_map[kind]
         params = {
             "limit": limit,
             "t": timeframe,
         }
+
+        if isinstance(status, Status):
+            status.update(f"Getting {limit} {kind} users...")
 
         users = self._paginate(
             url=endpoint,
@@ -506,21 +506,22 @@ class Reddit:
         **kwargs: str,
     ) -> t.Union[t.List[Subreddit], Subreddit]:
 
-        subreddits_map = {
+        endpoints = {
             "all": f"{self.ENDPOINTS['subreddits']}.json",
-            "default": f"{self.ENDPOINTS['subreddits']}/default.json",
-            "new": f"{self.ENDPOINTS['subreddits']}/new.json",
-            "popular": f"{self.ENDPOINTS['subreddits']}/popular.json",
             "user_moderated": self.ENDPOINTS["user"] % kwargs.get("username")
             + "/moderated_subreddits.json",
         }
 
+        if kind in ["default", "new", "popular"]:
+            endpoint = f"{self.ENDPOINTS['subreddits']}/{kind}.json"
+        else:
+            endpoint = endpoints[kind]
+
+        params = {"raw_json": 1}
+
         if isinstance(status, Status):
             desc = f"{limit} " if kind != "user_moderated" else ""
             status.update(f"Getting {desc}{kind} subreddits...")
-
-        endpoint = subreddits_map[kind]
-        params = {"raw_json": 1}
 
         if kind == "user_moderated":
             response = self.send_request(
