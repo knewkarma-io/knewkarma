@@ -11,8 +11,9 @@ from .client import reddit
 class Users:
     """Represents Reddit users and provides methods for getting related data."""
 
-    @staticmethod
+    @classmethod
     def new(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -51,8 +52,9 @@ class Users:
 
         return new_users
 
-    @staticmethod
+    @classmethod
     def popular(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -91,8 +93,9 @@ class Users:
 
         return popular_users
 
-    @staticmethod
+    @classmethod
     def all(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",

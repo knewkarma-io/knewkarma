@@ -11,8 +11,9 @@ from .client import reddit
 class Posts:
     """Represents Reddit posts and provides methods for retrieving posts from various sources."""
 
-    @staticmethod
+    @classmethod
     def best(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -20,14 +21,10 @@ class Posts:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        Asynchronously retrieves the best posts.
+        Gets best posts.
 
         :param session: A `requests.Session` for making the HTTP request.
         :type session: requests.Session
-
-
-
-
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -40,7 +37,7 @@ class Posts:
         :rtype: List[Post]
         """
 
-        best_posts = reddit.posts(
+        posts = reddit.posts(
             session=session,
             logger=logger,
             status=status,
@@ -50,10 +47,11 @@ class Posts:
             timeframe=timeframe,
         )
 
-        return best_posts
+        return posts
 
-    @staticmethod
+    @classmethod
     def controversial(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -61,14 +59,10 @@ class Posts:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        Asynchronously retrieves the controversial posts.
+        Gets controversial posts.
 
         :param session: A `requests.Session` for making the HTTP request.
         :type session: requests.Session
-
-
-
-
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -81,7 +75,7 @@ class Posts:
         :rtype: List[Post]
         """
 
-        controversial_posts = reddit.posts(
+        posts = reddit.posts(
             session=session,
             logger=logger,
             status=status,
@@ -91,10 +85,11 @@ class Posts:
             timeframe=timeframe,
         )
 
-        return controversial_posts
+        return posts
 
-    @staticmethod
+    @classmethod
     def front_page(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -103,14 +98,10 @@ class Posts:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        Asynchronously retrieves the front-page posts.
+        Gets front-page posts.
 
         :param session: A `requests.Session` for making the HTTP request.
         :type session: requests.Session
-
-
-
-
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -125,7 +116,7 @@ class Posts:
         :rtype: List[Post]
         """
 
-        front_page_posts = reddit.posts(
+        posts = reddit.posts(
             session=session,
             logger=logger,
             status=status,
@@ -135,10 +126,11 @@ class Posts:
             timeframe=timeframe,
         )
 
-        return front_page_posts
+        return posts
 
-    @staticmethod
+    @classmethod
     def new(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -147,14 +139,10 @@ class Posts:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        Asynchronously retrieves the new posts.
+        Gets new posts.
 
         :param session: A `requests.Session` for making the HTTP request.
         :type session: requests.Session
-
-
-
-
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -169,7 +157,7 @@ class Posts:
         :rtype: List[Post]
         """
 
-        new_posts = reddit.posts(
+        posts = reddit.posts(
             session=session,
             logger=logger,
             status=status,
@@ -179,10 +167,11 @@ class Posts:
             timeframe=timeframe,
         )
 
-        return new_posts
+        return posts
 
-    @staticmethod
-    def popular(
+    @classmethod
+    def top(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -190,14 +179,10 @@ class Posts:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        Asynchronously retrieves the popular posts.
+        Gets top posts.
 
         :param session: A `requests.Session` for making the HTTP request.
         :type session: requests.Session
-
-
-
-
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -209,20 +194,22 @@ class Posts:
         :return: A list of `Post` objects, each containing parsed post data.
         :rtype: List[Post]
         """
-        popular_posts = reddit.posts(
+
+        posts = reddit.posts(
             session=session,
             logger=logger,
             status=status,
-            kind="popular",
+            kind="top",
             limit=limit,
             sort="all",
             timeframe=timeframe,
         )
 
-        return popular_posts
+        return posts
 
-    @staticmethod
+    @classmethod
     def rising(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -230,14 +217,10 @@ class Posts:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        Asynchronously retrieves the rising posts.
+        Gets rising posts.
 
         :param session: A `requests.Session` for making the HTTP request.
         :type session: requests.Session
-
-
-
-
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param timeframe: The timeframe from which to retrieve posts. Defaults to "all".
@@ -250,7 +233,7 @@ class Posts:
         :rtype: List[Post]
         """
 
-        rising_posts = reddit.posts(
+        posts = reddit.posts(
             session=session,
             logger=logger,
             status=status,
@@ -260,4 +243,4 @@ class Posts:
             timeframe=timeframe,
         )
 
-        return rising_posts
+        return posts

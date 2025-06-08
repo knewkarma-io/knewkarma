@@ -11,8 +11,9 @@ from .client import reddit
 class Subreddits:
     """Represents Reddit subreddits and provides methods for getting related data."""
 
-    @staticmethod
+    @classmethod
     def all(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -23,11 +24,7 @@ class Subreddits:
         get all subreddits.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get all subreddits.
@@ -40,7 +37,7 @@ class Subreddits:
         :rtype: List[Subreddit]
 
         Note:
-            Items will most likely be limited to 1000, per Reddit's API policy.
+            Items will most likely be limited to 1000, per Reddit's public API policy.
         """
 
         all_subreddits = reddit.subreddits(
@@ -54,8 +51,9 @@ class Subreddits:
 
         return all_subreddits
 
-    @staticmethod
+    @classmethod
     def default(
+        cls,
         limit: int,
         session: requests.Session,
         status: t.Optional[Status] = None,
@@ -67,11 +65,7 @@ class Subreddits:
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :param logger:
@@ -91,8 +85,9 @@ class Subreddits:
 
         return default_subreddits
 
-    @staticmethod
+    @classmethod
     def new(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -103,11 +98,7 @@ class Subreddits:
         get new subreddits.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new subreddits.
@@ -130,8 +121,9 @@ class Subreddits:
 
         return new_subreddits
 
-    @staticmethod
+    @classmethod
     def popular(
+        cls,
         session: requests.Session,
         limit: int,
         timeframe: reddit.TIMEFRAME = "all",
@@ -142,11 +134,7 @@ class Subreddits:
         get popular subreddits.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param limit: Maximum number of subreddits to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular subreddits.

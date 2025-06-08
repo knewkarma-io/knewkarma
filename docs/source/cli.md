@@ -1,4 +1,4 @@
-# Usage (CLI)
+# Command-Line Interface
 
 ## 🚀 Getting Started
 
@@ -54,7 +54,7 @@ Use this command get best, controversial, popular, new and/or front-page posts.
 | `knewkarma posts --controversial` | `rposts --controversial` | Get posts from *controversial* listing |
 | `knewkarma posts --front-page`    | `rposts --front-page`    | Get posts from Reddit Front-Page       |
 | `knewkarma posts --new`           | `rposts --new`           | Get new posts                          |
-| `knewkarma posts --popular`       | `rposts --popular`       | Get posts from *popular* listing       |
+| `knewkarma posts --top`           | `rposts --top`           | Get posts from *top* listing           |
 | `knewkarma posts --rising`        | `rposts --rising`        | Get posts from *rising* listing        |
 
 ---
@@ -112,7 +112,8 @@ Use this command to get user data, such as profile, posts, comments, top subredd
 | `knewkarma user AutoModerator --search-posts "banned"`       | `ruser AutoModerator --search-posts "banned"`       | Get a user's posts that contain the specified keyword               |
 | `knewkarma user AutoModerator --search-comments "automated"` | `ruser AutoModerator --search-comments "automated"` | Get a user's comment that contain the specified keyword             |
 | `knewkarma user janellemonae --moderated-subreddits`         | `ruser janellemonae --moderated-subreddits`         | Get subreddits moderated by user                                    |
-| `knewkarma user TheRealKSi --top-subreddits 10`              | `ruser  janellemonae --top-subreddits 10`           | Get user's top n subreddits based on subreddit frequency in n posts |
+| `knewkarma user TheRealKSi --top-subreddits 10`              | `ruser  TheRealKSi --top-subreddits 10`             | Get user's top n subreddits based on subreddit frequency in n posts |
+| `knewkarma user TheRealKSi --does-user-exist`                | `ruser  TheRealKSI --does-user-exist`               | Check user existence                                                |
 
 ---
 

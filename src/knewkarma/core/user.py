@@ -14,15 +14,15 @@ from .client import reddit
 class User:
     """Represents a Reddit user and provides methods for getting data from the specified user."""
 
-    def __init__(self, name: str):
+    def __init__(self, username: str):
         """
         Initialises a `User()` instance for getting a user's `profile`, `posts` and `comments` data.
 
-        :param name: Username to get data from.
-        :type name: str
+        :param username: Username to get data from.
+        :type username: str
         """
 
-        self.name = name
+        self.username = username
 
     def comments(
         self,
@@ -37,11 +37,7 @@ class User:
         get a user's comments.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param limit: Maximum number of comments to return.
         :type limit: int
         :param sort: Sort criterion for the comments.
@@ -61,7 +57,7 @@ class User:
             logger=logger,
             status=status,
             kind="user",
-            username=self.name,
+            username=self.username,
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -80,10 +76,6 @@ class User:
 
         :param session: An `requests.Session` for making the HTTP request.
         :type session: requests.Session
-
-
-
-
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :param logger:
@@ -98,7 +90,7 @@ class User:
             status=status,
             kind="user_moderated",
             timeframe="all",
-            username=self.name,
+            username=self.username,
             limit=0,
         )
 
@@ -118,10 +110,6 @@ class User:
         :type limit: int
         :param session: An `requests.Session` for making the HTTP request.
         :type session: requests.Session
-
-
-
-
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :param logger:
@@ -138,7 +126,7 @@ class User:
             limit=limit,
             sort="all",
             timeframe="all",
-            username=self.name,
+            username=self.username,
         )
 
         return user_overview
@@ -179,7 +167,7 @@ class User:
             limit=limit,
             sort=sort,
             timeframe=timeframe,
-            username=self.name,
+            username=self.username,
         )
 
         return user_posts
@@ -193,11 +181,7 @@ class User:
         get a user's profile data.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :return: A SimpleNamespace object containing user profile data.
@@ -207,10 +191,66 @@ class User:
         user_profile = reddit.user(
             session=session,
             status=status,
-            name=self.name,
+            name=self.username,
         )
 
         return user_profile
+
+    def search_comments(
+        self,
+        query: str,
+        limit: int,
+        session: requests.Session,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
+    ) -> t.List[Comment]:
+        """
+        Search user comments that match the query string.
+        """
+        comments = self.comments(
+            limit=limit,
+            sort="all",
+            timeframe="all",
+            status=status,
+            logger=logger,
+            session=session,
+        )
+
+        results = []
+
+        for comment in comments:
+            if query in getattr(comment, "body"):
+                results.append(comment)
+
+        return results
+
+    def search_posts(
+        self,
+        query: str,
+        limit: int,
+        session: requests.Session,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
+    ) -> t.List[Post]:
+        """
+        Search user posts that much the query string.
+        """
+        posts = self.posts(
+            limit=limit,
+            sort="all",
+            timeframe="all",
+            status=status,
+            logger=logger,
+            session=session,
+        )
+
+        results = []
+
+        for post in posts:
+            if query in getattr(post, "title") or getattr(post, "selftext"):
+                results.append(post)
+
+        return results
 
     def top_subreddits(
         self,
@@ -225,11 +265,7 @@ class User:
         get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param top_n: Communities arranging number.
         :type top_n: int
         :param limit: Maximum number of posts to scrape.
@@ -242,15 +278,13 @@ class User:
         :type logger: Logger
         """
 
-        posts = reddit.posts(
+        posts = self.posts(
             session=session,
             logger=logger,
             status=status,
-            kind="user",
             limit=limit,
             sort="all",
             timeframe=timeframe,
-            username=self.name,
         )
 
         if posts:
@@ -281,21 +315,17 @@ class User:
             return data
         return None
 
-    def is_username_available(
+    def does_user_exist(
         self,
         session: requests.Session,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.Union[bool, None]:
         """
-        Checks if the given username is available or taken.
+        Checks if a specified user exists.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
         :param logger:
@@ -304,23 +334,23 @@ class User:
         :rtype: bool
         """
 
-        if status:
-            status.update(f"Checking username availability: {self.name}...")
+        if isinstance(status, Status):
+            status.update(f"Checking user existence: {self.username}...")
 
         response: bool = reddit.send_request(
             session=session,
             url=reddit.ENDPOINTS["username_available"],
-            params={"user": self.name},
+            params={"user": self.username},
         )
 
-        if status and logger:
+        if isinstance(logger, Logger):
             if bool(response) is True:
                 logger.info(
-                    f"[{self.name}] {colours.BOLD_GREEN}Username is available{colours.BOLD_GREEN_RESET}"
+                    f"[{self.username}] {colours.BOLD_YELLOW}User does not exist{colours.BOLD_YELLOW_RESET}"
                 )
             else:
                 logger.warning(
-                    f"[{self.name}] {colours.BOLD_YELLOW}Username is already taken{colours.BOLD_YELLOW_RESET}"
+                    f"[{self.username}] {colours.BOLD_GREEN}User exists{colours.BOLD_GREEN_RESET}"
                 )
         else:
             return response
