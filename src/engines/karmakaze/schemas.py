@@ -16,7 +16,7 @@ class Comment(BaseModel):
     awarders: t.List[str]
     mod_reason_by: t.Optional[str] = None
     banned_by: t.Optional[str] = None
-    author_flair_type: t.Optional[str] = None  # 👈 Made optional
+    author_flair_type: t.Optional[str] = None
     total_awards_received: int
     subreddit: str
     author_flair_template_id: t.Optional[str] = None
@@ -37,7 +37,7 @@ class Comment(BaseModel):
     send_replies: bool
     parent_id: str
     score: int
-    author_fullname: t.Optional[str] = None  # 👈 Made optional
+    author_fullname: t.Optional[str] = None
     approved_by: t.Optional[str] = None
     mod_note: t.Optional[str] = None
     all_awardings: t.List[dict]
@@ -48,16 +48,15 @@ class Comment(BaseModel):
     author_flair_css_class: t.Optional[str] = None
     name: str
     is_submitter: bool
-    downs: int
-    author_flair_richtext: t.Optional[t.List[dict]] = None  # 👈 Made optional
-    author_patreon_flair: t.Optional[bool] = None  # 👈 Made optional
+    author_flair_richtext: t.Optional[t.List[dict]] = None
+    author_patreon_flair: t.Optional[bool] = None
     body_html: str
     removal_reason: t.Optional[str] = None
     collapsed_reason: t.Optional[str] = None
     distinguished: t.Optional[str] = None
     associated_award: t.Optional[dict] = None
     stickied: bool
-    author_premium: t.Optional[bool] = None  # 👈 Made optional
+    author_premium: t.Optional[bool] = None
     can_gild: bool
     gildings: t.Dict[str, int]
     unrepliable_reason: t.Optional[str] = None
@@ -82,7 +81,6 @@ class Comment(BaseModel):
 
 
 class Post(BaseModel):
-    # approved_at_utc: t.Optional[float] = None
     subreddit: str
     selftext: t.Optional[str] = None
     title: str
@@ -91,7 +89,6 @@ class Post(BaseModel):
     hidden: bool
     pwls: t.Optional[int] = None
     link_flair_css_class: t.Optional[str] = None
-    downs: int
     thumbnail_height: t.Optional[int] = None
     top_awarded_type: t.Optional[str] = None
     hide_score: bool
@@ -167,21 +164,18 @@ class Post(BaseModel):
 
 class UserSubreddit(BaseModel):
     default_set: bool
-    # user_is_contributor: t.Optional[bool]
     banner_img: t.Optional[str]
     allowed_media_in_comments: t.List[str]
-    # user_is_banned: t.Optional[bool]
     free_form_reports: bool
     community_icon: t.Optional[str]
     show_media: bool
     icon_color: t.Optional[str]
-    # user_is_muted: t.Optional[bool]
     display_name: str
     header_img: t.Optional[str]
     title: str
     previous_names: t.List[str]
     over_18: bool
-    icon_size: t.Optional[t.List[int]]  # Usually [256, 256]
+    icon_size: t.Optional[t.List[int]]
     primary_color: str
     icon_img: t.Optional[HttpUrl]
     description: str
@@ -206,7 +200,6 @@ class UserSubreddit(BaseModel):
     link_flair_enabled: bool
     disable_contributor_requests: bool
     subreddit_type: str
-    # user_is_subscriber: t.Optional[bool]
 
 
 class User(BaseModel):

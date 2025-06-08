@@ -1,3 +1,4 @@
+import json
 import os
 import typing as t
 from datetime import datetime
@@ -77,19 +78,46 @@ class DataFrameHandler:
         formats: t.List[EXPORT_FORMATS],
     ):
         """
-        Exports a Pandas dataframe to specified file formats.
+        Exports a pandas DataFrame to one or more file formats, saving the output files to the specified directory.
 
-        :param dataframe: Pandas dataframe to export.
-        :type dataframe: pandas.DataFrame
-        :param filename: Name of the file to which the dataframe will be exported.
+        This method includes preprocessing specifically for XML export to ensure that all values in the
+        DataFrame are scalar values (e.g., strings, integers, floats, or None), avoiding issues with
+        non-scalar types such as lists or dictionaries.
+
+        :param dataframe: The pandas DataFrame to export.
+        :type dataframe: pd.DataFrame
+        :param filename: The base name of the file (without extension) to save the exported data as.
         :type filename: str
-        :param directory: Directory to which the dataframe files will be saved.
+        :param directory: The root directory under which subdirectories for each format (e.g., "csv", "xml") will be used.
         :type directory: str
-        :param formats: A list of file formats to which the data will be exported.
-        :type formats: List[Literal]
+        :param formats: A list of output formats to export the data to. Must be one or more of ["csv", "html", "json", "xml"].
+        :type formats: List[Literal["csv", "html", "json", "xml"]]
         """
 
-        file_mapping: t.Dict = {
+        def sanitize_for_xml(df: pd.DataFrame) -> pd.DataFrame:
+            """
+            Converts all non-scalar values in the DataFrame to strings.
+
+            This avoids pandas XML export errors by ensuring that each DataFrame cell contains a scalar value.
+
+            :param df: The DataFrame to sanitize.
+            :type df: pd.DataFrame
+            :return: A sanitized DataFrame with all non-scalar values converted to strings.
+            :rtype: pd.DataFrame
+            """
+
+            def scalarize(value: t.Any) -> t.Any:
+                if isinstance(value, (list, dict, set)):
+                    return json.dumps(value)
+                return value
+
+            return df.apply(lambda col: col.map(scalarize))
+
+        # Preprocess DataFrame for XML if needed
+        if "xml" in formats:
+            dataframe = sanitize_for_xml(dataframe)
+
+        file_mapping: t.Dict[str, t.Callable[[], None]] = {
             "csv": lambda: dataframe.to_csv(
                 os.path.join(directory, "csv", f"{filename}.csv"), encoding="utf-8"
             ),
@@ -115,12 +143,14 @@ class DataFrameHandler:
                 filepath: str = os.path.join(
                     directory, file_format, f"{filename}.{file_format}"
                 )
-                file_mapping.get(file_format)()
+
+                # Execute the export function for the current format
+                file_mapping[file_format]()
+
+                # Log export status
                 logger.info(
                     f"{FileHandler.get_file_size(file_path=filepath)} written to [link file://{filepath}]{filepath}"
                 )
-            else:
-                continue
 
 
 class FileHandler:

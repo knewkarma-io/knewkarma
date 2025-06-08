@@ -196,7 +196,7 @@ def cmd_post(ctx: click.Context, _id: str, subreddit: str, data: bool, comments:
             limit=limit, sort=sort, status=status, logger=logger, session=session
         ),
         "data": lambda session, status, logger: post.data(
-            session=session, status=status
+            session=session, status=status, logger=logger
         ),
     }
 
@@ -474,7 +474,9 @@ def cmd_user(
             status=status,
             logger=logger,
         ),
-        "profile": lambda session, status: user.profile(session=session, status=status),
+        "profile": lambda session, status, logger: user.profile(
+            session=session, status=status, logger=logger
+        ),
         "search_comments": lambda logger, status, session: user.search_comments(
             query=search_comments,
             limit=limit,
@@ -589,7 +591,7 @@ def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
     )
 
 
-@click.command(
+@cli.command(
     name="subreddit",
     help="Use this command to get a subreddit's data, such as comments, posts, wiki-pages, wiki-page data, and more...",
 )
@@ -640,7 +642,7 @@ def cmd_subreddit(
         name=subreddit_name,
     )
     method_map: t.Dict = {
-        "posts": lambda session, status, logger=None: subreddit.posts(
+        "posts": lambda session, status, logger: subreddit.posts(
             limit=limit,
             sort=sort,
             timeframe=timeframe,
@@ -648,8 +650,8 @@ def cmd_subreddit(
             logger=logger,
             session=session,
         ),
-        "profile": lambda session, status: subreddit.profile(
-            status=status, session=session
+        "profile": lambda session, status, logger: subreddit.profile(
+            status=status, logger=logger, session=session
         ),
         "search": lambda session, status, logger: subreddit.search(
             query=search,

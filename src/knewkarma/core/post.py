@@ -28,18 +28,17 @@ class Post:
         self,
         session: requests.Session,
         status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> schemas.Post:
         """
-        Asynchronously retrieves data for a Reddit post, excluding comments.
+        Gets data for a Reddit post, excluding comments.
 
         :param session: An `requests.Session` for making the HTTP request.
         :type session: requests.Session
-
-
-
-
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param logger:
+        :type logger:
         :return: A `Post` object containing parsed post data.
         :rtype: Post
         """
@@ -47,6 +46,7 @@ class Post:
         post_data = reddit.post(
             session=session,
             status=status,
+            logger=logger,
             id=self._id,
             subreddit=self._subreddit,
         )
@@ -63,7 +63,7 @@ class Post:
         logger: t.Optional[Logger] = None,
     ) -> t.List[schemas.Comment]:
         """
-        Asynchronously retrieves comments for a Reddit post.
+        Gets comments for a Reddit post.
 
         :param session: An `requests.Session` for making the HTTP request.
         :type session: requests.Session
