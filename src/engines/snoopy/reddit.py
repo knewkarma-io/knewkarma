@@ -1,3 +1,4 @@
+import random
 import time
 import typing as t
 from logging import Logger
@@ -83,14 +84,15 @@ class Reddit:
                 url=url, headers={"User-Agent": self.user_agent}, params=params
             ) as response:
                 if response.status_code == 429:
-                    self._backoff_attempts += 1
-                    sleep_duration = min(
-                        self._base_backoff * (2 ** (self._backoff_attempts - 1)),
-                        self._max_backoff,
+                    base_sleep = self._base_backoff * (
+                        2 ** (self._backoff_attempts - 1)
                     )
+                    jittered_sleep = random.uniform(base_sleep / 2, base_sleep)
+                    sleep_duration = min(jittered_sleep, self._max_backoff)
+
                     self.cooldown(
                         message=f"Too Many Requests ({response.status_code}). Attempt {self._backoff_attempts}. Retrying in",
-                        duration=sleep_duration,
+                        duration=int(sleep_duration),
                         status=status,
                     )
                     continue  # retry after cooldown
@@ -99,7 +101,11 @@ class Reddit:
                 try:
                     return response.json()
                 except ValueError:
-                    logger.error(f"Failed to parse response: {response.text}")
+                    error_message = f"Failed to parse response: {response.text}"
+                    if isinstance(logger, Logger):
+                        logger.error(error_message)
+                    else:
+                        print(error_message)
                     return None
         return None
 
@@ -204,18 +210,15 @@ class Reddit:
             page += 1
 
             sleep_duration: int = randint(1, 5)
-            if isinstance(status, Status):
-                self.cooldown(
-                    message=(
-                        f"{colours.CYAN}{len(results)}{colours.CYAN_RESET}"
-                        f" of {colours.CYAN}{limit}{colours.CYAN_RESET}"
-                        f" items fetched. Resuming"
-                    ),
-                    status=status,
-                    duration=sleep_duration,
-                )
-            else:
-                time.sleep(sleep_duration)
+            self.cooldown(
+                message=(
+                    f"{colours.CYAN}{len(results)}{colours.CYAN_RESET}"
+                    f" of {colours.CYAN}{limit}{colours.CYAN_RESET}"
+                    f" items fetched. Resuming"
+                ),
+                status=status,
+                duration=sleep_duration,
+            )
 
         if isinstance(logger, Logger):
             # logger.info(f"Showing {len(results[:limit])} items")
@@ -235,10 +238,15 @@ class Reddit:
                 (remaining_time - remaining_seconds) * 100
             )
 
-            status.update(
+            message: str = (
                 f"{message} in {colours.CYAN}{remaining_seconds}"
                 f".{remaining_milliseconds:02}{colours.CYAN_RESET} seconds"
             )
+            if isinstance(status, Status):
+                status.update(message)
+            else:
+                print(message)
+
             time.sleep(0.01)  # Sleep for 10 milliseconds
 
     def _more_comments(
