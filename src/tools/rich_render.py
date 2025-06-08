@@ -186,53 +186,50 @@ class RichRender:
     def _user(cls, data: User, print_panel: bool = True):
         subreddit = getattr(data, "subreddit")
         is_suspended = getattr(data, "is_suspended")
-        if not is_suspended:
 
-            header_content = (
-                f"{colours.BOLD}{colours.POWDER_BLUE}{data.name}{colours.RESET}{colours.RESET} "
-                f"· {colours.GREY}{cls._timestamp_to_relative(unix_timestamp=0 if is_suspended else data.created
+        if is_suspended:
+            return None
+
+        header_content = (
+            f"{colours.BOLD}{colours.POWDER_BLUE}{data.name}{colours.RESET}{colours.RESET} "
+            f"· {colours.GREY}{cls._timestamp_to_relative(unix_timestamp=0 if is_suspended else data.created
     )}\n"
-                f"{subreddit.display_name_prefixed}{colours.RESET}"
+            f"{subreddit.display_name_prefixed}{colours.RESET}"
+        )
+
+        if subreddit.over_18:
+            header_content = (
+                f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
             )
 
-            if is_suspended:
-                header_content = f"{colours.BOLD_YELLOW}SUSPENDED{colours.BOLD_YELLOW_RESET} · {header_content}"
+        footer_data = {
+            "Post Karma": cls._number_to_relative(
+                number=0 if is_suspended else data.link_karma
+            ),
+            "Comment Karma": cls._number_to_relative(
+                number=0 if is_suspended else data.comment_karma
+            ),
+            "Total Karma": cls._number_to_relative(
+                number=0 if is_suspended else data.link_karma + data.comment_karma
+            ),
+        }
 
-            if subreddit.over_18:
-                header_content = (
-                    f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
-                )
+        footer_content = cls._footer_table(footer_data=footer_data)
 
-            footer_data = {
-                "Post Karma": cls._number_to_relative(
-                    number=0 if is_suspended else data.link_karma
-                ),
-                "Comment Karma": cls._number_to_relative(
-                    number=0 if is_suspended else data.comment_karma
-                ),
-                "Total Karma": cls._number_to_relative(
-                    number=0 if is_suspended else data.link_karma + data.comment_karma
-                ),
-            }
+        panel_parts = []
+        if subreddit.public_description:
+            panel_parts.append(subreddit.public_description)
 
-            footer_content = cls._footer_table(footer_data=footer_data)
+        text = "\n\n".join(panel_parts)
 
-            panel_parts = []
-            if subreddit.public_description:
-                panel_parts.append(subreddit.public_description)
-
-            text = "\n\n".join(panel_parts)
-
-            return cls._panel(
-                title=f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}{subreddit.url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
-                header=header_content,
-                content=text,
-                footer=footer_content,
-                add_dividers=True,
-                print_panel=print_panel,
-            )
-
-        return None
+        return cls._panel(
+            title=f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}{subreddit.url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
+            header=header_content,
+            content=text,
+            footer=footer_content,
+            add_dividers=True,
+            print_panel=print_panel,
+        )
 
     @classmethod
     def _users(cls, data: t.List[User], print_panel: bool = True):
