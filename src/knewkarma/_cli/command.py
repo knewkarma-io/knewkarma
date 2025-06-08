@@ -27,7 +27,7 @@ THE_QUOTES: list = [
     "*sigh* some people just want to watch the subreddit burn.",
     "I came here for memes and statistical insight. I’m all out of memes.",
     "You know, analysing Reddit is like herding cats... if the cats were arguing about pineapple on pizza.",
-    "Hmmmm this data smells like upvote farming.",
+    "*sniffs* Hmmm this data smells like upvote farming.",
     "My code doesn't judge your karma. But I do.",
     "If it’s on r/conspiracy, it’s either the truth or a guy named Greg in his basement. Sometimes both.",
     "Behind every karma point, there’s a good chance someone was just looking for a little internet validation.",

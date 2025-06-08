@@ -122,7 +122,7 @@ class User:
             session=session,
             logger=logger,
             status=status,
-            kind="user_overview",
+            kind="u_overview",
             limit=limit,
             sort="all",
             timeframe="all",

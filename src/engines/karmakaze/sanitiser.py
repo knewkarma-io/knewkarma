@@ -73,14 +73,16 @@ class RedditSanitiser:
 
         # Case 2: A pre-extracted list of comment dicts (e.g., from saved data)
         elif isinstance(response, list):
-            sane_comments: list[Comment] = []
+            raw_comments = response[1]
+            raw_children = raw_comments.get("data", {}).get("children", [])
+            sane_children: list[Comment] = []
 
-            for raw_comment in response:
-                comment = self.comment(raw_comment)
-                if comment is not None:
-                    sane_comments.append(comment)
+            for raw_child in raw_children:
+                sane_child = self.comment(raw_child)
+                if sane_child is not None:
+                    sane_children.append(sane_child)
 
-            return sane_comments if sane_comments else None
+            return sane_children if sane_children else None
 
         return None
 

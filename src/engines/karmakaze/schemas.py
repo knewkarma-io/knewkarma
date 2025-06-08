@@ -16,12 +16,12 @@ class Comment(BaseModel):
     awarders: t.List[str]
     mod_reason_by: t.Optional[str] = None
     banned_by: t.Optional[str] = None
-    author_flair_type: str
+    author_flair_type: t.Optional[str] = None  # 👈 Made optional
     total_awards_received: int
     subreddit: str
     author_flair_template_id: t.Optional[str] = None
     likes: t.Optional[bool] = None
-    replies: t.Union[str, Listing]  # Sometimes this is an empty string
+    replies: t.Union[str, Listing]
     user_reports: t.List[t.Any]
     saved: bool
     id: str
@@ -37,27 +37,27 @@ class Comment(BaseModel):
     send_replies: bool
     parent_id: str
     score: int
-    author_fullname: str
+    author_fullname: t.Optional[str] = None  # 👈 Made optional
     approved_by: t.Optional[str] = None
     mod_note: t.Optional[str] = None
     all_awardings: t.List[dict]
     collapsed: bool
     body: str
-    edited: t.Union[bool, float]  # Can be False or a timestamp
+    edited: t.Union[bool, float]
     top_awarded_type: t.Optional[str] = None
     author_flair_css_class: t.Optional[str] = None
     name: str
     is_submitter: bool
     downs: int
-    author_flair_richtext: t.List[dict]
-    author_patreon_flair: bool
+    author_flair_richtext: t.Optional[t.List[dict]] = None  # 👈 Made optional
+    author_patreon_flair: t.Optional[bool] = None  # 👈 Made optional
     body_html: str
     removal_reason: t.Optional[str] = None
     collapsed_reason: t.Optional[str] = None
     distinguished: t.Optional[str] = None
     associated_award: t.Optional[dict] = None
     stickied: bool
-    author_premium: bool
+    author_premium: t.Optional[bool] = None  # 👈 Made optional
     can_gild: bool
     gildings: t.Dict[str, int]
     unrepliable_reason: t.Optional[str] = None
