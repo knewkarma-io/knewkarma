@@ -183,48 +183,55 @@ class RichRender:
 
     @classmethod
     def _user(cls, data: User, print_panel: bool = True):
-        subreddit = data.subreddit
+        subreddit = getattr(data, "subreddit")
+        is_suspended = getattr(data, "is_suspended")
+        if not is_suspended:
 
-        header_content = (
-            f"{colours.BOLD}{colours.POWDER_BLUE}{data.name}{colours.RESET}{colours.RESET} "
-            f"· {colours.GREY}{cls._timestamp_to_relative(unix_timestamp=data.created)}\n"
-            f"{subreddit.display_name_prefixed}{colours.RESET}"
-        )
-
-        if data.is_suspended:
-            header_content = f"{colours.BOLD_YELLOW}SUSPENDED{colours.BOLD_YELLOW_RESET} · {header_content}"
-
-        if subreddit.over_18:
             header_content = (
-                f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
+                f"{colours.BOLD}{colours.POWDER_BLUE}{data.name}{colours.RESET}{colours.RESET} "
+                f"· {colours.GREY}{cls._timestamp_to_relative(unix_timestamp=0 if is_suspended else data.created
+    )}\n"
+                f"{subreddit.display_name_prefixed}{colours.RESET}"
             )
 
-        footer_data = {
-            "Post Karma": cls._number_to_relative(number=data.link_karma),
-            "Comment Karma": cls._number_to_relative(number=data.comment_karma),
-            "Total Karma": (
-                cls._number_to_relative(number=data.link_karma + data.comment_karma)
-                if not hasattr(data, "total_karma")
-                else cls._number_to_relative(number=data.total_karma)
-            ),
-        }
+            if is_suspended:
+                header_content = f"{colours.BOLD_YELLOW}SUSPENDED{colours.BOLD_YELLOW_RESET} · {header_content}"
 
-        footer_content = cls._footer_table(footer_data=footer_data)
+            if subreddit.over_18:
+                header_content = (
+                    f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
+                )
 
-        panel_parts = []
-        if subreddit.public_description:
-            panel_parts.append(subreddit.public_description)
+            footer_data = {
+                "Post Karma": cls._number_to_relative(
+                    number=0 if is_suspended else data.link_karma
+                ),
+                "Comment Karma": cls._number_to_relative(
+                    number=0 if is_suspended else data.comment_karma
+                ),
+                "Total Karma": cls._number_to_relative(
+                    number=0 if is_suspended else data.link_karma + data.comment_karma
+                ),
+            }
 
-        text = "\n\n".join(panel_parts)
+            footer_content = cls._footer_table(footer_data=footer_data)
 
-        return cls._panel(
-            title=f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}{subreddit.url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
-            header=header_content,
-            content=text,
-            footer=footer_content,
-            add_dividers=True,
-            print_panel=print_panel,
-        )
+            panel_parts = []
+            if subreddit.public_description:
+                panel_parts.append(subreddit.public_description)
+
+            text = "\n\n".join(panel_parts)
+
+            return cls._panel(
+                title=f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}{subreddit.url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
+                header=header_content,
+                content=text,
+                footer=footer_content,
+                add_dividers=True,
+                print_panel=print_panel,
+            )
+
+        return None
 
     @classmethod
     def _users(cls, data: t.List[User], print_panel: bool = True):
@@ -250,7 +257,8 @@ class RichRender:
         subreddit: str = getattr(data, "subreddit_name_prefixed", "")
         subreddit = f"self" if subreddit.lower() == f"u/{author.lower()}" else subreddit
         permalink: str = getattr(data, "permalink", "")
-        created: int = getattr(data, "created", 0)
+        created: int = 0 if getattr(data, "created", None) is None else data.created
+
         score = cls._number_to_relative(number=data.score)
         replies: list = getattr(data, "replies", [])
         awards: list = getattr(data, "all_awardings", [])
@@ -316,7 +324,8 @@ class RichRender:
         score = cls._number_to_relative(number=data.score)
         header_content: str = (
             f"{colours.BOLD}{colours.POWDER_BLUE}{subreddit_name}{colours.RESET}{colours.RESET} · "
-            f"{colours.GREY}{cls._timestamp_to_relative(unix_timestamp=data.created)}{colours.RESET}\n"
+            f"{colours.GREY}{cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) is None else data.created
+)}{colours.RESET}\n"
             f"{colours.GREY}u/{data.author}{colours.RESET}"
         )
 
@@ -384,7 +393,8 @@ class RichRender:
 
         header_content: str = (
             f"{colours.BOLD}{data.display_name_prefixed}{colours.RESET} · "
-            f"{colours.BOLD_BLACK}{cls._timestamp_to_relative(unix_timestamp=data.created)}"
+            f"{colours.BOLD_BLACK}{cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) is None else data.created
+)}"
             f"{colours.BOLD_BLACK_RESET}"
         )
 

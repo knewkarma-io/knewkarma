@@ -265,88 +265,88 @@ class ModeratedSubreddit(BaseModel):
 
 class Subreddit(BaseModel):
     submit_text_html: t.Optional[str] = None
-    restrict_posting: bool
-    free_form_reports: bool
-    wiki_enabled: bool
+    restrict_posting: t.Optional[bool] = None
+    free_form_reports: t.Optional[bool] = None
+    wiki_enabled: t.Optional[bool] = None
     display_name: str
     header_img: t.Optional[HttpUrl] = None
     title: str
-    allow_galleries: bool
+    allow_galleries: t.Optional[bool] = None
     icon_size: t.Optional[t.List[int]] = None
-    primary_color: str
+    primary_color: t.Optional[str] = None
     active_user_count: t.Optional[int] = None
-    icon_img: str
+    icon_img: t.Optional[str] = None
     display_name_prefixed: str
     accounts_active: t.Optional[int] = None
-    public_traffic: bool
-    subscribers: int
+    public_traffic: t.Optional[bool] = None
+    subscribers: t.Optional[int] = None
     user_flair_richtext: t.List[dict]
     name: str
-    quarantine: bool
-    hide_ads: bool
-    prediction_leaderboard_entry_type: int
+    quarantine: t.Optional[bool] = None
+    hide_ads: t.Optional[bool] = None
+    prediction_leaderboard_entry_type: t.Optional[int] = None
     emojis_enabled: bool
-    advertiser_category: str
+    advertiser_category: t.Optional[str] = None
     public_description: str
-    comment_score_hide_mins: int
+    comment_score_hide_mins: t.Optional[int] = None
     allow_predictions: bool
     community_icon: str
     banner_background_image: str
-    original_content_tag_enabled: bool
-    community_reviewed: bool
-    submit_text: str
+    original_content_tag_enabled: t.Optional[bool] = None
+    community_reviewed: t.Optional[bool] = None
+    submit_text: t.Optional[str] = None
     description_html: t.Optional[str] = None
-    spoilers_enabled: bool
+    spoilers_enabled: t.Optional[bool] = None
     comment_contribution_settings: CommentContributionSettings
     allow_talks: bool
     header_size: t.Optional[t.List[int]] = None
-    user_flair_position: str
-    all_original_content: bool
+    user_flair_position: t.Optional[str] = None
+    all_original_content: t.Optional[bool] = None
     has_menu_widget: bool
-    key_color: str
+    key_color: t.Optional[str] = None
     can_assign_user_flair: bool
     created: float
     wls: t.Optional[int] = None
-    show_media_preview: bool
-    submission_type: str
+    show_media_preview: t.Optional[bool] = None
+    submission_type: t.Optional[str] = None
     allowed_media_in_comments: t.List[str]
     allow_videogifs: bool
-    should_archive_posts: bool
+    should_archive_posts: t.Optional[bool] = None
     user_flair_type: str
-    allow_polls: bool
-    collapse_deleted_comments: bool
+    allow_polls: t.Optional[bool] = None
+    collapse_deleted_comments: t.Optional[bool] = None
     emojis_custom_size: t.Optional[t.List[int]] = None
     public_description_html: t.Optional[str] = None
     allow_videos: bool
     is_crosspostable_subreddit: bool
     should_show_media_in_comments_setting: bool
     can_assign_link_flair: bool
-    accounts_active_is_fuzzed: bool
+    accounts_active_is_fuzzed: t.Optional[bool] = None
     allow_prediction_contributors: bool
-    submit_text_label: str
-    link_flair_position: str
-    user_flair_enabled_in_sr: bool
-    allow_discovery: bool
-    accept_followers: bool
-    user_sr_theme_enabled: bool
-    link_flair_enabled: bool
-    disable_contributor_requests: bool
+    submit_text_label: t.Optional[str] = None
+    link_flair_position: t.Optional[str] = None
+    user_flair_enabled_in_sr: t.Optional[bool] = None
+    allow_discovery: t.Optional[bool] = None
+    accept_followers: t.Optional[bool] = None
+    user_sr_theme_enabled: t.Optional[bool] = None
+    link_flair_enabled: t.Optional[bool] = None
+    disable_contributor_requests: t.Optional[bool] = None
     subreddit_type: str
-    banner_img: str
-    banner_background_color: str
-    show_media: bool
+    banner_img: t.Optional[str] = None
+    banner_background_color: t.Optional[str] = None
+    show_media: t.Optional[bool] = None
     id: str
-    over18: bool
-    header_title: str
-    description: str
-    submit_link_label: str
-    restrict_commenting: bool
-    allow_images: bool
-    lang: str
+    over18: t.Optional[bool] = None
+    header_title: t.Optional[str] = None
+    description: t.Optional[str] = None
+    submit_link_label: t.Optional[str] = None
+    restrict_commenting: t.Optional[bool] = None
+    allow_images: t.Optional[bool] = None
+    lang: t.Optional[str] = None
     url: str
     created_utc: float
     banner_size: t.Optional[t.List[int]] = None
-    mobile_banner_image: str
+    mobile_banner_image: t.Optional[str] = None
     allow_predictions_tournament: bool
 
 
