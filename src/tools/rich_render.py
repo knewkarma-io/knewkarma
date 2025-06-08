@@ -260,8 +260,8 @@ class RichRender:
         permalink: str = getattr(data, "permalink", "")
         created: int = 0 if getattr(data, "created", None) is None else data.created
         score = cls._number_to_relative(number=data.score)
-        replies = getattr(data.replies, "data")
-        num_replies = len(replies.get("children"))
+        _replies = getattr(data.replies, "data")
+        num_replies = len(_replies.get("children"))
         awards: list = getattr(data, "all_awardings", [])
 
         if body:
@@ -325,8 +325,8 @@ class RichRender:
         score = cls._number_to_relative(number=data.score)
         header_content: str = (
             f"{colours.BOLD}{colours.POWDER_BLUE}{subreddit_name}{colours.RESET}{colours.RESET} · "
-            f"{colours.GREY}{cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) is None else data.created
-)}{colours.RESET}\n"
+            f"{colours.GREY}{cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) 
+                                                                            is None else data.created)}{colours.RESET}\n"
             f"{colours.GREY}u/{data.author}{colours.RESET}"
         )
 
