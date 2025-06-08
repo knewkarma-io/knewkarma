@@ -33,13 +33,10 @@ class Search:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        Asynchronously retrieves posts that match with the specified query.
+        Gets posts that match with the specified query.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
+        :type session: requests.Session
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param sort: Sorting criterion for posts. Defaults to "all".
@@ -73,7 +70,7 @@ class Search:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Subreddit]:
         """
-        Asynchronously retrieves subreddits that match with the specified query.
+        Gets subreddits that match with the specified query.
 
         :param session: An `requests.Session` for making the HTTP request.
                 :type session: requests.Session
@@ -113,7 +110,7 @@ class Search:
         logger: t.Optional[Logger] = None,
     ) -> t.List[User]:
         """
-        Asynchronously retrieves users that match with the specified query.
+        Gets users that match with the specified query.
 
         :param session: An `requests.Session` for making the HTTP request.
                 :type session: requests.Session

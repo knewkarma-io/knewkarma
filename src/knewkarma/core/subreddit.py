@@ -34,14 +34,10 @@ class Subreddit:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Comment]:
         """
-        retrieves comments from a subreddit.
+        Get comments from a subreddit.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param posts_limit: Maximum number of posts to retrieve comments from.
         :type posts_limit: int
         :param comments_per_post: Maximum number of comments to retrieve per post.
@@ -94,14 +90,10 @@ class Subreddit:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        retrieves posts from a subreddit.
+        Get posts from a subreddit.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param limit: Maximum number of posts to retrieve.
         :type limit: int
         :param sort: Sorting criterion for the posts. Defaults to "all".
@@ -133,18 +125,17 @@ class Subreddit:
         self,
         session: requests.Session,
         status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ):
         """
-        retrieves a subreddit's profile data.
+        Get a subreddit's profile data.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param logger:
+        :type logger:
         :return: A `SimpleNamespace` object containing the parsed subreddit profile data.
         :rtype: SimpleNamespace
         """
@@ -152,6 +143,7 @@ class Subreddit:
         subreddit_profile = reddit.subreddit(
             session=session,
             status=status,
+            logger=logger,
             name=self._name,
         )
 
@@ -168,14 +160,10 @@ class Subreddit:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        get posts that contain the specified query string from a subreddit.
+        Get posts that contain the specified query string from a subreddit.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param query: Search query.
         :type query: str
         :param limit: Maximum number of posts to return.
@@ -192,7 +180,7 @@ class Subreddit:
         :rtype: List[SimpleNamespace]
         """
 
-        search_results = reddit.posts(
+        results = reddit.posts(
             session=session,
             logger=logger,
             status=status,
@@ -204,24 +192,23 @@ class Subreddit:
             timeframe=timeframe,
         )
 
-        return search_results
+        return results
 
     def wikipages(
         self,
         session: requests.Session,
         status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.List[str]:
         """
-        get a subreddit's wiki pages.
+        Get a subreddit's wiki pages.
 
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param logger:
+        :type logger:
         :return: A list of strings, each representing a wiki page.
         :rtype: List[str]
         """
@@ -232,8 +219,10 @@ class Subreddit:
             )
 
         pages = reddit.send_request(
-            endpoint=reddit.ENDPOINTS["subreddit"] % self._name + "/wiki/pages.json",
+            url=reddit.ENDPOINTS["subreddit"] % self._name + "/wiki/pages.json",
             session=session,
+            status=status,
+            logger=logger,
         )
 
         return pages.get("data")
@@ -243,20 +232,19 @@ class Subreddit:
         page_name: str,
         session: requests.Session,
         status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> WikiPage:
         """
-        get a subreddit's specified wiki page data.
+        Get a subreddit's specified wiki page data.
 
         :param page_name: Wiki page to get data from.
         :type page_name: str
         :param session: An `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param logger:
+        :type logger:
         :return: A `SimpleNamespace` object containing the parsed wiki page data.
         :rtype: SimpleNamespace
         """
@@ -264,6 +252,7 @@ class Subreddit:
         wiki_page = reddit.wiki_page(
             session=session,
             status=status,
+            logger=logger,
             name=page_name,
             subreddit=self._name,
         )

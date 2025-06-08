@@ -56,32 +56,52 @@ class Reddit:
         :type user_agent: str
         """
         self.user_agent = user_agent
+        self._base_backoff: int = 60  # base cooldown on 429
+        self._max_backoff: int = 600  # max cooldown (e.g., 10 minutes)
+        self._backoff_attempts: int = 0  # how many times we've been rate-limited
 
     def send_request(
         self,
         url: str,
         session: requests.Session,
-        params: t.Optional[t.Dict] = None,
+        params: t.Optional[t.Dict[str, t.Any]] = None,
+        status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> t.Union[t.Dict, t.List, str, None]:
         """
-        Internal method to send a GET request to a Reddit endpoint.
+        Send a GET request to a Reddit endpoint, with exponential backoff on 429s.
 
         :param url: The URL to request.
-        :type url: str
-        :param session: An aiohttp session object.
-        :type session: requests.Session
+        :param session: A requests.Session object.
         :param params: Optional query parameters to include in the request.
-        :type params: Optional[Dict]
-        :return: The parsed JSON response.
-        :rtype: Union[Dict, List, str, None]
+        :param status:
+        :param logger:
+        :return: Parsed JSON response.
         """
-        with session.get(
-            url=url,
-            headers={"User-Agent": self.user_agent},
-            params=params,
-        ) as response:
-            data = response.json()
-            return data
+        while True:
+            with session.get(
+                url=url, headers={"User-Agent": self.user_agent}, params=params
+            ) as response:
+                if response.status_code == 429:
+                    self._backoff_attempts += 1
+                    sleep_duration = min(
+                        self._base_backoff * (2 ** (self._backoff_attempts - 1)),
+                        self._max_backoff,
+                    )
+                    self.cooldown(
+                        message=f"Too Many Requests ({response.status_code}). Attempt {self._backoff_attempts}. Retrying in",
+                        duration=sleep_duration,
+                        status=status,
+                    )
+                    continue  # retry after cooldown
+
+                self._backoff_attempts = 0  # reset backoff if successful
+                try:
+                    return response.json()
+                except ValueError:
+                    logger.error(f"Failed to parse response: {response.text}")
+                    return None
+        return None
 
     @staticmethod
     def _deduplicate(existing: list, new_items: list, key: str = "id") -> list:
@@ -144,10 +164,14 @@ class Reddit:
             if after:
                 params["after"] = after
 
+            params["count"] = len(results)
+
             if isinstance(status, Status):
                 status.update(f"Fetching page {page} (cursor={after})...")
 
-            response = self.send_request(url=url, session=session, params=params)
+            response = self.send_request(
+                url=url, session=session, params=params, logger=logger, status=status
+            )
             items = sanitiser(response) or []
 
             if isinstance(logger, Logger):
@@ -179,14 +203,16 @@ class Reddit:
 
             page += 1
 
-            # t.Optional delay between requests
-            sleep_duration = randint(1, 5)
+            sleep_duration: int = randint(1, 5)
             if isinstance(status, Status):
-                self._pagination_countdown(
+                self.cooldown(
+                    message=(
+                        f"{colours.CYAN}{len(results)}{colours.CYAN_RESET}"
+                        f" of {colours.CYAN}{limit}{colours.CYAN_RESET}"
+                        f" items fetched. Resuming"
+                    ),
                     status=status,
                     duration=sleep_duration,
-                    current_count=len(results),
-                    overall_count=limit,
                 )
             else:
                 time.sleep(sleep_duration)
@@ -200,13 +226,7 @@ class Reddit:
         return results[:limit]
 
     @staticmethod
-    def _pagination_countdown(
-        duration: int,
-        current_count: int,
-        overall_count: int,
-        status: Status,
-    ):
-
+    def cooldown(message: str, status: Status, duration: int = 120):
         end_time: float = time.time() + duration
         while time.time() < end_time:
             remaining_time: float = end_time - time.time()
@@ -215,14 +235,10 @@ class Reddit:
                 (remaining_time - remaining_seconds) * 100
             )
 
-            countdown_text: str = (
-                f"{colours.CYAN}{current_count}{colours.CYAN_RESET}"
-                f" of {colours.CYAN}{overall_count}{colours.CYAN_RESET}"
-                f" items fetched, "
-                f"resuming in {colours.CYAN}{remaining_seconds}"
+            status.update(
+                f"{message} in {colours.CYAN}{remaining_seconds}"
                 f".{remaining_milliseconds:02}{colours.CYAN_RESET} seconds"
             )
-            status.update(countdown_text)
             time.sleep(0.01)  # Sleep for 10 milliseconds
 
     def _more_comments(
@@ -231,6 +247,7 @@ class Reddit:
         post_id: str,
         comment_ids: t.List[str],
         status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
         limit: int = 50,
     ) -> t.List[Comment]:
         """
@@ -254,9 +271,7 @@ class Reddit:
         }
 
         response = self.send_request(
-            url=url,
-            session=session,
-            params=params,
+            url=url, session=session, params=params, logger=logger, status=status
         )
 
         # Reddit wraps the returned comments in 'json' -> 'data' -> 'things'
@@ -347,13 +362,16 @@ class Reddit:
         subreddit: str,
         session: requests.Session,
         status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> Post:
         if isinstance(status, Status):
             status.update(f"Getting data from post with id {id} in r/{subreddit}")
 
         response = self.send_request(
-            session=session,
             url=self.ENDPOINTS["subreddit"] % f"{subreddit}/comments/{id}.json",
+            session=session,
+            logger=logger,
+            status=status,
         )
         sanitised_response = self.SANITISERS["post"](response=response)
 
@@ -426,6 +444,7 @@ class Reddit:
         name: str,
         session: requests.Session,
         status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> User:
         """
         Fetch a single Reddit user and sanitise the response.
@@ -434,7 +453,10 @@ class Reddit:
             status.update(f"Getting profile data from user {name}...")
 
         response = self.send_request(
-            url=self.ENDPOINTS["user"] % f"{name}/about.json", session=session
+            url=self.ENDPOINTS["user"] % f"{name}/about.json",
+            session=session,
+            logger=logger,
+            status=status,
         )
         user = self.SANITISERS["user"](response=response)
 
@@ -480,6 +502,7 @@ class Reddit:
         name: str,
         session: requests.Session,
         status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> Subreddit:
         """
         Fetch a single subreddit and sanitise the response.
@@ -489,7 +512,10 @@ class Reddit:
             status.update(f"Getting profile data from subreddit {name}...")
 
         response = self.send_request(
-            url=self.ENDPOINTS["subreddit"] % f"{name}/about.json", session=session
+            url=self.ENDPOINTS["subreddit"] % f"{name}/about.json",
+            session=session,
+            logger=logger,
+            status=status,
         )
         subreddit = self.SANITISERS["subreddit"](response=response)
 
@@ -525,8 +551,7 @@ class Reddit:
 
         if kind == "user_moderated":
             response = self.send_request(
-                url=endpoint,
-                session=session,
+                url=endpoint, session=session, logger=logger, status=status
             )
             subreddits = self.SANITISERS["subreddits"](response=response)
         else:
@@ -549,12 +574,16 @@ class Reddit:
         subreddit: str,
         session: requests.Session,
         status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ) -> WikiPage:
         if isinstance(status, Status):
             status.update(f"Getting data from wikipage {name} of r/{subreddit}...")
 
         response = self.send_request(
-            url=self.ENDPOINTS["wikipage"] % (subreddit, name), session=session
+            url=self.ENDPOINTS["wikipage"] % (subreddit, name),
+            session=session,
+            logger=logger,
+            status=status,
         )
 
         return self.SANITISERS["wikipage"](response=response)

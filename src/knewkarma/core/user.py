@@ -34,7 +34,7 @@ class User:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Comment]:
         """
-        get a user's comments.
+        Get a user's comments.
 
         :param session: An `requests.Session` for making the HTTP request.
         :type session: requests.Session
@@ -72,7 +72,7 @@ class User:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Subreddit]:
         """
-        get subreddits moderated by user.
+        Get subreddits moderated by user.
 
         :param session: An `requests.Session` for making the HTTP request.
         :type session: requests.Session
@@ -104,7 +104,7 @@ class User:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Comment]:
         """
-        get a user's most recent comments.
+        Get a user's most recent comments.
 
         :param limit: Maximum number of comments to return.
         :type limit: int
@@ -141,7 +141,7 @@ class User:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
         """
-        get a user's posts.
+        Get a user's posts.
 
         :param session: An `requests.Session` for making the HTTP request.
         :type session: requests.Session
@@ -176,14 +176,17 @@ class User:
         self,
         session: requests.Session,
         status: t.Optional[Status] = None,
+        logger: t.Optional[Logger] = None,
     ):
         """
-        get a user's profile data.
+        Get a user's profile data.
 
         :param session: An `requests.Session` for making the HTTP request.
         :type session: requests.Session
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.
         :type status: Optional[rich.status.Status]
+        :param logger:
+        :type logger:
         :return: A SimpleNamespace object containing user profile data.
         :rtype: SimpleNamespace
         """
@@ -191,6 +194,7 @@ class User:
         user_profile = reddit.user(
             session=session,
             status=status,
+            logger=logger,
             name=self.username,
         )
 
@@ -262,7 +266,7 @@ class User:
         logger: t.Optional[Logger] = None,
     ) -> t.Union[t.Dict[str, int], None]:
         """
-        get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
+        Get a user's top n subreddits based on subreddit frequency in n posts and saves the analysis to a file.
 
         :param session: An `requests.Session` for making the HTTP request.
         :type session: requests.Session
@@ -338,9 +342,11 @@ class User:
             status.update(f"Checking user existence: {self.username}...")
 
         response: bool = reddit.send_request(
-            session=session,
             url=reddit.ENDPOINTS["username_available"],
+            session=session,
             params={"user": self.username},
+            status=status,
+            logger=logger,
         )
 
         if isinstance(logger, Logger):

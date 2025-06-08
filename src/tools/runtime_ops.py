@@ -45,8 +45,10 @@ class RuntimeOps:
             status.update(f"Checking server status...")
 
         status_response: dict = self.reddit_cls.send_request(
-            session=session,
             url=self.reddit_cls.ENDPOINTS["infrastructure"]["status"],
+            session=session,
+            status=status,
+            logger=logger,
         )
 
         indicator = status_response.get("status").get("indicator")
@@ -73,8 +75,10 @@ class RuntimeOps:
                     status.update("Getting status components...")
 
                 status_components: t.Dict = self.reddit_cls.send_request(
-                    session=session,
                     url=self.reddit_cls.ENDPOINTS["infrastructure"]["components"],
+                    session=session,
+                    logger=logger,
+                    status=status,
                 )
 
                 if isinstance(status_components, t.Dict):
@@ -107,6 +111,8 @@ class RuntimeOps:
         response = self.reddit_cls.send_request(
             url=f"https://api.github.com/repos/knewkarma-io/{self.package_name}/releases/latest",
             session=session,
+            logger=logger,
+            status=status,
         )
 
         if response.get("tag_name"):

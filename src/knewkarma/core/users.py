@@ -21,14 +21,10 @@ class Users:
         logger: t.Optional[Logger] = None,
     ) -> t.List[User]:
         """
-        get new users.
+        Get new users.
 
         :param session: A `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param limit: Maximum number of new users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get new posts.
@@ -62,14 +58,10 @@ class Users:
         logger: t.Optional[Logger] = None,
     ) -> t.List[User]:
         """
-        get popular users.
+        Get popular users.
 
         :param session: A `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param limit: Maximum number of popular users to return.
         :type limit: int
         :param timeframe: Timeframe from which to get popular posts.
@@ -103,16 +95,12 @@ class Users:
         logger: t.Optional[Logger] = None,
     ) -> t.List[User]:
         """
-        get all users.
+        Get all users.
 
         :param limit: Maximum number of all users to return.
         :type limit: int
         :param session: A `requests.Session` for making the HTTP request.
-                :type session: requests.Session
-
-
-
-
+        :type session: requests.Session
         :param timeframe: Timeframe from which to get all posts.
         :type timeframe: Literal[str]
         :param status: An optional `rich.status.Status` object for displaying status messages. Defaults to None.

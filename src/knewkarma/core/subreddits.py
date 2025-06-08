@@ -21,7 +21,7 @@ class Subreddits:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Subreddit]:
         """
-        get all subreddits.
+        Get all subreddits.
 
         :param session: An `requests.Session` for making the HTTP request.
         :type session: requests.Session
@@ -60,7 +60,7 @@ class Subreddits:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Subreddit]:
         """
-        get default subreddits.
+        Get default subreddits.
 
         :param limit: Maximum number of subreddits to return.
         :type limit: int
@@ -95,7 +95,7 @@ class Subreddits:
         logger: t.Optional[Logger] = None,
     ) -> t.List[Subreddit]:
         """
-        get new subreddits.
+        Get new subreddits.
 
         :param session: An `requests.Session` for making the HTTP request.
         :type session: requests.Session
