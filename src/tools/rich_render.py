@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 
 from rich.console import RenderableType, Group
 from rich.markdown import Markdown
+from rich.markup import escape
 from rich.panel import Panel
 from rich.rule import Rule
 from rich.table import Table
@@ -252,15 +253,15 @@ class RichRender:
     def _comment(cls, data: Comment, print_panel: bool = True):
         panel_parts: t.List[str] = []
 
-        author: str = getattr(data, "author", "")
-        body: str = getattr(data, "body", "")
+        author: str = getattr(data, "author")
+        body: str = getattr(data, "body")
         subreddit: str = getattr(data, "subreddit_name_prefixed", "")
         subreddit = f"self" if subreddit.lower() == f"u/{author.lower()}" else subreddit
         permalink: str = getattr(data, "permalink", "")
         created: int = 0 if getattr(data, "created", None) is None else data.created
-
         score = cls._number_to_relative(number=data.score)
-        replies: list = getattr(data, "replies", [])
+        replies = getattr(data.replies, "data")
+        num_replies = len(replies.get("children"))
         awards: list = getattr(data, "all_awardings", [])
 
         if body:
@@ -270,14 +271,14 @@ class RichRender:
         header_content: str = (
             f"{colours.BOLD}{colours.POWDER_BLUE}{subreddit}{colours.RESET}{colours.RESET} · "
             f"{colours.GREY}{cls._timestamp_to_relative(unix_timestamp=created)}\n"
-            f"u/{author}{colours.RESET}"
+            f"u/{escape(author)}{colours.RESET}"
         )
 
         footer_content: str = (
             f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" 
             if score == 0 
             else colours.POWDER_BLUE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
-            f"💬{colours.POWDER_BLUE}{cls._number_to_relative(number=len(replies))}{colours.RESET} "
+            f"💬{colours.POWDER_BLUE}{cls._number_to_relative(number=num_replies)}{colours.RESET} "
             f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(awards))}{colours.BOLD_YELLOW_RESET}"
         )
 

@@ -274,7 +274,7 @@ class Reddit:
     def comments(
         self,
         session: requests.Session,
-        kind: t.Literal["user_comments", "user_overview"],
+        kind: t.Literal["user", "u_overview", "post"],
         limit: int,
         sort: SORT,
         timeframe: TIMEFRAME,
@@ -283,14 +283,14 @@ class Reddit:
         **kwargs: str,
     ) -> t.List[Comment]:
         username = kwargs.get("username")
-        subreddit_name = kwargs.get("subreddit")
+        subreddit = kwargs.get("subreddit")
         post_id = kwargs.get("id")
 
         endpoints = {
-            "user_overview": self.ENDPOINTS["user"] % username + "/overview.json",
+            "u_overview": self.ENDPOINTS["user"] % username + "/overview.json",
             "user": self.ENDPOINTS["user"] % username + "/comments.json",
-            "post": self.ENDPOINTS["subreddit"]
-            % f"{subreddit_name}/comments/{post_id}.json",
+            "post": self.ENDPOINTS["subreddit"] % subreddit
+            + f"/comments/{post_id}.json",
         }
 
         endpoint = endpoints[kind]
