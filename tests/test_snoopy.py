@@ -1,21 +1,14 @@
-from platform import python_version, platform
-
 import pytest
 import requests
 
 from engines.karmakaze.schemas import User, Subreddit, Comment, Post
 from engines.snoopy.reddit import Reddit
-from knewkarma.meta.about import Project
-from knewkarma.meta.version import Version
+from knewkarma.core.client import USER_AGENT
 
 
 @pytest.fixture(scope="module")
 def reddit():
-    return Reddit(
-        user_agent=f"pytest-integration-test for "
-        f"{Project.name.replace(' ', '-')}/{Version.release} "
-        f"(Python {python_version} on {platform}; +{Project.documentation})"
-    )
+    return Reddit(user_agent=f"pytest-integration-test for {USER_AGENT}")
 
 
 @pytest.fixture
