@@ -14,7 +14,9 @@ from tools import colours
 
 class Reddit:
     SUBREDDITS_KIND = t.Literal["all", "default", "new", "popular", "user_moderated"]
-    SORT = t.Literal["controversial", "new", "top", "best", "hot", "rising", "all"]
+    SORT = t.Literal[
+        "controversial", "new", "top", "best", "hot", "rising", "all", "relevance"
+    ]
     TIMEFRAME = t.Literal["hour", "day", "week", "month", "year", "all"]
 
     BASE_URL: str = "https://reddit.com"
