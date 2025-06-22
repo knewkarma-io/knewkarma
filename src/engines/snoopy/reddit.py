@@ -274,11 +274,13 @@ class Reddit:
         if isinstance(status, Status):
             status.update("Fetching more comments...")
 
-        url = f"{self.BASE_URL}/api/morechildren.json"
+        url = f"{self.BASE_URL}/api/morechildren.json?link_id={post_id}&children={",".join(comment_ids[:limit])}"
         params = {
             "api_type": "json",
-            "link_id": f"t3_{post_id}",
+            "link_id": f"t3_{post_id}",  # ✅ full thing_id of the post
             "children": ",".join(comment_ids[:limit]),
+            "limit_children": False,  # ✅ optional, but helps get nested replies too
+            "raw_json": 1,  # ✅ important for getting properly escaped JSON
         }
 
         response = self.send_request(
@@ -334,6 +336,24 @@ class Reddit:
             status=status,
             initial_params=params,
         )
+
+        # Collect missing reply IDs
+        missing_comment_ids = []
+        for comment in comments:
+            if hasattr(comment, "replies") and comment.replies == "":
+                # This likely indicates a "more" situation
+                # Let's fetch missing children from _more_comments
+                missing_comment_ids.append(comment.id)
+
+        if missing_comment_ids:
+            more_comments = self._more_comments(
+                session=session,
+                post_id=post_id,  # You'll need to pass this if not already
+                comment_ids=missing_comment_ids,
+                status=status,
+                logger=logger,
+            )
+            comments.extend(more_comments)
 
         return comments
 

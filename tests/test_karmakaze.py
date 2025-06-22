@@ -1,7 +1,5 @@
-from types import SimpleNamespace
-from typing import List
+import typing as t
 
-import karmakaze
 from conftest import (
     RAW_COMMENTS,
     RAW_POST,
@@ -12,71 +10,73 @@ from conftest import (
     RAW_USERS,
     RAW_WIKI_PAGE,
 )
+from engines import karmakaze
+from engines.karmakaze.schemas import User, WikiPage, Post, Comment, Subreddit
 
-sanitise_and_parse = karmakaze.SanitiseAndParse()
+sanitise_and_parse = karmakaze.RedditSanitiser()
 
 
 def test_comments_sanitation_and_parsing():
     comments = sanitise_and_parse.comments(RAW_COMMENTS[1])
-    assert isinstance(comments.children, List)
+    assert isinstance(comments, t.List)
 
-    for comment in comments.children:
-        assert isinstance(comment, SimpleNamespace)
-        assert isinstance(comment.data.subreddit, str)
-        assert hasattr(comment.data, "ups")
+    for comment in comments:
+        assert isinstance(comment, Comment)
+        assert isinstance(comment.subreddit, str)
+        assert hasattr(comment, "ups")
 
 
 def test_post_sanitation_and_parsing():
     post = sanitise_and_parse.post(RAW_POST)
-    assert isinstance(post, SimpleNamespace)
-    assert isinstance(post.data.ups, int)
-    assert isinstance(post.data.upvote_ratio, (float, int))
-    assert isinstance(post.data.is_robot_indexable, bool)
+    assert isinstance(post, Post)
+    assert isinstance(post.ups, int)
+    assert isinstance(post.upvote_ratio, (float, int))
+    assert isinstance(post.is_robot_indexable, bool)
 
 
 def test_posts_sanitation_and_parsing():
-    posts = sanitise_and_parse.posts(RAW_POSTS).children
-    assert isinstance(posts, List)
+    posts = sanitise_and_parse.posts(RAW_POSTS)
+    assert isinstance(posts, t.List)
     for post in posts:
-        assert isinstance(post, SimpleNamespace)
-        assert isinstance(post.data.num_comments, int)
-        assert hasattr(post.data, "url")
+        assert isinstance(post, Post)
+        assert isinstance(post.num_comments, int)
+        assert hasattr(post, "url")
 
 
 def test_subreddit_sanitation_and_parsing():
     subreddit = sanitise_and_parse.subreddit(RAW_SUBREDDIT)
-    assert isinstance(subreddit, SimpleNamespace)
-    assert isinstance(subreddit.data.active_user_count, int)
-    assert hasattr(subreddit.data, "display_name")
+    assert isinstance(subreddit, Subreddit)
+    assert isinstance(subreddit.active_user_count, int)
+    assert hasattr(subreddit, "display_name")
 
 
 def test_subreddits_sanitation_and_parsing():
     subreddits = sanitise_and_parse.subreddits(RAW_SUBREDDITS)
-    assert isinstance(subreddits.children, List)
-    for subreddit in subreddits.children:
-        assert isinstance(subreddit, SimpleNamespace)
-        assert isinstance(subreddit.data.subscribers, int)
-        assert hasattr(subreddit.data, "description")
+    assert isinstance(subreddits, t.List)
+    for subreddit in subreddits:
+        assert isinstance(subreddit, Subreddit)
+        assert isinstance(subreddit.subscribers, int)
+        assert hasattr(subreddit, "description")
 
 
 def test_user_sanitation_and_parsing():
     user = sanitise_and_parse.user(RAW_USER)
-    assert isinstance(user, SimpleNamespace)
-    assert isinstance(user.data.created, float)
-    assert hasattr(user.data, "comment_karma")
+    assert isinstance(user, User)
+    assert isinstance(user.created, float)
+    assert hasattr(user, "comment_karma")
 
 
 def test_users_sanitation_and_parsing():
     users = sanitise_and_parse.users(RAW_USERS)
-    assert isinstance(users.children, List)
-    for user in users.children:
-        assert isinstance(user, SimpleNamespace)
-        assert isinstance(user.data.accept_followers, bool)
-        assert hasattr(user.data, "name")
+    assert isinstance(users, t.List)
+    for user in users:
+        assert isinstance(user, Subreddit)
+        assert isinstance(user.accept_followers, bool)
+        assert hasattr(user, "name")
 
 
 def test_wiki_page_sanitation_and_parsing():
     wiki_page = sanitise_and_parse.wiki_page(RAW_WIKI_PAGE)
-    assert isinstance(wiki_page, SimpleNamespace)
-    assert isinstance(wiki_page.data.revision_date, int)
-    assert hasattr(wiki_page.data, "revision_id")
+    assert isinstance(wiki_page, WikiPage)
+    assert isinstance(wiki_page.revision_date, float)
+    assert hasattr(wiki_page, "revision_id")

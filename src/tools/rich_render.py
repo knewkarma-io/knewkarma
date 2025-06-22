@@ -192,7 +192,7 @@ class RichRender:
 
         header_content = (
             f"{colours.BOLD}{colours.POWDER_BLUE}{data.name}{colours.RESET}{colours.RESET} "
-            f"· {colours.GREY}{cls._timestamp_to_relative(unix_timestamp=0 if is_suspended else data.created
+            f"· {colours.GREY}⏲ {cls._timestamp_to_relative(unix_timestamp=0 if is_suspended else data.created
     )}\n"
             f"{subreddit.display_name_prefixed}{colours.RESET}"
         )
@@ -257,8 +257,11 @@ class RichRender:
         permalink: str = getattr(data, "permalink", "")
         created: int = 0 if getattr(data, "created", None) is None else data.created
         score = cls._number_to_relative(number=data.score)
-        _replies = getattr(data.replies, "data")
-        num_replies = len(_replies.get("children"))
+        # _replies = data.replies
+        # num_replies = 0
+        # if isinstance(_replies, dict):
+        #    num_replies = len(_replies.get("data").get("children"))
+
         awards: list = getattr(data, "all_awardings", [])
 
         if body:
@@ -267,16 +270,16 @@ class RichRender:
         text: str = "\n\n".join(panel_parts)
         header_content: str = (
             f"{colours.BOLD}{colours.POWDER_BLUE}{subreddit}{colours.RESET}{colours.RESET} · "
-            f"{colours.GREY}{cls._timestamp_to_relative(unix_timestamp=created)}\n"
-            f"u/{escape(author)}{colours.RESET}"
+            f"{colours.GREY}⏲ {cls._timestamp_to_relative(unix_timestamp=created)}\n"
+            f"{escape(author)}{colours.RESET}"
         )
 
         footer_content: str = (
             f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" 
             if score == 0 
             else colours.POWDER_BLUE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
-            f"💬{colours.POWDER_BLUE}{cls._number_to_relative(number=num_replies)}{colours.RESET} "
-            f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(awards))}{colours.BOLD_YELLOW_RESET}"
+            # f"💬{colours.POWDER_BLUE}{cls._number_to_relative(number=num_replies)}{colours.RESET} "
+            # f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(awards))}{colours.BOLD_YELLOW_RESET}"
         )
 
         return cls._panel(
@@ -322,9 +325,9 @@ class RichRender:
         score = cls._number_to_relative(number=data.score)
         header_content: str = (
             f"{colours.BOLD}{colours.POWDER_BLUE}{subreddit_name}{colours.RESET}{colours.RESET} · "
-            f"{colours.GREY}{cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) 
+            f"{colours.GREY}⏲ {cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) 
                                                                             is None else data.created)}{colours.RESET}\n"
-            f"{colours.GREY}u/{data.author}{colours.RESET}"
+            f"{colours.GREY}{escape(data.author)}{colours.RESET}"
         )
 
         footer_content: str = (
@@ -391,7 +394,7 @@ class RichRender:
 
         header_content: str = (
             f"{colours.BOLD}{data.display_name_prefixed}{colours.RESET} · "
-            f"{colours.BOLD_BLACK}{cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) is None else data.created
+            f"{colours.BOLD_BLACK}⏲ {cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) is None else data.created
 )}"
             f"{colours.BOLD_BLACK_RESET}"
         )

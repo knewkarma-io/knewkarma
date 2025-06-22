@@ -21,7 +21,7 @@ class Comment(BaseModel):
     subreddit: str
     author_flair_template_id: t.Optional[str] = None
     likes: t.Optional[bool] = None
-    replies: t.Union[str, Listing]
+    replies: t.Union[Listing, str]
     user_reports: t.List[t.Any]
     saved: bool
     id: str
