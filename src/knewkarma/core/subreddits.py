@@ -16,7 +16,6 @@ class Subreddits:
         cls,
         session: requests.Session,
         limit: int,
-        timeframe: reddit.TIMEFRAME = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Subreddit]:
@@ -46,7 +45,6 @@ class Subreddits:
             status=status,
             kind="all",
             limit=limit,
-            timeframe=timeframe,
         )
 
         return all_subreddits
@@ -90,7 +88,6 @@ class Subreddits:
         cls,
         session: requests.Session,
         limit: int,
-        timeframe: reddit.TIMEFRAME = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Subreddit]:
@@ -116,7 +113,6 @@ class Subreddits:
             status=status,
             kind="new",
             limit=limit,
-            timeframe=timeframe,
         )
 
         return new_subreddits
@@ -126,7 +122,6 @@ class Subreddits:
         cls,
         session: requests.Session,
         limit: int,
-        timeframe: reddit.TIMEFRAME = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Subreddit]:
@@ -153,7 +148,6 @@ class Subreddits:
             status=status,
             kind="popular",
             limit=limit,
-            timeframe=timeframe,
         )
 
         return popular_subreddits

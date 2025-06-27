@@ -1,6 +1,8 @@
 import typing as t
 from datetime import datetime, timezone
 
+from praw.models import Submission, Redditor, Comment, WikiPage
+from praw.models.reddit.subreddit import Subreddit
 from rich.console import RenderableType, Group
 from rich.markdown import Markdown
 from rich.markup import escape
@@ -9,19 +11,11 @@ from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
 
-from engines.karmakaze.schemas import (
-    User,
-    Subreddit,
-    WikiPage,
-    Comment,
-    Post,
-    ModeratedSubreddit,
-)
-from engines.snoopy.reddit import Reddit
 from tools import colours
 from tools.log_config import console
 
 __all__ = ["RichRender"]
+BASE_URL: str = "https://reddit.com/"
 
 
 class RichRender:
@@ -30,9 +24,9 @@ class RichRender:
     def panels(
         cls,
         data: t.Union[
-            t.List[t.Union[User, Post, Subreddit, Comment, WikiPage]],
-            User,
-            Post,
+            t.List[t.Union[Redditor, Submission, Subreddit, Comment, WikiPage]],
+            Redditor,
+            Submission,
             Subreddit,
             Comment,
             WikiPage,
@@ -41,28 +35,29 @@ class RichRender:
         """
         Dynamically dispatch the appropriate rendering method based on data type.
         """
+        # pprint([vars(item) for item in data])
         # Handle list input
         if isinstance(data, list) and data:
             item = data[0]
-            if isinstance(item, Post):
+            if isinstance(item, Submission):
                 return cls._posts(data)
             elif isinstance(item, Comment):
                 return cls._comments(data)
-            elif isinstance(item, User):
+            elif isinstance(item, Redditor):
                 return cls._users(data)
-            elif isinstance(item, (Subreddit, ModeratedSubreddit)):
+            elif isinstance(item, Subreddit):
                 return cls._subreddits(data)
-            # elif isinstance(item, WikiPage):
-            #    return cls.wiki_pages(data)
+            elif isinstance(item, WikiPage):
+                return cls._wiki_pages(data)
 
         # Handle single item input
-        elif isinstance(data, Post):
+        elif isinstance(data, Submission):
             return cls._post(data)
         elif isinstance(data, Comment):
             return cls._comment(data)
-        elif isinstance(data, User):
+        elif isinstance(data, Redditor):
             return cls._user(data)
-        elif isinstance(data, (Subreddit, ModeratedSubreddit)):
+        elif isinstance(data, Subreddit):
             return cls._subreddit(data)
         # elif isinstance(data, WikiPage):
         #    return cls.wiki_page(data)
@@ -130,11 +125,11 @@ class RichRender:
         Examples:
             - Just now
             - 2m ago
-            - 3h ago
+            - 3hr ago
             - 5d ago
-            - 2w ago
+            - 2wk ago
             - 4mo ago
-            - 1y ago
+            - 1yr ago
         """
         now = datetime.now(timezone.utc)
         then = datetime.fromtimestamp(unix_timestamp, tz=timezone.utc)
@@ -154,17 +149,19 @@ class RichRender:
         if seconds < minute:
             return "Just now"
         elif seconds < hour:
-            return f"{seconds // minute}m ago"
+            relative_time = f"{seconds // minute}min ago"
         elif seconds < day:
-            return f"{seconds // hour}h ago"
+            relative_time = f"{seconds // hour}hr ago"
         elif seconds < week:
-            return f"{seconds // day}d ago"
+            relative_time = f"{seconds // day}d ago"
         elif seconds < month:
-            return f"{seconds // week}w ago"
+            relative_time = f"{seconds // week}wk ago"
         elif seconds < year:
-            return f"{seconds // month}mo ago"
+            relative_time = f"{seconds // month}mo ago"
         else:
-            return f"{seconds // year}y ago"
+            relative_time = f"{seconds // year}yr ago"
+
+        return f"{colours.GREY}⏲ {relative_time}{colours.RESET}"
 
     @classmethod
     def _number_to_relative(cls, number: t.Union[int, float]):
@@ -182,8 +179,12 @@ class RichRender:
         else:
             return str(number)
 
+    @staticmethod
+    def _set_item_url(url: str) -> str:
+        return f"{colours.BOLD_BLUE}[link={url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}"
+
     @classmethod
-    def _user(cls, data: User, print_panel: bool = True):
+    def _user(cls, data: Redditor, print_panel: bool = True):
         subreddit = getattr(data, "subreddit")
         is_suspended = getattr(data, "is_suspended")
 
@@ -192,9 +193,8 @@ class RichRender:
 
         header_content = (
             f"{colours.BOLD}{colours.POWDER_BLUE}{data.name}{colours.RESET}{colours.RESET} "
-            f"· {colours.GREY}⏲ {cls._timestamp_to_relative(unix_timestamp=0 if is_suspended else data.created
-    )}\n"
-            f"{subreddit.display_name_prefixed}{colours.RESET}"
+            f"· {cls._timestamp_to_relative(unix_timestamp=0 if is_suspended else data.created)}\n"
+            f"{colours.GREY}{subreddit.display_name_prefixed}{colours.RESET}"
         )
 
         if subreddit.over_18:
@@ -223,7 +223,7 @@ class RichRender:
         text = "\n\n".join(panel_parts)
 
         return cls._panel(
-            title=f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}{subreddit.url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
+            title=cls._set_item_url(url=f"{BASE_URL}{subreddit.url}"),
             header=header_content,
             content=text,
             footer=footer_content,
@@ -232,7 +232,7 @@ class RichRender:
         )
 
     @classmethod
-    def _users(cls, data: t.List[User], print_panel: bool = True):
+    def _users(cls, data: t.List[Redditor], print_panel: bool = True):
         panels = []
 
         for user_data in data:
@@ -250,40 +250,43 @@ class RichRender:
     def _comment(cls, data: Comment, print_panel: bool = True):
         panel_parts: t.List[str] = []
 
-        author: str = getattr(data, "author")
+        author = data.author
+        post_title = data.link_title
         body: str = getattr(data, "body")
+
         subreddit: str = getattr(data, "subreddit_name_prefixed", "")
-        subreddit = f"self" if subreddit.lower() == f"u/{author.lower()}" else subreddit
+        subreddit = (
+            f"self" if subreddit.lower() == f"u/{author.name.lower()}" else subreddit
+        )
         permalink: str = getattr(data, "permalink", "")
         created: int = 0 if getattr(data, "created", None) is None else data.created
         score = cls._number_to_relative(number=data.score)
-        # _replies = data.replies
-        # num_replies = 0
-        # if isinstance(_replies, dict):
-        #    num_replies = len(_replies.get("data").get("children"))
-
+        data.replies.replace_more(limit=None)  # Expand all 'MoreComments'
+        all_replies = data.replies.list()  # Flatten and get all replies as a list
         awards: list = getattr(data, "all_awardings", [])
 
+        if post_title:
+            panel_parts.append(f"> {post_title}")
         if body:
             panel_parts.append(body)
 
         text: str = "\n\n".join(panel_parts)
         header_content: str = (
             f"{colours.BOLD}{colours.POWDER_BLUE}{subreddit}{colours.RESET}{colours.RESET} · "
-            f"{colours.GREY}⏲ {cls._timestamp_to_relative(unix_timestamp=created)}\n"
-            f"{escape(author)}{colours.RESET}"
+            f"{cls._timestamp_to_relative(unix_timestamp=created)}\n"
+            f"{colours.GREY}{escape(author.name)}{colours.RESET}"
         )
 
         footer_content: str = (
             f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" 
             if score == 0 
             else colours.POWDER_BLUE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
-            # f"💬{colours.POWDER_BLUE}{cls._number_to_relative(number=num_replies)}{colours.RESET} "
-            # f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(awards))}{colours.BOLD_YELLOW_RESET}"
+            f"💬{colours.POWDER_BLUE}{cls._number_to_relative(number=len(all_replies))}{colours.RESET} "
+            f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(awards))}{colours.BOLD_YELLOW_RESET}"
         )
 
         return cls._panel(
-            title=f"{colours.BOLD_BLUE}[link={Reddit.BASE_URL}/{permalink}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
+            title=cls._set_item_url(url=f"{BASE_URL}{permalink}"),
             header=header_content,
             content=text,
             footer=footer_content,
@@ -305,13 +308,15 @@ class RichRender:
         console.print(panel_group)
 
     @classmethod
-    def _post(cls, data: Post, print_panel: bool = True) -> t.Union[Panel, None]:
+    def _post(cls, data: Submission, print_panel: bool = True) -> t.Union[Panel, None]:
         """Render a single Reddit post or comment into a Panel."""
+
+        author = getattr(data.author, "name", "[deleted]")
 
         panel_parts: t.List[str] = []
         subreddit_name = (
             f"self"
-            if data.subreddit_name_prefixed.lower() == f"u/{data.author.lower()}"
+            if data.subreddit_name_prefixed.lower() == f"u/{author}"
             else data.subreddit_name_prefixed
         )
         if data.title:
@@ -325,9 +330,10 @@ class RichRender:
         score = cls._number_to_relative(number=data.score)
         header_content: str = (
             f"{colours.BOLD}{colours.POWDER_BLUE}{subreddit_name}{colours.RESET}{colours.RESET} · "
-            f"{colours.GREY}⏲ {cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) 
-                                                                            is None else data.created)}{colours.RESET}\n"
-            f"{colours.GREY}{escape(data.author)}{colours.RESET}"
+            f"{cls._timestamp_to_relative(unix_timestamp=0
+            if getattr(data, "created", None) 
+               is None else data.created)}\n"
+            f"{colours.GREY}{escape(author)}{colours.RESET}"
         )
 
         footer_content: str = (
@@ -344,7 +350,7 @@ class RichRender:
             )
 
         return cls._panel(
-            title=f"{colours.BOLD_BLUE}[link={data.url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}",
+            title=cls._set_item_url(url=data.url),
             header=header_content,
             content=text,
             footer=footer_content,
@@ -353,7 +359,7 @@ class RichRender:
         )
 
     @classmethod
-    def _posts(cls, data: t.List[Post]):
+    def _posts(cls, data: t.List[Submission]):
         """Render and print a list of posts/comments using the `post` method."""
         panels: t.List[Panel] = []
 
@@ -367,7 +373,7 @@ class RichRender:
 
     @classmethod
     def _subreddit(
-        cls, data: t.Union[Subreddit, ModeratedSubreddit], print_panel: bool = True
+        cls, data: Subreddit, print_panel: bool = True
     ) -> t.Union[Panel, None]:
         if data.subreddit_type == "private":
             return None
@@ -394,9 +400,7 @@ class RichRender:
 
         header_content: str = (
             f"{colours.BOLD}{data.display_name_prefixed}{colours.RESET} · "
-            f"{colours.BOLD_BLACK}⏲ {cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) is None else data.created
-)}"
-            f"{colours.BOLD_BLACK_RESET}"
+            f"{cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) is None else data.created)}"
         )
 
         if is_nsfw:
@@ -405,19 +409,20 @@ class RichRender:
             )
 
         footer_data: t.Union[t.Dict, None] = {
-            "Subscribers": cls._number_to_relative(number=data.subscribers)
+            "👥 Subscribers": cls._number_to_relative(number=data.subscribers)
         }
         if getattr(data, "accounts_active", None):
             footer_data.update(
                 {
-                    "Active Accounts": cls._number_to_relative(
+                    f"{colours.BOLD_GREEN}●{colours.BOLD_GREEN_RESET} Online Members": cls._number_to_relative(
                         number=data.accounts_active
                     )
                 }
             )
         if hasattr(data, "lang"):
-            footer_data.update({"Language": data.lang})
+            footer_data.update({"🌐 Language": data.lang})
 
+        footer_data.update({f"👁 Visibility": data.subreddit_type})
         if data.subreddit_type == "user":
             footer_data = None
 
@@ -432,10 +437,45 @@ class RichRender:
         )
 
     @classmethod
-    def _subreddits(cls, data: t.List[t.Union[Subreddit, ModeratedSubreddit]]):
+    def _subreddits(cls, data: t.List[Subreddit]):
         panels = []
         for subreddit in data:
             panel = cls._subreddit(data=subreddit, print_panel=False)
+            if panel:
+                panels.append(panel)
+
+        panels_group = Group(*panels)
+        console.print(panels_group)
+
+    @classmethod
+    def _wiki_page(cls, data: WikiPage, print_panel: bool = True):
+        panel_parts = []
+        name = data.name
+        content = data.content_md
+
+        if content:
+            panel_parts.append(content)
+
+        header_content: str = (
+            f"{colours.BOLD}{name}{colours.RESET} · "
+            f"{cls._timestamp_to_relative(unix_timestamp=data.revision_date)}"
+        )
+
+        return cls._panel(
+            title=cls._set_item_url(
+                url=f"{BASE_URL}{data.subreddit.display_name_prefixed}/wiki/{name}"
+            ),
+            header=header_content,
+            content=content,
+            add_dividers=True,
+            print_panel=print_panel,
+        )
+
+    @classmethod
+    def _wiki_pages(cls, data: t.List[WikiPage]):
+        panels = []
+        for page in data:
+            panel = cls._wiki_page(data=page, print_panel=False)
             if panel:
                 panels.append(panel)
 

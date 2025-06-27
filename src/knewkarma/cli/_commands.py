@@ -5,8 +5,8 @@ import rich_click as click
 
 from tools.log_config import console
 from tools.runtime_ops import RuntimeOps
-from . import command
-from ..core.client import reddit
+from ._main import run
+from ..core.client import LISTINGS, SORT, TIME_FILTERS
 from ..core.post import Post
 from ..core.posts import Posts
 from ..core.search import Search
@@ -37,6 +37,13 @@ def global_options(func: t.Callable) -> t.Callable:
     """
 
     @click.option(
+        "--listing",
+        default="top",
+        show_default=True,
+        type=click.Choice(t.get_args(LISTINGS)),
+        help="Reddit Listings (I'm still working on a better description)",
+    )
+    @click.option(
         "-e",
         "--export",
         type=str,
@@ -55,33 +62,35 @@ def global_options(func: t.Callable) -> t.Callable:
         "--sort",
         default="all",
         show_default=True,
-        type=click.Choice(t.get_args(reddit.SORT)),
+        type=click.Choice(t.get_args(SORT)),
         help="Sort criterion",
     )
     @click.option(
         "-t",
-        "--timeframe",
+        "--time-filter",
         default="all",
         show_default=True,
-        type=click.Choice(t.get_args(reddit.TIMEFRAME)),
-        help="Timeframe to get data from",
+        type=click.Choice(t.get_args(TIME_FILTERS)),
+        help="Filter data by time",
     )
     @click.pass_context
     @functools.wraps(func)
     def wrapper(
         ctx: click.Context,
-        timeframe: reddit.TIMEFRAME,
-        sort: reddit.SORT,
+        time_filter: TIME_FILTERS,
+        sort: SORT,
         limit: int,
         export: str,
+        listing: str,
         *args,
         **kwargs,
     ):
         ctx.ensure_object(dict)
-        ctx.obj["timeframe"] = timeframe
+        ctx.obj["time_filter"] = time_filter
         ctx.obj["sort"] = sort
         ctx.obj["limit"] = limit
         ctx.obj["export"] = export
+        ctx.obj["listing"] = listing
         return ctx.invoke(func, *args, **kwargs)
 
     return wrapper
@@ -186,7 +195,7 @@ def cmd_post(ctx: click.Context, _id: str, subreddit: str, data: bool, comments:
     :type comments: bool
     """
 
-    sort: reddit.SORT = ctx.obj["sort"]
+    sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
 
@@ -200,7 +209,7 @@ def cmd_post(ctx: click.Context, _id: str, subreddit: str, data: bool, comments:
         ),
     }
 
-    command.run(
+    run(
         ctx=ctx,
         method_map=method_map,
         export=export,
@@ -261,21 +270,19 @@ def cmd_posts(
     :type rising: bool
     """
 
-    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
-    sort: reddit.SORT = ctx.obj["sort"]
+    time_filter: TIME_FILTERS = ctx.obj["time_filter"]
+    sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
 
     method_map: t.Dict = {
         "best": lambda session, status, logger: Posts.best(
-            timeframe=timeframe,
             limit=limit,
             status=status,
             logger=logger,
             session=session,
         ),
         "controversial": lambda session, status, logger: Posts.controversial(
-            timeframe=timeframe,
             limit=limit,
             status=status,
             logger=logger,
@@ -288,7 +295,6 @@ def cmd_posts(
             limit=limit, sort=sort, status=status, logger=logger, session=session
         ),
         "top": lambda session, status, logger: Posts.top(
-            timeframe=timeframe,
             limit=limit,
             status=status,
             logger=logger,
@@ -299,7 +305,7 @@ def cmd_posts(
         ),
     }
 
-    command.run(
+    run(
         ctx=ctx,
         method_map=method_map,
         export=export,
@@ -340,7 +346,7 @@ def cmd_search(
     :type users: bool
     """
 
-    sort: reddit.SORT = ctx.obj["sort"]
+    sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
 
@@ -359,7 +365,7 @@ def cmd_search(
         ),
     }
 
-    command.run(
+    run(
         ctx=ctx,
         method_map=method_map,
         export=export,
@@ -445,8 +451,8 @@ def cmd_user(
     :param does_user_exist: Flag to check if the given user exists.
     :type does_user_exist: bool
     """
-    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
-    sort: reddit.SORT = ctx.obj["sort"]
+    time_filter: TIME_FILTERS = ctx.obj["time_filter"]
+    sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
 
@@ -456,7 +462,6 @@ def cmd_user(
             session=session,
             limit=limit,
             sort=sort,
-            timeframe=timeframe,
             status=status,
             logger=logger,
         ),
@@ -470,7 +475,6 @@ def cmd_user(
             session=session,
             limit=limit,
             sort=sort,
-            timeframe=timeframe,
             status=status,
             logger=logger,
         ),
@@ -495,7 +499,6 @@ def cmd_user(
             session=session,
             top_n=top_subreddits,
             limit=limit,
-            timeframe=timeframe,
             status=status,
             logger=logger,
         ),
@@ -504,7 +507,7 @@ def cmd_user(
         ),
     }
 
-    command.run(
+    run(
         ctx=ctx,
         method_map=method_map,
         export=export,
@@ -554,7 +557,7 @@ def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
     """
 
     export: str = ctx.obj["export"]
-    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
+    time_filter: TIME_FILTERS = ctx.obj["time_filter"]
     limit: int = ctx.obj["limit"]
 
     method_map: t.Dict = {
@@ -562,26 +565,23 @@ def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
             logger=logger,
             session=session,
             limit=limit,
-            timeframe=timeframe,
             status=status,
         ),
         "new": lambda session, status, logger: Users.new(
             logger=logger,
             session=session,
             limit=limit,
-            timeframe=timeframe,
             status=status,
         ),
         "popular": lambda session, status, logger: Users.popular(
             logger=logger,
             session=session,
             limit=limit,
-            timeframe=timeframe,
             status=status,
         ),
     }
 
-    command.run(
+    run(
         ctx=ctx,
         method_map=method_map,
         export=export,
@@ -593,90 +593,51 @@ def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
 
 @cli.command(
     name="subreddit",
-    help="Use this command to get a subreddit's data, such as comments, posts, wiki-pages, wiki-page data, and more...",
+    help="Get data from a specified subreddit.",
 )
-@click.argument("subreddit_name")
-@click.option("-sr", "--search", type=str, help="Search for posts in a subreddit")
-@click.option("-pf", "--profile", is_flag=True, help="Get a subreddit's profile")
-@click.option("-ps", "--posts", is_flag=True, help="Get a subreddit's posts")
-@click.option(
-    "-wp", "--wikipage", type=str, help="Get a subreddit's specified wiki page data"
-)
-@click.option("-wps", "--wikipages", is_flag=True, help="Get a subreddit's wiki pages")
+@click.argument("name")
+@click.option("--comments", is_flag=True, type=str, help="Get comments")
+@click.option("--posts", is_flag=True, help="Get posts")
+@click.option("--profile", is_flag=True, help="Get profile")
+@click.option("--search", type=str, help="Search for posts that match a query")
+@click.option("--wiki-pages", is_flag=True, help="Get wiki pages")
 @global_options
 @click.pass_context
-def cmd_subreddit(
+def subreddit(
     ctx: click.Context,
-    subreddit_name: str,
+    name: str,
+    comments: bool,
     posts: bool,
     profile: bool,
-    wikipage: str,
     search: str,
-    wikipages: bool,
+    wiki_pages: bool,
 ):
-    """
-    Retrieve data about a specific subreddit including profile, comments, posts, and wiki pages.
-
-    :param ctx: The Click context object.
-    :type ctx: click.Context
-    :param subreddit_name: The name of the subreddit.
-    :type subreddit_name: str
-    :param posts: Flag to get the subreddit's posts.
-    :type posts: bool
-    :param profile: Flag to get the subreddit's profile.
-    :type profile: bool
-    :param wikipage: The name of the wiki page to retrieve.
-    :type wikipage: str
-    :param search:
-    :type search: str
-    :param wikipages: Flag to get the subreddit's wiki pages.
-    :type wikipages: bool
-    """
-
-    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
-    sort: reddit.SORT = ctx.obj["sort"]
+    time_filter: TIME_FILTERS = ctx.obj["time_filter"]
+    sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
+    listing = ctx.obj["listing"]
 
-    subreddit = Subreddit(
-        name=subreddit_name,
-    )
-    method_map: t.Dict = {
-        "posts": lambda session, status, logger: subreddit.posts(
-            limit=limit,
-            sort=sort,
-            timeframe=timeframe,
-            status=status,
-            logger=logger,
-            session=session,
+    sub = Subreddit(name=name)
+    method_map = {
+        "comments": lambda status, logger: sub.comments(limit=limit, status=status),
+        "posts": lambda status: sub.posts(limit=limit, listing=listing, status=status),
+        "profile": lambda status, logger: sub.profile(status=status),
+        "search": lambda status, logger: sub.search(
+            query=search, limit=limit, sort=sort, status=status, time_filter=time_filter
         ),
-        "profile": lambda session, status, logger: subreddit.profile(
-            status=status, logger=logger, session=session
-        ),
-        "search": lambda session, status, logger: subreddit.search(
-            query=search,
-            limit=limit,
-            sort=sort,
-            timeframe=timeframe,
-            status=status,
-            logger=logger,
-            session=session,
-        ),
-        "wikipages": lambda session, status, logger: subreddit.wikipages(
-            status=status, session=session
-        ),
-        "wikipage": lambda session, status: subreddit.wikipage(
-            page_name=wikipage, status=status, session=session
-        ),
+        "wiki_pages": lambda status, logger: sub.wiki_pages(status=status),
     }
-    command.run(
+    run(
         ctx=ctx,
         method_map=method_map,
         export=export,
+        comments=comments,
         profile=profile,
         posts=posts,
-        wikipages=wikipages,
-        wikipage=wikipage,
+        search=search,
+        wiki_pages=wiki_pages,
+        listing=listing,
     )
 
 
@@ -724,7 +685,6 @@ def cmd_subreddits(
     """
 
     export: str = ctx.obj["export"]
-    timeframe: reddit.TIMEFRAME = ctx.obj["timeframe"]
     limit: int = ctx.obj["limit"]
 
     method_map: t.Dict = {
@@ -745,11 +705,10 @@ def cmd_subreddits(
         ),
     }
 
-    command.run(
+    run(
         ctx=ctx,
         method_map=method_map,
         export=export,
-        timeframe=timeframe,
         all=all,
         default=default,
         new=new,

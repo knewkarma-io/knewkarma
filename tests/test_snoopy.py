@@ -3,12 +3,12 @@ import requests
 
 from engines.karmakaze.schemas import User, Subreddit, Comment, Post
 from engines.snoopy.reddit import Reddit
-from knewkarma.core.client import USER_AGENT
+from knewkarma.meta.about import Project
 
 
 @pytest.fixture(scope="module")
 def reddit():
-    return Reddit(user_agent=f"pytest-integration-test for {USER_AGENT}")
+    return Reddit(app_name=f"pytest-integration-test for {Project.package}/snoopy")
 
 
 @pytest.fixture

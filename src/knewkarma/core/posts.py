@@ -16,7 +16,6 @@ class Posts:
         cls,
         session: requests.Session,
         limit: int,
-        timeframe: reddit.TIMEFRAME = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
@@ -44,7 +43,6 @@ class Posts:
             kind="best",
             limit=limit,
             sort="all",
-            timeframe=timeframe,
         )
 
         return posts
@@ -54,7 +52,6 @@ class Posts:
         cls,
         session: requests.Session,
         limit: int,
-        timeframe: reddit.TIMEFRAME = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
@@ -82,7 +79,6 @@ class Posts:
             kind="controversial",
             limit=limit,
             sort="all",
-            timeframe=timeframe,
         )
 
         return posts
@@ -92,8 +88,6 @@ class Posts:
         cls,
         session: requests.Session,
         limit: int,
-        timeframe: reddit.TIMEFRAME = "all",
-        sort: reddit.SORT = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
@@ -122,8 +116,6 @@ class Posts:
             status=status,
             kind="front_page",
             limit=limit,
-            sort=sort,
-            timeframe=timeframe,
         )
 
         return posts
@@ -133,8 +125,6 @@ class Posts:
         cls,
         session: requests.Session,
         limit: int,
-        timeframe: reddit.TIMEFRAME = "all",
-        sort: reddit.SORT = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
@@ -163,8 +153,6 @@ class Posts:
             status=status,
             kind="new",
             limit=limit,
-            sort=sort,
-            timeframe=timeframe,
         )
 
         return posts
@@ -174,7 +162,6 @@ class Posts:
         cls,
         session: requests.Session,
         limit: int,
-        timeframe: reddit.TIMEFRAME = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
@@ -202,7 +189,6 @@ class Posts:
             kind="top",
             limit=limit,
             sort="all",
-            timeframe=timeframe,
         )
 
         return posts
@@ -212,7 +198,6 @@ class Posts:
         cls,
         session: requests.Session,
         limit: int,
-        timeframe: reddit.TIMEFRAME = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
@@ -240,7 +225,6 @@ class Posts:
             kind="rising",
             limit=limit,
             sort="all",
-            timeframe=timeframe,
         )
 
         return posts

@@ -6,7 +6,7 @@ from logging import Logger
 import requests
 from rich.status import Status
 
-from engines.snoopy import Reddit
+from knewkarma.core.client import USER_AGENT
 from knewkarma.meta.version import Version
 from . import colours
 
@@ -14,21 +14,26 @@ __all__ = ["RuntimeOps"]
 
 
 class RuntimeOps:
-    """
-    Provides utilities that are executed during the application's runtime.
+    ENDPOINTS = {
+        "status": "https://www.redditstatus.com/api/v2/status.json",
+        "components": "https://www.redditstatus.com/api/v2/components.json",
+        "releases": "https://api.github.com/repos/knewkarma-io/knewkarma/releases/latest",
+    }
 
-    :param package_name:  The name of the package being inspected (used for update checks).
-    :param reddit_cls: A class that implements request handling for Reddit-related endpoints.
-    :param version_cls: A class that provides semantic version information
-                                     (e.g., major, minor, patch versions).
-    """
-
-    def __init__(
-        self, package_name: str, reddit_cls: Reddit, version_cls: t.Type[Version]
-    ):
+    def __init__(self, package_name: str, version_cls: t.Type[Version]):
         self.package_name = package_name
         self.version_cls = version_cls
-        self.reddit_cls = reddit_cls
+
+    @staticmethod
+    def send_request(
+        url: str,
+        session: requests.Session,
+    ) -> t.Union[t.Dict, t.List, str, None]:
+        with session.get(
+            url=url,
+            headers={"User-Agent": USER_AGENT},
+        ) as response:
+            return response.json()
 
     @classmethod
     def clear_screen(cls):
@@ -44,11 +49,8 @@ class RuntimeOps:
         if isinstance(status, Status):
             status.update(f"Checking server status...")
 
-        status_response: dict = self.reddit_cls.send_request(
-            url=self.reddit_cls.ENDPOINTS["infrastructure"]["status"],
-            session=session,
-            status=status,
-            logger=logger,
+        status_response: dict = self.send_request(
+            url=self.ENDPOINTS["status"], session=session
         )
 
         indicator = status_response.get("status").get("indicator")
@@ -74,11 +76,9 @@ class RuntimeOps:
                 if isinstance(status, Status):
                     status.update("Getting status components...")
 
-                status_components: t.Dict = self.reddit_cls.send_request(
-                    url=self.reddit_cls.ENDPOINTS["infrastructure"]["components"],
+                status_components: t.Dict = self.send_request(
+                    url=self.ENDPOINTS["components"],
                     session=session,
-                    logger=logger,
-                    status=status,
                 )
 
                 if isinstance(status_components, t.Dict):
@@ -92,27 +92,15 @@ class RuntimeOps:
         session: requests.Session,
         status: t.Optional[Status] = None,
     ):
-        """
-        Asynchronously checks for updates by comparing the current local version with the remote version.
-
-        Assumes version format: major.minor.patch.prefix
-
-        :param session: An `requests.Session` for making the HTTP request.
-        :type session: requests.Session
-        :param status: An optional `Status` object for displaying status messages.
-        :type status: t.Optional[rich.status.Status]
-        """
         from .log_config import logger
 
         if isinstance(status, Status):
             status.update("Checking for updates")
 
         # Make a GET request to GitHub to get the project's latest release.
-        response = self.reddit_cls.send_request(
-            url=f"https://api.github.com/repos/knewkarma-io/{self.package_name}/releases/latest",
+        response = self.send_request(
+            url=self.ENDPOINTS["releases"],
             session=session,
-            logger=logger,
-            status=status,
         )
 
         if response.get("tag_name"):
@@ -153,34 +141,13 @@ class RuntimeOps:
 
     @staticmethod
     def is_docker_container() -> bool:
-        """
-        Determines if the program is running inside a Docker container.
-
-        :return: True if running inside a Docker container, otherwise False.
-        :rtype: bool
-        """
         return os.environ.get("IS_DOCKER_CONTAINER") == "1"
 
     @staticmethod
     def is_snap_package() -> bool:
-        """
-        Checks if a specified package name is installed as a snap package
-        by checking if it's running inside a SNAP environment.
-
-        :return: True if the specified package is installed as a snap package, otherwise False.
-        :rtype: bool
-        """
-
         return True if os.getenv("SNAP") else False
 
     def is_pypi_package(self) -> bool:
-        """
-        Checks if a specified package name is installed as a pypi package.
-
-        :return: True if the specified package is installed as a pypi package, otherwise False.
-        :rtype: bool
-        """
-
         try:
             __import__(name=self.package_name)
             return True

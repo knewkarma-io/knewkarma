@@ -15,7 +15,6 @@ from tools.log_config import console
 from tools.log_config import logger
 from tools.rich_render import RichRender
 from tools.runtime_ops import RuntimeOps
-from ..core.client import reddit
 
 __all__ = ["run"]
 
@@ -143,9 +142,7 @@ def route_to_method(
 
     If no valid argument is provided, prints command usage help.
     """
-    runtime = RuntimeOps(
-        package_name=Project.package, version_cls=Version, reddit_cls=reddit
-    )
+    runtime = RuntimeOps(package_name=Project.package, version_cls=Version)
 
     is_valid_arg: bool = False
 
@@ -165,23 +162,22 @@ def route_to_method(
                     console=console,
                 ) as status:
                     with requests.Session() as session:
-                        # logger.info(f"◉ Session opened.")
                         runtime.check_updates(session=session, status=status)
                         runtime.infra_status(
                             session=session,
                             status=status,
                             logger=logger,
                         )
+                        status.update(f"Initialising {ctx.command.name} module...")
 
-                        invoke_method(
-                            method=method,
-                            session=session,
-                            status=status,
-                            logger=logger,
-                            ctx=ctx,
-                            export=export,
-                            argument=argument,
-                        )
+                    invoke_method(
+                        method=method,
+                        status=status,
+                        logger=logger,
+                        ctx=ctx,
+                        export=export,
+                        argument=argument,
+                    )
             except requests.exceptions.ConnectionError as connection_error:
                 logger.error(
                     f"{colours.BOLD_RED}⚠{colours.BOLD_RED_RESET} A connection error occurred: {connection_error}"
@@ -189,6 +185,10 @@ def route_to_method(
             except requests.exceptions.HTTPError as response_error:
                 logger.error(
                     f"{colours.BOLD_RED}⚠{colours.BOLD_RED_RESET} An HTTP error occurred: {response_error}"
+                )
+            except Exception as unexpected_error:
+                logger.error(
+                    f"{colours.BOLD_RED}⚠{colours.BOLD_RED_RESET} An unexpected error occurred: {unexpected_error}"
                 )
             finally:
                 elapsed_time = datetime.now() - start_time

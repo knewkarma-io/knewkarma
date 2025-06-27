@@ -28,7 +28,6 @@ class Search:
         self,
         session: requests.Session,
         limit: int,
-        sort: reddit.SORT = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
@@ -55,7 +54,6 @@ class Search:
             status=status,
             kind="posts",
             query=self._query,
-            sort=sort,
             limit=limit,
         )
 
@@ -65,7 +63,6 @@ class Search:
         self,
         session: requests.Session,
         limit: int,
-        sort: reddit.SORT = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Subreddit]:
@@ -95,7 +92,6 @@ class Search:
             status=status,
             kind="subreddits",
             query=self._query,
-            sort=sort,
             limit=limit,
         )
 
@@ -105,7 +101,6 @@ class Search:
         self,
         session: requests.Session,
         limit: int,
-        sort: reddit.SORT = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[User]:
@@ -136,7 +131,6 @@ class Search:
             status=status,
             kind="users",
             query=self._query,
-            sort=sort,
             limit=limit,
         )
 

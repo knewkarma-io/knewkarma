@@ -2,6 +2,7 @@ import random
 import time
 import typing as t
 from logging import Logger
+from platform import python_version, platform
 from random import randint
 
 import requests
@@ -9,10 +10,13 @@ from rich.status import Status
 
 from engines.karmakaze.sanitiser import RedditSanitiser
 from engines.karmakaze.schemas import User, Subreddit, Post, WikiPage, Comment
+from knewkarma.meta.about import Project
+from knewkarma.meta.version import Version
 from tools import colours
 
 
 class Reddit:
+
     SUBREDDITS_KIND = t.Literal["all", "default", "new", "popular", "user_moderated"]
     SORT = t.Literal[
         "controversial", "new", "top", "best", "hot", "rising", "all", "relevance"
@@ -51,14 +55,14 @@ class Reddit:
         "comments": lambda response: RedditSanitiser().comments(response=response),
     }
 
-    def __init__(self, user_agent: str):
+    def __init__(self, app_name: str):
         """
         Initialise the Reddit client.
 
-        :param user_agent: The User-Agent string to use for HTTP requests.
-        :type user_agent: str
+        :param app_name: The User-Agent string to use for HTTP requests.
+        :type app_name: str
         """
-        self.user_agent = user_agent
+        self.app_name = app_name
         self._base_backoff: int = 60  # base cooldown on 429
         self._max_backoff: int = 600  # max cooldown (e.g., 10 minutes)
         self._backoff_attempts: int = 0  # how many times we've been rate-limited
@@ -83,7 +87,14 @@ class Reddit:
         """
         while True:
             with session.get(
-                url=url, headers={"User-Agent": self.user_agent}, params=params
+                url=url,
+                headers={
+                    "User-Agent": (
+                        f"{self.app_name}, powered by {Project.name.replace(' ', '-')}/{Version.release} "
+                        f"(Python {python_version} on {platform}; +{Project.documentation})"
+                    )
+                },
+                params=params,
             ) as response:
                 if response.status_code == 429:
                     base_sleep = self._base_backoff * (

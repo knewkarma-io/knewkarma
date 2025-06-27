@@ -5,6 +5,7 @@ import requests
 from rich.status import Status
 
 from engines.karmakaze import schemas
+from engines.snoopy import reddit
 from .client import reddit
 
 
@@ -57,8 +58,6 @@ class Post:
         self,
         session: requests.Session,
         limit: int,
-        sort: reddit.SORT = "all",
-        timeframe: reddit.TIMEFRAME = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[schemas.Comment]:
@@ -93,8 +92,6 @@ class Post:
             id=self._id,
             subreddit=self._subreddit,
             limit=limit,
-            sort=sort,
-            timeframe=timeframe,
         )
 
         return comments_data

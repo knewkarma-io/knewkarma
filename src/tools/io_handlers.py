@@ -4,8 +4,9 @@ import typing as t
 from datetime import datetime
 
 import pandas as pd
+from praw.models import Submission, Redditor, Comment
+from praw.models.reddit.subreddit import WikiPage, Subreddit
 
-from engines.karmakaze.schemas import User, Subreddit, Post, WikiPage, Comment
 from .log_config import logger
 
 __all__ = ["FileHandler", "DataFrameHandler"]
@@ -18,12 +19,12 @@ class DataFrameHandler:
     def build(
         cls,
         data: t.Union[
-            User,
+            Redditor,
             Subreddit,
-            Post,
+            Submission,
             WikiPage,
             Comment,
-            t.List[t.Union[User, Subreddit, Post, WikiPage, Comment]],
+            t.List[t.Union[Redditor, Subreddit, Submission, WikiPage, Comment]],
             t.List[t.Tuple[str, t.Any]],
         ],
     ) -> pd.DataFrame:

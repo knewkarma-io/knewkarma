@@ -28,8 +28,6 @@ class User:
         self,
         session: requests.Session,
         limit: int,
-        sort: reddit.SORT = "all",
-        timeframe: reddit.TIMEFRAME = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Comment]:
@@ -59,8 +57,6 @@ class User:
             kind="user",
             username=self.username,
             limit=limit,
-            sort=sort,
-            timeframe=timeframe,
         )
 
         return user_comments
@@ -135,8 +131,6 @@ class User:
         self,
         session: requests.Session,
         limit: int,
-        sort: reddit.SORT = "all",
-        timeframe: reddit.TIMEFRAME = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.List[Post]:
@@ -165,8 +159,6 @@ class User:
             status=status,
             kind="user",
             limit=limit,
-            sort=sort,
-            timeframe=timeframe,
             username=self.username,
         )
 
@@ -261,7 +253,6 @@ class User:
         session: requests.Session,
         top_n: int,
         limit: int,
-        timeframe: reddit.TIMEFRAME = "all",
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
     ) -> t.Union[t.Dict[str, int], None]:
@@ -288,7 +279,6 @@ class User:
             status=status,
             limit=limit,
             sort="all",
-            timeframe=timeframe,
         )
 
         if posts:
