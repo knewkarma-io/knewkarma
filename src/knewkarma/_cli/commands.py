@@ -5,15 +5,15 @@ import rich_click as click
 
 from tools.log_config import console
 from tools.runtime_ops import RuntimeOps
-from ._main import run
-from ..core.client import LISTINGS, SORT, TIME_FILTERS
-from ..core.post import Post
-from ..core.posts import Posts
-from ..core.search import Search
-from ..core.subreddit import Subreddit
-from ..core.subreddits import Subreddits
-from ..core.user import User
-from ..core.users import Users
+from .main import run
+from .._core.client import LISTINGS, SORT, TIME_FILTERS
+from .._core.post import Post
+from .._core.posts import Posts
+from .._core.search import Search
+from .._core.subreddit import Subreddit
+from .._core.subreddits import Subreddits
+from .._core.user import User
+from .._core.users import Users
 from ..meta.about import Project
 from ..meta.license import License
 from ..meta.version import Version
@@ -37,13 +37,6 @@ def global_options(func: t.Callable) -> t.Callable:
     """
 
     @click.option(
-        "--listing",
-        default="top",
-        show_default=True,
-        type=click.Choice(t.get_args(LISTINGS)),
-        help="Reddit Listings (I'm still working on a better description)",
-    )
-    @click.option(
         "-e",
         "--export",
         type=str,
@@ -60,7 +53,7 @@ def global_options(func: t.Callable) -> t.Callable:
     @click.option(
         "-s",
         "--sort",
-        default="all",
+        default="lucene",
         show_default=True,
         type=click.Choice(t.get_args(SORT)),
         help="Sort criterion",
@@ -381,130 +374,62 @@ def cmd_search(
     "comments, top subreddits, moderated subreddits, and more...",
 )
 @click.argument("username")
-@click.option("--comments", is_flag=True, help="Get user's comments")
+@click.option("--comments", is_flag=True, help="Get comments")
 @click.option(
-    "--moderated-subreddits",
+    "--moderated",
     is_flag=True,
-    help="Get user's moderated subreddits",
+    help="Get moderated subreddits",
 )
-@click.option("--overview", is_flag=True, help="Get user's most recent comments")
-@click.option("--posts", is_flag=True, help="Get user's posts")
-@click.option("--profile", is_flag=True, help="Get user's profile")
+@click.option("--overview", is_flag=True, help="Get most recent comments")
+@click.option("--posts", is_flag=True, help="Get posts")
+@click.option("--profile", is_flag=True, help="Get profile")
 @click.option(
     "--top-subreddits",
     type=int,
-    help="Get user's top n subreddits",
+    help="Get top n subreddits",
 )
 @click.option(
-    "--does-user-exist",
+    "--exists",
     is_flag=True,
     help="Check if a user exists",
 )
-@click.option(
-    "--search-posts",
-    type=str,
-    help="Search user posts that match a specified query string",
-)
-@click.option(
-    "--search-comments",
-    type=str,
-    help="Search user comments that match a specified query string",
-)
 @global_options
 @click.pass_context
-def cmd_user(
+def user(
     ctx: click.Context,
     username: str,
     comments: bool,
-    moderated_subreddits: bool,
-    search_comments: str,
-    search_posts: str,
+    moderated: bool,
     overview: bool,
     posts: bool,
     profile: bool,
     top_subreddits: int,
-    does_user_exist: bool,
+    exists: bool,
 ):
-    """
-    Retrieve data about a specific user including profile, posts, comments, and top subreddits.
-
-    :param ctx: The Click context object.
-    :type ctx: click.Context
-    :param username: The username to retrieve data for.
-    :type username: str
-    :param comments: Flag to get user's comments.
-    :type comments: bool
-    :param search_comments:
-    :type search_comments: str
-    :param search_posts:
-    :type search_posts: str
-    :param moderated_subreddits: Flag to get user's moderated subreddits.
-    :type moderated_subreddits: bool
-    :param overview: Flag to get user's most recent comments.
-    :type overview: bool
-    :param posts: Flag to get user's posts.
-    :type posts: bool
-    :param profile: Flag to get user's profile.
-    :type profile: bool
-    :param top_subreddits: Number of top subreddits to retrieve.
-    :type top_subreddits: int
-    :param does_user_exist: Flag to check if the given user exists.
-    :type does_user_exist: bool
-    """
     time_filter: TIME_FILTERS = ctx.obj["time_filter"]
-    sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
+    listing: LISTINGS = ctx.obj["listing"]
 
-    user = User(username=username)
+    r_user = User(username=username)
     method_map: t.Dict = {
-        "comments": lambda session, status, logger: user.comments(
-            session=session,
-            limit=limit,
-            sort=sort,
-            status=status,
-            logger=logger,
+        "comments": lambda status, logger: r_user.comments(
+            limit=limit, listing=listing, status=status, logger=logger
         ),
-        "moderated_subreddits": lambda session, status, logger: user.moderated_subreddits(
-            logger=logger, session=session, status=status
+        "moderated": lambda status, logger: r_user.moderated(
+            status=status, logger=logger
         ),
-        "overview": lambda session, status, logger: user.overview(
-            limit=limit, logger=logger, session=session, status=status
+        "overview": lambda status, logger: r_user.overview(
+            status=status, logger=logger
         ),
-        "posts": lambda session, status, logger: user.posts(
-            session=session,
-            limit=limit,
-            sort=sort,
-            status=status,
-            logger=logger,
+        "posts": lambda status, logger: r_user.posts(
+            limit=limit, listing=listing, status=status, logger=logger
         ),
-        "profile": lambda session, status, logger: user.profile(
-            session=session, status=status, logger=logger
+        "profile": lambda status, logger: r_user.profile(status=status, logger=logger),
+        "top_subreddits": lambda status, logger: r_user.top_subreddits(
+            top_n=top_subreddits, status=status, logger=logger
         ),
-        "search_comments": lambda logger, status, session: user.search_comments(
-            query=search_comments,
-            limit=limit,
-            logger=logger,
-            status=status,
-            session=session,
-        ),
-        "search_posts": lambda logger, status, session: user.search_posts(
-            query=search_posts,
-            limit=limit,
-            logger=logger,
-            status=status,
-            session=session,
-        ),
-        "top_subreddits": lambda session, status, logger: user.top_subreddits(
-            session=session,
-            top_n=top_subreddits,
-            limit=limit,
-            status=status,
-            logger=logger,
-        ),
-        "does_user_exist": lambda session, status, logger: user.does_user_exist(
-            logger=logger, session=session, status=status
-        ),
+        "exists": lambda status, logger: r_user.exists(status=status, logger=logger),
     }
 
     run(
@@ -512,14 +437,12 @@ def cmd_user(
         method_map=method_map,
         export=export,
         comments=comments,
-        moderated_subreddits=moderated_subreddits,
+        moderated=moderated,
         overview=overview,
         posts=posts,
         profile=profile,
-        search_comments=search_comments,
-        search_posts=search_posts,
         top_subreddits=top_subreddits,
-        does_user_exist=does_user_exist,
+        exists=exists,
     )
 
 
@@ -595,38 +518,58 @@ def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
     name="subreddit",
     help="Get data from a specified subreddit.",
 )
-@click.argument("name")
+@click.argument("display_name")
 @click.option("--comments", is_flag=True, type=str, help="Get comments")
 @click.option("--posts", is_flag=True, help="Get posts")
 @click.option("--profile", is_flag=True, help="Get profile")
 @click.option("--search", type=str, help="Search for posts that match a query")
 @click.option("--wiki-pages", is_flag=True, help="Get wiki pages")
+@click.option(
+    "--listing",
+    default="top",
+    show_default=True,
+    type=click.Choice(t.get_args(LISTINGS)),
+    help="Reddit Listings (I'm still working on a better description)",
+)
 @global_options
 @click.pass_context
 def subreddit(
     ctx: click.Context,
-    name: str,
+    display_name: str,
     comments: bool,
     posts: bool,
     profile: bool,
     search: str,
     wiki_pages: bool,
+    listing: LISTINGS,
 ):
     time_filter: TIME_FILTERS = ctx.obj["time_filter"]
     sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
-    listing = ctx.obj["listing"]
 
-    sub = Subreddit(name=name)
+    r_subreddit = Subreddit(display_name=display_name)
     method_map = {
-        "comments": lambda status, logger: sub.comments(limit=limit, status=status),
-        "posts": lambda status: sub.posts(limit=limit, listing=listing, status=status),
-        "profile": lambda status, logger: sub.profile(status=status),
-        "search": lambda status, logger: sub.search(
-            query=search, limit=limit, sort=sort, status=status, time_filter=time_filter
+        "comments": lambda status, logger: r_subreddit.comments(
+            limit=limit, status=status, logger=logger
         ),
-        "wiki_pages": lambda status, logger: sub.wiki_pages(status=status),
+        "posts": lambda status, logger: r_subreddit.posts(
+            limit=limit, listing=listing, status=status, logger=logger
+        ),
+        "profile": lambda status, logger: r_subreddit.profile(
+            status=status, logger=logger
+        ),
+        "search": lambda status, logger: r_subreddit.search(
+            query=search,
+            limit=limit,
+            sort=sort,
+            time_filter=time_filter,
+            status=status,
+            logger=logger,
+        ),
+        "wiki_pages": lambda status, logger: r_subreddit.wiki_pages(
+            status=status, logger=logger
+        ),
     }
     run(
         ctx=ctx,

@@ -15,7 +15,5 @@ TIME_FILTERS = t.Literal["all", "hour", "day", "week", "month", "year"]
 SORT = t.Literal["relevance", "hot", "top", "new", "lucene", "all"]
 
 reddit = praw.Reddit(
-    client_id="",
-    client_secret="",
     user_agent=USER_AGENT,
 )

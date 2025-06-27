@@ -6,7 +6,7 @@ from logging import Logger
 import requests
 from rich.status import Status
 
-from knewkarma.core.client import USER_AGENT
+from knewkarma._core.client import USER_AGENT
 from knewkarma.meta.version import Version
 from . import colours
 
@@ -95,7 +95,7 @@ class RuntimeOps:
         from .log_config import logger
 
         if isinstance(status, Status):
-            status.update("Checking for updates")
+            status.update("Checking for updates...")
 
         # Make a GET request to GitHub to get the project's latest release.
         response = self.send_request(

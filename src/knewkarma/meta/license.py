@@ -577,7 +577,7 @@ This is free software, and you are welcome to redistribute it
 """
 
     warranty: str = f"""
-Zero-auth toolkit for Reddit data analysis.
+Reddit-data analysis toolkit.
 Copyright © {_current_year} {colours.BOLD_BLUE}[link={_author.gravatar}]{_author.name}[/link]{colours.BOLD_BLUE_RESET}
 
 This program is free software: you can redistribute it and/or modify

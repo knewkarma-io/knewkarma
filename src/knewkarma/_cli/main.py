@@ -6,6 +6,7 @@ from datetime import datetime
 
 import requests
 import rich_click as click
+from prawcore import exceptions
 from rich.status import Status
 from rich.syntax import Syntax
 
@@ -15,11 +16,10 @@ from tools.log_config import console
 from tools.log_config import logger
 from tools.rich_render import RichRender
 from tools.runtime_ops import RuntimeOps
-
-__all__ = ["run"]
-
 from ..meta.about import Project
 from ..meta.version import Version
+
+__all__ = ["run"]
 
 THE_QUOTES: list = [
     "If you stare into the subreddit, the subreddit also stares back into you.",
@@ -37,6 +37,9 @@ THE_QUOTES: list = [
     "I built this tool to understand Reddit, but now it understands me!",
     "When in doubt, blame the algorithm. That’s what I do.",
 ]
+NORMAL_ERROR_PREFIX: str = f"{colours.RED}⚠{colours.RED_RESET}"
+CRITICAL_ERROR_PREFIX: str = f"{colours.BOLD_RED}⚠{colours.BOLD_RED_RESET}"
+WARNING_PREFIX: str = f"{colours.BOLD_YELLOW}⚠{colours.BOLD_YELLOW_RESET}"
 
 
 def get_quote():
@@ -178,17 +181,29 @@ def route_to_method(
                         export=export,
                         argument=argument,
                     )
-            except requests.exceptions.ConnectionError as connection_error:
-                logger.error(
-                    f"{colours.BOLD_RED}⚠{colours.BOLD_RED_RESET} A connection error occurred: {connection_error}"
+            except exceptions.TooManyRequests as too_many_requests:
+                logger.warning(
+                    f"{WARNING_PREFIX} Woah! Chill out, dude: {too_many_requests}"
                 )
-            except requests.exceptions.HTTPError as response_error:
+            except exceptions.BadRequest as bad_request:
                 logger.error(
-                    f"{colours.BOLD_RED}⚠{colours.BOLD_RED_RESET} An HTTP error occurred: {response_error}"
+                    f"{NORMAL_ERROR_PREFIX} A BadRequest error occurred: {bad_request}"
                 )
-            except Exception as unexpected_error:
+            except exceptions.ServerError as server_error:
                 logger.error(
-                    f"{colours.BOLD_RED}⚠{colours.BOLD_RED_RESET} An unexpected error occurred: {unexpected_error}"
+                    f"{NORMAL_ERROR_PREFIX} A ServerError occurred: {server_error}"
+                )
+            except exceptions.RequestException as response_exception:
+                logger.error(
+                    f"{NORMAL_ERROR_PREFIX} A ResponseException error occurred: {response_exception}"
+                )
+            except exceptions.PrawcoreException as prawcore_exception:
+                logger.critical(
+                    f"{CRITICAL_ERROR_PREFIX} A PrawcoreException error: {prawcore_exception}"
+                )
+            except Exception as error:
+                logger.critical(
+                    f"{CRITICAL_ERROR_PREFIX} An unexpected error occurred: {error}"
                 )
             finally:
                 elapsed_time = datetime.now() - start_time
