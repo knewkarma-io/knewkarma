@@ -3,10 +3,10 @@ import typing as t
 
 import rich_click as click
 
+from knewkarma.config.client import LISTINGS, SORT, TIME_FILTERS
 from tools.log_config import console
 from tools.runtime_ops import RuntimeOps
 from .main import run
-from .._core.client import LISTINGS, SORT, TIME_FILTERS
 from .._core.post import Post
 from .._core.posts import Posts
 from .._core.search import Search
@@ -14,6 +14,7 @@ from .._core.subreddit import Subreddit
 from .._core.subreddits import Subreddits
 from .._core.user import User
 from .._core.users import Users
+from ..config.auth import AuthHandler
 from ..meta.about import Project
 from ..meta.license import License
 from ..meta.version import Version
@@ -130,6 +131,13 @@ def cli(
     """
     set_window_title()
     ctx.ensure_object(dict)
+
+
+@cli.command(name="auth", help="Authenticate with Reddit")
+@click.option("--client-id", help="Reddit API client id", type=str)
+@click.option("--client-secret", help="Reddit API client secret", type=str)
+def auth(client_id: t.Optional[str], client_secret: t.Optional[str]):
+    AuthHandler.write(client_id=client_id, client_secret=client_secret)
 
 
 @cli.command("license")
@@ -541,12 +549,12 @@ def subreddit(
     profile: bool,
     search: str,
     wiki_pages: bool,
-    listing: LISTINGS,
 ):
     time_filter: TIME_FILTERS = ctx.obj["time_filter"]
     sort: SORT = ctx.obj["sort"]
     limit: int = ctx.obj["limit"]
     export: str = ctx.obj["export"]
+    listing: LISTINGS = ctx.obj["listing"]
 
     r_subreddit = Subreddit(display_name=display_name)
     method_map = {

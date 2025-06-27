@@ -6,7 +6,7 @@ from rich.status import Status
 
 from engines.karmakaze import schemas
 from engines.snoopy import reddit
-from .client import reddit
+from ..config.client import reddit
 
 
 class Post:

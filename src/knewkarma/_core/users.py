@@ -5,7 +5,7 @@ import requests
 from rich.status import Status
 
 from engines.karmakaze.schemas import User
-from .client import reddit
+from knewkarma.config.client import reddit
 
 
 class Users:

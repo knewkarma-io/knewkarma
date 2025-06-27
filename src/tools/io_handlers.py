@@ -155,7 +155,8 @@ class DataFrameHandler:
 
 
 class FileHandler:
-    EXPORTS_PARENT_DIR: str = os.path.expanduser(os.path.join("~", "knewkarma"))
+    PARENT_DIR: str = os.path.expanduser(os.path.join("~", "knewkarma"))
+    AUTH_DIR: str = os.path.join(PARENT_DIR, "auth")
 
     @classmethod
     def get_file_size(cls, file_path: str) -> str:

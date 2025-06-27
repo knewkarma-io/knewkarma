@@ -37,6 +37,7 @@ sphinx = "^7.4.7"
 sphinx-rtd-theme = "^2.0.0"
 
 [tool.poetry.scripts]
+rauth = "knewkarma._cli.commands:auth"
 ruser = "knewkarma._cli.commands:user"
 rusers = "knewkarma._cli.commands:cmd_users"
 rsubreddit = "knewkarma._cli.commands:subreddit"

@@ -6,7 +6,7 @@ from logging import Logger
 import requests
 from rich.status import Status
 
-from knewkarma._core.client import USER_AGENT
+from knewkarma.config.client import USER_AGENT
 from knewkarma.meta.version import Version
 from . import colours
 

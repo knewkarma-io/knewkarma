@@ -96,7 +96,7 @@ def invoke_method(
         RichRender.panels(data=response_data)
         if kwargs.get("export"):
             exports_child_dir: str = os.path.join(
-                FileHandler.EXPORTS_PARENT_DIR,
+                FileHandler.PARENT_DIR,
                 "exports",
                 command,
                 argument,

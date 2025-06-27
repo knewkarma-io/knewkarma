@@ -7,7 +7,7 @@ from prawcore import exceptions
 from rich.status import Status
 
 from tools import colours
-from .client import reddit, TIME_FILTERS, SORT, LISTINGS
+from ..config.client import reddit, TIME_FILTERS, SORT, LISTINGS
 
 
 class Subreddit:

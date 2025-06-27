@@ -8,7 +8,7 @@ from rich.status import Status
 from engines.karmakaze.schemas import Comment, Subreddit
 from tools import colours
 from tools.rich_render import RichRender
-from .client import reddit, LISTINGS
+from ..config.client import reddit, LISTINGS
 
 
 class User:
