@@ -86,12 +86,13 @@ def invoke_method(
             )
 
             export_to: t.List[str] = kwargs.get("export").split(",")
-            dataframe = DataFrameHandler.build(data=response_data)
+            dataframe = DataFrameHandler.build(data=response_data, status=status)
             DataFrameHandler.export(
                 dataframe=dataframe,
                 filename=FileHandler.time_to_filename(),
                 directory=exports_child_dir,
                 formats=export_to,
+                status=status,
             )
 
 

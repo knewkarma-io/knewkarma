@@ -6,6 +6,7 @@ from datetime import datetime
 import pandas as pd
 from praw.models import Submission, Redditor, Comment
 from praw.models.reddit.subreddit import WikiPage, Subreddit
+from rich.status import Status
 
 from ..konsole.logging import logger
 
@@ -27,48 +28,44 @@ class DataFrameHandler:
             t.List[t.Union[Redditor, Subreddit, Submission, WikiPage, Comment]],
             t.List[t.Tuple[str, t.Any]],
         ],
+        status: Status,
     ) -> pd.DataFrame:
-        """
-        Makes a Pandas DataFrame from Pydantic model data.
 
-        :param data: Data to be converted into a DataFrame. Can be a single Pydantic model,
-                     a list of Pydantic models, or a list of (key, value) tuples.
-        :return: A pandas DataFrame constructed from the provided data.
-        """
+        if isinstance(status, Status):
+            status.update("Loading data into a DataFrame dataframe...")
 
-        def to_dict(obj: t.Any) -> dict:
+        def praw_to_dict(obj: t.Any) -> dict:
             """
-            Converts a Pydantic v2 model to a dictionary using model_dump().
+            Converts a PRAW object to a dictionary by inspecting its __dict__.
+            Filters out private/internal attributes.
             """
-            if hasattr(obj, "model_dump") and callable(obj.model_dump):
-                return obj.model_dump()
-            raise ValueError(f"Unsupported object type: {type(obj)}")
+            raw = vars(obj)
+            clean = {k: v for k, v in raw.items() if not k.startswith("_")}
+            return clean
 
-        # Handle a single Pydantic object
-        if hasattr(data, "model_dump") and callable(data.model_dump):
-            transformed_data = [to_dict(data)]
+        # Handle a single PRAW object
+        if hasattr(data, "__dict__") and not isinstance(data, list):
+            transformed_data = [praw_to_dict(data)]
 
-        # Handle a list of Pydantic objects
-        elif isinstance(data, list) and all(
-            hasattr(item, "model_dump") and callable(item.model_dump) for item in data
-        ):
-            transformed_data = [to_dict(item) for item in data]
+        # Handle list of PRAW objects
+        elif isinstance(data, list) and all(hasattr(item, "__dict__") for item in data):
+            transformed_data = [praw_to_dict(item) for item in data]
 
-        # Handle a list of (key, value) tuples
+        # Handle list of (key, value) tuples
         elif isinstance(data, list) and all(
             isinstance(item, tuple) and len(item) == 2 for item in data
         ):
             transformed_data = [{key: value for key, value in data}]
 
         else:
-            raise ValueError("Unsupported data structure for DataFrame conversion.")
+            raise ValueError(f"Unsupported data type: {type(data)}")
 
-        # Set display option for better debugging (optional)
+        # Optional: display all rows when debugging
         pd.set_option("display.max_rows", None)
 
-        # Convert to DataFrame and clean it
-        dataframe = pd.DataFrame(transformed_data)
-        return dataframe.dropna(axis=1, how="all")
+        # Build DataFrame, drop all-null columns
+        df = pd.DataFrame(transformed_data)
+        return df.dropna(axis=1, how="all")
 
     @classmethod
     def export(
@@ -77,6 +74,7 @@ class DataFrameHandler:
         filename: str,
         directory: str,
         formats: t.List[EXPORT_FORMATS],
+        status: Status,
     ):
         """
         Exports a pandas DataFrame to one or more file formats, saving the output files to the specified directory.
@@ -94,6 +92,9 @@ class DataFrameHandler:
         :param formats: A list of output formats to export the data to. Must be one or more of ["csv", "html", "json", "xml"].
         :type formats: List[Literal["csv", "html", "json", "xml"]]
         """
+
+        if isinstance(status, Status):
+            status.update(f"Exporting data to {formats}...")
 
         def sanitize_for_xml(df: pd.DataFrame) -> pd.DataFrame:
             """
