@@ -6,14 +6,14 @@ from logging import Logger
 import requests
 from rich.status import Status
 
-from knewkarma.config.client import USER_AGENT
+from karmakrate.konsole import colours
+from knewkarma.core.client import USER_AGENT
 from knewkarma.meta.version import Version
-from . import colours
 
-__all__ = ["RuntimeOps"]
+__all__ = ["RuntimeCalls"]
 
 
-class RuntimeOps:
+class RuntimeCalls:
     ENDPOINTS = {
         "status": "https://www.redditstatus.com/api/v2/status.json",
         "components": "https://www.redditstatus.com/api/v2/components.json",
@@ -42,8 +42,8 @@ class RuntimeOps:
     def infra_status(
         self,
         session: requests.Session,
-        logger: t.Optional[Logger] = None,
-        status: t.Optional[Status] = None,
+        logger: Logger,
+        status: Status,
     ) -> t.Union[t.List[t.Dict], None]:
 
         if isinstance(status, Status):
@@ -90,9 +90,9 @@ class RuntimeOps:
     def check_updates(
         self,
         session: requests.Session,
-        status: t.Optional[Status] = None,
+        status: Status,
     ):
-        from .log_config import logger
+        from ..konsole.logging import logger
 
         if isinstance(status, Status):
             status.update("Checking for updates...")
@@ -136,7 +136,7 @@ class RuntimeOps:
 
             if update_level:
                 logger.info(
-                    f"🔄 {update_level} update is available [{colours.CYAN}{remote_version_str}{colours.CYAN_RESET}]"
+                    f"🡅 {update_level} update is available [{colours.CYAN}{remote_version_str}{colours.CYAN_RESET}]"
                 )
 
     @staticmethod

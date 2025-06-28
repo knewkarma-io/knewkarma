@@ -7,7 +7,7 @@ import pandas as pd
 from praw.models import Submission, Redditor, Comment
 from praw.models.reddit.subreddit import WikiPage, Subreddit
 
-from .log_config import logger
+from ..konsole.logging import logger
 
 __all__ = ["FileHandler", "DataFrameHandler"]
 

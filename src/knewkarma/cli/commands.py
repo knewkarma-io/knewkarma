@@ -3,18 +3,18 @@ import typing as t
 
 import rich_click as click
 
-from knewkarma.config.client import LISTINGS, SORT, TIME_FILTERS
-from tools.log_config import console
-from tools.runtime_ops import RuntimeOps
+from karmakrate.handlers.auth_handler import AuthHandler
+from karmakrate.konsole.logging import console
+from karmakrate.runtime.calls import RuntimeCalls
 from .main import run
-from .._core.post import Post
-from .._core.posts import Posts
-from .._core.search import Search
-from .._core.subreddit import Subreddit
-from .._core.subreddits import Subreddits
-from .._core.user import User
-from .._core.users import Users
-from ..config.auth import AuthHandler
+from ..core.client import LISTINGS, SORT, TIME_FILTERS
+from ..core.post import Post
+from ..core.posts import Posts
+from ..core.search import Search
+from ..core.subreddit import Subreddit
+from ..core.subreddits import Subreddits
+from ..core.user import User
+from ..core.users import Users
 from ..meta.about import Project
 from ..meta.license import License
 from ..meta.version import Version
@@ -42,6 +42,13 @@ def global_options(func: t.Callable) -> t.Callable:
         "--export",
         type=str,
         help="A comma-separated list <w/o whitespaces> of file types to export the output to <supported: csv,html,json,xml>",
+    )
+    @click.option(
+        "--listing",
+        default="top",
+        show_default=True,
+        type=click.Choice(t.get_args(LISTINGS)),
+        help="Reddit Listings (I'm still working on a better description)",
     )
     @click.option(
         "-l",
@@ -97,7 +104,7 @@ def help_callback(ctx: click.Context, _, value: bool):
 
     if value and not ctx.resilient_parsing:
         click.echo(ctx.get_help())
-        if RuntimeOps.is_snap_package():
+        if RuntimeCalls.is_snap_package():
             click.pause()
         ctx.exit()
 
@@ -171,50 +178,27 @@ def licence(
 
 @cli.command(
     name="post",
-    help="Use this command to get an individual post's data including its comments, "
-    "provided the post's <id> and source <subreddit> are specified.",
+    help="Use this command to get an individual post's data including its comments.",
 )
-@click.argument("_id", metavar="ID")
-@click.argument("subreddit")
-@click.option("--data", is_flag=True, help="Get post data")
+@click.argument("id")
+@click.option("--info", is_flag=True, help="Get post info (w/o comments)")
 @click.option("--comments", is_flag=True, help="Get post comments")
 @global_options
 @click.pass_context
-def cmd_post(ctx: click.Context, _id: str, subreddit: str, data: bool, comments: bool):
-    """
-    Retrieve an individual post's data or comments.
-
-    :param ctx: The Click context object.
-    :type ctx: click.Context
-    :param _id: The ID of the post.
-    :type _id: str
-    :param subreddit: The source subreddit of the post.
-    :type subreddit: str
-    :param data: Flag to get post data.
-    :type data: bool
-    :param comments: Flag to get post comments.
-    :type comments: bool
-    """
-
-    sort: SORT = ctx.obj["sort"]
-    limit: int = ctx.obj["limit"]
+def post(ctx: click.Context, id: str, info: bool, comments: bool):
     export: str = ctx.obj["export"]
 
-    post = Post(id=_id, subreddit=subreddit)
+    r_post = Post(id=id)
     method_map: t.Dict = {
-        "comments": lambda session, status, logger: post.comments(
-            limit=limit, sort=sort, status=status, logger=logger, session=session
-        ),
-        "data": lambda session, status, logger: post.data(
-            session=session, status=status, logger=logger
-        ),
+        "comments": lambda session, status, logger: r_post.comments(status=status),
+        "info": lambda session, status, logger: r_post.info(status=status),
     }
 
     run(
         ctx=ctx,
         method_map=method_map,
         export=export,
-        data=data,
+        info=info,
         comments=comments,
     )
 
@@ -290,10 +274,10 @@ def cmd_posts(
             session=session,
         ),
         "front_page": lambda session, status, logger: Posts.front_page(
-            limit=limit, sort=sort, status=status, logger=logger, session=session
+            limit=limit, status=status, logger=logger, session=session
         ),
         "new": lambda session, status, logger: Posts.new(
-            limit=limit, sort=sort, status=status, logger=logger, session=session
+            limit=limit, status=status, logger=logger, session=session
         ),
         "top": lambda session, status, logger: Posts.top(
             limit=limit,
@@ -356,13 +340,13 @@ def cmd_search(
     )
     method_map: t.Dict = {
         "posts": lambda session, status, logger: search.posts(
-            sort=sort, limit=limit, status=status, logger=logger, session=session
+            limit=limit, status=status, logger=logger, session=session
         ),
         "subreddits": lambda session, status, logger: search.subreddits(
-            sort=sort, limit=limit, logger=logger, session=session, status=status
+            limit=limit, logger=logger, session=session, status=status
         ),
         "users": lambda session, status, logger: search.users(
-            sort=sort, limit=limit, status=status, logger=logger, session=session
+            limit=limit, status=status, logger=logger, session=session
         ),
     }
 
@@ -396,11 +380,6 @@ def cmd_search(
     type=int,
     help="Get top n subreddits",
 )
-@click.option(
-    "--exists",
-    is_flag=True,
-    help="Check if a user exists",
-)
 @global_options
 @click.pass_context
 def user(
@@ -412,7 +391,6 @@ def user(
     posts: bool,
     profile: bool,
     top_subreddits: int,
-    exists: bool,
 ):
     time_filter: TIME_FILTERS = ctx.obj["time_filter"]
     limit: int = ctx.obj["limit"]
@@ -437,7 +415,6 @@ def user(
         "top_subreddits": lambda status, logger: r_user.top_subreddits(
             top_n=top_subreddits, status=status, logger=logger
         ),
-        "exists": lambda status, logger: r_user.exists(status=status, logger=logger),
     }
 
     run(
@@ -450,7 +427,6 @@ def user(
         posts=posts,
         profile=profile,
         top_subreddits=top_subreddits,
-        exists=exists,
     )
 
 
@@ -532,13 +508,6 @@ def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
 @click.option("--profile", is_flag=True, help="Get profile")
 @click.option("--search", type=str, help="Search for posts that match a query")
 @click.option("--wiki-pages", is_flag=True, help="Get wiki pages")
-@click.option(
-    "--listing",
-    default="top",
-    show_default=True,
-    type=click.Choice(t.get_args(LISTINGS)),
-    help="Reddit Listings (I'm still working on a better description)",
-)
 @global_options
 @click.pass_context
 def subreddit(

@@ -25,7 +25,7 @@ And/Or
 ```python
 import requests
 
-from knewkarma._core.subreddit import Subreddit
+from knewkarma.core.subreddit import Subreddit
 
 subreddit = Subreddit("AskScience")
 with requests.Session() as session:

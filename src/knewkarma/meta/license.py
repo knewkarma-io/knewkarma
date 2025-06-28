@@ -1,6 +1,6 @@
 from datetime import date
 
-from tools import colours
+from karmakrate.konsole import colours
 from .about import Author, Project
 
 __all__ = ["License"]

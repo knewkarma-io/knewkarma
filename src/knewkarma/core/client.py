@@ -3,9 +3,9 @@ from platform import platform, python_version
 
 import praw
 
-from knewkarma.config.auth import AuthHandler
-from knewkarma.meta.about import Project
-from knewkarma.meta.version import Version
+from karmakrate.handlers.auth_handler import AuthHandler
+from ..meta.about import Project
+from ..meta.version import Version
 
 USER_AGENT: str = (
     f"{Project.name.replace(' ', '-')}/{Version.release} "

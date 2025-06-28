@@ -1,6 +1,5 @@
 import inspect
 import os
-import random
 import typing as t
 from datetime import datetime
 
@@ -8,43 +7,20 @@ import requests
 import rich_click as click
 from prawcore import exceptions
 from rich.status import Status
-from rich.syntax import Syntax
 
-from tools import colours
-from tools.io_handlers import DataFrameHandler, FileHandler
-from tools.log_config import console
-from tools.log_config import logger
-from tools.rich_render import RichRender
-from tools.runtime_ops import RuntimeOps
+from karmakrate.handlers.io_handlers import DataFrameHandler, FileHandler
+from karmakrate.konsole import colours
+from karmakrate.konsole.logging import console, logger
+from karmakrate.konsole.renderer import Render
+from karmakrate.runtime.calls import RuntimeCalls
 from ..meta.about import Project
 from ..meta.version import Version
 
 __all__ = ["run"]
 
-THE_QUOTES: list = [
-    "If you stare into the subreddit, the subreddit also stares back into you.",
-    "*sigh* some people just want to watch the subreddit burn.",
-    "I came here for memes and statistical insight. I’m all out of memes.",
-    "You know, analysing Reddit is like herding cats... if the cats were arguing about pineapple on pizza.",
-    "*sniffs* Hmmm this data smells like upvote farming.",
-    "My code doesn't judge your karma. But I do.",
-    "If it’s on r/conspiracy, it’s either the truth or a guy named Greg in his basement. Sometimes both.",
-    "Behind every karma point, there’s a good chance someone was just looking for a little internet validation.",
-    "My algorithm is 99.7% sure that this post is a cry for help.",
-    "A subreddit is like a dumpster fire...",
-    "The plural of anecdote is not data. Unless it's from r/AskReddit.",
-    "This analysis was brought to you by caffeine, spite, and three deleted comments.",
-    "I built this tool to understand Reddit, but now it understands me!",
-    "When in doubt, blame the algorithm. That’s what I do.",
-]
 NORMAL_ERROR_PREFIX: str = f"{colours.RED}⚠{colours.RED_RESET}"
 CRITICAL_ERROR_PREFIX: str = f"{colours.BOLD_RED}⚠{colours.BOLD_RED_RESET}"
 WARNING_PREFIX: str = f"{colours.BOLD_YELLOW}⚠{colours.BOLD_YELLOW_RESET}"
-
-
-def get_quote():
-    syntax = Syntax(code=random.choice(THE_QUOTES), lexer="text")
-    console.print(syntax)
 
 
 def invoke_method(
@@ -93,7 +69,7 @@ def invoke_method(
     response_data: t.Union[t.List, t.Dict, str, bool, t.Any] = method(**accepted_kwargs)
 
     if response_data:
-        RichRender.panels(data=response_data)
+        Render.panels(data=response_data)
         if kwargs.get("export"):
             exports_child_dir: str = os.path.join(
                 FileHandler.PARENT_DIR,
@@ -138,14 +114,14 @@ def route_to_method(
     :type kwargs: Union[str, int, bool]
 
     Side Effects:
-        - Prints status updates and errors to the console.
+        - Prints status updates and errors to the konsole.
         - Displays a license notice.
         - Performs data export if applicable.
         - Logs execution details and exceptions.
 
     If no valid argument is provided, prints command usage help.
     """
-    runtime = RuntimeOps(package_name=Project.package, version_cls=Version)
+    runtime_calls = RuntimeCalls(package_name=Project.package, version_cls=Version)
 
     is_valid_arg: bool = False
 
@@ -154,19 +130,14 @@ def route_to_method(
             is_valid_arg = True
             start_time: datetime = datetime.now()
             try:
-                runtime.clear_screen()
-                console.print(
-                    random.choice(THE_QUOTES),
-                    justify="center",
-                    style=f"{colours.BOLD_WHITE.strip('[,]')} on {colours.ORANGE_RED.strip('[,]')}",
-                )
+                runtime_calls.clear_screen()
                 with Status(
                     status=f"Starting",
                     console=console,
                 ) as status:
                     with requests.Session() as session:
-                        runtime.check_updates(session=session, status=status)
-                        runtime.infra_status(
+                        runtime_calls.check_updates(session=session, status=status)
+                        runtime_calls.infra_status(
                             session=session,
                             status=status,
                             logger=logger,
@@ -208,9 +179,13 @@ def route_to_method(
             finally:
                 elapsed_time = datetime.now() - start_time
                 console.print(
-                    f"END. {elapsed_time.total_seconds():.2f} seconds elapsed.",
+                    f":keyboard: {colours.BOLD_BLUE}[link=https://github.com/{Project.package}-io]GitHub[/link]{colours.BOLD_BLUE_RESET}"
+                    " | "
+                    f":books: {colours.BOLD_BLUE}[link=https://{Project.package}.readthedocs.io]Documentation[/link]{colours.BOLD_BLUE_RESET}"
+                    " | "
+                    f":black_heart: {colours.BOLD_BLUE}[link=https://opencollective.com/{Project.package}]Become a Sponsor[/link]{colours.BOLD_BLUE_RESET}",
                     justify="center",
-                    style=f"{colours.BOLD_WHITE.strip('[,]')} on {colours.ORANGE_RED.strip('[,]')}",
+                    style=colours.BOLD_WHITE.strip("[,]"),
                 )
 
     if not is_valid_arg:

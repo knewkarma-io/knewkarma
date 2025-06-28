@@ -2,10 +2,10 @@ import typing as t
 from logging import Logger
 
 import requests
+from praw.models import Submission, Subreddit, Redditor
 from rich.status import Status
 
-from engines.karmakaze.schemas import Post, Subreddit, User
-from knewkarma.config.client import reddit
+from .client import reddit
 
 
 class Search:
@@ -30,7 +30,7 @@ class Search:
         limit: int,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
-    ) -> t.List[Post]:
+    ) -> t.List[Submission]:
         """
         Gets posts that match with the specified query.
 
@@ -103,7 +103,7 @@ class Search:
         limit: int,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
-    ) -> t.List[User]:
+    ) -> t.List[Redditor]:
         """
         Gets users that match with the specified query.
 

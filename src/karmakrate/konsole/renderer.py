@@ -11,14 +11,14 @@ from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
 
-from tools import colours
-from tools.log_config import console
+from . import colours
+from .logging import console
 
-__all__ = ["RichRender"]
+__all__ = ["Render"]
 BASE_URL: str = "https://reddit.com/"
 
 
-class RichRender:
+class Render:
 
     @classmethod
     def panels(
@@ -249,9 +249,12 @@ class RichRender:
     @classmethod
     def _comment(cls, data: Comment, print_panel: bool = True):
         panel_parts: t.List[str] = []
+        # Skip fully deleted or removed comments
+        if data.author is None:
+            return None
 
         author = data.author
-        post_title = data.link_title
+        post_title = getattr(data, "link_title", None)
         body: str = getattr(data, "body")
 
         subreddit: str = getattr(data, "subreddit_name_prefixed", "")
@@ -503,7 +506,7 @@ class RichRender:
         :type header: Optional[str]
         :param footer: Optional panel footer, rendered using Rich markup.
         :type footer: Optional[str]
-        :keyword print_panel: Whether to immediately print the panel to the console.
+        :keyword print_panel: Whether to immediately print the panel to the konsole.
         :keyword show_outline: Whether to show a visible white border around the panel.
         :keyword add_dividers: Whether to add horizontal dividers between header, content, and footer.
         :keyword divider_visibility: Whether dividers should be visible or hidden (color-wise).

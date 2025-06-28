@@ -37,7 +37,7 @@ Gets a post's data.
 
 ```python
 import requests
-from knewkarma._core.post import Post
+from knewkarma.core.post import Post
 
 post = Post(id="13ptwzd", subreddit="AskReddit")
 with requests.Session() as session:
@@ -56,7 +56,7 @@ Gets a post's comments.
 
 ```python
 import requests
-from knewkarma._core.post import Post
+from knewkarma.core.post import Post
 
 post = Post(id="13ptwzd", subreddit="AskReddit")
 with requests.Session() as session:
@@ -81,7 +81,7 @@ Gets posts from the best listing.
 
 ```python
 import requests
-from knewkarma._core.posts import Posts
+from knewkarma.core.posts import Posts
 
 with requests.Session() as session:
     best_posts = Posts.best(limit=150, session=session)
@@ -101,7 +101,7 @@ Gets posts from the controversial listing.
 
 ```python
 import requests
-from knewkarma._core.posts import Posts
+from knewkarma.core.posts import Posts
 
 with requests.Session() as session:
     controversial_posts = Posts.controversial(limit=20, session=session)
@@ -120,7 +120,7 @@ Gets posts from the Reddit front-page.
 
 ```python
 import requests
-from knewkarma._core.posts import Posts
+from knewkarma.core.posts import Posts
 
 with requests.Session() as session:
     frontpage_posts = Posts.front_page(limit=10, session=session)
@@ -139,7 +139,7 @@ Gets new posts.
 
 ```python
 import requests
-from knewkarma._core.posts import Posts
+from knewkarma.core.posts import Posts
 
 with requests.Session() as session:
     new_posts = Posts.new(limit=10, session=session)
@@ -159,7 +159,7 @@ Gets posts from the top listing.
 
 ```python
 import requests
-from knewkarma._core.posts import Posts
+from knewkarma.core.posts import Posts
 
 posts = Posts
 with requests.Session() as session:
@@ -179,7 +179,7 @@ Gets posts from the rising listing.
 
 ```python
 import requests
-from knewkarma._core.posts import Posts
+from knewkarma.core.posts import Posts
 
 with requests.Session() as session:
     rising_posts = Posts.rising(limit=100, session=session)
@@ -216,7 +216,7 @@ Search posts.
 
 ```python
 import requests
-from knewkarma._core.search import Search
+from knewkarma.core.search import Search
 
 search = Search(query="Something about data science")
 with requests.Session() as session:
@@ -237,7 +237,7 @@ Search subreddits.
 
 ```python
 import requests
-from knewkarma._core.search import Search
+from knewkarma.core.search import Search
 
 search = Search(query="ask")
 with requests.Session() as session:
@@ -257,7 +257,7 @@ Search users.
 
 ```python
 import requests
-from knewkarma._core.search import Search
+from knewkarma.core.search import Search
 
 search = Search(query="john")
 with requests.Session() as session:
@@ -293,7 +293,7 @@ Gets a subreddit's profile data.
 
 ```python
 import requests
-from knewkarma._core.subreddit import Subreddit
+from knewkarma.core.subreddit import Subreddit
 
 subreddit = Subreddit(name="AskScience")
 with requests.Session() as session:
@@ -311,7 +311,7 @@ Gets a subreddit's wiki pages.
 
 ```python
 import requests
-from knewkarma._core.subreddit import Subreddit
+from knewkarma.core.subreddit import Subreddit
 
 subreddit = Subreddit(name="MachineLearning")
 with requests.Session() as session:
@@ -329,7 +329,7 @@ Gets a subreddit's specified wiki page data.
 
 ```python
 import requests
-from knewkarma._core.subreddit import Subreddit
+from knewkarma.core.subreddit import Subreddit
 
 subreddit = Subreddit(name="MachineLearning")
 with requests.Session() as session:
@@ -347,7 +347,7 @@ Gets a subreddit's posts.
 
 ```python
 import requests
-from knewkarma._core.subreddit import Subreddit
+from knewkarma.core.subreddit import Subreddit
 
 subreddit = Subreddit(name="MachineLearning")
 with requests.Session() as session:
@@ -367,7 +367,7 @@ Gets posts that contain a specified keyword from a subreddit.
 
 ```python
 import requests
-from knewkarma._core.subreddit import Subreddit
+from knewkarma.core.subreddit import Subreddit
 
 subreddit = Subreddit(name="AskScience")
 with requests.Session() as session:
@@ -393,7 +393,7 @@ Gets all subreddits.
 
 ```python
 import requests
-from knewkarma._core.subreddits import Subreddits
+from knewkarma.core.subreddits import Subreddits
 
 with requests.Session() as session:
     all_subreddits = Subreddits.all(limit=500, session=session)
@@ -412,7 +412,7 @@ Gets default subreddits.
 
 ```python
 import requests
-from knewkarma._core.subreddits import Subreddits
+from knewkarma.core.subreddits import Subreddits
 
 with requests.Session() as session:
     default_subreddits = Subreddits.default(limit=20, session=session)
@@ -431,7 +431,7 @@ Gets new subreddits.
 
 ```python
 import requests
-from knewkarma._core.subreddits import Subreddits
+from knewkarma.core.subreddits import Subreddits
 
 with requests.Session() as session:
     new_subreddits = Subreddits.new(limit=50, session=session)
@@ -451,7 +451,7 @@ Gets popular subreddits.
 
 ```python
 import requests
-from knewkarma._core.subreddits import Subreddits
+from knewkarma.core.subreddits import Subreddits
 
 with requests.Session() as session:
     popular_subreddits = Subreddits.popular(limit=100, session=session)
@@ -486,7 +486,7 @@ Check if a user exists.
 
 ```python
 import requests
-from knewkarma._core.user import User
+from knewkarma.core.user import User
 
 user = User(username="AutoModerator")
 with requests.Session() as session:
@@ -505,7 +505,7 @@ Gets a user's profile data.
 
 ```python
 import requests
-from knewkarma._core.user import User
+from knewkarma.core.user import User
 
 user = User(username="AutoModerator")
 with requests.Session() as session:
@@ -523,7 +523,7 @@ Gets a user's posts.
 
 ```python
 import requests
-from knewkarma._core.user import User
+from knewkarma.core.user import User
 
 user = User(username="AutoModerator")
 with requests.Session() as session:
@@ -543,7 +543,7 @@ Gets a user's comments.
 
 ```python
 import requests
-from knewkarma._core.user import User
+from knewkarma.core.user import User
 
 user = User(username="AutoModerator")
 with requests.Session() as session:
@@ -563,7 +563,7 @@ Gets a user's most recent comments.
 
 ```python
 import requests
-from knewkarma._core.user import User
+from knewkarma.core.user import User
 
 user = User(username="AutoModerator")
 with requests.Session() as session:
@@ -583,7 +583,7 @@ Search user comments that match the query string.
 
 ```python
 import requests
-from knewkarma._core.user import User
+from knewkarma.core.user import User
 
 user = User(username="AutoModerator")
 with requests.Session() as session:
@@ -603,7 +603,7 @@ Search user posts that match the query string.
 
 ```python
 import requests
-from knewkarma._core.user import User
+from knewkarma.core.user import User
 
 user = User(username="AutoModerator")
 with requests.Session() as session:
@@ -623,7 +623,7 @@ Gets subreddits moderated by the user.
 
 ```python
 import requests
-from knewkarma._core.user import User
+from knewkarma.core.user import User
 
 user = User(username="JanelleMonae")
 with requests.Session() as session:
@@ -643,7 +643,7 @@ Gets a user's top n subreddits based on subreddit frequency in *n* posts.
 
 ```python
 import requests
-from knewkarma._core.user import User
+from knewkarma.core.user import User
 
 user = User(username="JanelleMonae")
 with requests.Session() as session:
@@ -672,7 +672,7 @@ Gets all users.
 
 ```python
 import requests
-from knewkarma._core.users import Users
+from knewkarma.core.users import Users
 
 with requests.Session() as session:
     all_users = Users.all(limit=50, session=session)
@@ -691,7 +691,7 @@ Gets new users.
 
 ```python
 import requests
-from knewkarma._core.users import Users
+from knewkarma.core.users import Users
 
 with requests.Session() as session:
     new_users = Users.new(limit=100, session=session)
@@ -710,7 +710,7 @@ Gets popular users.
 
 ```python
 import requests
-from knewkarma._core.users import Users
+from knewkarma.core.users import Users
 
 with requests.Session() as session:
     popular_users = Users.popular(limit=200, session=session)

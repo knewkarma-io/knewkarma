@@ -4,9 +4,9 @@ import typing as t
 from dotenv import load_dotenv
 from rich.prompt import Prompt
 
-from tools import colours
-from tools.io_handlers import FileHandler
-from tools.log_config import logger
+from .io_handlers import FileHandler
+from ..konsole import colours
+from ..konsole.logging import logger
 
 
 class AuthHandler:
@@ -34,7 +34,7 @@ class AuthHandler:
 
         if client_id and client_secret:
             logger.info(
-                f"{colours.BOLD_GREEN}✔{colours.BOLD_GREEN_RESET} Successfully loaded credentials from environment."
+                f"{colours.BOLD_BLUE}＊{colours.BOLD_BLUE_RESET} Successfully loaded credentials from environment."
             )
             return {"client_id": client_id, "client_secret": client_secret}
         else:

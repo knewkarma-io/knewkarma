@@ -2,13 +2,12 @@ import typing as t
 from collections import Counter
 from logging import Logger
 
-from praw.models import Submission, Redditor
+from praw.models import Submission, Redditor, Comment, Subreddit
 from rich.status import Status
 
-from engines.karmakaze.schemas import Comment, Subreddit
-from tools import colours
-from tools.rich_render import RichRender
-from ..config.client import reddit, LISTINGS
+from karmakrate.konsole import colours
+from karmakrate.konsole.renderer import Render
+from .client import reddit, LISTINGS
 
 
 class User:
@@ -114,7 +113,7 @@ class User:
                     zip(subreddit_names, subreddit_frequencies)
                 )
 
-                RichRender.bar_chart(
+                Render.bar_chart(
                     data=data,
                     title=f"top {top_n}/{len(posts)} subreddits analysis",
                     x_label="Subreddits",

@@ -2,10 +2,10 @@ import typing as t
 from logging import Logger
 
 import requests
+from praw.models import Subreddit
 from rich.status import Status
 
-from engines.karmakaze.schemas import Subreddit
-from knewkarma.config.client import reddit
+from .client import reddit
 
 
 class Subreddits:

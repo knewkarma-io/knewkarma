@@ -6,8 +6,8 @@ from praw.models.reddit.subreddit import SubredditWiki
 from prawcore import exceptions
 from rich.status import Status
 
-from tools import colours
-from ..config.client import reddit, TIME_FILTERS, SORT, LISTINGS
+from karmakrate.konsole import colours
+from .client import reddit, TIME_FILTERS, SORT, LISTINGS
 
 
 class Subreddit:

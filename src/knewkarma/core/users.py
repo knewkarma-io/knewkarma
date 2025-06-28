@@ -2,10 +2,10 @@ import typing as t
 from logging import Logger
 
 import requests
+from praw.models import Redditor
 from rich.status import Status
 
-from engines.karmakaze.schemas import User
-from knewkarma.config.client import reddit
+from .client import reddit
 
 
 class Users:
@@ -18,7 +18,7 @@ class Users:
         limit: int,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
-    ) -> t.List[User]:
+    ) -> t.List[Redditor]:
         """
         Get new users.
 
@@ -53,7 +53,7 @@ class Users:
         limit: int,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
-    ) -> t.List[User]:
+    ) -> t.List[Redditor]:
         """
         Get popular users.
 
@@ -88,7 +88,7 @@ class Users:
         limit: int,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
-    ) -> t.List[User]:
+    ) -> t.List[Redditor]:
         """
         Get all users.
 

@@ -37,15 +37,15 @@ sphinx = "^7.4.7"
 sphinx-rtd-theme = "^2.0.0"
 
 [tool.poetry.scripts]
-rauth = "knewkarma._cli.commands:auth"
-ruser = "knewkarma._cli.commands:user"
-rusers = "knewkarma._cli.commands:cmd_users"
-rsubreddit = "knewkarma._cli.commands:subreddit"
-rsubreddits = "knewkarma._cli.commands:cmd_subreddits"
-rsearch = "knewkarma._cli.commands:cmd_search"
-rpost = "knewkarma._cli.commands:cmd_post"
-rposts = "knewkarma._cli.commands:cmd_posts"
-knewkarma = "knewkarma._cli.commands:cli"
+rauth = "knewkarma.cli.commands:auth"
+ruser = "knewkarma.cli.commands:user"
+rusers = "knewkarma.cli.commands:cmd_users"
+rsubreddit = "knewkarma.cli.commands:subreddit"
+rsubreddits = "knewkarma.cli.commands:cmd_subreddits"
+rsearch = "knewkarma.cli.commands:cmd_search"
+rpost = "knewkarma.cli.commands:post"
+rposts = "knewkarma.cli.commands:cmd_posts"
+knewkarma = "knewkarma.cli.commands:cli"
 
 [build-system]
 requires = ["poetry-core"]

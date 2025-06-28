@@ -2,10 +2,10 @@ import typing as t
 from logging import Logger
 
 import requests
+from praw.models import Submission
 from rich.status import Status
 
-from engines.karmakaze.schemas import Post
-from knewkarma.config.client import reddit
+from .client import reddit
 
 
 class Posts:
@@ -18,7 +18,7 @@ class Posts:
         limit: int,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
-    ) -> t.List[Post]:
+    ) -> t.List[Submission]:
         """
         Gets best posts.
 
@@ -54,7 +54,7 @@ class Posts:
         limit: int,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
-    ) -> t.List[Post]:
+    ) -> t.List[Submission]:
         """
         Gets controversial posts.
 
@@ -90,7 +90,7 @@ class Posts:
         limit: int,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
-    ) -> t.List[Post]:
+    ) -> t.List[Submission]:
         """
         Gets front-page posts.
 
@@ -127,7 +127,7 @@ class Posts:
         limit: int,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
-    ) -> t.List[Post]:
+    ) -> t.List[Submission]:
         """
         Gets new posts.
 
@@ -164,7 +164,7 @@ class Posts:
         limit: int,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
-    ) -> t.List[Post]:
+    ) -> t.List[Submission]:
         """
         Gets top posts.
 
@@ -200,7 +200,7 @@ class Posts:
         limit: int,
         status: t.Optional[Status] = None,
         logger: t.Optional[Logger] = None,
-    ) -> t.List[Post]:
+    ) -> t.List[Submission]:
         """
         Gets rising posts.
 
