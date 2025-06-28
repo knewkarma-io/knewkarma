@@ -8,7 +8,7 @@ from praw.models import Submission, Redditor, Comment
 from praw.models.reddit.subreddit import WikiPage, Subreddit
 from rich.status import Status
 
-from ..konsole.logging import logger
+from ..riches.rich_logging import console
 
 __all__ = ["FileHandler", "DataFrameHandler"]
 
@@ -150,7 +150,7 @@ class DataFrameHandler:
                 file_mapping[file_format]()
 
                 # Log export status
-                logger.info(
+                console.log(
                     f"{FileHandler.get_file_size(file_path=filepath)} written to [link file://{filepath}]{filepath}"
                 )
 
@@ -222,7 +222,7 @@ class FileHandler:
             elif isinstance(directories, str):
                 os.makedirs(name=directories, exist_ok=True)
         except Exception as unexpected_error:
-            logger.exception(unexpected_error)
+            console.log(unexpected_error)
 
 
 # -------------------------------- END ----------------------------------------- #

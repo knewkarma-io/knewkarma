@@ -3,9 +3,9 @@ import typing as t
 
 import rich_click as click
 
+from karmakrate.everything.runtime_things import RuntimeThings
 from karmakrate.handlers.auth_handler import AuthHandler
-from karmakrate.konsole.logging import console
-from karmakrate.runtime.calls import RuntimeCalls
+from karmakrate.riches.rich_logging import console
 from .main import run
 from ..core.client import LISTINGS, SORT, TIME_FILTERS
 from ..core.post import Post
@@ -104,7 +104,7 @@ def help_callback(ctx: click.Context, _, value: bool):
 
     if value and not ctx.resilient_parsing:
         click.echo(ctx.get_help())
-        if RuntimeCalls.is_snap_package():
+        if RuntimeThings.is_snap_package():
             click.pause()
         ctx.exit()
 
@@ -264,29 +264,26 @@ def cmd_posts(
         "best": lambda session, status, logger: Posts.best(
             limit=limit,
             status=status,
-            logger=logger,
             session=session,
         ),
         "controversial": lambda session, status, logger: Posts.controversial(
             limit=limit,
             status=status,
-            logger=logger,
             session=session,
         ),
         "front_page": lambda session, status, logger: Posts.front_page(
-            limit=limit, status=status, logger=logger, session=session
+            limit=limit, status=status, session=session
         ),
         "new": lambda session, status, logger: Posts.new(
-            limit=limit, status=status, logger=logger, session=session
+            limit=limit, status=status, session=session
         ),
         "top": lambda session, status, logger: Posts.top(
             limit=limit,
             status=status,
-            logger=logger,
             session=session,
         ),
         "rising": lambda session, status, logger: Posts.rising(
-            limit=limit, status=status, logger=logger, session=session
+            limit=limit, status=status, session=session
         ),
     }
 
@@ -340,13 +337,13 @@ def cmd_search(
     )
     method_map: t.Dict = {
         "posts": lambda session, status, logger: search.posts(
-            limit=limit, status=status, logger=logger, session=session
+            limit=limit, status=status, session=session
         ),
         "subreddits": lambda session, status, logger: search.subreddits(
-            limit=limit, logger=logger, session=session, status=status
+            limit=limit, session=session, status=status
         ),
         "users": lambda session, status, logger: search.users(
-            limit=limit, status=status, logger=logger, session=session
+            limit=limit, status=status, session=session
         ),
     }
 
@@ -400,20 +397,16 @@ def user(
     r_user = User(username=username)
     method_map: t.Dict = {
         "comments": lambda status, logger: r_user.comments(
-            limit=limit, listing=listing, status=status, logger=logger
+            limit=limit, listing=listing, status=status
         ),
-        "moderated": lambda status, logger: r_user.moderated(
-            status=status, logger=logger
-        ),
-        "overview": lambda status, logger: r_user.overview(
-            status=status, logger=logger
-        ),
+        "moderated": lambda status, logger: r_user.moderated(status=status),
+        "overview": lambda status, logger: r_user.overview(status=status),
         "posts": lambda status, logger: r_user.posts(
-            limit=limit, listing=listing, status=status, logger=logger
+            limit=limit, listing=listing, status=status
         ),
-        "profile": lambda status, logger: r_user.profile(status=status, logger=logger),
+        "profile": lambda status, logger: r_user.profile(status=status),
         "top_subreddits": lambda status, logger: r_user.top_subreddits(
-            top_n=top_subreddits, status=status, logger=logger
+            top_n=top_subreddits, status=status
         ),
     }
 
@@ -469,19 +462,16 @@ def cmd_users(ctx: click.Context, _all: bool, new: bool, popular: bool):
 
     method_map: t.Dict = {
         "all": lambda session, status, logger: Users.all(
-            logger=logger,
             session=session,
             limit=limit,
             status=status,
         ),
         "new": lambda session, status, logger: Users.new(
-            logger=logger,
             session=session,
             limit=limit,
             status=status,
         ),
         "popular": lambda session, status, logger: Users.popular(
-            logger=logger,
             session=session,
             limit=limit,
             status=status,
@@ -528,25 +518,20 @@ def subreddit(
     r_subreddit = Subreddit(display_name=display_name)
     method_map = {
         "comments": lambda status, logger: r_subreddit.comments(
-            limit=limit, status=status, logger=logger
+            limit=limit, status=status
         ),
         "posts": lambda status, logger: r_subreddit.posts(
-            limit=limit, listing=listing, status=status, logger=logger
+            limit=limit, listing=listing, status=status
         ),
-        "profile": lambda status, logger: r_subreddit.profile(
-            status=status, logger=logger
-        ),
+        "profile": lambda status, logger: r_subreddit.profile(status=status),
         "search": lambda status, logger: r_subreddit.search(
             query=search,
             limit=limit,
             sort=sort,
             time_filter=time_filter,
             status=status,
-            logger=logger,
         ),
-        "wiki_pages": lambda status, logger: r_subreddit.wiki_pages(
-            status=status, logger=logger
-        ),
+        "wiki_pages": lambda status, logger: r_subreddit.wiki_pages(status=status),
     }
     run(
         ctx=ctx,
@@ -612,16 +597,15 @@ def cmd_subreddits(
             limit=limit,
             session=session,
             status=status,
-            logger=logger,
         ),
         "default": lambda session, status, logger: Subreddits.default(
             limit=limit, session=session, status=status
         ),
         "new": lambda session, status, logger: Subreddits.new(
-            limit=limit, logger=logger, session=session, status=status
+            limit=limit, session=session, status=status
         ),
         "popular": lambda session, status, logger: Subreddits.popular(
-            limit=limit, logger=logger, session=session, status=status
+            limit=limit, session=session, status=status
         ),
     }
 

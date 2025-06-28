@@ -1,12 +1,12 @@
 import typing as t
 from collections import Counter
-from logging import Logger
 
 from praw.models import Submission, Redditor, Comment, Subreddit
 from rich.status import Status
 
-from karmakrate.konsole import colours
-from karmakrate.konsole.renderer import Render
+from karmakrate.riches import rich_colours
+from karmakrate.riches.rich_logging import console
+from karmakrate.riches.rich_render import Render
 from .client import reddit, LISTINGS
 
 
@@ -18,11 +18,10 @@ class User:
     def comments(
         self,
         limit: int,
-        status: Status,
-        logger: Logger,
         listing: LISTINGS,
+        status: t.Optional[Status] = None,
     ) -> t.Union[t.List[Comment], None]:
-        if self.exists(status=status, logger=logger):
+        if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(
                     f"Getting {limit} {listing} comments from u/{self._username}..."
@@ -35,11 +34,11 @@ class User:
             return None
 
     def moderated(
-        self, status: Status, logger: Logger
+        self, status: t.Optional[Status] = None
     ) -> t.Union[t.List[Subreddit], None]:
-        if self.exists(status=status, logger=logger):
+        if self.exists(status=status):
             if isinstance(status, Status):
-                self.exists(status=status, logger=logger)
+                self.exists(status=status)
 
                 status.update(
                     f"Getting moderated subreddits from u/{self._username}..."
@@ -50,9 +49,10 @@ class User:
             return None
 
     def overview(
-        self, status: Status, logger: Logger
+        self,
+        status: t.Optional[Status] = None,
     ) -> t.Union[t.List[Comment], None]:
-        if self.exists(status=status, logger=logger):
+        if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(f"Getting recent comments from u/{self._username}...")
 
@@ -64,11 +64,10 @@ class User:
     def posts(
         self,
         limit: t.Optional[int],
-        status: Status,
-        logger: Logger,
         listing: LISTINGS,
+        status: t.Optional[Status] = None,
     ) -> t.Union[t.List[Submission], None]:
-        if self.exists(status=status, logger=logger):
+        if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(
                     f"Getting {limit} {listing} posts from u/{self._username}..."
@@ -79,8 +78,11 @@ class User:
         else:
             return None
 
-    def profile(self, status: Status, logger: Logger) -> t.Union[Redditor, None]:
-        if self.exists(status=status, logger=logger):
+    def profile(
+        self,
+        status: t.Optional[Status] = None,
+    ) -> t.Union[Redditor, None]:
+        if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(f"Getting profile info from u/{self._username}...")
 
@@ -89,9 +91,13 @@ class User:
         else:
             return None
 
-    def top_subreddits(self, top_n: int, status: Status, logger: Logger):
-        if self.exists(status=status, logger=logger):
-            posts = self.posts(status=status, logger=logger, limit=None, listing="top")
+    def top_subreddits(
+        self,
+        top_n: int,
+        status: t.Optional[Status] = None,
+    ):
+        if self.exists(status=status):
+            posts = self.posts(status=status, limit=None, listing="top")
 
             if posts:
                 # Extract subreddit names
@@ -120,7 +126,10 @@ class User:
                     y_label="Frequency",
                 )
 
-    def exists(self, status: Status, logger: Logger) -> bool:
+    def exists(
+        self,
+        status: t.Optional[Status] = None,
+    ) -> bool:
         if isinstance(status, Status):
             status.update(f"Checking user availability...")
 
@@ -128,14 +137,13 @@ class User:
             True if not reddit.username_available(name=self._username) else False
         )
 
-        if isinstance(logger, Logger):
-            if verdict:
-                logger.warning(
-                    f"{colours.BOLD_GREEN}✔{colours.BOLD_GREEN_RESET} Username exists"
-                )
+        if verdict:
+            console.print(
+                f"{rich_colours.BOLD_GREEN}✔{rich_colours.BOLD_GREEN_RESET} {self._username} is a real user"
+            )
 
-            elif not verdict:
-                logger.info(
-                    f"{colours.BOLD_YELLOW}✘{colours.BOLD_YELLOW_RESET} Username does not exist"
-                )
+        elif not verdict:
+            console.print(
+                f"{rich_colours.BOLD_YELLOW}✘{rich_colours.BOLD_YELLOW_RESET} {self._username} is not a real user"
+            )
         return verdict

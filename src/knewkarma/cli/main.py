@@ -8,19 +8,19 @@ import rich_click as click
 from prawcore import exceptions
 from rich.status import Status
 
+from karmakrate.everything.runtime_things import RuntimeThings
 from karmakrate.handlers.io_handlers import DataFrameHandler, FileHandler
-from karmakrate.konsole import colours
-from karmakrate.konsole.logging import console, logger
-from karmakrate.konsole.renderer import Render
-from karmakrate.runtime.calls import RuntimeCalls
+from karmakrate.riches import rich_colours
+from karmakrate.riches.rich_logging import console, logger
+from karmakrate.riches.rich_render import Render
 from ..meta.about import Project
 from ..meta.version import Version
 
 __all__ = ["run"]
 
-NORMAL_ERROR_PREFIX: str = f"{colours.RED}⚠{colours.RED_RESET}"
-CRITICAL_ERROR_PREFIX: str = f"{colours.BOLD_RED}⚠{colours.BOLD_RED_RESET}"
-WARNING_PREFIX: str = f"{colours.BOLD_YELLOW}⚠{colours.BOLD_YELLOW_RESET}"
+NORMAL_ERROR_PREFIX: str = f"{rich_colours.RED}⚠{rich_colours.RED_RESET}"
+CRITICAL_ERROR_PREFIX: str = f"{rich_colours.BOLD_RED}⚠{rich_colours.BOLD_RED_RESET}"
+WARNING_PREFIX: str = f"{rich_colours.BOLD_YELLOW}⚠{rich_colours.BOLD_YELLOW_RESET}"
 
 
 def invoke_method(
@@ -115,14 +115,16 @@ def route_to_method(
     :type kwargs: Union[str, int, bool]
 
     Side Effects:
-        - Prints status updates and errors to the konsole.
+        - Prints status updates and errors to the riches.
         - Displays a license notice.
         - Performs data export if applicable.
         - Logs execution details and exceptions.
 
     If no valid argument is provided, prints command usage help.
     """
-    runtime_calls = RuntimeCalls(package_name=Project.package, version_cls=Version)
+    runtime_operations = RuntimeThings(
+        package_name=Project.package, version_cls=Version
+    )
 
     is_valid_arg: bool = False
 
@@ -131,24 +133,19 @@ def route_to_method(
             is_valid_arg = True
             start_time: datetime = datetime.now()
             try:
-                runtime_calls.clear_screen()
+                runtime_operations.clear_screen()
                 with Status(
                     status=f"Starting",
                     console=console,
                 ) as status:
                     with requests.Session() as session:
-                        runtime_calls.check_updates(session=session, status=status)
-                        runtime_calls.infra_status(
-                            session=session,
-                            status=status,
-                            logger=logger,
-                        )
+                        runtime_operations.check_updates(session=session, status=status)
+                        runtime_operations.infra_status(session=session, status=status)
                         status.update(f"Initialising {ctx.command.name} module...")
 
                     invoke_method(
                         method=method,
                         status=status,
-                        logger=logger,
                         ctx=ctx,
                         export=export,
                         argument=argument,
@@ -178,15 +175,14 @@ def route_to_method(
                     f"{CRITICAL_ERROR_PREFIX} An unexpected error occurred: {error}"
                 )
             finally:
-                elapsed_time = datetime.now() - start_time
                 console.print(
-                    f":keyboard: {colours.BOLD_BLUE}[link=https://github.com/{Project.package}-io]GitHub[/link]{colours.BOLD_BLUE_RESET}"
+                    f":keyboard: {rich_colours.BOLD_BLUE}[link=https://github.com/{Project.package}-io]GitHub[/link]{rich_colours.BOLD_BLUE_RESET}"
                     " | "
-                    f":books: {colours.BOLD_BLUE}[link=https://{Project.package}.readthedocs.io]Documentation[/link]{colours.BOLD_BLUE_RESET}"
+                    f":books: {rich_colours.BOLD_BLUE}[link=https://{Project.package}.readthedocs.io]Documentation[/link]{rich_colours.BOLD_BLUE_RESET}"
                     " | "
-                    f":black_heart: {colours.BOLD_BLUE}[link=https://opencollective.com/{Project.package}]Become a Sponsor[/link]{colours.BOLD_BLUE_RESET}",
+                    f":black_heart: {rich_colours.BOLD_BLUE}[link=https://opencollective.com/{Project.package}]Become a Sponsor[/link]{rich_colours.BOLD_BLUE_RESET}",
                     justify="center",
-                    style=colours.BOLD_WHITE.strip("[,]"),
+                    style=rich_colours.BOLD_WHITE.strip("[,]"),
                 )
 
     if not is_valid_arg:

@@ -1,6 +1,6 @@
 from datetime import date
 
-from karmakrate.konsole import colours
+from karmakrate.riches import rich_colours
 from .about import Author, Project
 
 __all__ = ["License"]
@@ -569,16 +569,16 @@ class License:
 """
 
     notice: str = f"""
-{_project.name} {Version.release} Copyright © {_current_year} {colours.BOLD_BLUE}[link={_author.gravatar}]{_author.name}[/link]{colours.BOLD_BLUE_RESET}
+{_project.name} {Version.release} Copyright © {_current_year} {rich_colours.BOLD_BLUE}[link={_author.gravatar}]{_author.name}[/link]{rich_colours.BOLD_BLUE_RESET}
 
-This program comes with [bold]ABSOLUTELY NO WARRANTY[/]; for details, use {colours.BLUE}licence -w/--warranty{colours.BLUE_RESET}.
+This program comes with [bold]ABSOLUTELY NO WARRANTY[/]; for details, use {rich_colours.BLUE}licence -w/--warranty{rich_colours.BLUE_RESET}.
 This is free software, and you are welcome to redistribute it
-[bold]UNDER CERTAIN CONDITIONS[/]; use {colours.BLUE}license -c/--conditions{colours.BLUE_RESET} for details.
+[bold]UNDER CERTAIN CONDITIONS[/]; use {rich_colours.BLUE}license -c/--conditions{rich_colours.BLUE_RESET} for details.
 """
 
     warranty: str = f"""
 Reddit-data analysis toolkit.
-Copyright © {_current_year} {colours.BOLD_BLUE}[link={_author.gravatar}]{_author.name}[/link]{colours.BOLD_BLUE_RESET}
+Copyright © {_current_year} {rich_colours.BOLD_BLUE}[link={_author.gravatar}]{_author.name}[/link]{rich_colours.BOLD_BLUE_RESET}
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,19 +1,22 @@
 import os
 import subprocess
 import typing as t
-from logging import Logger
 
+import packaging.version
 import requests
 from rich.status import Status
 
-from karmakrate.konsole import colours
+from karmakrate.everything.human_things import HumanThings
 from knewkarma.core.client import USER_AGENT
+from knewkarma.meta.about import Project
 from knewkarma.meta.version import Version
+from ..riches import rich_colours
+from ..riches.rich_logging import console
 
-__all__ = ["RuntimeCalls"]
+__all__ = ["RuntimeThings"]
 
 
-class RuntimeCalls:
+class RuntimeThings:
     ENDPOINTS = {
         "status": "https://www.redditstatus.com/api/v2/status.json",
         "components": "https://www.redditstatus.com/api/v2/components.json",
@@ -42,7 +45,6 @@ class RuntimeCalls:
     def infra_status(
         self,
         session: requests.Session,
-        logger: Logger,
         status: Status,
     ) -> t.Union[t.List[t.Dict], None]:
 
@@ -57,20 +59,12 @@ class RuntimeCalls:
         description = status_response.get("status").get("description")
         if description:
             if indicator == "none":
-                description = (
-                    f"{colours.BOLD_GREEN}✔{colours.BOLD_GREEN_RESET} {description}"
-                )
-                (
-                    logger.info(description)
-                    if isinstance(logger, Logger)
-                    else print(description.strip("[,]./,bold,green"))
+                console.print(
+                    f"{rich_colours.BOLD_GREEN}✔{rich_colours.BOLD_GREEN_RESET} {description}"
                 )
             else:
-                status_message = f"{colours.BOLD_YELLOW}✘{colours.BOLD_YELLOW_RESET} {description} ({colours.YELLOW}{indicator}{colours.YELLOW_RESET})"
-                (
-                    logger.warning(status_message)
-                    if isinstance(logger, Logger)
-                    else print(status_message.strip("[,],/,bold,yellow"))
+                console.log(
+                    f"{rich_colours.BOLD_YELLOW}✘{rich_colours.BOLD_YELLOW_RESET} {description} ({rich_colours.YELLOW}{indicator}{rich_colours.YELLOW_RESET})"
                 )
 
                 if isinstance(status, Status):
@@ -92,52 +86,38 @@ class RuntimeCalls:
         session: requests.Session,
         status: Status,
     ):
-        from ..konsole.logging import logger
+        package_name = Project.package
+        local_version = Version.full_version
 
         if isinstance(status, Status):
             status.update("Checking for updates...")
 
-        # Make a GET request to GitHub to get the project's latest release.
         response = self.send_request(
-            url=self.ENDPOINTS["releases"],
-            session=session,
+            url=f"https://pypi.org/pypi/{package_name}/json", session=session
         )
 
-        if response.get("tag_name"):
-            remote_version_str = response.get("tag_name")
+        latest_version = response.get("info").get("version")
+        release_date = response.get("releases")[latest_version][0]["upload_time"]
 
-            # Splitting the version strings into components
-            local_version_parts = [
-                self.version_cls.major[0],
-                self.version_cls.minor[0],
-                self.version_cls.patch[0],
-            ]
-            remote_version_parts: t.List = remote_version_str.split(".")
+        local_ver = packaging.version.parse(local_version)
+        latest_ver = packaging.version.parse(latest_version)
 
-            local_major: int = local_version_parts[0]
-            local_minor: int = local_version_parts[1]
-            local_patch: int = local_version_parts[2]
+        if local_ver < latest_ver:
+            message = (
+                f"🡅 Update available: v{local_version} → v{latest_version} "
+                f"(released {HumanThings.human_datetime(inhuman_datetime=release_date)})"
+            )
+        elif local_ver > latest_ver:
+            message = (
+                f"You are running a newer version of {package_name} (v{local_version}) "
+                f"than what's on PyPI (v{latest_version}, "
+                f"released {HumanThings.human_datetime(inhuman_datetime=release_date, show_clock=False)}). "
+                f"This may be an internal or unreleased build."
+            )
+        else:
+            message = f"{rich_colours.BOLD_GREEN}✔{rich_colours.BOLD_GREEN_RESET} up to date (v{local_version})."
 
-            remote_major = int(remote_version_parts[0])
-            remote_minor = int(remote_version_parts[1])
-            remote_patch = int(remote_version_parts[2])
-
-            update_level = ""
-
-            # Check for differences in version parts
-            if remote_major != local_major:
-                update_level = f"{colours.BOLD_RED}{self.version_cls.major[1]}{colours.BOLD_RED_RESET}"
-
-            elif remote_minor != local_minor:
-                update_level = f"{colours.BOLD_YELLOW}{self.version_cls.minor[1]}{colours.BOLD_YELLOW_RESET}"
-
-            elif remote_patch != local_patch:
-                update_level = f"{colours.BOLD_GREEN}{self.version_cls.patch[1]}{colours.BOLD_GREEN_RESET}"
-
-            if update_level:
-                logger.info(
-                    f"🡅 {update_level} update is available [{colours.CYAN}{remote_version_str}{colours.CYAN_RESET}]"
-                )
+        console.print(message, justify="center" if local_ver > latest_ver else "left")
 
     @staticmethod
     def is_docker_container() -> bool:

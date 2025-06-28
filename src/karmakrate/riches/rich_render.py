@@ -1,5 +1,4 @@
 import typing as t
-from datetime import datetime, timezone
 
 from praw.models import Submission, Redditor, Comment, WikiPage
 from praw.models.reddit.subreddit import Subreddit
@@ -11,10 +10,13 @@ from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
 
-from . import colours
-from .logging import console
+from . import rich_colours
+from .rich_logging import console
+from ..everything.human_things import HumanThings
 
 __all__ = ["Render"]
+
+
 BASE_URL: str = "https://reddit.com/"
 
 
@@ -107,7 +109,7 @@ class Render:
             table.add_row(
                 *[
                     Text.from_markup(
-                        f"{colours.BOLD}{value}{colours.RESET}\n[dim]{label}[/]"
+                        f"{rich_colours.BOLD}{value}{rich_colours.RESET}\n[dim]{label}[/]"
                     )
                     for label, value in footer_data.items()
                 ]
@@ -117,100 +119,38 @@ class Render:
 
         return None
 
-    @classmethod
-    def _timestamp_to_relative(cls, unix_timestamp: float) -> str:
-        """
-        Converts a UNIX timestamp to relative time format.
-
-        Examples:
-            - Just now
-            - 2m ago
-            - 3hr ago
-            - 5d ago
-            - 2wk ago
-            - 4mo ago
-            - 1yr ago
-        """
-        now = datetime.now(timezone.utc)
-        then = datetime.fromtimestamp(unix_timestamp, tz=timezone.utc)
-        delta = now - then
-        seconds = int(delta.total_seconds())
-
-        if seconds < 0:
-            return "Just now"  # Reddit doesn’t display "in X minutes"
-
-        minute = 60
-        hour = 60 * minute
-        day = 24 * hour
-        week = 7 * day
-        month = 30 * day  # approx
-        year = 365 * day  # approx
-
-        if seconds < minute:
-            return "Just now"
-        elif seconds < hour:
-            relative_time = f"{seconds // minute}min ago"
-        elif seconds < day:
-            relative_time = f"{seconds // hour}hr ago"
-        elif seconds < week:
-            relative_time = f"{seconds // day}d ago"
-        elif seconds < month:
-            relative_time = f"{seconds // week}wk ago"
-        elif seconds < year:
-            relative_time = f"{seconds // month}mo ago"
-        else:
-            relative_time = f"{seconds // year}yr ago"
-
-        return f"{colours.GREY}⏲ {relative_time}{colours.RESET}"
-
-    @classmethod
-    def _number_to_relative(cls, number: t.Union[int, float]):
-        """
-        Format a number using abbreviations like k, M, B, etc.
-        """
-        if number >= 1_000_000_000_000:
-            return f"{number / 1_000_000_000_000:.1f}T"
-        if number >= 1_000_000_000:
-            return f"{number / 1_000_000_000:.1f}B"
-        elif number >= 1_000_000:
-            return f"{number / 1_000_000:.1f}M"
-        elif number >= 1_000:
-            return f"{number / 1_000:.1f}K"
-        else:
-            return str(number)
-
     @staticmethod
     def _set_item_url(url: str) -> str:
-        return f"{colours.BOLD_BLUE}[link={url}]View on Reddit[/link]{colours.BOLD_BLUE_RESET}"
+        return f"{rich_colours.BOLD_BLUE}[link={url}]View on Reddit[/link]{rich_colours.BOLD_BLUE_RESET}"
 
     @classmethod
     def _user(cls, data: Redditor, print_panel: bool = True):
         subreddit = getattr(data, "subreddit")
-        is_suspended = getattr(data, "is_suspended")
+        is_suspended = hasattr(data, "is_suspended")
 
         if is_suspended:
             return None
 
         header_content = (
-            f"{colours.BOLD}{colours.POWDER_BLUE}{data.name}{colours.RESET}{colours.RESET} "
-            f"· {cls._timestamp_to_relative(unix_timestamp=0 if is_suspended else data.created)}\n"
-            f"{colours.GREY}{subreddit.display_name_prefixed}{colours.RESET}"
+            f"{rich_colours.BOLD}{rich_colours.POWDER_BLUE}{data.name}{rich_colours.RESET}{rich_colours.RESET} "
+            f"· {HumanThings.human_datetime(inhuman_datetime=0 if is_suspended else data.created)}\n"
+            f"{rich_colours.GREY}{subreddit.display_name_prefixed}{rich_colours.RESET}"
         )
 
         if subreddit.over_18:
-            header_content = (
-                f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
-            )
+            header_content = f"{rich_colours.BOLD_RED}NSFW{rich_colours.BOLD_RED_RESET} · {header_content}"
 
         footer_data = {
-            "Post Karma": cls._number_to_relative(
-                number=0 if is_suspended else data.link_karma
+            "Post Karma": HumanThings.human_number(
+                inhuman_number=0 if is_suspended else data.link_karma
             ),
-            "Comment Karma": cls._number_to_relative(
-                number=0 if is_suspended else data.comment_karma
+            "Comment Karma": HumanThings.human_number(
+                inhuman_number=0 if is_suspended else data.comment_karma
             ),
-            "Total Karma": cls._number_to_relative(
-                number=0 if is_suspended else data.link_karma + data.comment_karma
+            "Total Karma": HumanThings.human_number(
+                inhuman_number=(
+                    0 if is_suspended else data.link_karma + data.comment_karma
+                )
             ),
         }
 
@@ -263,7 +203,7 @@ class Render:
         )
         permalink: str = getattr(data, "permalink", "")
         created: int = 0 if getattr(data, "created", None) is None else data.created
-        score = cls._number_to_relative(number=data.score)
+        score = HumanThings.human_number(inhuman_number=data.score)
         data.replies.replace_more(limit=None)  # Expand all 'MoreComments'
         all_replies = data.replies.list()  # Flatten and get all replies as a list
         awards: list = getattr(data, "all_awardings", [])
@@ -275,17 +215,17 @@ class Render:
 
         text: str = "\n\n".join(panel_parts)
         header_content: str = (
-            f"{colours.BOLD}{colours.POWDER_BLUE}{subreddit}{colours.RESET}{colours.RESET} · "
-            f"{cls._timestamp_to_relative(unix_timestamp=created)}\n"
-            f"{colours.GREY}{escape(author.name)}{colours.RESET}"
+            f"{rich_colours.BOLD}{rich_colours.POWDER_BLUE}{subreddit}{rich_colours.RESET}{rich_colours.RESET} · "
+            f"{HumanThings.human_datetime(inhuman_datetime=created)}\n"
+            f"{rich_colours.GREY}{escape(author.name)}{rich_colours.RESET}"
         )
 
         footer_content: str = (
-            f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" 
+            f"{rich_colours.ORANGE_RED}🡅{rich_colours.RESET} {"[dim]" 
             if score == 0 
-            else colours.POWDER_BLUE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
-            f"💬{colours.POWDER_BLUE}{cls._number_to_relative(number=len(all_replies))}{colours.RESET} "
-            f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(awards))}{colours.BOLD_YELLOW_RESET}"
+            else rich_colours.POWDER_BLUE}{score}{rich_colours.RESET} {rich_colours.SOFT_BLUE}🡇{rich_colours.RESET} "
+            f"💬{rich_colours.POWDER_BLUE}{HumanThings.human_number(inhuman_number=len(all_replies))}{rich_colours.RESET} "
+            f"{rich_colours.BOLD_YELLOW}🏆{HumanThings.human_number(inhuman_number=len(awards))}{rich_colours.BOLD_YELLOW_RESET}"
         )
 
         return cls._panel(
@@ -330,27 +270,25 @@ class Render:
 
         text: str = "\n\n".join(panel_parts)
 
-        score = cls._number_to_relative(number=data.score)
+        score = HumanThings.human_number(inhuman_number=data.score)
         header_content: str = (
-            f"{colours.BOLD}{colours.POWDER_BLUE}{subreddit_name}{colours.RESET}{colours.RESET} · "
-            f"{cls._timestamp_to_relative(unix_timestamp=0
+            f"{rich_colours.BOLD}{rich_colours.POWDER_BLUE}{subreddit_name}{rich_colours.RESET}{rich_colours.RESET} · "
+            f"{HumanThings.human_datetime(inhuman_datetime=0
             if getattr(data, "created", None) 
                is None else data.created)}\n"
-            f"{colours.GREY}{escape(author)}{colours.RESET}"
+            f"{rich_colours.GREY}{escape(author)}{rich_colours.RESET}"
         )
 
         footer_content: str = (
-            f"{colours.ORANGE_RED}🡅{colours.RESET} {"[dim]" 
+            f"{rich_colours.ORANGE_RED}🡅{rich_colours.RESET} {"[dim]" 
             if score == 0 
-            else colours.POWDER_BLUE}{score}{colours.RESET} {colours.SOFT_BLUE}🡇{colours.RESET} "
-            f"💬{colours.POWDER_BLUE}{cls._number_to_relative(number=data.num_comments)}{colours.RESET} "
-            f"{colours.BOLD_YELLOW}🏆{cls._number_to_relative(number=len(data.all_awardings))}{colours.BOLD_YELLOW_RESET}"
+            else rich_colours.POWDER_BLUE}{score}{rich_colours.RESET} {rich_colours.SOFT_BLUE}🡇{rich_colours.RESET} "
+            f"💬{rich_colours.POWDER_BLUE}{HumanThings.human_number(inhuman_number=data.num_comments)}{rich_colours.RESET} "
+            f"{rich_colours.BOLD_YELLOW}🏆{HumanThings.human_number(inhuman_number=len(data.all_awardings))}{rich_colours.BOLD_YELLOW_RESET}"
         )
 
         if data.over_18:
-            header_content = (
-                f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
-            )
+            header_content = f"{rich_colours.BOLD_RED}NSFW{rich_colours.BOLD_RED_RESET} · {header_content}"
 
         return cls._panel(
             title=cls._set_item_url(url=data.url),
@@ -402,23 +340,23 @@ class Render:
         content: str = "\n\n".join(panel_parts)
 
         header_content: str = (
-            f"{colours.BOLD}{data.display_name_prefixed}{colours.RESET} · "
-            f"{cls._timestamp_to_relative(unix_timestamp=0 if getattr(data, "created", None) is None else data.created)}"
+            f"{rich_colours.BOLD}{data.display_name_prefixed}{rich_colours.RESET} · "
+            f"{HumanThings.human_datetime(inhuman_datetime=0 if getattr(data, "created", None) is None else data.created)}"
         )
 
         if is_nsfw:
             header_content: str = (
-                f"{colours.BOLD_RED}NSFW{colours.BOLD_RED_RESET} · {header_content}"
+                f"{rich_colours.BOLD_RED}NSFW{rich_colours.BOLD_RED_RESET} · {header_content}"
             )
 
         footer_data: t.Union[t.Dict, None] = {
-            "👥 Subscribers": cls._number_to_relative(number=data.subscribers)
+            "👥 Subscribers": HumanThings.human_number(inhuman_number=data.subscribers)
         }
         if getattr(data, "accounts_active", None):
             footer_data.update(
                 {
-                    f"{colours.BOLD_GREEN}●{colours.BOLD_GREEN_RESET} Online Members": cls._number_to_relative(
-                        number=data.accounts_active
+                    f"{rich_colours.BOLD_GREEN}●{rich_colours.BOLD_GREEN_RESET} Online Members": HumanThings.human_number(
+                        inhuman_number=data.accounts_active
                     )
                 }
             )
@@ -460,8 +398,8 @@ class Render:
             panel_parts.append(content)
 
         header_content: str = (
-            f"{colours.BOLD}{name}{colours.RESET} · "
-            f"{cls._timestamp_to_relative(unix_timestamp=data.revision_date)}"
+            f"{rich_colours.BOLD}{name}{rich_colours.RESET} · "
+            f"{HumanThings.human_datetime(inhuman_datetime=data.revision_date)}"
         )
 
         return cls._panel(
@@ -506,7 +444,7 @@ class Render:
         :type header: Optional[str]
         :param footer: Optional panel footer, rendered using Rich markup.
         :type footer: Optional[str]
-        :keyword print_panel: Whether to immediately print the panel to the konsole.
+        :keyword print_panel: Whether to immediately print the panel to the riches.
         :keyword show_outline: Whether to show a visible white border around the panel.
         :keyword add_dividers: Whether to add horizontal dividers between header, content, and footer.
         :keyword divider_visibility: Whether dividers should be visible or hidden (color-wise).

@@ -1,12 +1,12 @@
 import typing as t
-from logging import Logger
 
 from praw.models import Submission, Comment
 from praw.models.reddit.subreddit import SubredditWiki
 from prawcore import exceptions
 from rich.status import Status
 
-from karmakrate.konsole import colours
+from karmakrate.riches import rich_colours
+from karmakrate.riches.rich_logging import console
 from .client import reddit, TIME_FILTERS, SORT, LISTINGS
 
 
@@ -16,9 +16,9 @@ class Subreddit:
         self._subreddit = reddit.subreddit(display_name=display_name)
 
     def comments(
-        self, limit: int, status: Status, logger: Logger
+        self, limit: int, status: t.Optional[Status] = None
     ) -> t.Union[t.List[Comment], None]:
-        if self.exists(status=status, logger=logger):
+        if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(
                     f"Getting {limit} comments from {self._subreddit.display_name_prefixed}..."
@@ -31,9 +31,9 @@ class Subreddit:
             return None
 
     def posts(
-        self, limit: int, status: Status, logger: Logger, listing: LISTINGS
+        self, limit: int, listing: LISTINGS, status: t.Optional[Status] = None
     ) -> t.Union[t.List[Submission], None]:
-        if self.exists(status=status, logger=logger):
+        if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(
                     f"Getting {limit} {listing} posts from {self._subreddit.display_name_prefixed}..."
@@ -43,8 +43,8 @@ class Subreddit:
         else:
             return None
 
-    def profile(self, status: Status, logger: Logger) -> t.Union["Subreddit", None]:
-        if self.exists(status=status, logger=logger):
+    def profile(self, status: t.Optional[Status] = None) -> t.Union["Subreddit", None]:
+        if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(
                     f"Getting profile data from subreddit r/{self._display_name}..."
@@ -58,12 +58,11 @@ class Subreddit:
         self,
         query: str,
         limit: int,
-        status: Status,
-        logger: Logger,
         sort: SORT,
         time_filter: TIME_FILTERS,
+        status: t.Optional[Status] = None,
     ) -> t.Union[t.List[Submission], None]:
-        if self.exists(status=status, logger=logger):
+        if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(
                     f"Searching for '{query}' in posts from {self._subreddit.display_name_prefixed}..."
@@ -79,9 +78,9 @@ class Subreddit:
             return None
 
     def wiki_pages(
-        self, status: Status, logger: Logger
+        self, status: t.Optional[Status] = None
     ) -> t.Union[t.List[SubredditWiki], None]:
-        if self.exists(status=status, logger=logger):
+        if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(
                     f"Getting wiki pages from {self._subreddit.display_name_prefixed}...",
@@ -93,7 +92,7 @@ class Subreddit:
         else:
             return None
 
-    def exists(self, status: Status, logger: Logger) -> bool:
+    def exists(self, status: t.Optional[Status] = None) -> bool:
         if isinstance(status, Status):
             status.update(f"Checking subreddit availability...")
 
@@ -107,14 +106,13 @@ class Subreddit:
         except exceptions.Forbidden:
             verdict = False
 
-        if isinstance(logger, Logger):
-            if verdict:
-                logger.warning(
-                    f"{colours.BOLD_GREEN}✔{colours.BOLD_GREEN_RESET} Subreddit exists"
-                )
+        if verdict:
+            console.print(
+                f"{rich_colours.BOLD_GREEN}✔{rich_colours.BOLD_GREEN_RESET} {self._display_name} is a real subreddit"
+            )
 
-            elif not verdict:
-                logger.info(
-                    f"{colours.BOLD_YELLOW}✘{colours.BOLD_YELLOW_RESET} Subreddit does not exist"
-                )
+        elif not verdict:
+            console.print(
+                f"{rich_colours.BOLD_YELLOW}✘{rich_colours.BOLD_YELLOW_RESET} {self._display_name} is not a real subreddit"
+            )
         return verdict
