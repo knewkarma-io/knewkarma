@@ -5,14 +5,14 @@ from datetime import datetime
 
 import requests
 import rich_click as click
-from prawcore import exceptions
-from rich.status import Status
-
 from karmakrate.everything.runtime_things import RuntimeThings
 from karmakrate.handlers.io_handlers import DataFrameHandler, FileHandler
 from karmakrate.riches import rich_colours
 from karmakrate.riches.rich_logging import console, logger
 from karmakrate.riches.rich_render import Render
+from prawcore import exceptions
+from rich.status import Status
+
 from ..meta.about import Project
 from ..meta.version import Version
 
@@ -44,13 +44,14 @@ def invoke_method(
 
     :return: None
     """
-
+    ctx: click.Context = kwargs.get("ctx")
     session = kwargs.get("session")
     status = kwargs.get("status")
-    ctx: click.Context = kwargs.get("ctx")
+
     command: str = ctx.command.name
     argument: str = kwargs.get("argument")
 
+    status.update(f"Initialising {ctx.command.name} module...")
     # 🔍 Filter out only those kwargs that the method actually accepts
     sig = inspect.signature(method)
     accepted_kwargs = {
@@ -140,8 +141,7 @@ def route_to_method(
                 ) as status:
                     with requests.Session() as session:
                         runtime_operations.check_updates(session=session, status=status)
-                        runtime_operations.infra_status(session=session, status=status)
-                        status.update(f"Initialising {ctx.command.name} module...")
+                        runtime_operations.check_status(session=session, status=status)
 
                     invoke_method(
                         method=method,

@@ -2,10 +2,10 @@ import functools
 import typing as t
 
 import rich_click as click
-
 from karmakrate.everything.runtime_things import RuntimeThings
 from karmakrate.handlers.auth_handler import AuthHandler
 from karmakrate.riches.rich_logging import console
+
 from .main import run
 from ..core.client import LISTINGS, SORT, TIME_FILTERS
 from ..core.post import Post

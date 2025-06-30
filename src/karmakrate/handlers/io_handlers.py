@@ -8,6 +8,7 @@ from praw.models import Submission, Redditor, Comment
 from praw.models.reddit.subreddit import WikiPage, Subreddit
 from rich.status import Status
 
+from ..everything.human_things import HumanThings
 from ..riches.rich_logging import console
 
 __all__ = ["FileHandler", "DataFrameHandler"]
@@ -151,35 +152,13 @@ class DataFrameHandler:
 
                 # Log export status
                 console.log(
-                    f"{FileHandler.get_file_size(file_path=filepath)} written to [link file://{filepath}]{filepath}"
+                    f"{HumanThings.human_filesize(inhuman_filesize=os.path.getsize(filepath))} written to [link file://{filepath}]{filepath}"
                 )
 
 
 class FileHandler:
     PARENT_DIR: str = os.path.expanduser(os.path.join("~", "knewkarma"))
     AUTH_DIR: str = os.path.join(PARENT_DIR, "auth")
-
-    @classmethod
-    def get_file_size(cls, file_path: str) -> str:
-        """
-        Gets a file size and puts it in human-readable form.
-
-        :param file_path: Path to target file.
-        :type file_path: str
-        :return: A human-readable form of the file size.
-        :rtype: str
-        """
-
-        file_size_bytes: int = os.path.getsize(file_path)
-        units: list = ["B", "KB", "MB", "GB", "TB", "PB"]
-
-        unit_index: int = 0
-
-        while file_size_bytes >= 1024 and unit_index < len(units) - 1:
-            file_size_bytes /= 1024
-            unit_index += 1
-
-        return f"{file_size_bytes:.2f}{units[unit_index]}"
 
     @classmethod
     def time_to_filename(cls) -> str:

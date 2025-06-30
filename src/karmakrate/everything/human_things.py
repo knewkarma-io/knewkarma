@@ -44,3 +44,7 @@ class HumanThings:
             .replace(" billion", "B")
             .replace(" trillion", "T")
         )
+
+    @classmethod
+    def human_filesize(cls, inhuman_filesize: int) -> str:
+        return humanize.naturalsize(value=inhuman_filesize, binary=True)

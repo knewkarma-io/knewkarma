@@ -4,12 +4,12 @@ import typing as t
 
 import packaging.version
 import requests
-from rich.status import Status
-
 from karmakrate.everything.human_things import HumanThings
 from knewkarma.core.client import USER_AGENT
 from knewkarma.meta.about import Project
 from knewkarma.meta.version import Version
+from rich.status import Status
+
 from ..riches import rich_colours
 from ..riches.rich_logging import console
 
@@ -42,7 +42,7 @@ class RuntimeThings:
     def clear_screen(cls):
         subprocess.run(["cls" if os.name == "nt" else "clear"])
 
-    def infra_status(
+    def check_status(
         self,
         session: requests.Session,
         status: Status,
