@@ -37,8 +37,7 @@ class Render:
         """
         Dynamically dispatch the appropriate rendering method based on data type.
         """
-        # pprint([vars(item) for item in data])
-        # Handle list input
+
         if isinstance(data, list) and data:
             item = data[0]
             if isinstance(item, Submission):
@@ -344,35 +343,21 @@ class Render:
             f"{HumanThings.human_datetime(inhuman_datetime=0 if getattr(data, "created", None) is None else data.created)}"
         )
 
+        if "user" not in data.subreddit_type:
+            header_content += (
+                f"\n{rich_colours.GREY}{HumanThings.human_number(inhuman_number=data.subscribers)} members   "
+                f"{rich_colours.BOLD_GREEN}●{rich_colours.BOLD_GREEN_RESET} "
+                f"{HumanThings.human_number(inhuman_number=data.accounts_active)} online"
+            )
+
         if is_nsfw:
             header_content: str = (
                 f"{rich_colours.BOLD_RED}NSFW{rich_colours.BOLD_RED_RESET} · {header_content}"
             )
 
-        footer_data: t.Union[t.Dict, None] = {
-            "👥 Subscribers": HumanThings.human_number(inhuman_number=data.subscribers)
-        }
-        if getattr(data, "accounts_active", None):
-            footer_data.update(
-                {
-                    f"{rich_colours.BOLD_GREEN}●{rich_colours.BOLD_GREEN_RESET} Online Members": HumanThings.human_number(
-                        inhuman_number=data.accounts_active
-                    )
-                }
-            )
-        if hasattr(data, "lang"):
-            footer_data.update({"🌐 Language": data.lang})
-
-        footer_data.update({f"👁 Visibility": data.subreddit_type})
-        if data.subreddit_type == "user":
-            footer_data = None
-
-        footer_content = cls._footer_table(footer_data=footer_data)
-
         return cls._panel(
             header=header_content,
             content=content,
-            footer=footer_content,
             add_dividers=True,
             print_panel=print_panel,
         )

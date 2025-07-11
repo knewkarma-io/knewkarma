@@ -8,6 +8,7 @@ from rich.status import Status
 from karmakrate.riches import rich_colours
 from karmakrate.riches.rich_logging import console
 from .client import reddit, TIME_FILTERS, SORT, LISTINGS
+from .shared import is_empty_data
 
 
 class Subreddit:
@@ -18,6 +19,16 @@ class Subreddit:
     def comments(
         self, limit: int, status: t.Optional[Status] = None
     ) -> t.Union[t.List[Comment], None]:
+        """
+        Retrieves a list of comments from the subreddit.
+
+        :param limit: Maximum number of comments to retrieve.
+        :type limit: int
+        :param status: Optional status object for updating progress.
+        :type status: t.Optional[Status]
+        :return: List of comments from the subreddit, or None if the subreddit does not exist.
+        :rtype: t.Union[t.List[Comment], None]
+        """
         if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(
@@ -26,20 +37,37 @@ class Subreddit:
             comments = [
                 comment.refresh() for comment in self._subreddit.comments(limit=limit)
             ]
-            return comments
+            return is_empty_data(
+                data=comments,
+                message=f"No comments found in {self._subreddit.display_name_prefixed}.",
+            )
         else:
             return None
 
     def posts(
         self, limit: int, listing: LISTINGS, status: t.Optional[Status] = None
     ) -> t.Union[t.List[Submission], None]:
+        """
+        Retrieves a list of posts from the subreddit based on the specified listing type.
+
+        :param limit: Maximum number of posts to retrieve.
+        :type limit: int
+        :param listing: Type of listing to retrieve (e.g., 'hot', 'new', 'top').
+        :param status: Optional status object for updating progress.
+        :type status: t.Optional[Status]
+        :return: List of posts from the subreddit, or None if the subreddit does not exist.
+        :rtype: t.Union[t.List[Submission], None]
+        """
         if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(
                     f"Getting {limit} {listing} posts from {self._subreddit.display_name_prefixed}..."
                 )
             func = getattr(self._subreddit, listing)
-            return list(func(limit=limit))
+            return is_empty_data(
+                data=list(func(limit=limit)),
+                message=f"No {listing} posts found in {self._subreddit.display_name_prefixed}.",
+            )
         else:
             return None
 
@@ -62,6 +90,22 @@ class Subreddit:
         time_filter: TIME_FILTERS,
         status: t.Optional[Status] = None,
     ) -> t.Union[t.List[Submission], None]:
+        """
+        Searches for posts in the subreddit based on the provided query.
+
+        :param query: Search query string.
+        :type query: str
+        :param limit: Maximum number of posts to return.
+        :type limit: int
+        :param sort: Sorting method for the search results.
+        :type sort: SORT
+        :param time_filter: Time filter for the search results.
+        :type time_filter: TIME_FILTERS
+        :param status: Optional status object for updating progress.
+        :type status: t.Optional[Status]
+        :return: List of posts matching the search query, or None if the subreddit does not exist.
+        :rtype: t.Union[t.List[Submission], None]
+        """
         if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(
@@ -73,13 +117,25 @@ class Subreddit:
                 sort=sort,
                 time_filter=time_filter,
             )
-            return list(results)
+
+            return is_empty_data(
+                data=list(results),
+                message=f"No results found for '{query}' in {self._subreddit.display_name_prefixed}.",
+            )
         else:
             return None
 
     def wiki_pages(
         self, status: t.Optional[Status] = None
     ) -> t.Union[t.List[SubredditWiki], None]:
+        """
+        Retrieves a list of wiki pages from the subreddit.
+
+        :param status: Optional status object for updating progress.
+        :type status: t.Optional[Status]
+        :return: List of wiki pages from the subreddit, or None if the subreddit does not exist.
+        :rtype: t.Union[t.List[SubredditWiki], None]
+        """
         if self.exists(status=status):
             if isinstance(status, Status):
                 status.update(
@@ -87,12 +143,22 @@ class Subreddit:
                 )
 
             pages = self._subreddit.wiki
-
-            return list(pages)
+            return is_empty_data(
+                data=list(pages),
+                message=f"No wiki pages found in {self._subreddit.display_name_prefixed}.",
+            )
         else:
             return None
 
     def exists(self, status: t.Optional[Status] = None) -> bool:
+        """
+        Checks if the subreddit exists by attempting to access its ID.
+
+        :param status: Optional status object for updating progress.
+        :type status: t.Optional[Status]
+        :return: True if the subreddit exists, False otherwise.
+        :rtype: bool
+        """
         if isinstance(status, Status):
             status.update(f"Checking subreddit availability...")
 
