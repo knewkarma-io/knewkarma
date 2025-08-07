@@ -1,8 +1,11 @@
 from datetime import date
 
+from karmakrate.riches import rich_colours
 from .about import Author, Project
 
 __all__ = ["License"]
+
+from .version import Version
 
 _current_year: int = date.today().year
 
@@ -79,7 +82,7 @@ class License:
     the source code needed to generate, install, and (for an executable
     work) run the object code and to modify the work, including scripts to
     control those activities.  However, it does not include the work's
-    System Libraries, or general-purpose tools or generally available free
+    System Libraries, or general-purpose _utils or generally available free
     programs which are used unmodified in performing those activities but
     which are not part of the work.  For example, Corresponding Source
     includes interface definition files associated with source files for
@@ -566,16 +569,16 @@ class License:
 """
 
     notice: str = f"""
-{_project.name} Copyright (C) {_current_year} {_author.name}
+{_project.name} {Version.release} Copyright © {_current_year} {rich_colours.BOLD_BLUE}[link={_author.gravatar}]{_author.name}[/link]{rich_colours.BOLD_BLUE_RESET}
 
-This program comes with [bold]ABSOLUTELY NO WARRANTY[/]; for details, use 'knewkarma licence -w/--warranty'.
+This program comes with [bold]ABSOLUTELY NO WARRANTY[/]; for details, use {rich_colours.BLUE}licence -w/--warranty{rich_colours.BLUE_RESET}.
 This is free software, and you are welcome to redistribute it
-[bold]UNDER CERTAIN CONDITIONS[/]; use 'knewkarma license -c/--conditions' for details.
+[bold]UNDER CERTAIN CONDITIONS[/]; use {rich_colours.BLUE}license -c/--conditions{rich_colours.BLUE_RESET} for details.
 """
 
     warranty: str = f"""
-A Reddit data analysis toolkit
-Copyright (C) {_current_year}  {_author.name}
+Reddit-data analysis toolkit.
+Copyright © {_current_year} {rich_colours.BOLD_BLUE}[link={_author.gravatar}]{_author.name}[/link]{rich_colours.BOLD_BLUE_RESET}
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -2,25 +2,19 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
 </head>
 
+<!--
 <p>
-    A Reddit data analysis toolkit designed to provide an extensive range of
-    functionalities for exploring and analysing Reddit data.
+    A zero-auth toolkit for Reddit data analysis.
 </p>
-
-<h3>Useful Links</h3>
+-->
+<h3>Jump to Page</h3>
 <ul>
+    {%- if pagename != "index" %}
+    <li><i class="fa-solid fa-house"></i><a href="{{ pathto('index') }}"> Home</a></li>
+    {%- endif %}
     <li><i class="fa-solid fa-download"></i><a href="{{ pathto('installation') }}"> Installation</a></li>
-    <li><i class="fa-solid fa-keyboard"></i><a href="{{ pathto('usage') }}"> Usage (CLI)</a></li>
+    <li><i class="fa-solid fa-keyboard"></i><a href="{{ pathto('cli') }}"> Command-Line Interface</a></li>
     <li><i class="fa-solid fa-book"></i><a href="{{ pathto('api') }}"> API Reference</a></li>
-
-    <p></p>
-
-    <li><i class="fa-solid fa-hand-holding-dollar"></i><a href="https://opencollective.com/knewkarma"> Become a
-        Sponsor</a></li>
-    <li><a href="https://github.com/knewkarma-io/knewkarma"><i class="fa-brands fa-github"></i> GitHub</a></li>
-    <li><i class="fa-brands fa-python"></i><a href="https://pypi.org/project/knewkarma/"> PyPI Package</a></li>
-    <li><i class="fa-brands fa-linux"></i><a href="https://snapcraft.io/knewkarma"> Snap Package</a></li>
-    <li><i class="fa-solid fa-bug"></i><a href="https://github.com/knewkarma-io/knewkarma/issues"> Bug Tracker</a></li>
 </ul>
 
 {% if pagename == "api" %}
@@ -33,7 +27,7 @@
             <li><a href="#class-knewkarma-post">knewkarma.Post</a>
                 <ul>
                     <li><a class="method-link"
-                           href="#post-data-session-aiohttp-clientsession">Post.data</a>
+                           href="#post-data">Post.data</a>
                     </li>
                     <li><a class="method-link"
                            href="#post-comments">Post.comments</a>
@@ -116,6 +110,9 @@
             <li><a href="#class-knewkarma-user">knewkarma.User</a>
                 <ul>
                     <li><a class="method-link"
+                           href="#user-does-user-exist">User.does_user_exist</a>
+                    </li>
+                    <li><a class="method-link"
                            href="#user-profile">User.profile</a></li>
                     <li><a class="method-link"
                            href="#user-posts">User.posts</a>
@@ -127,14 +124,20 @@
                            href="#user-overview">User.overview</a>
                     </li>
                     <li><a class="method-link"
-                           href="#user-moderated-subreddits-session-aiohttp-clientsession">User.moderated_subreddits</a>
+                           href="#user-moderated-subreddits-session-requests-session">User.moderated_subreddits</a>
+                    </li>
+                    <li><a class="method-link"
+                           href="#user-search-posts">User.search_comments</a>
+                    </li>
+                    <li><a class="method-link"
+                           href="#user-search-posts">User.search_posts</a>
                     </li>
                     <li><a class="method-link"
                            href="#user-top-subreddits">User.top_subreddits</a>
                     </li>
                 </ul>
             </li>
-            <li><a href="#knewkarma-users">knewkarma.Users</a>
+            <li><a href="#class-knewkarma-users">knewkarma.Users</a>
                 <ul>
                     <li><a class="method-link"
                            href="#users-all">Users.all</a>
@@ -174,17 +177,28 @@
 
         <ul>
             <li><a href="#getting-started">Getting Started</a></li>
-            <ul>
-                <li><a href="#basic-usage-examples">Basic Usage Examples</a></li>
-                <li><a href="#post-command">Post Command</a></li>
-                <li><a href="#posts-command">Posts Command</a></li>
-                <li><a href="#search-command">Search Command</a></li>
-                <li><a href="#subreddit-command">Subreddit Command</a></li>
-                <li><a href="#subreddits-command">Subreddits Command</a></li>
-                <li><a href="#user-command">User Command</a></li>
-                <li><a href="#users-command">Users Command</a></li>
-            </ul>
+            <!--<ul>-->
+            <li><a href="#basic-usage-examples">Basic Usage Examples</a></li>
+            <li><a href="#post-command">Post Command</a></li>
+            <li><a href="#posts-command">Posts Command</a></li>
+            <li><a href="#search-command">Search Command</a></li>
+            <li><a href="#subreddit-command">Subreddit Command</a></li>
+            <li><a href="#subreddits-command">Subreddits Command</a></li>
+            <li><a href="#user-command">User Command</a></li>
+            <li><a href="#users-command">Users Command</a></li>
+            <!--</ul>-->
         </ul>
     </li>
 </ul>
 {% endif %}
+
+<h3>Useful Links</h3>
+<ul>
+    <li><a href="https://github.com/knewkarma-io/knewkarma"><i class="fa-brands fa-github"></i> GitHub</a></li>
+    <li><i class="fa-brands fa-python"></i><a href="https://pypi.org/project/knewkarma/"> PyPI Package</a></li>
+    <li><i class="fa-brands fa-linux"></i><a href="https://snapcraft.io/knewkarma"> Snap Package</a></li>
+    <li><i class="fa-solid fa-bug"></i><a href="https://github.com/knewkarma-io/knewkarma/issues"> Bug Tracker</a></li>
+    <li><i class="fa-solid fa-heart fa-beat-fade" style="color: red"></i><a href="https://opencollective.com/knewkarma">
+        Donate</a>
+    </li>
+</ul>
