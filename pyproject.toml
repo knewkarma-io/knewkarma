@@ -28,7 +28,7 @@ requests = "^2.32.3"
 pandas = "^2.1.4"
 praw = "^7.7.1"
 pydantic = "^2.11.5"
-rich-click = "^1.8.9"
+rich-click = "^1.9.4"
 
 [tool.poetry.group.dev.dependencies]
 myst-parser = "^3.0.1"
