@@ -2,7 +2,7 @@
 name = "knewkarma"
 version = "7.2.0"
 description = "Reddit-data analysis toolkit"
-authors = ["Ritchie Mwewa <rly0nheart@duck.com>", "Knew Karma IO <redacted@redacted.com>"]
+authors = ["Ritchie Mwewa <rly0nheart@duck.com>"]
 readme = "README.md"
 license = "GPL-3.0+"
 keywords = ["reddit", "data-analysis"]
@@ -17,10 +17,8 @@ classifiers = [
 ]
 
 [tool.poetry.urls]
-sponsor = "https://opencollective.com/knewkarma"
-homepage = "https://knewkarma.readthedocs.io"
-issues = "https://github.com/knewkarma-io/knewkarma/issues"
-repository = "https://github.com/knewkarma-io/knewkarma"
+issues = "https://codeberg.org/rly0nheart/knewkarma/issues"
+repository = "https://codeberg.org/rly0nheart/knewkarma"
 
 [tool.poetry.dependencies]
 python = "^3.11"

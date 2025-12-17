@@ -10,8 +10,6 @@ class Author:
 class Project:
     name: str = "Knew Karma"
     package: str = "knewkarma"
-    open_collective: str = f"https://opencollective.com/{package}"
-    documentation: str = f"https://{package}.readthedocs.io"
     summary: str = f"Reddit-data analysis toolkit — by {Author.name}"
     description: str = f"""
 {name} (/nuː ‘kɑːrmə/) is an analysis toolkit designed to provide an extensive range of
