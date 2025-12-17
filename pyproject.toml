@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "knewkarma"
-version = "7.2.0"
+version = "7.2.1"
 description = "Reddit-data analysis toolkit"
 authors = ["Ritchie Mwewa <rly0nheart@duck.com>"]
 readme = "README.md"
@@ -48,4 +48,5 @@ knewkarma = "knewkarma.cli.commands:cli"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
 
